@@ -1,0 +1,311 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Utils: header &mdash; GAMERA 0.9 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="GAMERA 0.9 documentation" href="index.html"/>
+        <link rel="up" title="Utils" href="utils.html"/>
+        <link rel="prev" title="Utils: source" href="utils_source.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> GAMERA
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="classes.html">Class Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="radiation.html">Radiation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="particles.html">Particles</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="utils.html">Utils</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="utils_members.html">Utils: public members</a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils_source.html">Utils: source</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">Utils: header</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="radiation.html">Radiation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="particles.html">Particles</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="utils.html">Utils</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="utils_members.html">Utils: public members</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils_source.html">Utils: source</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Utils: header</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">GAMERA</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="utils.html">Utils</a> &raquo;</li>
+      
+    <li>Utils: header</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/utils_header.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="utils-header">
+<h1>Utils: header<a class="headerlink" href="#utils-header" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-C++"><div class="highlight"><pre><span class="cp">#ifndef _UTILS_</span>
+<span class="cp">#define _UTILS_</span>
+
+<span class="cp">#include &lt;math.h&gt;</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;stdlib.h&gt;</span>
+<span class="cp">#include &lt;fstream&gt;</span>
+<span class="cp">#include &lt;vector&gt;</span>
+
+<span class="cm">/* TeV-&gt;erg */</span>
+<span class="cp">#define TeV_to_erg 1.602</span>
+<span class="cm">/* parsec to cm */</span>
+<span class="cp">#define pc_to_cm 3.0857e18</span>
+<span class="cm">/* kiloparsec to cm */</span>
+<span class="cp">#define kpc_to_cm 3.0857e21</span>
+<span class="cm">/* proton mass in g */</span>
+<span class="cp">#define m_p_g 1.6726e-24</span>
+<span class="cm">/* well... pi! */</span>
+<span class="cp">#define pi 3.1416</span>
+<span class="cm">/* year in seconds */</span>
+<span class="cp">#define yr_to_sec 3.15576e7</span>
+<span class="cm">/* solar mass */</span>
+<span class="cp">#define mSol 1.9891e33</span>
+<span class="cm">/* Thomson cross section */</span>
+<span class="cp">#define sigma_T 6.6524e-25</span>
+<span class="cm">/* electron mass in erg */</span>
+<span class="cp">#define m_e 8.187e-7</span>
+<span class="cm">/* boltzmann constant (erg/K) */</span>
+<span class="cp">#define kb 1.380658e-16</span>
+<span class="cm">/* proton mass in erg */</span>
+<span class="cp">#define m_p 1.50310854e-3</span>
+<span class="cm">/* pi0 mass in erg */</span>
+<span class="cp">#define m_pi 2.1622194e-4</span>
+<span class="cm">/* parsec to cm */</span>
+<span class="cp">#define pc_to_cm 3.0857e18</span>
+<span class="cm">/* well... pi! */</span>
+<span class="cp">#define pi 3.1416</span>
+<span class="cm">/* year in seconds */</span>
+<span class="cp">#define yr_to_sec 3.15576e7</span>
+<span class="cm">/* solar mass */</span>
+<span class="cp">#define mSol 1.9891e33</span>
+<span class="cm">/* speed of light cm/s */</span>
+<span class="cp">#define c_speed 29979245800.</span>
+<span class="cm">/* elementary charge */</span>
+<span class="cp">#define el_charge 4.80320427e-10</span>
+<span class="cm">/* classical electron radius (cm) */</span>
+<span class="cp">#define eRadius 2.8179e-13</span>
+<span class="cm">/* planck&#39;s constant */</span>
+<span class="cp">#define hp 6.62606896e-27</span>
+<span class="cm">/* fine structure constant */</span>
+<span class="cp">#define fineStructConst 7.2974e-3</span>
+<span class="cm">/* hour in seconds */</span>
+<span class="cp">#define h_to_sec 3.6e3</span>
+<span class="cm">/* pc to lyr */</span>
+<span class="cp">#define pc_to_lyr 3.26156</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @file Utils.C</span>
+<span class="cm"> * @author Joachim Hahn</span>
+<span class="cm"> * @short Class that provides utility functions</span>
+<span class="cm"> * Provides different things, mainly useful for population studies.</span>
+<span class="cm"> * This includes spiral galaxy models as well as gas distributions,</span>
+<span class="cm"> * B-Field distributions, coordinate transformations etc.</span>
+<span class="cm"> * Also includes more technical functions that are helpful in writing</span>
+<span class="cm"> * GAMERA programs.</span>
+<span class="cm"> */</span>
+
+<span class="k">class</span> <span class="nc">Utils</span> <span class="p">{</span>
+ <span class="k">private</span><span class="o">:</span>
+  <span class="kt">bool</span> <span class="n">QUIETMODE</span><span class="p">;</span>
+  <span class="kt">bool</span> <span class="n">GAMERADESTROYEDTHECONSOLE</span><span class="p">;</span>
+
+ <span class="k">public</span><span class="o">:</span>
+  <span class="n">Utils</span><span class="p">(</span><span class="kt">bool</span> <span class="n">DRAWLOGO</span> <span class="o">=</span> <span class="nb">true</span><span class="p">);</span>
+  <span class="o">~</span><span class="n">Utils</span><span class="p">();</span>
+  <span class="kt">void</span> <span class="nf">ToggleQuietMode</span><span class="p">()</span> <span class="p">{</span> <span class="n">QUIETMODE</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kt">int</span> <span class="nf">ReadParameterFile</span><span class="p">(</span><span class="n">string</span> <span class="n">inputname</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">parameter_names</span><span class="p">,</span>
+                        <span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="n">files_names</span><span class="p">,</span>
+                        <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">parameter_values</span><span class="p">,</span>
+                        <span class="n">vector</span><span class="o">&lt;</span><span class="n">string</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">files</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="nf">DrawGamera</span><span class="p">();</span>
+  <span class="kt">void</span> <span class="nf">WriteOut</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">sp</span><span class="p">,</span> <span class="n">string</span> <span class="n">outname</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="nf">ReadIn</span><span class="p">(</span><span class="n">string</span> <span class="n">inname</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">sp</span><span class="p">);</span>
+<span class="p">};</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="utils_source.html" class="btn btn-neutral" title="Utils: source" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Joachim Hahn.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.9',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

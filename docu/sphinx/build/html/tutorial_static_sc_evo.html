@@ -1,0 +1,375 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Level 2: Photon Spectrum, Particle Evolution, Static Scenario &mdash; GAMERA 0.9 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="GAMERA 0.9 documentation" href="index.html"/>
+        <link rel="up" title="Tutorial" href="tutorial.html"/>
+        <link rel="next" title="Level 3: Photon Spectrum, Particle Evolution, Variable Luminosity" href="tutorial_dyn_sc_evo.html"/>
+        <link rel="prev" title="Level 1: Photon Spectrum, Input Particle Distribution" href="tutorial_static_sc_simple.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> GAMERA
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tutorial.html#spectral-source-modeling">Spectral Source Modeling</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tutorial_static_sc_simple.html">Level 1: Photon Spectrum, Input Particle Distribution</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">Level 2: Photon Spectrum, Particle Evolution, Static Scenario</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_dyn_sc_evo.html">Level 3: Photon Spectrum, Particle Evolution, Variable Luminosity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_dyn_sc_evo_losses.html">Level 4: Photon Spectrum, Particle Evolution, Almost Everything Variable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_MartinPWN.html">Level 5: The PWN model by Martin et al. 2012</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="classes.html">Class Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="radiation.html">Radiation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="particles.html">Particles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">GAMERA</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="tutorial.html">Tutorial</a> &raquo;</li>
+      
+    <li>Level 2: Photon Spectrum, Particle Evolution, Static Scenario</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/tutorial_static_sc_evo.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="level-2-photon-spectrum-particle-evolution-static-scenario">
+<h1>Level 2: Photon Spectrum, Particle Evolution, Static Scenario<a class="headerlink" href="#level-2-photon-spectrum-particle-evolution-static-scenario" title="Permalink to this headline">¶</a></h1>
+<p>Now, we will adapt the model from level 1 to allow for a particle evolution.
+That means that the particle distribution which generates the photon spectrum
+is not provided by an external file, but generated from a physical model.</p>
+<p>In this section, this physical model is as follows:</p>
+<blockquote>
+<div><ul class="simple">
+<li>an astrophysical accelerator is injecting particles at a constant rate
+distributed in a power law with constant index.</li>
+<li>the ambient medium (magn. field strength, density etc.) is constant in time</li>
+</ul>
+</div></blockquote>
+<p>To calculate the particle evolution, we will use the <code class="docutils literal"><span class="pre">Particles</span></code> class.
+The following example will be displayed in <code class="docutils literal"><span class="pre">python</span></code> style but of course
+the <code class="docutils literal"><span class="pre">C++</span></code> syntax is analogue - see level 1 as an example.</p>
+<p>You can find the python script <code class="docutils literal"><span class="pre">TutorialLevel2.py</span></code> and parameter file
+<code class="docutils literal"><span class="pre">TutorialLevel3Params.dat</span></code> in the``docu/tutorial/`` directory.
+Run it like:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ python docu/tutorial/TutorialLevel2.py docu/tutorial/TutorialLevel2Params.dat
+</pre></div>
+</div>
+<p>This will create a plot <code class="docutils literal"><span class="pre">docu/pics/TutorialLevel2.png</span></code></p>
+<p>Let&#8217;s go through the code:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The parameter file is read in using the <code class="docutils literal"><span class="pre">ConfigParser</span></code> module.</li>
+</ul>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">ConfigParser</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+
+  <span class="c"># Read in parameter file</span>
+  <span class="n">configFile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+  <span class="n">configParser</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">RawConfigParser</span><span class="p">()</span>
+  <span class="n">configParser</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">configFile</span><span class="p">)</span>
+  <span class="n">lum</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">configParser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;Parameters&#39;</span><span class="p">,</span><span class="s">&#39;Luminosity&#39;</span><span class="p">))</span>
+  <span class="n">age</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">configParser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;Parameters&#39;</span><span class="p">,</span><span class="s">&#39;Age&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>and so forth.</p>
+</div></blockquote>
+<ul class="simple">
+<li>intialise objects:</li>
+</ul>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">fr</span> <span class="o">=</span> <span class="n">gamerapy</span><span class="o">.</span><span class="n">Radiation</span><span class="p">()</span>
+<span class="n">fp</span> <span class="o">=</span> <span class="n">gamerapy</span><span class="o">.</span><span class="n">Particles</span><span class="p">()</span>
+<span class="n">fu</span> <span class="o">=</span> <span class="n">gamerapy</span><span class="o">.</span><span class="n">Utils</span><span class="p">()</span>
+<span class="n">fu</span><span class="o">.</span><span class="n">DrawGamera</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Yes, you should draw Gamera on your terminal!</p>
+</div></blockquote>
+<ul class="simple">
+<li>set parameters:</li>
+</ul>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">fp</span><span class="o">.</span><span class="n">SetLuminosity</span><span class="p">(</span><span class="n">lum</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetBField</span><span class="p">(</span><span class="n">bfield</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetEmax</span><span class="p">(</span><span class="n">emax</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetEmin</span><span class="p">(</span><span class="n">emin</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetSpectralIndex</span><span class="p">(</span><span class="n">spind</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetEnergyBinsForNumericalSolver</span><span class="p">(</span><span class="n">ebins</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetAmbientDensity</span><span class="p">(</span><span class="n">dens</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetAge</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
+
+<span class="n">fr</span><span class="o">.</span><span class="n">SetDistance</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+<span class="n">fr</span><span class="o">.</span><span class="n">SetAmbientDensity</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">GetAmbientDensity</span><span class="p">())</span>
+<span class="n">fr</span><span class="o">.</span><span class="n">SetBField</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">GetBField</span><span class="p">())</span>
+<span class="n">fr</span><span class="o">.</span><span class="n">AddThermalTargetPhotons</span><span class="p">(</span><span class="mf">2.7</span><span class="p">,</span><span class="mf">0.25</span><span class="o">*</span><span class="mf">1.602</span><span class="o">*</span><span class="mf">1.e-12</span><span class="p">)</span>
+<span class="n">fr</span><span class="o">.</span><span class="n">AddThermalTargetPhotons</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The input units for <code class="docutils literal"><span class="pre">GAMERA</span></code> are <strong>always</strong>:</p>
+<ul class="last simple">
+<li>Energy: erg</li>
+<li>Time: yrs</li>
+<li>Length: cm</li>
+<li>Mass: g</li>
+<li>Density: cm^-3</li>
+<li>B-field: G</li>
+</ul>
+</div>
+<div class="admonition hint">
+<p class="first admonition-title">Hint</p>
+<p class="last">Setting the energy bins of the particle spectrum via
+<code class="docutils literal"><span class="pre">SetEnergyBinsForNumericalSolver</span></code> is optional. The default number of bins
+is 100. The less bins the faster the computation, but also the less precise
+the result! Vice versa, if the particle spectrum computation is not a time-
+critical step, the higher the better.</p>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li>calculate a lookup table that holds the electron cooling rate due to the
+IC process and give it to the <code class="docutils literal"><span class="pre">Particle</span></code> objects</li>
+</ul>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">fr</span><span class="o">.</span><span class="n">CreateICLossLookup</span><span class="p">()</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetICLossLookup</span><span class="p">(</span><span class="n">fr</span><span class="o">.</span><span class="n">GetICLossLookup</span><span class="p">())</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li>compute the particle evolution and give the result to the <code class="docutils literal"><span class="pre">Radiation</span></code> object:</li>
+</ul>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">fp</span><span class="o">.</span><span class="n">CalculateElectronSpectrum</span><span class="p">()</span>
+<span class="n">fr</span><span class="o">.</span><span class="n">SetElectrons</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">GetParticleSpectrum</span><span class="p">())</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li>with the last line, the electron distribution was computed. Doing the same
+for protons (just for fun with somewhat different parameters) is easy:</li>
+</ul>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">fp</span><span class="o">.</span><span class="n">SetLuminosity</span><span class="p">(</span><span class="mf">1.e2</span><span class="o">*</span><span class="n">lum</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetEmax</span><span class="p">(</span><span class="mf">1.e3</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetSpectralIndex</span><span class="p">(</span><span class="n">spind</span><span class="o">-</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">CalculateProtonSpectrum</span><span class="p">()</span>
+<span class="n">fr</span><span class="o">.</span><span class="n">SetProtons</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">GetParticleSpectrum</span><span class="p">())</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li>now calculate the radiation spectra the provided particles emit with</li>
+</ul>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">fr</span><span class="o">.</span><span class="n">CalculateDifferentialPhotonSpectrum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li>and get the result</li>
+</ul>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">TotalSED</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fr</span><span class="o">.</span><span class="n">GetTotalSED</span><span class="p">())</span>
+<span class="n">ICSED</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fr</span><span class="o">.</span><span class="n">GetICSED</span><span class="p">())</span>
+<span class="n">BremsSED</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fr</span><span class="o">.</span><span class="n">GetBremsstrahlungSED</span><span class="p">())</span>
+<span class="n">SynchSED</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fr</span><span class="o">.</span><span class="n">GetSynchrotronSED</span><span class="p">())</span>
+<span class="n">PPSED</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fr</span><span class="o">.</span><span class="n">GetPPSED</span><span class="p">())</span>
+<span class="n">ElectronSED</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">GetParticleSED</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="admonition hint">
+<p class="first admonition-title">Hint</p>
+<p class="last">Input and output in gamerapy are <code class="docutils literal"><span class="pre">doubles</span></code> and
+two-dimensional <code class="docutils literal"><span class="pre">lists</span></code> or <a class="reference external" href="http://www.numpy.org/">numpy</a> <code class="docutils literal"><span class="pre">arrays</span></code>.</p>
+</div>
+</div></blockquote>
+</div></blockquote>
+<p>Here is the output, plotted with <a class="reference external" href="http://matplotlib.org/">matplotlib</a> :</p>
+<a class="reference internal image-reference" href="_images/TutorialLevel2.jpg"><img alt="_images/TutorialLevel2.jpg" class="align-center" src="_images/TutorialLevel2.jpg" style="width: 1500.0px; height: 600.0px;" /></a>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tutorial_dyn_sc_evo.html" class="btn btn-neutral float-right" title="Level 3: Photon Spectrum, Particle Evolution, Variable Luminosity" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tutorial_static_sc_simple.html" class="btn btn-neutral" title="Level 1: Photon Spectrum, Input Particle Distribution" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Joachim Hahn.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.9',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
