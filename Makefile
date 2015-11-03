@@ -43,7 +43,7 @@ TutorialLevel1 : docu/tutorial/TutorialLevel1.C
 # make gamerapy package
 gamerapy:
 	cd python;\
-	swig -python -c++ -nosafecstrings  -outdir ../lib -o _gamerapy.cc gamerapy.i;\
+	swig -python -c++ -py3 -nosafecstrings  -outdir ../lib -o _gamerapy.cc gamerapy.i;\
 	python setup.py build_ext --build-lib ../lib;\
 	cd ..;\
 
