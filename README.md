@@ -29,3 +29,4 @@ will generate a shared object (lib/libgamera.so) as well as the python module
 (lib/_gamerapy.so , lib/gamerapy.py).
 
 
+

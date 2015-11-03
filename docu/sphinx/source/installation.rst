@@ -76,6 +76,10 @@ You need to add the directory holding the module (default: ``./lib``) to the sea
    import os
    sys.path.append(os.path.abspath('./lib'))
 
+.. warning:: 
+
+  Currently, ``GAMERA`` doesn't work with ``python3``, use ``python2`` instead!
+
 
 
 

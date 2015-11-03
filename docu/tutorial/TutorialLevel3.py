@@ -12,13 +12,9 @@ import ConfigParser
 def GetPulsarSpindown(tc, age, l0):
 
   t = np.logspace(0,math.log10(1.e6*age),300)
-  puls = []
-  n = 0
-  for i in t:
-    puls.append([])
-    puls[n].append(i)
-    puls[n].append(l0/math.pow(1.+i/tc,2.))
-    n = n+1
+  puls = l0/(1.+t/tc)**2
+  
+  puls = np.vstack((t, puls)).T
   return puls
 
 if __name__ == "__main__":
@@ -38,7 +34,6 @@ if __name__ == "__main__":
   ebins = float(configParser.get('Parameters','Ebins'))
   emax = gamerapy.TeV_to_erg*float(configParser.get('Parameters','Emax'))
   emin = gamerapy.TeV_to_erg*float(configParser.get('Parameters','Emin'))
-  print emin
   spind = float(configParser.get('Parameters','SpectralIndex'))
   outfile = configParser.get('Files','outfile')
 
@@ -77,7 +72,7 @@ if __name__ == "__main__":
   ICSED = np.array(fr.GetICSED())
   BremsSED = np.array(fr.GetBremsstrahlungSED())
   SynchSED = np.array(fr.GetSynchrotronSED())
-  print emin,0.7*min(ElectronSED[:,0]),1.5*max(ElectronSED[:,0])
+
   ## plot stuff ##
   f, (ax1, ax2, ax3) = plt.subplots(3, 1, sharey=False,figsize=(7, 15))  
   ax1.set_yscale("log")

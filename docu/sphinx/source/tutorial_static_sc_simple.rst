@@ -73,6 +73,11 @@ Now, let's discuss the individual commands:
    - ``SetSSCTargetPhotons``: Add source's own emission spectrum as a target 
      field. Works only if a source extension is available.
 
+.. warning::
+
+   At the moment, the ``ImportTargetPhotonsFromFile`` is not available in the
+   python package!
+
 - calculate the spectrum
 
 .. sourcecode:: C++
