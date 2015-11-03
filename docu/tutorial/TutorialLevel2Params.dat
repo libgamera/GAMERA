@@ -11,4 +11,4 @@ Emax = 1.e2
 Emin = 1.e-3
 SpectralIndex = 2.2
 [Files]
-outfile = docu/pics/TutorialLevel3.jpg
+outfile = docu/pics/TutorialLevel2.jpg

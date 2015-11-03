@@ -9,7 +9,7 @@ tRAD = 1000.
 edensRAD = 1.
 Ebins = 100
 Emax = 1.e2
-Emin = 1.e-7
-SpectralIndex = 1.5
+Emin = 1.e-4
+SpectralIndex = 2.2
 [Files]
 outfile = docu/pics/TutorialLevel3.jpg

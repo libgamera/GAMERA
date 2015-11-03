@@ -43,8 +43,6 @@ if __name__ == "__main__":
   outfile = configParser.get('Files','outfile')
 
   puls = np.array(GetPulsarSpindown(tc,age,lum))
-  for i in puls:
-    print i[0],i[1]
 
   fr = gamerapy.Radiation()
   fp = gamerapy.Particles()

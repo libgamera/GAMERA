@@ -101,9 +101,9 @@ if __name__ == "__main__":
   ax1.set_title('particles')
   ax2.set_title('gammas')
   ax1.set_ylabel(r'$E^{2} \mathrm{d}N/\mathrm{d}E(\mathrm{erg})$', fontsize=13)
-  ax1.set_xlabel(r'$E~(\mathrm{TeV})$', fontsize=13)
+  ax1.set_xlabel(r'$E(\mathrm{TeV})$', fontsize=13)
   ax2.set_ylabel(r'$\nu F_{\nu}(\mathrm{erg} \cdot \mathrm{cm}^{-2} \cdot \mathrm{s}^{-1})$', fontsize=13)
-  ax2.set_xlabel(r'$E~(\mathrm{TeV})$', fontsize=13)
+  ax2.set_xlabel(r'$E(\mathrm{TeV})$', fontsize=13)
   ax1.set_xlim([0.7*min(min(ElectronSED[:,0]),min(ProtonSED[:,0])),
                 1.5*max(max(ElectronSED[:,0]),max(ProtonSED[:,0]))])
   ax1.set_ylim([0.7*min(min(ElectronSED[:,1]),min(ProtonSED[:,1])),

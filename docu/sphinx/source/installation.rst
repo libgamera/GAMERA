@@ -34,13 +34,13 @@ using `homebrew <http://brew.sh/>`_ ::
 
 Downloading ``GAMERA``
 ----------------------
-Manual:
-
-* `link`
 
 via git::
 
-    $ git checkout stuff
+    $ git clone https://github.com/JoachimHahn/GAMERA.git
+
+Manual download from `github <https://github.com/JoachimHahn/GAMERA>`_
+
 
 Building ``GAMERA``
 -------------------

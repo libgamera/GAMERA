@@ -9,11 +9,7 @@ Dependencies
 
 * `GSL <http://www.gnu.org/software/gsl/>`_
 * `SWIG <http://www.swig.org/>`_ (to wrap the python package)
-* `Sphinx <http://sphinx-doc.org/>`_ and `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_ (optional, to build the docu)
-
-a version of `Breathe <https://breathe.readthedocs.org/>`_ is also required for
-building the docu and is already included in the package. Tow install these
-dependencies, enter the following commands 
+* `Sphinx <http://sphinx-doc.org/>`_, `Breathe <https://breathe.readthedocs.org/>`_ and `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_ (optional, to build the docu)
 
 **on Ubuntu**
 
@@ -24,7 +20,7 @@ using apt::
 (optional)::
 
     $ sudo apt-get install doxygen python-pip
-    $ sudo pip install sphinx
+    $ sudo pip install sphinx breathe
 
 **on MacOS**
 using `homebrew <http://brew.sh/>`_ ::
@@ -34,17 +30,19 @@ using `homebrew <http://brew.sh/>`_ ::
 (optional)::
 
     $ brew install doxygen python-pip
-    $ pip install sphinx
+    $ pip install sphinx breathe
 
 Downloading ``GAMERA``
 ----------------------
-Manual:
-
-* `link`
 
 via git::
 
-    $ git checkout stuff
+    $ git clone https://github.com/JoachimHahn/GAMERA.git
+
+Manual download from
+
+`https://github.com/JoachimHahn/GAMERA`_
+
 
 Building ``GAMERA``
 -------------------

@@ -103,16 +103,10 @@ if __name__ == "__main__":
   fp.SetICLossLookup(fr.GetICLossLookup())
 
   # calculate stuff 
-  t = np.logspace(math.log10(500.),math.log10(age),6)
+  t = np.logspace(math.log10(2000.),math.log10(age),6)
   n = 0
   for i in t:
     print i,n
-#    if(i<=500):
-#      fp.SetCriticalMinEnergyForGridSolver(1.e-2)
-#    elif(i<3000):
-#      fp.SetCriticalMinEnergyForGridSolver(2.*1.e-2)
-#    else:
-#      fp.SetCriticalMinEnergyForGridSolver(2.*1.e-3)
     fp.SetAge(i) 
     fr.SetBField(fp.GetBField())
     fp.CalculateParticleSpectrum("electrons")

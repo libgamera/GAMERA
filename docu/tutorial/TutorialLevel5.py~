@@ -103,16 +103,10 @@ if __name__ == "__main__":
   fp.SetICLossLookup(fr.GetICLossLookup())
 
   # calculate stuff 
-  t = np.logspace(math.log10(500.),math.log10(age),6)
+  t = np.logspace(math.log10(200.),math.log10(age),6)
   n = 0
   for i in t:
     print i,n
-#    if(i<=500):
-#      fp.SetCriticalMinEnergyForGridSolver(1.e-2)
-#    elif(i<3000):
-#      fp.SetCriticalMinEnergyForGridSolver(2.*1.e-2)
-#    else:
-#      fp.SetCriticalMinEnergyForGridSolver(2.*1.e-3)
     fp.SetAge(i) 
     fr.SetBField(fp.GetBField())
     fp.CalculateParticleSpectrum("electrons")
@@ -161,7 +155,7 @@ if __name__ == "__main__":
   ax7.set_ylabel(r'$V (\mathrm{cm/s}$', fontsize=13)
   ax7.set_xlabel(r'$t (\mathrm{yrs})$', fontsize=13)
   ax1.set_xlim([0.7*min(ElectronSED[:,0]),2.e4])
-  ax1.set_ylim([1.e40,1.e50])
+  ax1.set_ylim([1.e42,1.e49])
   ax2.set_xlim([0.7*min(TotalSED[:,0]),2.e3])
   ax2.set_ylim([1.e-16,1.e-6])
   ax3.set_xlim([2.,1.5*age])
