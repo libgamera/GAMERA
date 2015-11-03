@@ -12,37 +12,23 @@ To that end, we replace the ``GetSpindownStuff`` function from level 4 by
   .. sourcecode:: python
 
     def CalculateTimeDependentStuff():
-      t = np.logspace(0,math.log10(1.e6*age),200)
-      gammap = 1.3333;
+      t = np.logspace(0,math.log10(1.e6*age),80)
+      gammap = 1.3333
       vej = math.sqrt(10.*e0/(3.*mej))
       c = math.pow((6./(15.*(gammap-1.)))+289./240.,-0.2);
-      lum=[]
-      emax=[]
-      r=[]
-      v=[]
-      b=[]
-      for i in t:
-        lum.append((1.-etab)*lum0*math.pow(1.+i/tc,-1.*(brind+1.)/(brind-1.)))
-        emax.append(3.*eps*gamerapy.el_charge*math.sqrt(etab*lum[len(lum)-1]/((1.-etab)*gamerapy.c_speed)))
-        r.append(c*math.pow(lum0*i*gamerapy.yr_to_sec/e0,0.2)*vej*i*gamerapy.yr_to_sec)
-        v.append(1.2*r[len(r)-1]/(gamerapy.yr_to_sec*i))
-      for i in xrange(len(t)):
-        bi=0.
-        ri=r[i]
-        if(i==0):
-          bi=0.
-        else:
-          for j in xrange(i):
-            if(j==0):
-              continue
-            bi = bi+etab*lum[j]*ri*gamerapy.yr_to_sec*(t[j]-t[j-1])
-      bi=math.sqrt(6.*bi/(ri*ri*ri*ri))
-      b.append(bi)
-      lum = np.array(zip(t,lum))
-      b = np.array(zip(t,b))
-      emax = np.array(zip(t,emax))
-      r = np.array(zip(t,r))
-      v = np.array(zip(t,v))
+
+      lum = (1.-etab)*lum0*(1.+t/tc)**(-1.*(brind+1.)/(brind-1.))
+      emax = 3.*eps*gamerapy.el_charge*np.sqrt(etab*lum/((1.-etab)*gamerapy.c_speed))
+      r = c*(lum0*t*gamerapy.yr_to_sec/e0)**0.2 * vej*t*gamerapy.yr_to_sec
+      v = 1.2*r/(gamerapy.yr_to_sec*t)
+      b = np.sqrt(gamerapy.yr_to_sec*etab*6./r**4 * np.concatenate(([0], ((lum * r)[1:] * np.diff(t)).cumsum())))
+
+      lum = np.vstack((t, lum)).T
+      b = np.vstack((t, b)).T
+      emax = np.vstack((t, emax)).T
+      r = np.vstack((t, r)).T
+      v = np.vstack((t, v)).T
+
       return lum, b, emax, r, v
 
 

@@ -18,15 +18,11 @@ to change two things:
     def GetPulsarSpindown(tc, age, l0):
 
       t = np.logspace(0,math.log10(1.e6*age),300)
-      puls = []
-      n = 0
-      for i in t:
-        puls.append([])
-        puls[n].append(i)
-        puls[n].append(l0/math.pow(1.+i/tc,2.))
-        n = n+1
-
+      puls = l0/(1.+t/tc)**2
+  
+      puls = np.vstack((t, puls)).T
       return puls
+
 
   where ``tc`` is the characteristic spin-down time scale and
   ``l0`` is the initial source luminosity.

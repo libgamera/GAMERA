@@ -159,14 +159,9 @@ to change two things:</p>
 <div><div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">GetPulsarSpindown</span><span class="p">(</span><span class="n">tc</span><span class="p">,</span> <span class="n">age</span><span class="p">,</span> <span class="n">l0</span><span class="p">):</span>
 
   <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mf">1.e6</span><span class="o">*</span><span class="n">age</span><span class="p">),</span><span class="mi">300</span><span class="p">)</span>
-  <span class="n">puls</span> <span class="o">=</span> <span class="p">[]</span>
-  <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
-  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>
-    <span class="n">puls</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
-    <span class="n">puls</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-    <span class="n">puls</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l0</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="n">i</span><span class="o">/</span><span class="n">tc</span><span class="p">,</span><span class="mf">2.</span><span class="p">))</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span>
+  <span class="n">puls</span> <span class="o">=</span> <span class="n">l0</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="n">t</span><span class="o">/</span><span class="n">tc</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
 
+  <span class="n">puls</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">t</span><span class="p">,</span> <span class="n">puls</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
   <span class="k">return</span> <span class="n">puls</span>
 </pre></div>
 </div>
