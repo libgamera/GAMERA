@@ -15,8 +15,8 @@ Dependencies
 You need to have [GSL](http://www.gnu.org/software/gsl/) installed on your
 system, as well as [SWIG](http://www.swig.org/) if you want to wrap the 
 python module. If you want to locally build the docu, you also need to install
-[Sphinx](http://sphinx-doc.org/), [breathe](https://breathe.readthedocs.org/)
-and [doxygen](http://www.stack.nl/~dimitri/doxygen/).
+[Sphinx](http://sphinx-doc.org/), [Breathe](https://breathe.readthedocs.org/)
+and [Doxygen](http://www.stack.nl/~dimitri/doxygen/).
 
 Building
 --------
