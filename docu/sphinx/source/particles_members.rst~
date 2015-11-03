@@ -1,8 +1,0 @@
-.. _particlesMembers:
-
-Particles: public members
-=========================
-
-.. doxygenclass:: Particles
-   :project: Particles
-   :members:
