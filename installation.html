@@ -92,9 +92,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="classes.html">Class Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="radiation.html">Radiation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="particles.html">Particles</a></li>
-<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
 </ul>
 
             
@@ -172,14 +169,11 @@ $ pip install sphinx breathe
 </div>
 <div class="section" id="downloading-gamera">
 <h2>Downloading <code class="docutils literal"><span class="pre">GAMERA</span></code><a class="headerlink" href="#downloading-gamera" title="Permalink to this headline">¶</a></h2>
-<p>Manual:</p>
-<ul class="simple">
-<li><cite>link</cite></li>
-</ul>
 <p>via git:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ git checkout stuff
+<div class="highlight-python"><div class="highlight"><pre>$ git clone https://github.com/JoachimHahn/GAMERA.git
 </pre></div>
 </div>
+<p>Manual download from <a class="reference external" href="https://github.com/JoachimHahn/GAMERA">github</a></p>
 </div>
 <div class="section" id="building-gamera">
 <h2>Building <code class="docutils literal"><span class="pre">GAMERA</span></code><a class="headerlink" href="#building-gamera" title="Permalink to this headline">¶</a></h2>
@@ -212,6 +206,10 @@ Also, it might be necessary to export the <code class="docutils literal"><span c
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s">&#39;./lib&#39;</span><span class="p">))</span>
 </pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Currently, <code class="docutils literal"><span class="pre">GAMERA</span></code> doesn&#8217;t work with <code class="docutils literal"><span class="pre">python3</span></code>, use <code class="docutils literal"><span class="pre">python2</span></code> instead!</p>
 </div>
 </div>
 </div>

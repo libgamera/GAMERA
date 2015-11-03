@@ -33,10 +33,6 @@ Usage:
    installation
    tutorial
    classes
-   radiation
-   particles
-   utils
-
 
 Index
 -----
