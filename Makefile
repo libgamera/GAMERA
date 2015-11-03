@@ -56,7 +56,7 @@ documentation:
 	make html;\
 
 clean-out: 
-	-rm -f out/*.o
+	-rm -f out/*
 clean-bin: 
 	-rm -f bin/*
 clean-lib: 
