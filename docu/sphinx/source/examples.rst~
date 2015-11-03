@@ -1,0 +1,25 @@
+Tutorial
+========
+
+Here a step-by-step tutorial is provided where you can learn how to perform
+source modeling data fitting and, in a future release, population synthesis.
+
+Spectral Source Modeling
+------------------------
+
+This paragraph starts with a simple model where the radiation spectrum from 
+pre-defined particle spectra is provided and ends with a physical PWN model 
+devised by 
+
+.. toctree::
+    :maxdepth: 2
+
+    tutorial_static_sc_simple
+    tutorial_static_sc_evo
+    tutorial_dyn_sc_evo
+    tutorial_dyn_sc_evo_losses
+    tutorial_MartinPWN
+
+
+Data Fitting
+------------

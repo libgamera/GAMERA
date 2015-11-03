@@ -1,0 +1,44 @@
+.. GAMERA documentation master file, created by
+   sphinx-quickstart on Wed Oct 28 19:18:21 2015.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+.. image::  ../../pics/GAMERA_banner.jpg
+   :align:  center
+   :scale: 100 %
+
+is a new open-source C++/python package which handles the spectral modelling of 
+non-thermally emitting astrophysical sources in a simple and modular way. 
+It allows the user to devise time-dependent models of leptonic and hadronic 
+particle populations in a general astrophysical context (including SNRs, PWNs 
+and AGNs) and to compute their subsequent photon emission. Moreover, this 
+package also contains the necessary tools to create Monte-Carlo population 
+synthesis models.
+
+.. warning::
+
+   I am currently removing all ROOT dependencies. 
+   The Dynamics, Galaxy and InstrumentResponse classes will land
+   in this repo in the near future.
+
+
+Documentation
+=============
+
+Usage:
+
+.. toctree::
+   :maxdepth: 2
+
+   installation
+   tutorial
+   classes
+   radiation
+   particles
+   utils
+
+
+Index
+-----
+
+* :ref:`genindex`

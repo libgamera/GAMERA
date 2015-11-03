@@ -1,0 +1,15 @@
+[Parameters]
+Age = 3.e4
+CharAge = 100.
+Luminosity = 1.e35
+Distance = 1.e3
+AmbientDensity = 0.3
+BField = 2.e-5
+tRAD = 1000.
+edensRAD = 1.
+Ebins = 100
+Emax = 1.e2
+Emin = 1.e-7
+SpectralIndex = 1.5
+[Files]
+outfile = docu/pics/TutorialLevel3.jpg

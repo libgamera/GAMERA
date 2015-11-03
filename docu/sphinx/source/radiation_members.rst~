@@ -1,0 +1,8 @@
+
+Radiation: public members
+=========================
+
+.. doxygenclass:: Radiation
+   :project: Radiation
+   :members:
+   :private-members:
