@@ -1,0 +1,322 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Level 4: Photon Spectrum, Particle Evolution, Almost Everything Variable &mdash; GAMERA 0.9 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="GAMERA 0.9 documentation" href="index.html"/>
+        <link rel="up" title="Tutorial" href="tutorial.html"/>
+        <link rel="next" title="Level 5: The PWN model by Martin et al. 2012" href="tutorial_MartinPWN.html"/>
+        <link rel="prev" title="Level 3: Photon Spectrum, Particle Evolution, Variable Luminosity" href="tutorial_dyn_sc_evo.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> GAMERA
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Usage</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html">Tutorial</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tutorial.html#spectral-source-modeling">Spectral Source Modeling</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tutorial_static_sc_simple.html">Level 1: Photon Spectrum, Input Particle Distribution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_static_sc_evo.html">Level 2: Photon Spectrum, Particle Evolution, Static Scenario</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_dyn_sc_evo.html">Level 3: Photon Spectrum, Particle Evolution, Variable Luminosity</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">Level 4: Photon Spectrum, Particle Evolution, Almost Everything Variable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorial_MartinPWN.html">Level 5: The PWN model by Martin et al. 2012</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="classes.html">Class Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="radiation.html">Radiation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="particles.html">Particles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">GAMERA</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="tutorial.html">Tutorial</a> &raquo;</li>
+      
+    <li>Level 4: Photon Spectrum, Particle Evolution, Almost Everything Variable</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/tutorial_dyn_sc_evo_losses.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="level-4-photon-spectrum-particle-evolution-almost-everything-variable">
+<h1>Level 4: Photon Spectrum, Particle Evolution, Almost Everything Variable<a class="headerlink" href="#level-4-photon-spectrum-particle-evolution-almost-everything-variable" title="Permalink to this headline">¶</a></h1>
+<p>In this section we also make a lot of stuff variable in time. This include the
+B-field and the ambient density, which means that energy losses become
+time-dependent. The assumed time-dependence has no specific physical meaning.</p>
+<p>In order to add a time-dependence in all of these parameters, the procedure
+is analogue to what was done in the last level with the luminosity.</p>
+<blockquote>
+<div><ul class="simple">
+<li>We expand the luminosity function to give us additional 2D-<code class="docutils literal"><span class="pre">lists</span></code> for
+density, maximum electron energy, ambient density and the B-field:</li>
+</ul>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">GetSpindownStuff</span><span class="p">(</span><span class="n">tc</span><span class="p">,</span> <span class="n">age</span><span class="p">,</span> <span class="n">l0</span><span class="p">,</span> <span class="n">b0</span><span class="p">,</span> <span class="n">emax0</span><span class="p">,</span> <span class="n">n0</span><span class="p">):</span>
+
+  <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">math</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mf">1000.</span><span class="o">*</span><span class="n">age</span><span class="p">),</span><span class="mi">300</span><span class="p">)</span>
+  <span class="n">lumt</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">emaxt</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">bt</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">nt</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">l0</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="n">i</span><span class="o">/</span><span class="n">tc</span><span class="p">,</span><span class="mf">2.</span><span class="p">)</span>
+    <span class="n">btt</span> <span class="o">=</span> <span class="n">b0</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">l</span><span class="o">/</span><span class="n">l0</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">0.1</span><span class="o">*</span><span class="n">n</span><span class="o">*</span><span class="mf">3.14</span><span class="p">))</span>
+    <span class="n">lumtt</span> <span class="o">=</span> <span class="n">l</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.1</span><span class="o">*</span><span class="n">n</span><span class="o">*</span><span class="mf">3.14</span><span class="p">))</span>
+    <span class="n">emaxtt</span> <span class="o">=</span> <span class="n">emax0</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">l</span><span class="o">/</span><span class="n">l0</span><span class="p">,</span><span class="mf">0.25</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mf">0.05</span><span class="o">*</span><span class="n">n</span><span class="o">*</span><span class="mf">3.14</span><span class="p">))</span>
+    <span class="n">ntt</span> <span class="o">=</span> <span class="n">n0</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">l</span><span class="o">/</span><span class="n">l0</span><span class="p">,</span><span class="mf">0.25</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">0.05</span><span class="o">*</span><span class="n">n</span><span class="o">*</span><span class="mf">3.14</span><span class="p">))</span>
+
+    <span class="n">bt</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+    <span class="n">bt</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">bt</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">btt</span><span class="p">)</span>
+    <span class="n">lumt</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+    <span class="n">lumt</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">lumt</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lumtt</span><span class="p">)</span>
+    <span class="n">emaxt</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+    <span class="n">emaxt</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">emaxt</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">emaxtt</span><span class="p">)</span>
+    <span class="n">nt</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+    <span class="n">nt</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">nt</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ntt</span><span class="p">)</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span>
+  <span class="k">return</span> <span class="n">lumt</span><span class="p">,</span><span class="n">bt</span><span class="p">,</span><span class="n">emaxt</span><span class="p">,</span><span class="n">nt</span>
+</pre></div>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li>usage of these parameter evolution works as follows:</li>
+</ul>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">fp</span><span class="o">.</span><span class="n">SetLuminosityLookup</span><span class="p">(</span><span class="n">lumt</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetBFieldLookup</span><span class="p">(</span><span class="n">bt</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetEmaxLookup</span><span class="p">(</span><span class="n">emaxt</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetAmbientDensityLookup</span><span class="p">(</span><span class="n">denst</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Particle evolution with time-dependent losses is in general not possible
+with analytic or semi-analytic methods.
+Using parameter evolutions that result in time-dependent energy losses
+thus internally call a grid-solving algorithm, whose calculation speed
+depends on the physics of the system. The grid solver is slow if time
+steps are small. Those are given by</p>
+<img src="_images/mathmpl/math-bfd3ff71a7.png" class="center" /><p>Therefore, the calculation can take a long time, if</p>
+<blockquote>
+<div><ul class="simple">
+<li>energy losses are high</li>
+<li>the number of spectrum bins is large</li>
+</ul>
+</div></blockquote>
+<p class="last">Furthermore, currently protons are considered to only lose energy by adiabatic
+losses (i.e. not due to p-p collisions), and only if an expansion speed is given.
+As these losses are normally relatively low compared to typical electron
+losses, speed problems normally are not an issue for the evolution calculation
+of protons.</p>
+</div>
+</div></blockquote>
+<ul class="simple">
+<li>for the following plots, we set two additional parameters:</li>
+</ul>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">fp</span><span class="o">.</span><span class="n">SetBreakEnergy</span><span class="p">(</span><span class="n">ebreak</span><span class="p">)</span>
+<span class="n">fp</span><span class="o">.</span><span class="n">SetLowSpectralIndex</span><span class="p">(</span><span class="n">spindlow</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+<div class="admonition hint">
+<p class="first admonition-title">Hint</p>
+<p class="last">Since power-law and broken power-law particle distributions are the most
+common in high energy astrophysics, those two models are pre-available in
+<code class="docutils literal"><span class="pre">GAMERA</span></code> and can be used by setting luminosity, minimal energy, maximal
+energy and the spectral indices and break energies (as shown in all the
+previous examples). If you want to use different shapes of the particle
+injection spectrum, you can provide this with the
+<code class="docutils literal"><span class="pre">SetCustomInjectionSpectrum</span></code> or <code class="docutils literal"><span class="pre">SetCustomInjectionSpectrumLookup</span></code>
+methods. The former specifies a custom injection spectrum that is constant over
+time (2D <code class="docutils literal"><span class="pre">list</span></code> or <code class="docutils literal"><span class="pre">vector</span></code>), whereas the latter allows for a injection
+spectrum that is time-dependent (input 3D <code class="docutils literal"><span class="pre">list</span></code> or <code class="docutils literal"><span class="pre">vector</span></code>). If these
+methods are used, the luminosity and energy boundaries are fixed by the
+input spectrum and do not have to be specified via <cite>Set</cite> functions.</p>
+</div>
+</div></blockquote>
+<a class="reference internal image-reference" href="_images/TutorialLevel4.jpg"><img alt="_images/TutorialLevel4.jpg" class="align-center" src="_images/TutorialLevel4.jpg" style="width: 700.0px; height: 3000.0px;" /></a>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tutorial_MartinPWN.html" class="btn btn-neutral float-right" title="Level 5: The PWN model by Martin et al. 2012" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tutorial_dyn_sc_evo.html" class="btn btn-neutral" title="Level 3: Photon Spectrum, Particle Evolution, Variable Luminosity" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Joachim Hahn.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.9',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

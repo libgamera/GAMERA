@@ -1,0 +1,766 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Particles: header &mdash; GAMERA 0.9 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="GAMERA 0.9 documentation" href="index.html"/>
+        <link rel="up" title="Particles" href="particles.html"/>
+        <link rel="next" title="Utils" href="utils.html"/>
+        <link rel="prev" title="Particles: source" href="particles_source.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> GAMERA
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="classes.html">Class Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="radiation.html">Radiation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="particles.html">Particles</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="particles_members.html">Particles: public members</a></li>
+<li class="toctree-l3"><a class="reference internal" href="particles_source.html">Particles: source</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">Particles: header</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="radiation.html">Radiation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="particles.html">Particles</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="particles_members.html">Particles: public members</a></li>
+<li class="toctree-l2"><a class="reference internal" href="particles_source.html">Particles: source</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Particles: header</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">Utils</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">GAMERA</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="particles.html">Particles</a> &raquo;</li>
+      
+    <li>Particles: header</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/particles_header.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="particles-header">
+<h1>Particles: header<a class="headerlink" href="#particles-header" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-C++"><div class="highlight"><pre><span class="cp">#ifndef _PARTICLES_</span>
+<span class="cp">#define _PARTICLES_</span>
+
+<span class="cp">#include &lt;cmath&gt;</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include &lt;stdlib.h&gt;</span>
+<span class="cp">#include &lt;fstream&gt;</span>
+<span class="cp">#include &lt;vector&gt;</span>
+<span class="cp">#include &lt;gsl/gsl_integration.h&gt;</span>
+<span class="cp">#include &lt;gsl/gsl_spline.h&gt;</span>
+
+<span class="cm">/* TeV-&gt;erg */</span>
+<span class="cp">#define TeV_to_erg 1.602</span>
+<span class="cm">/* GeV-&gt;erg */</span>
+<span class="cp">#define GeV_to_erg 1.602e-3</span>
+<span class="cm">/* Thomson cross section */</span>
+<span class="cp">#define sigma_T 6.6524e-25</span>
+<span class="cm">/* electron mass in erg */</span>
+<span class="cp">#define m_e 8.187e-7</span>
+<span class="cm">/* boltzmann constant (erg/K) */</span>
+<span class="cp">#define kb 1.380658e-16</span>
+<span class="cm">/* proton mass in erg */</span>
+<span class="cp">#define m_p 1.50310854e-3</span>
+<span class="cm">/* pi0 mass in erg */</span>
+<span class="cp">#define m_pi 2.1622194e-4</span>
+<span class="cm">/* parsec to cm */</span>
+<span class="cp">#define pc_to_cm 3.0857e18</span>
+<span class="cm">/* well... pi! */</span>
+<span class="cp">#define pi 3.1416</span>
+<span class="cm">/* year in seconds */</span>
+<span class="cp">#define yr_to_sec 3.15576e7</span>
+<span class="cm">/* solar mass */</span>
+<span class="cp">#define mSol 1.9891e33</span>
+<span class="cm">/* speed of light cm/s */</span>
+<span class="cp">#define c_speed 29979245800.</span>
+<span class="cm">/* elementary charge */</span>
+<span class="cp">#define el_charge 4.80320427e-10</span>
+<span class="cm">/* classical electron radius (cm) */</span>
+<span class="cp">#define eRadius 2.8179e-13</span>
+<span class="cm">/* planck&#39;s constant */</span>
+<span class="cp">#define hp 6.62606896e-27</span>
+<span class="cm">/* fine structure constant */</span>
+<span class="cp">#define fineStructConst 7.2974e-3</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="cm">/**  @file Particles.C</span>
+<span class="cm"> *   @author Joachim Hahn</span>
+<span class="cm"> *   @short Class that calculates particle spectra</span>
+<span class="cm"> *   This class allows for the time-dependent model of particle spectra,</span>
+<span class="cm"> *   using as a center piece a numerical algorithm (a piece-wise linear</span>
+<span class="cm"> *   advection scheme in energy space. Thus, in principle any time evolution of</span>
+<span class="cm"> *   energy losses and particle injection can be assumed and the resulting</span>
+<span class="cm"> * particle</span>
+<span class="cm"> *   distribution can be calculated.</span>
+<span class="cm"> *   What this code cannot do is the simultaneous spatial evolution of</span>
+<span class="cm"> * particles, e.g.</span>
+<span class="cm"> *   energy dependent diffusion. Here, no assumptions on the spatial</span>
+<span class="cm"> * distribution of</span>
+<span class="cm"> *   particles is made whatsoever.</span>
+<span class="cm"> */</span>
+<span class="c1">// class gsl_function_pp : public gsl_function</span>
+<span class="c1">// {</span>
+<span class="c1">//    public:</span>
+<span class="c1">//    gsl_function_pp(std::function&lt;double(double,void*)&gt; const&amp; func) :</span>
+<span class="c1">// _func(func){</span>
+<span class="c1">//      function=&amp;gsl_function_pp::invoke;</span>
+<span class="c1">//      params=this;</span>
+<span class="c1">//    }</span>
+<span class="c1">//    private:</span>
+<span class="c1">//    std::function&lt;double(double,void*)&gt; _func;</span>
+<span class="c1">//    static double invoke(double x, void *params) {</span>
+<span class="c1">//     return static_cast&lt;gsl_function_pp*&gt;(params)-&gt;_func(x,params);</span>
+<span class="c1">//   }</span>
+<span class="c1">//};</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">GSLfuncPart</span> <span class="o">:</span> <span class="k">public</span> <span class="n">gsl_function</span> <span class="p">{</span>
+ <span class="k">public</span><span class="o">:</span>
+  <span class="n">GSLfuncPart</span><span class="p">(</span><span class="k">const</span> <span class="n">F</span> <span class="o">&amp;</span><span class="n">func</span><span class="p">)</span> <span class="o">:</span> <span class="n">_func</span><span class="p">(</span><span class="n">func</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">function</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">GSLfuncPart</span><span class="o">::</span><span class="n">Call</span><span class="p">;</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+  <span class="p">}</span>
+
+ <span class="k">private</span><span class="o">:</span>
+  <span class="k">const</span> <span class="n">F</span> <span class="o">&amp;</span><span class="n">_func</span><span class="p">;</span>
+  <span class="k">static</span> <span class="kt">double</span> <span class="nf">Call</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">params</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">GSLfuncPart</span> <span class="o">*&gt;</span><span class="p">(</span><span class="n">params</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">_func</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="k">class</span> <span class="nc">Particles</span> <span class="p">{</span>
+  <span class="k">typedef</span> <span class="kt">double</span> <span class="p">(</span><span class="n">Particles</span><span class="o">::*</span><span class="n">fPointer</span><span class="p">)(</span><span class="kt">double</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="p">);</span>
+
+ <span class="k">private</span><span class="o">:</span>
+  <span class="kt">int</span> <span class="n">Type</span><span class="p">;</span>  <span class="c1">///&lt; integer indicating particle type. supported: 0-electrons and</span>
+             <span class="c1">///1-protons</span>
+  <span class="kt">double</span> <span class="n">theta</span><span class="p">;</span>           <span class="c1">///&lt; CR acceleration efficiency</span>
+  <span class="kt">double</span> <span class="n">SpectralIndex</span><span class="p">;</span>   <span class="c1">///&lt; spectral index of injected particles</span>
+  <span class="kt">double</span> <span class="n">SpectralIndex2</span><span class="p">;</span>  <span class="c1">///&lt; low-energy spectral index for broken power law</span>
+                          <span class="c1">///injection spectrum</span>
+  <span class="kt">double</span> <span class="n">SpectralIndexConstant</span><span class="p">;</span>   <span class="c1">///&lt; spectral index of injected particles</span>
+                                  <span class="c1">///manually set to a constant value</span>
+  <span class="kt">double</span> <span class="n">SpectralIndex2Constant</span><span class="p">;</span>  <span class="c1">///&lt; low-energy spectral index for broken</span>
+                                  <span class="c1">///power law injection spectrum manually set</span>
+                                  <span class="c1">///to a constant value</span>
+  <span class="kt">double</span> <span class="n">Kep</span><span class="p">;</span>                     <span class="c1">///&lt; electron-to-proton _number_ ratio</span>
+  <span class="kt">double</span> <span class="n">Tmin</span><span class="p">;</span>  <span class="c1">///&lt; optimised minimal time from which to start particle</span>
+                <span class="c1">///injection (given by the &#39;maximal&#39; starting time that doesn&#39;t</span>
+                <span class="c1">///change results)</span>
+  <span class="kt">double</span> <span class="n">TminInternal</span><span class="p">;</span>  <span class="c1">///&lt; internal minimal time for which all lookups</span>
+                        <span class="c1">///(B,N,R,V etc) are filled. If no lookups are provided</span>
+                        <span class="c1">///(constant losses etc), it is set to 0.</span>
+  <span class="kt">double</span> <span class="n">TmaxInternal</span><span class="p">;</span>  <span class="c1">///&lt; Same as TminInternal but here it is the maximal</span>
+                        <span class="c1">///time</span>
+  <span class="kt">double</span> <span class="n">EminInternal</span><span class="p">;</span>  <span class="c1">///&lt; internal parameter that is relevant to the grid-</span>
+                        <span class="c1">/// solver. Essentially, it is used to determine the</span>
+                        <span class="c1">/// starting time of the iteration. The starting time</span>
+                        <span class="c1">/// is then determined in a way that all particles that</span>
+                        <span class="c1">/// are injected before that time are cooled to an</span>
+                        <span class="c1">/// energy of maximal EminInternal after a time t=age.</span>
+  <span class="kt">double</span> <span class="n">BField</span><span class="p">;</span>        <span class="c1">///&lt; amplified B-field immediately dowmstream</span>
+  <span class="kt">double</span> <span class="n">N</span><span class="p">;</span>             <span class="c1">///&lt; ambient density</span>
+  <span class="kt">double</span> <span class="n">R</span><span class="p">;</span>             <span class="c1">///&lt; source extension (cm)</span>
+  <span class="kt">double</span> <span class="n">V</span><span class="p">;</span>             <span class="c1">///&lt; source expansion velocity (cm/s)</span>
+  <span class="kt">double</span> <span class="n">Lum</span><span class="p">;</span>           <span class="c1">///&lt; energy injection rate at a given time</span>
+  <span class="kt">double</span> <span class="n">Emin</span><span class="p">;</span>  <span class="c1">///&lt; internally and dynamically determined lower energy boundary</span>
+                <span class="c1">///within which the particle spectrum is calculated</span>
+  <span class="kt">bool</span> <span class="n">EminConstantForNormalisationOnly</span><span class="p">;</span>  <span class="c1">///&lt; flag that, if set to &#39;true&#39;</span>
+                                          <span class="c1">///indicates that emin will only be</span>
+                                          <span class="c1">///used in the calculation of the</span>
+                                          <span class="c1">///particle norm, but not the spectral</span>
+                                          <span class="c1">///range.</span>
+  <span class="kt">double</span> <span class="n">Emax</span><span class="p">;</span>  <span class="c1">///&lt; internally and dynamically determined upper energy boundary</span>
+                <span class="c1">///within which the particle spectrum is calculated</span>
+  <span class="kt">double</span> <span class="n">EminConstant</span><span class="p">;</span>  <span class="c1">///&lt; Constantly set lower energy boundary within which</span>
+                        <span class="c1">///the particle spectrum is calculated (optional)</span>
+  <span class="kt">double</span> <span class="n">eMaxConstant</span><span class="p">;</span>  <span class="c1">///&lt; Constantly set upper energy boundary within which</span>
+                        <span class="c1">///the particle spectrum is calculated (optional)</span>
+  <span class="kt">double</span> <span class="n">TminConstant</span><span class="p">;</span>  <span class="c1">///&lt; Constantly set lower time boundary at which the</span>
+                        <span class="c1">///particle iteration is started</span>
+  <span class="kt">double</span> <span class="n">BConstant</span><span class="p">;</span>     <span class="c1">///&lt; Constantly set constant B-Field</span>
+  <span class="kt">double</span> <span class="n">NConstant</span><span class="p">;</span>     <span class="c1">///&lt; Constantly set constant ambient density</span>
+  <span class="kt">double</span> <span class="n">LumConstant</span><span class="p">;</span>   <span class="c1">///&lt; Constantly set source luminosity</span>
+  <span class="kt">double</span> <span class="n">RConstant</span><span class="p">;</span>     <span class="c1">///&lt; Constantly set source extension</span>
+  <span class="kt">double</span> <span class="n">VConstant</span><span class="p">;</span>     <span class="c1">///&lt; Constantly set source expansion speed</span>
+  <span class="kt">double</span> <span class="n">eMax</span><span class="p">;</span>          <span class="c1">///&lt; maximum energy of particles the shock can contain</span>
+  <span class="kt">double</span> <span class="n">eElectronMax</span><span class="p">;</span>  <span class="c1">///&lt; maximum energy of electrons at the shock</span>
+  <span class="kt">double</span> <span class="n">eBreak</span><span class="p">;</span>  <span class="c1">///&lt; break energy for a broken power-law particle injection</span>
+                  <span class="c1">///spectrum</span>
+  <span class="kt">double</span> <span class="n">eBreakConstant</span><span class="p">;</span>  <span class="c1">///&lt; break energy for a broken power-law particle</span>
+                          <span class="c1">///injection spectrum manually set to a constant value</span>
+  <span class="kt">double</span> <span class="n">energyMarginFactor</span><span class="p">;</span>  <span class="c1">///&lt; energy safety margin above the spectral</span>
+                              <span class="c1">///cut-off. E.g. energyMarginFactor = 1.e-3 means</span>
+                              <span class="c1">///that the upper boundary of the energy spectrum</span>
+                              <span class="c1">///corresponds to the point where the has dropped</span>
+                              <span class="c1">///to 1/1000 exponential</span>
+  <span class="kt">double</span> <span class="n">energyMargin</span><span class="p">;</span>  <span class="c1">///&lt; this is the dynamically determined margin that</span>
+                        <span class="c1">///results from energyMarginFactor and CutOffFactor. It</span>
+                        <span class="c1">///determines the upper energy boundary of the particle</span>
+                        <span class="c1">///spectrum as upper_boundary = emax*energyMargin.</span>
+  <span class="kt">double</span> <span class="n">CutOffFactor</span><span class="p">;</span>  <span class="c1">///&lt; factor determining the strength of the exponential</span>
+                        <span class="c1">///cut-off in the particle injection spectrum:</span>
+                        <span class="c1">///f~exp[-(e/ecut)^CutOffFactor]</span>
+  <span class="kt">bool</span> <span class="n">sharpEnergyCut</span><span class="p">;</span>  <span class="c1">///&lt; toggle a sharp cut-off at emax</span>
+  <span class="kt">double</span> <span class="n">Age</span><span class="p">;</span>           <span class="c1">///&lt; source age</span>
+  <span class="kt">double</span> <span class="n">eBreakS2</span><span class="p">;</span>      <span class="c1">///&lt; constant used in &#39;SourceSpectrum&#39;. Used for speed</span>
+                        <span class="c1">///optimisation</span>
+  <span class="kt">double</span> <span class="n">eBreak2mS2</span><span class="p">;</span>    <span class="c1">///&lt; constant used in &#39;SourceSpectrum&#39;. Used for speed</span>
+                        <span class="c1">///optimisation</span>
+  <span class="kt">double</span> <span class="n">eBreakS</span><span class="p">;</span>       <span class="c1">///&lt; constant used in &#39;SourceSpectrum&#39;. Used for speed</span>
+                        <span class="c1">///optimisation</span>
+  <span class="kt">double</span> <span class="n">eBreak2mS</span><span class="p">;</span>     <span class="c1">///&lt; constant used in &#39;SourceSpectrum&#39;. Used for speed</span>
+                        <span class="c1">///optimisation</span>
+  <span class="kt">double</span> <span class="n">emin2mS2</span><span class="p">;</span>      <span class="c1">///&lt; constant used in &#39;SourceSpectrum&#39;. Used for speed</span>
+                        <span class="c1">///optimisation</span>
+  <span class="kt">double</span> <span class="n">emin2mS</span><span class="p">;</span>       <span class="c1">///&lt; constant used in &#39;SourceSpectrum&#39;. Used for speed</span>
+                        <span class="c1">///optimisation</span>
+  <span class="kt">double</span> <span class="n">emineBreak2mS2</span><span class="p">;</span>  <span class="c1">///&lt; constant used in &#39;SourceSpectrum&#39;. Used for speed</span>
+                          <span class="c1">///optimisation</span>
+  <span class="kt">double</span> <span class="n">eBreak2mSInd2</span><span class="p">;</span>   <span class="c1">///&lt; constant used in &#39;SourceSpectrum&#39;. Used for speed</span>
+                          <span class="c1">///optimisation</span>
+  <span class="kt">double</span> <span class="n">emin2mSInd2</span><span class="p">;</span>     <span class="c1">///&lt; constant used in &#39;SourceSpectrum&#39;. Used for speed</span>
+                          <span class="c1">///optimisation</span>
+  <span class="kt">double</span> <span class="n">emineBreak2mSInd2</span><span class="p">;</span>  <span class="c1">///&lt; constant used in &#39;SourceSpectrum&#39;. Used for</span>
+                             <span class="c1">///speed optimisation</span>
+  <span class="kt">double</span> <span class="n">fS</span><span class="p">;</span>           <span class="c1">///&lt; constant used in &#39;SourceSpectrum&#39;. Used for speed</span>
+                       <span class="c1">///optimisation</span>
+  <span class="kt">double</span> <span class="n">fS2</span><span class="p">;</span>          <span class="c1">///&lt; constant used in &#39;SourceSpectrum&#39;. Used for speed</span>
+                       <span class="c1">///optimisation</span>
+  <span class="kt">double</span> <span class="n">bremsl_epf</span><span class="p">;</span>   <span class="c1">///&lt; constant used in &#39;EnergyLossRate&#39;. Used for speed</span>
+                       <span class="c1">///optimisation</span>
+  <span class="kt">double</span> <span class="n">bremsl_eef</span><span class="p">;</span>   <span class="c1">///&lt; constant used in &#39;EnergyLossRate&#39;. Used for speed</span>
+                       <span class="c1">///optimisation</span>
+  <span class="kt">double</span> <span class="n">SACELI_Told</span><span class="p">;</span>  <span class="c1">///&lt; Helper quantity that saves the last time step in the</span>
+                       <span class="c1">///integration in CalcSpecSemiAnalyticConstELoss</span>
+
+  <span class="kt">bool</span> <span class="n">logarithmicCRLumLookupTimeBins</span><span class="p">;</span>  <span class="c1">///&lt; boolean indicating that time steps</span>
+                                        <span class="c1">///in CRLumLookup are logarithmic. In</span>
+                                        <span class="c1">///this case, the precise entry in the</span>
+                                        <span class="c1">///Lookup up for a given time can be</span>
+                                        <span class="c1">///calculated rather than iterated</span>
+  <span class="kt">bool</span> <span class="n">linearCRLumLookupTimeBins</span><span class="p">;</span>  <span class="c1">///&lt; boolean indicating that time steps in</span>
+                                   <span class="c1">///CRLumLookup are linear. In this case, the</span>
+                                   <span class="c1">///precise entry in the Lookup up for a given</span>
+                                   <span class="c1">///time can be calculated rather than</span>
+                                   <span class="c1">///iterated</span>
+  <span class="kt">double</span> <span class="n">CRLumLookupTimeMin</span><span class="p">;</span>  <span class="c1">///&lt; starting time (earliest entry) of CRLumLookup</span>
+  <span class="kt">double</span> <span class="n">CRLumLookupTimeMax</span><span class="p">;</span>  <span class="c1">///&lt; ending time (last entry) of CRLumLookup</span>
+  <span class="kt">double</span> <span class="n">logCRLumLookupTimeMin</span><span class="p">;</span>         <span class="c1">///&lt; log10 of CRLumLookupTimeMin (speed</span>
+                                        <span class="c1">///optimisation)</span>
+  <span class="kt">double</span> <span class="n">logCRLumLookupTimeMax</span><span class="p">;</span>         <span class="c1">///&lt; log10 of CRLumLookupTimeMax (speed</span>
+                                        <span class="c1">///optimisation)</span>
+  <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">CRLumLookupSize</span><span class="p">;</span>         <span class="c1">///&lt; entries of CRLumLookup</span>
+  <span class="kt">double</span> <span class="n">CRLumLookupdeltat</span><span class="p">;</span>             <span class="c1">///&lt; time bin size in CRLumLookup</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">CRLumLookup</span><span class="p">;</span>  <span class="c1">///&lt; 2D-vector containing quantities</span>
+                                        <span class="c1">///needed to calculate particle spectra.</span>
+                                        <span class="c1">///Each line comprises the quantities at</span>
+                                        <span class="c1">///a gives time. This allows for</span>
+                                        <span class="c1">///time-dependent modeling. Format:</span>
+                                        <span class="c1">///time(yrs) - e_dot( erg/s, luminosity</span>
+                                        <span class="c1">///of source put into acc.particles -</span>
+                                        <span class="c1">///radius (cm) - speed (cm/s) -</span>
+                                        <span class="c1">///ambient_density (cm^-3) -</span>
+                                        <span class="c1">///ambient_density2 (cm^-3) - magn.Field</span>
+                                        <span class="c1">///(G) - max. energy of injected protons</span>
+                                        <span class="c1">///(erg) - max. energy of injected</span>
+                                        <span class="c1">///electrons (erg) - escape time</span>
+
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">ICLossVector</span><span class="p">,</span> <span class="n">LumVector</span><span class="p">,</span> <span class="n">NVector</span><span class="p">,</span> <span class="n">BVector</span><span class="p">,</span> <span class="n">eMaxVector</span><span class="p">,</span>
+      <span class="n">escapeTimeVector</span><span class="p">,</span> <span class="n">RVector</span><span class="p">,</span> <span class="n">VVector</span><span class="p">;</span>
+  <span class="n">gsl_spline</span> <span class="o">*</span><span class="n">ICLossLookup</span><span class="p">,</span> <span class="o">*</span><span class="n">LumLookup</span><span class="p">,</span> <span class="o">*</span><span class="n">NLookup</span><span class="p">,</span> <span class="o">*</span><span class="n">BFieldLookup</span><span class="p">,</span> <span class="o">*</span><span class="n">eMaxLookup</span><span class="p">,</span>
+      <span class="o">*</span><span class="n">escapeTimeLookup</span><span class="p">,</span> <span class="o">*</span><span class="n">RLookup</span><span class="p">,</span> <span class="o">*</span><span class="n">VLookup</span><span class="p">,</span> <span class="o">*</span><span class="n">energyTrajectory</span><span class="p">,</span>
+      <span class="o">*</span><span class="n">energyTrajectoryInverse</span><span class="p">;</span>
+  <span class="n">gsl_interp_accel</span> <span class="o">*</span><span class="n">accIC</span><span class="p">,</span> <span class="o">*</span><span class="n">accLum</span><span class="p">,</span> <span class="o">*</span><span class="n">accN</span><span class="p">,</span> <span class="o">*</span><span class="n">accBField</span><span class="p">,</span> <span class="o">*</span><span class="n">acceMax</span><span class="p">,</span> <span class="o">*</span><span class="n">accescapeTime</span><span class="p">,</span>
+      <span class="o">*</span><span class="n">accR</span><span class="p">,</span> <span class="o">*</span><span class="n">accV</span><span class="p">,</span> <span class="o">*</span><span class="n">accTr</span><span class="p">,</span> <span class="o">*</span><span class="n">accTrInv</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="nf">SourceSpectrum</span><span class="p">(</span><span class="kt">double</span> <span class="n">e</span><span class="p">);</span>  <span class="c1">///&lt; particle injection spectrum</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">timeAxis</span><span class="p">;</span>          <span class="c1">///&lt; time axis for numerical integrator</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">energyAxis</span><span class="p">;</span>        <span class="c1">///&lt; energy axis for numerical integrator</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">grid</span><span class="p">;</span>     <span class="c1">///&lt; 2D grid on which solving takes place</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">diffusegrid</span><span class="p">;</span>  <span class="c1">///&lt; 2D grid of the streaming particles</span>
+  <span class="kt">double</span> <span class="n">ebins</span><span class="p">;</span>                         <span class="c1">///&lt; energy bins of grid (default: 100)</span>
+  <span class="kt">void</span> <span class="nf">DetermineTMin</span><span class="p">(</span><span class="kt">double</span> <span class="n">emin</span><span class="p">,</span>
+                     <span class="kt">double</span> <span class="o">&amp;</span><span class="n">tmin</span><span class="p">);</span>  <span class="c1">///&lt; determine the minimum time from where</span>
+                                     <span class="c1">///to start the calculation. Electrons</span>
+                                     <span class="c1">///before that time are injected as a</span>
+                                     <span class="c1">///single &#39;blob&#39;. This time is derived from</span>
+                                     <span class="c1">///the requirement that the blob has slid</span>
+                                     <span class="c1">///down to energies E&lt;1GeV at t=Age.</span>
+  <span class="kt">void</span> <span class="nf">PrepareAndRunNumericalSolver</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">particlespectrum</span><span class="p">,</span>
+                                    <span class="kt">bool</span> <span class="n">onlyprepare</span> <span class="o">=</span> <span class="nb">false</span><span class="p">,</span>
+                                    <span class="kt">bool</span> <span class="n">dontinitialise</span> <span class="o">=</span>
+                                        <span class="nb">false</span><span class="p">);</span>  <span class="c1">///&lt; grid solver to calculate</span>
+                                                 <span class="c1">///the final particle spectrum</span>
+  <span class="kt">void</span> <span class="nf">GetAxis</span><span class="p">(</span><span class="kt">double</span> <span class="n">min</span><span class="p">,</span> <span class="kt">double</span> <span class="n">max</span><span class="p">,</span> <span class="kt">int</span> <span class="n">steps</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">Axis</span><span class="p">,</span>
+               <span class="kt">bool</span> <span class="n">logarithmic</span><span class="p">);</span>  <span class="c1">///&lt; create an axis that attributes each bin</span>
+                                   <span class="c1">///with a real value (e.g. time axis, energy</span>
+                                   <span class="c1">///axis).</span>
+  <span class="kt">void</span> <span class="nf">CreateGrid</span><span class="p">();</span>  <span class="c1">///&lt; create the 2D propagation grid out of 2 1D-vectors</span>
+  <span class="kt">void</span> <span class="nf">SetInitialCondition</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">Grid</span><span class="p">,</span>
+                           <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">EnergyAxis</span><span class="p">,</span>
+                           <span class="kt">double</span> <span class="n">startTime</span><span class="p">);</span>  <span class="c1">///&lt; set initial condition</span>
+                                               <span class="c1">///(a.k.a. set the first time</span>
+                                               <span class="c1">///spectrum in the grid)</span>
+  <span class="kt">double</span> <span class="nf">EnergyLossRate</span><span class="p">(</span><span class="kt">double</span> <span class="n">E</span><span class="p">);</span>  <span class="c1">///&lt; total energy loss rate of particles</span>
+  <span class="kt">void</span> <span class="nf">ComputeGrid</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">Grid</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">EnergyAxis</span><span class="p">,</span>
+                   <span class="kt">double</span> <span class="n">startTime</span><span class="p">,</span> <span class="kt">double</span> <span class="n">Age</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">TimeAxis</span><span class="p">,</span>
+                   <span class="kt">double</span> <span class="n">minTimeBin</span> <span class="o">=</span>
+                       <span class="mf">1.</span> <span class="o">*</span> <span class="n">yr_to_sec</span><span class="p">);</span>  <span class="c1">///&lt; Iterate through the time-energy</span>
+                                         <span class="c1">///grid. Implemented is a piece-wise</span>
+                                         <span class="c1">///linear advection algorithm,</span>
+                                         <span class="c1">///optionally with the &#39;Superbee&#39;-Slope</span>
+                                         <span class="c1">///limiter</span>
+  <span class="kt">void</span> <span class="nf">FillEnergyTrajectoryLookup</span><span class="p">();</span>
+  <span class="kt">void</span> <span class="nf">Clear2DVector</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">v</span><span class="p">);</span>
+  <span class="kt">double</span> <span class="nf">CalcSpecSemiAnalyticConstELossIntegrand</span><span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">par</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="nf">CalcSpecSemiAnalyticConstELoss</span><span class="p">();</span>
+  <span class="kt">void</span> <span class="nf">CalcSpecSemiAnalyticNoELoss</span><span class="p">();</span>
+  <span class="kt">double</span> <span class="nf">MaxMod</span><span class="p">(</span><span class="kt">double</span> <span class="n">a</span><span class="p">,</span>
+                <span class="kt">double</span> <span class="n">b</span><span class="p">);</span>  <span class="c1">///&lt; Mod function required for slope delimiters</span>
+  <span class="kt">double</span> <span class="nf">MinMod</span><span class="p">(</span><span class="kt">double</span> <span class="n">a</span><span class="p">,</span>
+                <span class="kt">double</span> <span class="n">b</span><span class="p">);</span>  <span class="c1">///&lt; Mod function required for slope delimiters</span>
+  <span class="kt">double</span> <span class="nf">GetSuperBeeSlope</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="kt">double</span> <span class="n">deltaX</span><span class="p">,</span>
+                          <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">*</span><span class="n">Grid</span><span class="p">);</span>  <span class="c1">///&lt; slope for</span>
+                                                           <span class="c1">///superbee slope</span>
+                                                           <span class="c1">///limiter method</span>
+  <span class="kt">double</span> <span class="nf">GetMinModSlope</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="kt">double</span> <span class="n">deltaX</span><span class="p">,</span>
+                        <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">*</span><span class="n">Grid</span><span class="p">);</span>  <span class="c1">///&lt; slope for the</span>
+                                                         <span class="c1">///minmod slope limiter</span>
+                                                         <span class="c1">///method</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">ParticleSpectrum</span><span class="p">;</span>  <span class="c1">///&lt; vector containing the final</span>
+                                             <span class="c1">///source particle spectrum (i.e.</span>
+                                             <span class="c1">///at time=Age)</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">EscapeVector</span><span class="p">;</span>      <span class="c1">///&lt; vector containing escape delta</span>
+                                         <span class="c1">///functions for later diffusion (done</span>
+                                         <span class="c1">///by the &#39;Diffusion&#39; class)</span>
+  <span class="kt">double</span> <span class="nf">DetermineEmax</span><span class="p">(</span><span class="kt">double</span> <span class="n">tmin</span><span class="p">);</span>  <span class="c1">///&lt; maximum allowed particle energy over</span>
+                                      <span class="c1">///the course of the source&#39;s history</span>
+  <span class="kt">bool</span> <span class="n">DEBUG</span><span class="p">;</span>                         <span class="c1">///&lt; Debug flag</span>
+  <span class="kt">double</span> <span class="n">adLossCoeff</span><span class="p">;</span>                 <span class="c1">///&lt; coefficient for adiabatic losses</span>
+  <span class="kt">double</span> <span class="n">escapeTime</span><span class="p">;</span>                  <span class="c1">///&lt; particle escape time</span>
+  <span class="kt">double</span> <span class="n">escapeTimeConstant</span><span class="p">;</span>  <span class="c1">///&lt; particle escape time, Constantly set to a</span>
+                              <span class="c1">///single value</span>
+  <span class="kt">double</span> <span class="n">EnergyAxisLowerBoundary</span><span class="p">;</span>  <span class="c1">///&lt; might be superfluous (compare to</span>
+                                   <span class="c1">///EminConstant)</span>
+  <span class="kt">double</span> <span class="n">EnergyAxisUpperBoundary</span><span class="p">;</span>  <span class="c1">///&lt; might be superfluous (compare to</span>
+                                   <span class="c1">///eMaxConstant)</span>
+  <span class="kt">bool</span> <span class="n">QUIETMODE</span><span class="p">;</span>  <span class="c1">///&lt; Quietmode boolean: no output text at all if set to true</span>
+                   <span class="c1">///. Default is false.</span>
+  <span class="kt">double</span> <span class="nf">Polynomial</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">);</span>  <span class="c1">///&lt; polynomial function, used</span>
+                                                <span class="c1">///for deriving systematic</span>
+                                                <span class="c1">///errors due to numerical</span>
+                                                <span class="c1">///wiggling.</span>
+  <span class="kt">void</span> <span class="nf">CalculateConstants</span><span class="p">();</span>  <span class="c1">///&lt; speed hack where often used constants are</span>
+                              <span class="c1">///calculated ahead of the grid solving</span>
+  <span class="kt">double</span> <span class="nf">CustomInjectionSpectrum</span><span class="p">(</span><span class="kt">double</span> <span class="n">e</span><span class="p">,</span> <span class="kt">double</span> <span class="n">emax</span><span class="p">,</span>
+                                 <span class="kt">double</span> <span class="n">thr</span> <span class="o">=</span> <span class="mf">1.e-2</span><span class="p">);</span>  <span class="c1">///&lt; custom injection</span>
+                                                       <span class="c1">///spectrum, following</span>
+                                                       <span class="c1">///the shape specified in</span>
+                                                       <span class="c1">///CustomSpectrum</span>
+  <span class="kt">double</span> <span class="nf">PowerLawInjectionSpectrum</span><span class="p">(</span><span class="kt">double</span> <span class="n">e</span><span class="p">,</span> <span class="kt">double</span> <span class="n">ecut</span><span class="p">,</span>
+                                   <span class="kt">double</span> <span class="n">emax</span><span class="p">);</span>  <span class="c1">///&lt; power law injection</span>
+                                                  <span class="c1">///spectrum. If eBreak and</span>
+                                                  <span class="c1">///SpectralIndex2 are</span>
+                                                  <span class="c1">///specified, returns a broken</span>
+                                                  <span class="c1">///power law.</span>
+  <span class="kt">double</span> <span class="nf">InverseLossRate</span><span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">par</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="nf">SetLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">v</span><span class="p">,</span> <span class="n">string</span> <span class="n">LookupType</span><span class="p">,</span>
+                 <span class="kt">bool</span> <span class="n">UPDATE</span> <span class="o">=</span> <span class="nb">false</span><span class="p">);</span>  <span class="c1">///&lt;</span>
+  <span class="kt">void</span> <span class="nf">ExtendLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">v</span><span class="p">,</span> <span class="n">string</span> <span class="n">LookupType</span><span class="p">);</span>
+  <span class="kt">double</span> <span class="nf">SemiAnalyticConstELossIntegrand</span><span class="p">(</span><span class="kt">double</span> <span class="n">T</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">par</span><span class="p">);</span>
+  <span class="kt">double</span> <span class="nf">SourceSpectrumWrapper</span><span class="p">(</span><span class="kt">double</span> <span class="n">E</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">par</span><span class="p">);</span>
+  <span class="kt">double</span> <span class="n">integratorTolerance</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="nf">Integrate</span><span class="p">(</span><span class="n">fPointer</span> <span class="n">f</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">emin</span><span class="p">,</span> <span class="kt">double</span> <span class="n">emax</span><span class="p">,</span>
+                   <span class="kt">double</span> <span class="n">tolerance</span><span class="p">);</span>
+  <span class="kt">int</span> <span class="n">gslmemory</span><span class="p">;</span> <span class="c1">///&lt; memory of the GSL workspace when integrating.</span>
+                 <span class="c1">/// Default = 5000</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">Constants</span><span class="p">;</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">gsl_spline</span> <span class="o">*&gt;</span> <span class="n">splines</span><span class="p">;</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">gsl_interp_accel</span> <span class="o">*&gt;</span> <span class="n">accs</span><span class="p">;</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span> <span class="o">*&gt;</span> <span class="n">vals</span><span class="p">;</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">vETrajectory</span><span class="p">;</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">vs</span><span class="p">;</span>
+  <span class="kt">void</span> <span class="nf">CalculateEnergyTrajectory</span><span class="p">(</span><span class="kt">double</span> <span class="n">TExt</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="nf">DetermineLookupTimeBoundaries</span><span class="p">();</span>
+
+ <span class="k">public</span><span class="o">:</span>
+  <span class="n">Particles</span><span class="p">();</span>
+  <span class="o">~</span><span class="n">Particles</span><span class="p">();</span>
+  <span class="kt">void</span> <span class="nf">SetMembers</span><span class="p">(</span><span class="kt">double</span> <span class="n">t</span><span class="p">);</span>  <span class="c1">///&lt; set the values for the class variables</span>
+                              <span class="c1">///BField,eElectronMax and Ecr at a given time t</span>
+  <span class="kt">void</span> <span class="nf">CalculateParticleSpectrum</span><span class="p">(</span><span class="n">string</span> <span class="n">type</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">onlyprepare</span> <span class="o">=</span> <span class="nb">false</span><span class="p">,</span>
+                                 <span class="kt">bool</span> <span class="n">dontinitialise</span> <span class="o">=</span>
+                                     <span class="nb">false</span><span class="p">);</span>  <span class="c1">///&lt; fill the lookup that holds</span>
+                                              <span class="c1">///the particle spectrum.</span>
+  <span class="kt">void</span> <span class="nf">CalculateProtonSpectrum</span><span class="p">()</span> <span class="p">{</span><span class="n">CalculateParticleSpectrum</span><span class="p">(</span><span class="s">&quot;protons&quot;</span><span class="p">);}</span>
+  <span class="kt">void</span> <span class="nf">CalculateElectronSpectrum</span><span class="p">()</span> <span class="p">{</span><span class="n">CalculateParticleSpectrum</span><span class="p">(</span><span class="s">&quot;electrons&quot;</span><span class="p">);}</span>
+  <span class="kt">void</span> <span class="nf">SetType</span><span class="p">(</span><span class="n">string</span> <span class="n">type</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="nf">SetAge</span><span class="p">(</span><span class="kt">double</span> <span class="n">age</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">Age</span> <span class="o">=</span> <span class="n">age</span><span class="p">;</span>
+    <span class="n">SetMembers</span><span class="p">(</span><span class="n">Age</span><span class="p">);</span>
+  <span class="p">}</span>                                      <span class="c1">///&lt; set source age</span>
+  <span class="kt">double</span> <span class="n">GetAge</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">Age</span><span class="p">;</span> <span class="p">}</span>  <span class="c1">///&lt; get source age</span>
+  <span class="kt">double</span> <span class="n">GetLuminosity</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">Lum</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; get particle luminosity of the source</span>
+  <span class="kt">double</span> <span class="n">GetBField</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">BField</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; get the BField at the acceleration site of the astrophysical particle</span>
+     <span class="c1">///accelerator.</span>
+  <span class="kt">double</span> <span class="n">GetAmbientDensity</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">N</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; get the ambient density at the astrophysical particle accelerator.</span>
+  <span class="kt">double</span> <span class="n">GetRadius</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">R</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; get the extension of the astrophysical particle accelerator (cm).</span>
+  <span class="kt">double</span> <span class="n">GetSpeed</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">V</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; get the extension speed of the astrophysical particle accelerator</span>
+     <span class="c1">///(cm/s).</span>
+  <span class="kt">double</span> <span class="n">GetEmax</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">eMax</span><span class="p">;</span> <span class="p">}</span>  <span class="c1">///&lt; get the max. particle energy (erg)</span>
+  <span class="kt">double</span> <span class="n">GetEscapeTime</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">escapeTime</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; the particle escape time scale (s)</span>
+
+  <span class="kt">void</span> <span class="n">SetEElectronMax</span><span class="p">(</span><span class="kt">double</span> <span class="n">EElectronMax</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">eElectronMax</span> <span class="o">=</span> <span class="n">EElectronMax</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; set the maximum energy of electrons in the accelerator</span>
+  <span class="kt">void</span> <span class="n">SetEscapeTime</span><span class="p">(</span><span class="kt">double</span> <span class="n">EscapeTime</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">escapeTimeConstant</span> <span class="o">=</span> <span class="n">EscapeTime</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; set the time scale of particle escape</span>
+  <span class="kt">void</span> <span class="n">SetSpectralIndex</span><span class="p">(</span><span class="kt">double</span> <span class="n">spectralindex</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">SpectralIndex</span> <span class="o">=</span> <span class="n">spectralindex</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">SpectralIndex</span> <span class="o">==</span> <span class="mf">2.</span><span class="p">)</span> <span class="n">SpectralIndex</span> <span class="o">+=</span> <span class="mf">0.0000001</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; set spectral index of the particle injection spectrum</span>
+  <span class="kt">void</span> <span class="n">SetLowSpectralIndex</span><span class="p">(</span><span class="kt">double</span> <span class="n">spectralindex2</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">SpectralIndex2</span> <span class="o">=</span> <span class="n">spectralindex2</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">SpectralIndex2</span> <span class="o">==</span> <span class="mf">2.</span><span class="p">)</span> <span class="n">SpectralIndex2</span> <span class="o">+=</span> <span class="mf">0.0000001</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; set low-energy spectral index of the broken power-law particle</span>
+     <span class="c1">///injection spectrum. If this is not set, a single power-law injection</span>
+     <span class="c1">///spectrum will be assumed.</span>
+  <span class="kt">void</span> <span class="n">SetBreakEnergy</span><span class="p">(</span><span class="kt">double</span> <span class="n">ebreak</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">eBreak</span> <span class="o">=</span> <span class="n">ebreak</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; set break energy of broken powerlaw. If this is not set, a single</span>
+     <span class="c1">///power-law injection spectrum will be assumed.</span>
+  <span class="kt">void</span> <span class="n">ToggleDebugging</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">DEBUG</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; switch on Debugging/Testing mode</span>
+  <span class="kt">void</span> <span class="n">SetICLossLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">ICLOSSLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">SetLookup</span><span class="p">(</span><span class="n">ICLOSSLOOKUP</span><span class="p">,</span> <span class="s">&quot;ICLoss&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; set the lookup holding energy-dependent IC cooling rate {E-ICLossRate}</span>
+  <span class="kt">void</span> <span class="n">SetLuminosityLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">LUMLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">SetLookup</span><span class="p">(</span><span class="n">LUMLOOKUP</span><span class="p">,</span> <span class="s">&quot;Luminosity&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Set BField evolution</span>
+  <span class="kt">void</span> <span class="n">SetAmbientDensityLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">NLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">SetLookup</span><span class="p">(</span><span class="n">NLOOKUP</span><span class="p">,</span> <span class="s">&quot;AmbientDensity&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Set ambient density evolution</span>
+  <span class="kt">void</span> <span class="n">SetBFieldLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">BFIELDLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">SetLookup</span><span class="p">(</span><span class="n">BFIELDLOOKUP</span><span class="p">,</span> <span class="s">&quot;BField&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Set BField evolution</span>
+  <span class="kt">void</span> <span class="n">SetEmaxLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">EMAXLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">SetLookup</span><span class="p">(</span><span class="n">EMAXLOOKUP</span><span class="p">,</span> <span class="s">&quot;Emax&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Set max. particle evolution</span>
+  <span class="kt">void</span> <span class="n">SetEscapeTimeLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">ESCTIMELOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">SetLookup</span><span class="p">(</span><span class="n">ESCTIMELOOKUP</span><span class="p">,</span> <span class="s">&quot;EscapeTime&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Set escape time evolution</span>
+  <span class="kt">void</span> <span class="n">SetRadiusLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">RADIUSLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">SetLookup</span><span class="p">(</span><span class="n">RADIUSLOOKUP</span><span class="p">,</span> <span class="s">&quot;Radius&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Set radius evolution</span>
+  <span class="kt">void</span> <span class="n">SetVelocityLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">VELOCITYLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">SetLookup</span><span class="p">(</span><span class="n">VELOCITYLOOKUP</span><span class="p">,</span> <span class="s">&quot;Speed&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Set expansion velocity evolution</span>
+  <span class="kt">void</span> <span class="n">ExtendICLossLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">ICLOSSLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">ExtendLookup</span><span class="p">(</span><span class="n">ICLOSSLOOKUP</span><span class="p">,</span> <span class="s">&quot;ICLoss&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; set the lookup holding energy-dependent IC cooling rate {E-ICLossRate}</span>
+  <span class="kt">void</span> <span class="n">ExtendLuminosityLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">LUMLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">ExtendLookup</span><span class="p">(</span><span class="n">LUMLOOKUP</span><span class="p">,</span> <span class="s">&quot;Luminosity&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Set BField evolution</span>
+  <span class="kt">void</span> <span class="n">ExtendAmbientDensityLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">NLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">ExtendLookup</span><span class="p">(</span><span class="n">NLOOKUP</span><span class="p">,</span> <span class="s">&quot;AmbientDensity&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Set ambient density evolution</span>
+  <span class="kt">void</span> <span class="n">ExtendBFieldLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">BFIELDLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">ExtendLookup</span><span class="p">(</span><span class="n">BFIELDLOOKUP</span><span class="p">,</span> <span class="s">&quot;BField&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Set BField evolution</span>
+  <span class="kt">void</span> <span class="n">ExtendEmaxLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">EMAXLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">ExtendLookup</span><span class="p">(</span><span class="n">EMAXLOOKUP</span><span class="p">,</span> <span class="s">&quot;Emax&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Set max. particle evolution</span>
+  <span class="kt">void</span> <span class="n">ExtendEscapeTimeLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">ESCTIMELOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">ExtendLookup</span><span class="p">(</span><span class="n">ESCTIMELOOKUP</span><span class="p">,</span> <span class="s">&quot;EscapeTime&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Set escape time evolution</span>
+  <span class="kt">void</span> <span class="n">ExtendRadiusLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">RLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">ExtendLookup</span><span class="p">(</span><span class="n">RLOOKUP</span><span class="p">,</span> <span class="s">&quot;Radius&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt;</span>
+  <span class="kt">void</span> <span class="n">ExtendSpeedLookup</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">VLOOKUP</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">ExtendLookup</span><span class="p">(</span><span class="n">VLOOKUP</span><span class="p">,</span> <span class="s">&quot;Speed&quot;</span><span class="p">);</span>
+  <span class="p">}</span>  <span class="c1">///&lt;</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetICLossLookup</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">ICLossVector</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kt">double</span> <span class="n">GetEnergyLossRate</span><span class="p">(</span><span class="kt">double</span> <span class="n">E</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="n">EnergyLossRate</span><span class="p">(</span><span class="n">E</span><span class="p">);</span> <span class="p">}</span>
+  <span class="kt">void</span> <span class="n">SetEnergyBinsForNumericalSolver</span><span class="p">(</span><span class="kt">double</span> <span class="n">EBINS</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">ebins</span> <span class="o">=</span> <span class="n">EBINS</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; set energy binning of the numerical solution</span>
+  <span class="kt">double</span> <span class="n">GetEnergyBinsForNumericalSolver</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">ebins</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; get energy binning of the numerical solution</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetParticleSpectrum</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">ParticleSpectrum</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; get vector that holds source particle spectrum</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetEscapeVector</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">EscapeVector</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; get vector that holds the escape particles.</span>
+  <span class="kt">void</span> <span class="n">SetEmin</span><span class="p">(</span><span class="kt">double</span> <span class="n">EMIN</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">ONLYFORNORMALISATION</span> <span class="o">=</span>
+                                <span class="nb">false</span><span class="p">)</span> <span class="p">{</span>  <span class="c1">///&lt; Constanty set minimal energy of</span>
+                                          <span class="c1">///particle spectrum</span>
+    <span class="n">EminConstant</span> <span class="o">=</span> <span class="n">EMIN</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ONLYFORNORMALISATION</span><span class="p">)</span> <span class="n">EminConstantForNormalisationOnly</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="kt">void</span> <span class="n">SetTmin</span><span class="p">(</span><span class="kt">double</span> <span class="n">TMIN</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">TminConstant</span> <span class="o">=</span> <span class="n">TMIN</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Constanty set minimal time of injected particles</span>
+  <span class="kt">void</span> <span class="n">SetEmax</span><span class="p">(</span><span class="kt">double</span> <span class="n">EMAX</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">eMaxConstant</span> <span class="o">=</span> <span class="n">EMAX</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Constanty set maximal energy of particle spectrum</span>
+  <span class="kt">void</span> <span class="n">SetBField</span><span class="p">(</span><span class="kt">double</span> <span class="n">BEXT</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">BConstant</span> <span class="o">=</span> <span class="n">BEXT</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Constanty set B-Field value</span>
+  <span class="kt">void</span> <span class="n">SetAmbientDensity</span><span class="p">(</span><span class="kt">double</span> <span class="n">NCONSTANT</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">NConstant</span> <span class="o">=</span> <span class="n">NCONSTANT</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Constanty set value of ambient density</span>
+  <span class="kt">void</span> <span class="n">SetLuminosity</span><span class="p">(</span><span class="kt">double</span> <span class="n">LUMConstant</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">LumConstant</span> <span class="o">=</span> <span class="n">LUMConstant</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Constantly set value of source luminosity</span>
+  <span class="kt">void</span> <span class="n">SetSourceExtension</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">RConstant</span> <span class="o">=</span> <span class="n">pc_to_cm</span><span class="o">*</span><span class="n">r</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Constanty set value of source extension (pc)</span>
+  <span class="kt">void</span> <span class="n">SetSourceExpansionSpeed</span><span class="p">(</span><span class="kt">double</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">VConstant</span> <span class="o">=</span> <span class="n">v</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; Constanty set value of source expansion speed (cm/s)</span>
+  <span class="kt">void</span> <span class="n">SetCutOffFactor</span><span class="p">(</span><span class="kt">double</span> <span class="n">CUTOFFFACTOR</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">CutOffFactor</span> <span class="o">=</span> <span class="n">CUTOFFFACTOR</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; set shape of the Electron spectrum cut-off</span>
+  <span class="kt">double</span> <span class="n">GetCutOffFactor</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">CutOffFactor</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; get shape of the Electron spectrum cut-off</span>
+  <span class="kt">void</span> <span class="n">SetEnergyMarginFactor</span><span class="p">(</span><span class="kt">double</span> <span class="n">ENERGYMARGINFACTOR</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">energyMarginFactor</span> <span class="o">=</span> <span class="n">ENERGYMARGINFACTOR</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; set safety margin on the upper boundary of the particle spectrum</span>
+  <span class="kt">void</span> <span class="n">ToggleSharpEnergyCut</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">sharpEnergyCut</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; toggle (default: off) a sharp energy cut in the particle spectrum</span>
+     <span class="c1">///(position given by Emax)</span>
+  <span class="kt">void</span> <span class="n">UnToggleSharpEnergyCut</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">sharpEnergyCut</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; untoggle a sharp energy cut in the particle spectrum (position given</span>
+     <span class="c1">///by Emax)</span>
+  <span class="kt">void</span> <span class="n">ToggleQuietMode</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">QUIETMODE</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; untoggle quiet mode (no progress printout on the console)</span>
+  <span class="kt">void</span> <span class="n">ComputeGridInTimeInterval</span><span class="p">(</span><span class="kt">double</span> <span class="n">T1</span><span class="p">,</span>
+                                 <span class="kt">double</span> <span class="n">T2</span><span class="p">);</span>  <span class="c1">///&lt; wrapper function to calculate</span>
+                                              <span class="c1">///the grid only in a specified</span>
+                                              <span class="c1">///time interval dT = T2-T2 (yrs)</span>
+  <span class="kt">void</span> <span class="nf">SetEnergyAxisLowerBoundary</span><span class="p">(</span><span class="kt">double</span> <span class="n">BOUND</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">EnergyAxisLowerBoundary</span> <span class="o">=</span> <span class="n">BOUND</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; might be superflous</span>
+  <span class="kt">void</span> <span class="nf">SetEnergyAxisUpperBoundary</span><span class="p">(</span><span class="kt">double</span> <span class="n">BOUND</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">EnergyAxisUpperBoundary</span> <span class="o">=</span> <span class="n">BOUND</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; might be superflous</span>
+  <span class="kt">void</span> <span class="nf">SetTminInternal</span><span class="p">(</span><span class="kt">double</span> <span class="n">TMININTERNAL</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">TminInternal</span> <span class="o">=</span> <span class="n">TMININTERNAL</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; set minimal time from where to start the iteration (default: 1yr).</span>
+  <span class="kt">double</span> <span class="nf">GetTminInternal</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">TminInternal</span><span class="p">;</span>
+  <span class="p">}</span>  <span class="c1">///&lt; set minimal time from where to start the iteration (default: 1yr).</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetEnergyTrajectoryVector</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">vETrajectory</span><span class="p">;</span> <span class="p">}</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetParticleSED</span><span class="p">();</span>
+  <span class="kt">void</span> <span class="nf">SetCriticalMinEnergyForGridSolver</span><span class="p">(</span><span class="kt">double</span> <span class="n">eminint</span><span class="p">)</span> <span class="p">{</span><span class="n">EminInternal</span><span class="o">=</span><span class="n">eminint</span><span class="p">;}</span>
+  <span class="kt">void</span> <span class="nf">SetIntegratorMemory</span><span class="p">(</span><span class="n">string</span> <span class="n">mode</span><span class="p">);</span>
+<span class="p">};</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="utils.html" class="btn btn-neutral float-right" title="Utils" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="particles_source.html" class="btn btn-neutral" title="Particles: source" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Joachim Hahn.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.9',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
