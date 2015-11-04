@@ -2,8 +2,13 @@ Level 5: The PWN model by Martin et al. 2012
 ============================================
 
 Now we have learned everything that is needed for writing a real time-dependent 
-astrophysical source model. In the following, the model by Martin et al. 2012
-will be implemented in ``GAMERA``.
+astrophysical source model. In the following, the model by Martin et al. 
+(Martin J., Torres D. F., & Rea N. 2012, MNRAS 427, 415),
+(Torres, D. F., Cillis, A., Martin, J., & de Ona Wilhelmi, E. 2014,
+Journal of High Energy Astrophysics, 1, 31).
+
+Again, ``python``-script and parameter file are located in the 
+``docu/tutorial/`` directory.
 
 In principle, the whole model-specific physics is in the function that fills
 the parameter lookups, and so changing this function is all that has to be changed.
@@ -38,14 +43,20 @@ To that end, we replace the ``GetSpindownStuff`` function from level 4 by
      capped to 10 PeV if you call the grid solver (i.e. in the case of time-dependent
      energy losses).
 
- - one additional command has to be used in order to get the Synchtroton-Self-Compton (SSC)
+ - these additional commands have to be used in order to get the Synchtroton-Self-Compton (SSC)
    component and to set the source radius and extension velocity parameter lookups:
 
   .. sourcecode:: python
 
-    fr.SetSSCTargetPhotons(fp.GetRadius())
     fp.SetRadiusLookup(r)
     fp.SetVelocityLookup(v)
+    fr.SetSSCTargetPhotons(fp.GetRadius())
+
+.. hint::
+
+   In this example, the SSC target field is *not* used for calculating the energy
+   losses. To remove this caveat you have to iterate in time and pass the
+   SSC radiation field to the particles object in each step.
 
 The calculation will take a couple of minutes because the B-field strength and
 maximum electron energies are insane at times earlier than several hundreds of
