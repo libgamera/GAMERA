@@ -17,7 +17,25 @@ CXXFLAGS := $(GSLCFLAGS) -std=c++11
 # define additional switches to be passed to the linker
 LDFLAGS := $(GSLLIBS)
 
-all: Radiation Particles Utils libgamera TutorialLevel1 gamerapy documentation
+
+help:
+	@echo ''
+	@echo 'GAMERA available make targets:'
+	@echo ''
+	@echo '  gamera           Create the GAMERA shared object (lib/libgamera.so)'
+	@echo '  gamerapy         Wrap the python module (lib/gamerapy.py and lib/_gamerapy.so)'
+	@echo '  tutorial1        Compile a simple tutorial program'
+	@echo '                   (-> bin/TutorialLevel1, see http://joachimhahn.github.io/GAMERA/)'
+	@echo '  documentation    Generate documentation'
+	@echo '                   (-> docu/doxygen/html/ and docu/sphinx/build/html/)'
+	@echo '  clean            remove temporary files'
+
+
+all: gamera TutorialLevel1 gamerapy documentation
+
+gamera: Radiation Particles Utils libgamera
+
+tutorial1: gamera TutorialLevel1
 
 # create the individual .o files
 Radiation : src/Radiation.C
@@ -26,7 +44,6 @@ Particles : src/Particles.C
 	$(CXX) -g -O2 -fpic -Wall -c src/Particles.C -o $(OUTDIR)/Particles.o $(CXXFLAGS) $(INCLUDES)
 Utils : src/Utils.C
 	$(CXX) -g -O2 -fpic -Wall -c src/Utils.C -o $(OUTDIR)/Utils.o $(CXXFLAGS) $(INCLUDES)
-
 
 # create the shared library
 objectsSO = $(OUTDIR)/Radiation.o $(OUTDIR)/Particles.o $(OUTDIR)/Utils.o
