@@ -1,0 +1,13 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+install: make all
+
+script: bin/TutorialLevel1 docu/turorial/TutorialLevel1Params.data
+
+os:
+  - linux
+  - osx
