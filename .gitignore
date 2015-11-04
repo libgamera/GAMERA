@@ -1,5 +1,8 @@
 *~
 *png
+*.pyc
+__pycache__
+.idea
 docu/pics/
 
 docu/doxygen/html/
@@ -7,4 +10,3 @@ docu/doxygen/xml/
 docu/sphinx/build/
 python/_gamerapy.cc
 python/build/
-
