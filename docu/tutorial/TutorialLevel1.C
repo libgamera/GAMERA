@@ -7,13 +7,18 @@ vector<double> parameters;
 vector<string> parameters_names;
 vector<string> strings;
 vector<string> strings_names;
-int ReadParameterFile(const char* inputname);
+int ReadParameterFile(string inputname);
 
 int main(int argc, char **argv){
 
+  if (argc!=2) {
+    std::cout<<">> You have to specify a parameter file ( $ bin/TutorialLevel1 <parameterfile> )."<<std::endl;
+    std::cout<<">> Look at docu/tutorial/TutorialLevel1Params.dat for an example!"<<std::endl;
+    return 1;
+  }
   fUtils = new Utils();
   fRad = new Radiation();
-  const char* parameterfile = argv[1];
+  string parameterfile = argv[1];
   if(ReadParameterFile(parameterfile)) return 0;
 
   double d = pc_to_cm*parameters[0];
@@ -45,7 +50,7 @@ int main(int argc, char **argv){
   return 0;
 }
 
-int ReadParameterFile(const char* inputname){
+int ReadParameterFile(string inputname){
   parameters_names.push_back("Distance");
   parameters_names.push_back("AmbientDensity");
   parameters_names.push_back("BField");
