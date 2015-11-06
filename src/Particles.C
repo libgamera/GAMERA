@@ -161,7 +161,7 @@ void Particles::CalculateParticleSpectrum(string type, bool onlyprepare,
             "Emin: eMax = " << eMax << " Emin = " << Emin << endl;
     return;
   }
-  
+
   if (BVector.size() || NVector.size() || (RVector.size() && VVector.size())) {
     /* call numerical solver. */
     PrepareAndRunNumericalSolver(ParticleSpectrum, onlyprepare, dontinitialise);
@@ -169,7 +169,7 @@ void Particles::CalculateParticleSpectrum(string type, bool onlyprepare,
   else if (Type==0 && (BConstant || NConstant || VConstant)) {
     /* if B-Field, ambient density and speed are set externally thus constant.
      * This means constant energy losses due to Brems- and Synchrotronstrahlung
-     * as well as adiabatic expansion (currently IC losses are always constant 
+     * as well as adiabatic expansion (currently IC losses are always constant
      * in GAMERA.).
      */
     CalculateEnergyTrajectory();
@@ -178,12 +178,12 @@ void Particles::CalculateParticleSpectrum(string type, bool onlyprepare,
   else if (Type==1 && VConstant) {
     /* if B-Field, ambient density and speed are set externally thus constant.
      * This means constant energy losses due to Brems- and Synchrotronstrahlung
-     * as well as adiabatic expansion (currently IC losses are always constant 
+     * as well as adiabatic expansion (currently IC losses are always constant
      * in GAMERA.).
      */
     CalculateEnergyTrajectory();
     CalcSpecSemiAnalyticConstELoss();
-  } else {  
+  } else {
     CalcSpecSemiAnalyticNoELoss();
   }
   if (!QUIETMODE) {
@@ -872,11 +872,11 @@ void Particles::CalcSpecSemiAnalyticNoELoss() {
   }
   Clear2DVector(ParticleSpectrum);
   double totallum = 0.;
-  if(LumConstant) 
+  if(LumConstant)
     totallum = LumConstant*Age;
   else if(LumVector.size()) {
     gsl_interp_accel_reset(accLum);
-    if(gsl_spline_eval_integ_e(LumLookup, Tmin, Age, accLum, &totallum)) 
+    if(gsl_spline_eval_integ_e(LumLookup, Tmin, Age, accLum, &totallum))
       totallum = 0.;
   }
   else return;
@@ -927,7 +927,7 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
         cout << "    " << (int)(100. * tt / ebins) << "\% done\r" << std::flush;
       double val = Integrate(IntFunc, &dummy, e, eMax, integratorTolerance) /
                    EnergyLossRate(e);
-      if(std::isnan(val) || std::isinf(val) || !val) 
+      if(std::isnan(val) || std::isinf(val) || !val)
         continue;
       ParticleSpectrum.push_back(vector<double>());
       ParticleSpectrum[ParticleSpectrum.size() - 1].push_back(e);
@@ -1065,7 +1065,7 @@ void Particles::CalculateEnergyTrajectory(double TExt) {
     return;
   }
   Clear2DVector(vETrajectory);
-  
+
   double T = TminInternal;
   double E, Edot, dt;
   vETrajectory.clear();
@@ -1160,4 +1160,3 @@ double Particles::Integrate(fPointer f, double *x, double emin, double emax,
   gsl_integration_workspace_free(w);
   return integral;
 }
-

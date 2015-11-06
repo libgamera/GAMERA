@@ -1,5 +1,4 @@
 #include "Radiation.h"
-
 /**
  * Constructor. Nothing fancy, just initialises some stuff.
  */

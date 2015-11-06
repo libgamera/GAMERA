@@ -15,7 +15,7 @@ Dependencies
 
 using apt::
 
-    $ sudo apt-get install libgsl0ldbl libgsl0-dev libocamlgsl-ocaml libocamlgsl-ocaml-dev swig
+    $ sudo apt-get install libgsl0ldbl libgsl0-dev python-dev swig
 
 (optional)::
 
@@ -69,18 +69,13 @@ Usage in ``python``
 -------------------
 
 You need to add the directory holding the module (default: ``./lib``) to the search path for modules in your script, e.g.:
-    
+
 .. sourcecode:: python
 
    import sys
    import os
    sys.path.append(os.path.abspath('./lib'))
 
-.. warning:: 
+.. warning::
 
   Currently, ``GAMERA`` doesn't work with ``python3``, use ``python2`` instead!
-
-
-
-
-
