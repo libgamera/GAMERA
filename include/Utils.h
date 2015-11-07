@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <fstream>
 #include <vector>
+#include <ctime>
+#include <gsl/gsl_rng.h>
 
 /* TeV->erg */
 #define TeV_to_erg 1.602
@@ -71,6 +73,7 @@ class Utils {
  private:
   bool QUIETMODE;
   bool GAMERADESTROYEDTHECONSOLE;
+  gsl_rng * r;
 
  public:
   Utils(bool DRAWLOGO = true);
@@ -83,5 +86,14 @@ class Utils {
   void DrawGamera();
   void WriteOut(vector<vector<double> > sp, string outname);
   void ReadIn(string inname, vector< vector<double> > &sp);
+  double LinearRandom(double slope, double x_min, double x_max);
+  double PowerLawRandom(double index, double x_min, double x_max);
+  double GaussianRandom(double width, double offset);
+  double SignRandom();
+  double ExponentialRandom(double ind_norm, double x_min, double x_max);
+
+
+
+
 };
 #endif

@@ -71,8 +71,8 @@ class Radiation {
   typedef double (Radiation::*fPointer)(double, void *);
 
  private:
-  void CalculateLuminosityAndFlux(string mechanism, double e, double &l, 
-                                  double &f); 
+  void CalculateLuminosityAndFlux(string mechanism, double e, double &l,
+                                  double &f);
   double DifferentialEmissionComponent(double e, void *par);
   double GreyBody(double ephoton, double temp, double edens);
   double ICEmissivityRadFieldIntegrated(double x, void *par);

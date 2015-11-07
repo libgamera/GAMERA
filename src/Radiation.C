@@ -69,7 +69,7 @@ void Radiation::CalculateDifferentialGammaEmission(double e, int particletype) {
   ldiffbrems = fdiffbrems = ldiffsynch = fdiffsynch = 0.;
   ldiffic = fdiffic = ldiffpp = fdiffpp = 0.;
 
-  /* Conversion of differential photon rate to flux 
+  /* Conversion of differential photon rate to flux
    [ph/(erg*s) -> ph/(erg*s*cm^2)] */
   double lumtoflux = 0.;
   void *p = NULL;
@@ -116,7 +116,7 @@ void Radiation::CalculateDifferentialGammaEmission(double e, int particletype) {
   return;
 }
 
-/** 
+/**
  * Calculates the integral photon Emission above energy 'e' [erg]. This gives
  * - integral fluxes, fint* [(no. of photons)/(s*cm^2)]
  * - photon rate, lint* [(no. of photons)/s]
@@ -135,7 +135,7 @@ void Radiation::CalculateDifferentialGammaEmission(double e, int particletype) {
  *
  * This function calculates the appropriate (depending on the particle species)
  * radiation mechanism and their gamma-ray flux by calling
- * the method 'CalculateLuminosityAndFlux' which integrates 
+ * the method 'CalculateLuminosityAndFlux' which integrates
  * 'DifferentialEmissionComponent'.
  */
 void Radiation::CalculateIntegralGammaEmission(double e, int particletype) {
@@ -174,10 +174,10 @@ void Radiation::CalculateIntegralGammaEmission(double e, int particletype) {
 
   return;
 }
-/** 
- * Calculates the differential photon rate [(no. of photons)/(erg*s)] 
+/**
+ * Calculates the differential photon rate [(no. of photons)/(erg*s)]
  * at energy 'e' [erg] resulting from radiation mechanism
- * 'radiationMechanism' that has been specified before in 
+ * 'radiationMechanism' that has been specified before in
  * 'CalculateDifferentialGammaEmission' or 'CalculateIntegralGammaEmission'.
  */
 double Radiation::DifferentialEmissionComponent(double e, void *par) {
@@ -247,12 +247,12 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
   return gammas;
 }
 
-/** 
- * Calculates 
- * - f: integrated flux [(no. of photons)/(s*cm^2)] and 
- * - l: photon rate [(no. of photons)/s] 
+/**
+ * Calculates
+ * - f: integrated flux [(no. of photons)/(s*cm^2)] and
+ * - l: photon rate [(no. of photons)/s]
  *
- * above energy 'e' [erg]. 
+ * above energy 'e' [erg].
  *
  * This method integrates the 'DifferentialEmissionComponent' method
  * for the relevant radiation mechanisms:
@@ -263,8 +263,8 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
  *   + Bremsstrahlung
  *   + Synchrotron radiation
  *
- * The integration boundaries are {e,maximum particle energy}, where the 
- * maximum particle energy is automatically determined from the 
+ * The integration boundaries are {e,maximum particle energy}, where the
+ * maximum particle energy is automatically determined from the
  * 'ParticleVector' vector.
  */
 void Radiation::CalculateLuminosityAndFlux(string mechanism, double e,
@@ -307,10 +307,10 @@ void Radiation::CalculateLuminosityAndFlux(string mechanism, double e,
 /********* RADIATION MECHANISMS ***********************************/
 
 /* Inverse Compton part */
- 
+
 /**
- * Describes grey body with temperature 'temp' [K] and energy density 
- * 'edens' [erg/cm^3] and returns differential photon 
+ * Describes grey body with temperature 'temp' [K] and energy density
+ * 'edens' [erg/cm^3] and returns differential photon
  * density [(no of photons)/(cm^3*erg)] at energy 'ephoton' [erg].
  */
 double Radiation::GreyBody(double ephoton, double temp, double edens) {
@@ -320,24 +320,24 @@ double Radiation::GreyBody(double ephoton, double temp, double edens) {
 
 /**
  * IC emission from electrons integrated over the target photon population.
- * This method has the switch INTEGRATEOVERGAMMAS, which determines its 
+ * This method has the switch INTEGRATEOVERGAMMAS, which determines its
  * output. If INTEGRATEOVERGAMMAS is set to
  *
- * - TRUE: method returns a photon production rate [(no. of photons)/s] at 
- *         energy 'egamma'. It is used to calculate the total loss rate due to 
- *         IC emission for single electrons of energy 'eelectrons' by 
- *         integrating this production rate from a (hardcoded) minimum energy of 
+ * - TRUE: method returns a photon production rate [(no. of photons)/s] at
+ *         energy 'egamma'. It is used to calculate the total loss rate due to
+ *         IC emission for single electrons of energy 'eelectrons' by
+ *         integrating this production rate from a (hardcoded) minimum energy of
  *         1.e-10 eV  up to energy 'eelectrons'.
  *         This is done in the method 'CreateICLossLookup'.
  *
  *
- * - FALSE: method returns a differential production rate of photons 
- *          [(no. of photons)/(erg*s)] with energy 'egamma' from the 
+ * - FALSE: method returns a differential production rate of photons
+ *          [(no. of photons)/(erg*s)] with energy 'egamma' from the
  *          differential number of electrons at energy 'eelectron', which is
  *          then used to calculate the total IC gamma-ray emission at photon
  *          energy egamma from the total electron distribution. The
  *          corresponding integration is performed from the minimum electron
- *          energy to egamma and is implemented in the method 
+ *          energy to egamma and is implemented in the method
  *          'DifferentialEmissionComponent'
  */
 double Radiation::ICEmissivityRadFieldIntegrated(double x, void *par) {
@@ -388,7 +388,7 @@ double Radiation::ICEmissivityRadFieldIntegrated(double x, void *par) {
   }
 }
 
-/** 
+/**
  * emissivity from IC scattering. Taken from Blumenthal and Gould 1970,
  * Eq(2.48).
  */
@@ -668,7 +668,7 @@ double Radiation::PPEmissivity(double x, void *par) {
   if (Eg >= GetMaximumGammaEnergy(Tp)) return 0.;
   double N = DiffPPXSection(Tp, Eg);
   double logprotons = 0.;
-  
+
   if(gsl_spline_eval_e(ProtonLookup, log10(EP), acc, &logprotons)) {
     cout << "Radiation::PPEmissivity: Something wrong  "
             "with proton lookup interpolation! Exit!" << endl;
@@ -1238,7 +1238,7 @@ void Radiation::SetTargetPhotonVectorLookup() {
  * the total target photon spectrum
  */
 void Radiation::RemoveLastICTargetPhotonComponent() {
-  TargetPhotonVector = TargetPhotonVectorOld; 
+  TargetPhotonVector = TargetPhotonVectorOld;
   SetTargetPhotonVectorLookup();
   return;
 }

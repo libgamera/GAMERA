@@ -72,13 +72,13 @@ documentation:
 	cd ../sphinx/;\
 	make html;\
 
-clean-out: 
+clean-out:
 	-rm -f out/*
-clean-bin: 
+clean-bin:
 	-rm -f bin/*
-clean-lib: 
+clean-lib:
 	-rm -f lib/*
-clean-python: 
+clean-python:
 	-rm -f python/_gamerapy.cc python/_gamerapy.so python/gamerapy.py
 	-rm -rf python/build/
 clean-docu:
