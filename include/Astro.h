@@ -1,11 +1,6 @@
 #ifndef _ASTRO_
 #define _ASTRO_
 
-#include <math.h>
-#include <iostream>
-#include <stdlib.h>
-#include <fstream>
-#include <gsl/gsl_spline.h>
 #include "Utils.h"
 
 /* TeV->erg */
@@ -81,11 +76,7 @@ class Astro  {
     double y_a3[7];
     double x_a4[7];
     double y_a4[7];
-    TGraph *TaylorCordesArm1;
-    TGraph *TaylorCordesArm2;
-    TGraph *TaylorCordesArm3;
-    TGraph *TaylorCordesArm4;
-    vector<gsl_spline*> TaylorCordesArms;
+    vector<gsl_spline*> TaylorCordesArms,TaylorCordesArmsInv;
     vector<double> psi0V;
     vector<double> theta0V;
     vector<double> r0V;
@@ -96,9 +87,6 @@ class Astro  {
     double scaleHeight;
     bool QUIETMODE;
     double rMax;
-    TF1 *fiuskuc;
-    TF1 *fcasebhat;
-    TF1 *flinear;
     int SPIRALARMMODEL;
     int SURFACEDENSITYMODEL;
     int CENTRALSTRUCTUREMODEL;
@@ -106,11 +94,13 @@ class Astro  {
     int MSBUBBLEMODEL;
     bool GAMERAALREADYONTHECONSOLE;
     bool WRAPPINGHAPPENED;
-    double EvalArmTheta(double r, int arm);
-    gsl_spline *TaylorCordesArm1,*TaylorCordesArm2,*TaylorCordesArm3,*TaylorCordesArm4;
-    gsl_interp_accel *accArm1,*accArm2,*accArm3,*accArm4;
+    gsl_spline *TaylorCordesArm1,*TaylorCordesArm2,*TaylorCordesArm3,
+               *TaylorCordesArm4,*TaylorCordesArm1Inv,*TaylorCordesArm2Inv,
+               *TaylorCordesArm3Inv,*TaylorCordesArm4Inv;
+    gsl_interp_accel *accArm1,*accArm2,*accArm3,*accArm4,
+                     *accArm1Inv,*accArm2Inv,*accArm3Inv,*accArm4Inv;
   public:
-    Astro(bool DRAWLOGO=true);
+    Astro();
     ~Astro();
     void DisableArm(int arm);///< Switch off an individual arm in Galaxy spiral model
     double RandomSalpeterInitialMass();///< Dice an initial star mass following the Salpeter law
@@ -130,19 +120,13 @@ class Astro  {
     double GetHIFWHM(double R);///< TODO:COMMENT
     double GetH2FWHM(double R);///< TODO:COMMENT
     double ModulateGasDensityWithSpirals(double n, double x, double y, double z);
-    double CalculateGasColumnDensity(vector<double> xyzReference,vector<double> GLGB,string gascomponent,double modulate,double range,double steps);///< calculate gas column densities
+    //double CalculateGasColumnDensity(vector<double> xyzReference,vector<double> GLGB,string gascomponent,double modulate,double range,double steps);///< calculate gas column densities
     double nRadial(double *x, double *pars);///< TODO:COMMENT
-    double Integrate(TF1 *integrand, double xmin, double xmax, double steps, bool logarithmic=true);///< generic integration routine
     void GetCartesian(double r, double l, double b, double xref, double yref, double zref, double &x, double &y, double &z);///< Galactic coordinates (GL,GB,R) ->Cartesian
     void GetGalactic(double x, double y, double z, double xref, double yref, double zref, double &l, double &b);///< Cartesian coordinates -> Galactic Coordinates(GL,GB,R)
     void RotateCoordinates(double &x, double &y, double &z, double phi, double theta, double psi);///< rotate coordinate around (0,0,0) by (phi,theta,psi)
-    double LinearRandom(double slope, double x_min, double x_max);///< get linearly distributed variates
-    double PowerLawRandom(double index, double x_min, double x_max);///< get power-law distributed variates
-    int PoissonianRandom(double mean);///<Poissonian variate (just wrapped from TRandom))
-    double SignRandom();///< return a random sign
     void RandomTangentialShift(double r, double width, double &x, double &y);///< gaussian shift along concentric circle (retains r-distribution)
-    double ExponentialRandom(double ind_norm, double x_min, double x_max);///< return a exponentially distributed variate
-    double GaussianRandom(double width = 1., double offset = 0.);///< get gaussian distributed variate using the Box-Muller method
+    void RandomGaussianShift(double r, double width, double &x, double &y);
     unsigned int GetRandomArm();///< return a random spiral arm (identifier, i.e. an unsigned integer)
     void Bar(double r, double &x, double &y);///< Get xy Coordinates on a central bar inclined with an angle 'angle' clockwise
     void Disk(double r, double &x, double &y);///< Get random xy Coordinates  on a disk
@@ -152,41 +136,25 @@ class Astro  {
     void ValleeSpiral(double r, int arm, double &x, double &y);///<TODO: Comment
     double ValleeSpiralAngular(double theta, int arm);///<TODO: Comment
     double GetRandomZValue(double scaleHeight);///<TODO: Comment
-    double GetRandomGalactocentricRadius();///<TODO: Comment
+    vector<double> GetRandomGalactocentricRadii(int n);///<TODO: Comment
     void GalacticPositionXY(double r, int arm, double &x, double &y);///<Return x,y coordinates at given galactocentric radius r and on arm number i
     void PositionOnSpiralArmAngular(double theta, int arm, double &x, double &y); ///< get position on arm in x-y plane given a certain polar angle in the galaxy.
     void GetDistanceToNearestSpiralArm(double x, double y, double &DistanceToClosestArm, int &ClosestArm);
     double GetDistanceToGivenSpiralArm(double x, double y, int arm);
     void ToggleQuietMode() {QUIETMODE=true;}
-    void DiceGalacticPosition(double &x, double &y, double &z);
+    vector< vector<double> > DiceGalacticPositions(int i);
     double GetRMax() {return rMax;}
-    int ReadParameterFile(string inputname, vector<string> parameter_names, vector<string> files_names, vector<double> &parameter_values, vector<string> &files);
-    void SetNiceStyle();
-    void DrawGamera();
-    TRandom* GetRandomiser(){return randomiser;}
     void SetSpiralArmModel(string centralstructuremodel);
     void SetCentralStructureModel(string centralstructuremodel);
     void SetSurfaceDensityModel(string surfacedensitymodel);
     void SetMainSequenceBubbleModel(string msbubblemodel);
     void SetScaleHeight(double SCALEHEIGHT) {scaleHeight=SCALEHEIGHT;}
     void SetArmWidth(double ARMWIDTH) {armWidth=ARMWIDTH;}
-    double IntegrateTGraph(TGraph *graph, double xmin, double xmax, int steps=100, bool logarithmic=true);
-    double TGraphWrapper(double *X,double *par);
-    TF1 *TGraphToTF1(TGraph *graph);
-    TGraph *MakeTGraphIntegratedProfile(TGraph *graph);
     vector< vector<double> > CreateDensityProfile(double RGWRadius, double mDotRGWind, double vRGWind, double MSBubbleRadius, double MSBubbleDensity, double ISMDensity, double mEj, double rSWRGW, double rSWMS);
-    TH2D *GetRightFormatHistogram(TGraph *graph, string xtitle, string ytitle, string title, double lowmargin=1., double highmargin=1., double leftmargin=1., double rightmargin=1.);
-    vector< vector<double> > TGraphToVector(TGraph* g);
-    double LiMaSignificance(int ON, int OFF, double ALPHA);
-    void GetRolkeConfidenceIntervals(int ON, int OFF, double ALPHA, double CL, double &xsDOWN, double &xsUP);
-    TGraph *VectorToTGraph(vector< vector<double> > v);
-    TGraph *TH1FToTGraph(TH1F *h, int logtolinx = 0);
-    TGraphErrors *TH1FToTGraphErrors(TH1F *h);
-    double GetSpectralIndex(TGraph* g, double Eref);
-    void WriteOut(vector< vector<double> > sp, string outname);
-    void WriteOut(TGraph *sp, string outname);
-    void WriteOut(TGraphErrors *sp, string outname);
-    void WriteOut(TGraphAsymmErrors *sp, string outname);
+    double EvalTaylorCordesArmTheta(double r, int arm);
+    double EvalTaylorCordesArmGalactocentricRadius(double theta, int arm);
+    double CaseBhattacharyaProfile(double r);
+    double IusifovKucukProfile(double r);
 
 };
 #endif

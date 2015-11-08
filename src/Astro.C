@@ -19,75 +19,66 @@ Astro::Astro() {
   TaylorCordesArm2 = gsl_spline_alloc(gsl_interp_linear, 7);
   TaylorCordesArm3 = gsl_spline_alloc(gsl_interp_linear, 7);
   TaylorCordesArm4 = gsl_spline_alloc(gsl_interp_linear, 7);
+
+  TaylorCordesArm1Inv = gsl_spline_alloc(gsl_interp_linear, 7);
+  TaylorCordesArm2Inv = gsl_spline_alloc(gsl_interp_linear, 7);
+  TaylorCordesArm3Inv = gsl_spline_alloc(gsl_interp_linear, 7);
+  TaylorCordesArm4Inv = gsl_spline_alloc(gsl_interp_linear, 7);
+
   /*  Spline implementation of the Taylor & Cordes arms */
-  x_a1[0]=3.53;
-  x_a1[1]=3.76;
-  x_a1[2]=4.44;
-  x_a1[3]=5.24;
-  x_a1[4]=5.36;
-  x_a1[5]=5.81;
-  x_a1[6]=5.81;
-  y_a1[0]=164.-90.;
-  y_a1[1]=200.-90.;
-  y_a1[2]=240.-90.;
-  y_a1[3]=280.-90.;
-  y_a1[4]=290.-90.;
-  y_a1[5]=315.-90.;
-  y_a1[6]=330.-90.;
+  x_a1[0]=3.53;   y_a1[0]=164.-90.;
+  x_a1[1]=3.76;   y_a1[1]=200.-90.;
+  x_a1[2]=4.44;   y_a1[2]=240.-90.;
+  x_a1[3]=5.24;   y_a1[3]=280.-90.;
+  x_a1[4]=5.36;   y_a1[4]=290.-90.;
+  x_a1[5]=5.81;   y_a1[5]=315.-90.;
+  x_a1[6]=5.8101; y_a1[6]=330.-90.;
+
   gsl_spline_init(TaylorCordesArm1, x_a1, y_a1, 7);
+  gsl_spline_init(TaylorCordesArm1Inv, y_a1, x_a1, 7);
 
-  x_a2[0]=3.76;
-  x_a2[1]=4.56;
-  x_a2[2]=4.79;
-  x_a2[3]=5.70;
-  x_a2[4]=6.49;
-  x_a2[5]=7.29;
-  x_a2[6]=8.20;
-  y_a2[0]=63.-90.;
-  y_a2[1]=120.-90.;
-  y_a2[2]=160.-90.;
-  y_a2[3]=200.-90.;
-  y_a2[4]=220.-90.;
-  y_a2[5]=250.-90.;
-  y_a2[6]=288.-90.;
+  x_a2[0]=3.76;  y_a2[0]=63.-90.;
+  x_a2[1]=4.56;  y_a2[1]=120.-90.;
+  x_a2[2]=4.79;  y_a2[2]=160.-90.;
+  x_a2[3]=5.70;  y_a2[3]=200.-90.;
+  x_a2[4]=6.49;  y_a2[4]=220.-90.;
+  x_a2[5]=7.29;  y_a2[5]=250.-90.;
+  x_a2[6]=8.20;  y_a2[6]=288.-90.;
+
   gsl_spline_init(TaylorCordesArm2, x_a2, y_a2, 7);
+  gsl_spline_init(TaylorCordesArm2Inv, y_a2, x_a2, 7);
 
-  x_a3[0]=4.90;
-  x_a3[1]=6.27;
-  x_a3[2]=6.49;
-  x_a3[3]=6.95;
-  x_a3[4]=8.20;
-  x_a3[5]=8.89;
-  x_a3[6]=9.57;
-  y_a3[0]=52.-90.;
-  y_a3[1]=120.-90.;
-  y_a3[2]=170.-90.;
-  y_a3[3]=180.-90.;
-  y_a3[4]=200.-90.;
-  y_a3[5]=220.-90.;
-  y_a3[6]=252.-90.;
+  x_a3[0]=4.90;  y_a3[0]=52.-90.;
+  x_a3[1]=6.27;  y_a3[1]=120.-90.;
+  x_a3[2]=6.49;  y_a3[2]=170.-90.;
+  x_a3[3]=6.95;  y_a3[3]=180.-90.;
+  x_a3[4]=8.20;  y_a3[4]=200.-90.;
+  x_a3[5]=8.89;  y_a3[5]=220.-90.;
+  x_a3[6]=9.57;  y_a3[6]=252.-90.;
+
   gsl_spline_init(TaylorCordesArm3, x_a3, y_a3, 7);
+  gsl_spline_init(TaylorCordesArm3Inv, y_a3, x_a3, 7);
 
-  x_a4[0]=5.92;
-  x_a4[1]=7.06;
-  x_a4[2]=7.86;
-  x_a4[3]=9.68;
-  x_a4[4]=10.37;
-  x_a4[5]=11.39;
-  x_a4[6]=12.08;
-  y_a4[0]=20.-90.;
-  y_a4[1]=70.-90.;
-  y_a4[2]=100.-90.;
-  y_a4[3]=160.-90.;
-  y_a4[4]=180.-90.;
-  y_a4[5]=200.-90.;
-  y_a4[6]=223.-90.;
+  x_a4[0]=5.92;  y_a4[0]=20.-90.;
+  x_a4[1]=7.06;  y_a4[1]=70.-90.;
+  x_a4[2]=7.86;  y_a4[2]=100.-90.;
+  x_a4[3]=9.68;  y_a4[3]=160.-90.;
+  x_a4[4]=10.37;  y_a4[4]=180.-90.;
+  x_a4[5]=11.39;  y_a4[5]=200.-90.;
+  x_a4[6]=12.08;  y_a4[6]=223.-90.;
+
   gsl_spline_init(TaylorCordesArm4, x_a4, y_a4, 7);
+  gsl_spline_init(TaylorCordesArm4Inv, y_a4, x_a4, 7);
 
   TaylorCordesArms.push_back(TaylorCordesArm1);
   TaylorCordesArms.push_back(TaylorCordesArm2);
   TaylorCordesArms.push_back(TaylorCordesArm3);
   TaylorCordesArms.push_back(TaylorCordesArm4);
+
+  TaylorCordesArmsInv.push_back(TaylorCordesArm1Inv);
+  TaylorCordesArmsInv.push_back(TaylorCordesArm2Inv);
+  TaylorCordesArmsInv.push_back(TaylorCordesArm3Inv);
+  TaylorCordesArmsInv.push_back(TaylorCordesArm4Inv);
 
   /* Vallee Spiral parameters */
   psi0V.push_back(12.);
@@ -118,15 +109,14 @@ Astro::Astro() {
   WRAPPINGHAPPENED = false;
 }
 
-Astro::Astro() {
-}
+Astro::~Astro() {}
 
 
 /*    ------        SNR PROGENITOR STUFF       ------    */
 
 /* Dice an initial star mass following the Salpeter law */
 double Astro::RandomSalpeterInitialMass() {
-  double initialMass = fUtils->PowerLawRandom(2.35,8.,100.);
+  double initialMass = fUtils->PowerLawRandom(2.35,8.,100.,1.)[0];
   return initialMass;
 }
 
@@ -153,9 +143,9 @@ double Astro::MainSequenceBubbleRadius(double mDotMS, double vMSWind, double tim
      * rather dense molecular clouds. (i.e. p_5 = 1)
      */
     bubbleRadius = -9.15402+1.21532*initialMass;
-    double randomfactor = fUtils->GaussianRandom(0.2*bubbleRadius);
+    double randomfactor = fUtils->GaussianRandom(0.2*bubbleRadius, 0., 1)[0];
     while(randomfactor<-bubbleRadius) {
-      randomfactor = fUtils->GaussianRandom(0.2*bubbleRadius);
+      randomfactor = fUtils->GaussianRandom(0.2*bubbleRadius, 0., 1)[0];
     }
     bubbleRadius += randomfactor;
   }
@@ -229,9 +219,9 @@ double Astro::CalculateRGWRadius(double pBubble, double mDotRGW, double vRGWind)
   if(!pBubble) {
     /* Typical bubble pressure (Chevalier) with 30% Gaussian scatter */
     pBubble = 1.36e-16*1.e4;
-    double randomfactor = fUtils->GaussianRandom(0.3*pBubble);
+    double randomfactor = fUtils->GaussianRandom(0.3*pBubble, 0., 1)[0];
     while(randomfactor<=-pBubble) {
-      randomfactor = fUtils->GaussianRandom(0.3*pBubble);
+      randomfactor = fUtils->GaussianRandom(0.3*pBubble, 0., 1)[0];
     }
     pBubble += randomfactor;
   }
@@ -247,7 +237,6 @@ vector< vector<double> > Astro::CreateDensityProfile(double RGWRadius, double mD
   double rTransRGWMS = sqrt(mDotRGWind/(4.*pi*MSBubbleDensity*vRGWind));
   if(RGWRadius>rTransRGWMS) mSWRGW=mDotRGWind*(RGWRadius-rTransRGWMS)/vRGWind/m_p_g;
   else mSWRGW=4.*pi*MSBubbleDensity*(pow(rTransRGWMS,3.)-pow(RGWRadius,3.));
-  double mRGW = m_p_g*(mDotRGWind*(RGWRadius)/vRGWind+mSWRGW);
   /* calculate the mass that has been swept by the main sequence wind */
   double mSWMS = 4.*pi*ISMDensity*pow(MSBubbleRadius,3.);
   /* calcutate densities in the shells */
@@ -550,38 +539,38 @@ double Astro::ModulateGasDensityWithSpirals(double n, double x, double y, double
   return rhoc*n;
 }
 
-/**
- * calculate gas column densities from the on-point given by x,y,z
- * in direction l,b out to radius r
- */
-double Astro::CalculateGasColumnDensity(vector<double> xyzReference,
-                                        vector<double> GLGB,
-                                        string gascomponent,
-                                        double modulate,
-                                        double range,
-                                        double steps) {
-
-  double GasSpecies = -1.;
-  if(!gascomponent.compare("HI")) GasSpecies = 0.;
-  else if(!gascomponent.compare("H2")) GasSpecies = 1.;
-  else {
-    std::cout<<"Astro::CalculateGasColumnDensity: Specify supported Gas component (currently 'HI' and 'H2')! returning 0 value."<<std::endl;
-    return 0.;
-  }
-
-  TF1 *cdintegrand = new TF1("cd",this,&Astro::nRadial,0.,range,7,"Astro","cdintegrand");
-  cdintegrand->SetParameter(0,GLGB[0]);
-  cdintegrand->SetParameter(1,GLGB[1]);
-  cdintegrand->SetParameter(2,xyzReference[0]);
-  cdintegrand->SetParameter(3,xyzReference[1]);
-  cdintegrand->SetParameter(4,xyzReference[2]);
-  cdintegrand->SetParameter(5,GasSpecies);
-  cdintegrand->SetParameter(6,modulate);
-  double cd = kpc_to_cm*Integrate(cdintegrand,0.,range,steps,false);
-
-//  std::cout<<GasSpecies<<" "<<modulate<<" "<<SPIRALARMMODEL<<" "<<cd<<std::endl;
-  return cd;
-}
+// /**
+//  * calculate gas column densities from the on-point given by x,y,z
+//  * in direction l,b out to radius r
+//  */
+// double Astro::CalculateGasColumnDensity(vector<double> xyzReference,
+//                                         vector<double> GLGB,
+//                                         string gascomponent,
+//                                         double modulate,
+//                                         double range,
+//                                         double steps) {
+//
+//   double GasSpecies = -1.;
+//   if(!gascomponent.compare("HI")) GasSpecies = 0.;
+//   else if(!gascomponent.compare("H2")) GasSpecies = 1.;
+//   else {
+//     std::cout<<"Astro::CalculateGasColumnDensity: Specify supported Gas component (currently 'HI' and 'H2')! returning 0 value."<<std::endl;
+//     return 0.;
+//   }
+//
+//   TF1 *cdintegrand = new TF1("cd",this,&Astro::nRadial,0.,range,7,"Astro","cdintegrand");
+//   cdintegrand->SetParameter(0,GLGB[0]);
+//   cdintegrand->SetParameter(1,GLGB[1]);
+//   cdintegrand->SetParameter(2,xyzReference[0]);
+//   cdintegrand->SetParameter(3,xyzReference[1]);
+//   cdintegrand->SetParameter(4,xyzReference[2]);
+//   cdintegrand->SetParameter(5,GasSpecies);
+//   cdintegrand->SetParameter(6,modulate);
+//   double cd = kpc_to_cm*Integrate(cdintegrand,0.,range,steps,false);
+//
+// //  std::cout<<GasSpecies<<" "<<modulate<<" "<<SPIRALARMMODEL<<" "<<cd<<std::endl;
+//   return cd;
+// }
 
 
 /**
@@ -639,24 +628,12 @@ void Astro::GetGalactic(double x, double y, double z, double xref, double yref, 
   double dz =  z-zref;
 
   double dr = sqrt(dx*dx+dy*dy+dz*dz);
-  double rref = sqrt(xref*xref+yref*yref+zref*zref);
   double rrref = sqrt(xref*xref+yref*yref);
   double drr = sqrt(dx*dx+dy*dy);
   double prod = -dx*xref - dy*yref;
-  double prod2 = -dr*rref - dz*zref;
-//  l = 180.*atan2(dy,dx)/pi;
-//  b = 180.*asin(dz/dr)/pi;
-//  l = -180.*(atan2(dy,dx)-atan2(yref,xref))/pi;
-//  std::cout<<dx<<","<<xref<<","<<dy<<","<<yref<<" "<<(-dx*xref-dy*yref)/(drr*rrref)<<""<<std::endl;
   l = 180.*acos(prod/(drr*rrref))/pi;
-//  std::cout<<prod/(drr*rrref)<<" "<<l<<std::endl;
   if(dx<=0.) l*=-1.;
   b = 180.*asin(dz/dr)/pi;
-//  b = 180.*acos(prod2/(drr*rrref))/pi;
-//  if(dz<=0.) b*=-1.;
-//  std::cout<<b<<" "<<prod2<<" "<<(drr*rrref)<<" "<<prod2/(drr*rrref)<<std::endl;
-//  std::cout<<dr<<" "<<dx<<" "<<dy<<" "<<dz<<" "<<l<<" "<<b<<std::endl;
-//  std::cout<<r<<" "<<<<" "<<x<<" "<<y<<" "<<z<<" / "<<xref<<" "<<yref<<" "<<zref<<" / "<<l<<" "<<b<<" /" <<std::endl;
   return;
 }
 
@@ -777,7 +754,7 @@ void Astro::GetDistanceToNearestSpiralArm(double x, double y, double &DistanceTo
     }
     else if(SPIRALARMMODEL==1) {
       for(double r=0.00001;r<rMax;r+= .03){
-        theta = EvalArmTheta(r,ArmsVector[i]);
+        theta = EvalTaylorCordesArmTheta(r,ArmsVector[i]);
         xx = r*cos(theta)-x;
         yy = r*sin(theta)-y;
         drdr = xx*xx + yy*yy;
@@ -821,7 +798,7 @@ double Astro::GetDistanceToGivenSpiralArm(double x, double y, int arm) {
     }
     else if(SPIRALARMMODEL==1) {
       for(double r=0.00001;r<rMax;r+= .03){
-        theta = EvalArmTheta(r,arm);
+        theta = EvalTaylorCordesArmTheta(r,arm);
         xx = r*cos(theta)-x;
         yy = r*sin(theta)-y;
         drdr = xx*xx + yy*yy;
@@ -838,33 +815,80 @@ double Astro::GetDistanceToGivenSpiralArm(double x, double y, int arm) {
   return sqrt(ddr);
 }
 
-double Astro::EvalArmTheta(double r, int arm) {
+double Astro::EvalTaylorCordesArmTheta(double r, int arm) {
   double theta = 0.;
-  if(!i) {
-    cout << "Astro::EvalArm: Requested Arm 0! (Arm Index starts a 1, not 0.) "
+  if(!arm) {
+    cout << "Astro::EvalTaylorCordesArmTheta: Requested Arm 0! (Arm Index starts a 1, not 0.) "
             "Returning 0. " << endl;
     return 0.;
   }
-  gsl_interp_accel *a;
+  gsl_interp_accel *a = NULL;
+  double rmin,rmax;
   switch (arm){
     case 1:
       a = accArm1;
+      rmin = x_a1[0]; rmax = x_a1[6];
+      break;
     case 2:
       a = accArm2;
+      rmin = x_a2[0]; rmax = x_a2[6];
+      break;
     case 3:
       a = accArm3;
+      rmin = x_a3[0]; rmax = x_a3[6];
+      break;
     case 4:
       a = accArm4;
+      rmin = x_a4[0]; rmax = x_a4[6];
+      break;
   }
-  if (gsl_spline_eval_e(arm - 1 , r, a, &theta)) {
-    cout << "Astro::GetDistanceToGivenSpiralArm: Interpolation in arm "
+  if(r<rmin || r>rmax) return 0.;
+  if (gsl_spline_eval_e(TaylorCordesArms[arm - 1], r, a, &theta)) {
+    cout << "Astro::EvalTaylorCordesArmTheta: Interpolation in arm "
          << arm << " failed. Exiting with 0. return." << endl;
     return 0.;
   }
   if (isnan(theta) || isinf(theta)) return 0.;
   theta *= (pi/180.);
-  gsl_interp_accel_free(a);
   return theta;
+}
+
+double Astro::EvalTaylorCordesArmGalactocentricRadius(double theta, int arm) {
+  double r = 0.;
+  if(!arm) {
+    cout << "Astro::EvalTaylorCordesArmGalactocentricRadius: Requested Arm 0! "
+             "(Arm Index starts a 1, not 0.) Returning 0. " << endl;
+    return 0.;
+  }
+  gsl_interp_accel *a = NULL;
+  double thetamin,thetamax;
+  switch (arm){
+    case 1:
+      a = accArm1Inv;
+      thetamin = y_a1[0]; thetamax = y_a1[6];
+      break;
+    case 2:
+      a = accArm2Inv;
+      thetamin = y_a2[0]; thetamax = y_a2[6];
+      break;
+    case 3:
+      a = accArm3Inv;
+      thetamin = y_a3[0]; thetamax = y_a3[6];
+      break;
+    case 4:
+      a = accArm4Inv;
+      thetamin = y_a4[0]; thetamax = y_a4[6];
+      break;
+  }
+  if(theta<thetamin || theta>thetamax) return 0.;
+  if (gsl_spline_eval_e(TaylorCordesArmsInv[arm - 1], theta, a, &r)) {
+    cout << "Astro::EvalTaylorCordesArmGalactocentricRadius: Interpolation in arm "
+         << arm << " failed. Exiting with 0. return." << endl;
+    return 0.;
+  }
+  if (isnan(r) || isinf(r)) return 0.;
+  gsl_interp_accel_free(a);
+  return r;
 }
 
 void Astro::SetSurfaceDensityModel(string surfacedensitymodel) {
@@ -903,12 +927,20 @@ void Astro::SetMainSequenceBubbleModel(string msbubblemodel) {
   }
 }
 
-void Astro::DiceGalacticPosition(double &x, double &y, double &z) {
-  double r = GetRandomGalactocentricRadius();
-  GalacticPositionXY(r,GetRandomArm(),x,y);
-  RandomTangentialShift(r, armWidth, x, y);
-  z = GetRandomZValue(scaleHeight);
-  return;
+vector< vector<double> > Astro::DiceGalacticPositions(int n) {
+  vector<double> r = GetRandomGalactocentricRadii(n);
+  vector< vector<double> > v;
+  double x,y,z;
+  for(int i=0;i<n;i++) {
+    v.push_back(vector<double>());
+    GalacticPositionXY(r[i],GetRandomArm(),x,y);
+    RandomGaussianShift(r[i], armWidth, x, y);
+    z = GetRandomZValue(scaleHeight);
+    v[v.size()-1].push_back(x);
+    v[v.size()-1].push_back(y);
+    v[v.size()-1].push_back(z);
+  }
+  return v;
 }
 
 
@@ -917,7 +949,7 @@ void Astro::DiceGalacticPosition(double &x, double &y, double &z) {
  */
 unsigned int Astro::GetRandomArm() {
   unsigned int size = ArmsVector.size();
-  double v = randomiser->Rndm();
+  double v = fUtils->Random();
   for(unsigned int i=1;i<=size;i++) {
     double x = (double)i/size;
     if(x>v) return ArmsVector[i-1];
@@ -932,7 +964,7 @@ unsigned int Astro::GetRandomArm() {
 void Astro::GalacticPositionXY(double r, int arm, double &x, double &y) {
   x = y = 0.;
   /* Central Structure */
-  if(r<3.6 + fUtils->GaussianRandom(0.36, 0.)) {
+  if(r<3.6 + fUtils->GaussianRandom(0.36, 0.,1)[0]) {
     if(!CENTRALSTRUCTUREMODEL) Bar(r,x,y);
     else if(CENTRALSTRUCTUREMODEL==1) Disk(r,x,y);
     else {
@@ -963,30 +995,56 @@ void Astro::PositionOnSpiralArmAngular(double theta, int arm, double &x, double 
   return;
 }
 
-double Astro::GetRandomGalactocentricRadius() {
-  /* Surface density, this gives the radial distance from the center */
-  if(SURFACEDENSITYMODEL==0) return fcasebhat->GetRandom();
-  else if(SURFACEDENSITYMODEL==1) return fiuskuc->GetRandom();
-  else if(SURFACEDENSITYMODEL==2) return flinear->GetRandom();
-  else {
-    std::cout<<"Astro::LogarithmicSpiral: Specify proper surface density distribution. Option: 'IusifovKucuk','CaseButt','Uniform'! Exiting."<<std::endl;
-    return 0.;
+vector<double> Astro::GetRandomGalactocentricRadii(int n) {
+  double rmin = 0.;
+  double rmax = 20.;
+  if(SURFACEDENSITYMODEL==2) return fUtils->LinearRandom(0.,rmin,rmax,n);
+  vector< vector<double> > v;
+  int steps = 200;
+  double dr = (rmax-rmin)/steps;
+  for(int i=0;i<steps;i++) {
+    double r,val;
+    r  = rmin+i*dr;
+
+    if(!SURFACEDENSITYMODEL) val = CaseBhattacharyaProfile(r);
+    else if(SURFACEDENSITYMODEL==1) val = IusifovKucukProfile(r);
+    else break;
+    v.push_back(vector<double>());
+    v[v.size()-1].push_back(r);
+    v[v.size()-1].push_back(val);
   }
+  return fUtils->CustomFunctionRandom(v,v[0][0],v[v.size()-1][0],n);
 }
 
+double Astro::CaseBhattacharyaProfile(double r) {
+  return 2.*pi*r*pow(r/8.5,2.)*exp(-5.1*(r-8.5)/8.5);
+}
+double Astro::IusifovKucukProfile(double r) {
+  return 2.*pi*r*pow((r+0.55)/(8.5+0.55),1.64)*exp(-4.01*(r-8.5)/(8.5+0.55));
+}
 double Astro::GetRandomZValue(double scaleHeight) {
-  return fUtils->SignRandom()*fUtils->ExponentialRandom(scaleHeight,0.,5.*scaleHeight);
+  return fUtils->SignRandom(1)[0]*fUtils->ExponentialRandom(scaleHeight,0.,5.*scaleHeight,1)[0];
 }
 
 /**
- * gaussian shift along concentric circle (retains r-distribution)
+ * gaussian shift along concentric circle (retains r-distribution), but
+ * looks odd with TaylorCordes spirals
  */
 void Astro::RandomTangentialShift(double r, double width, double &x, double &y) {
-  double dtheta = 2.*pi*fUtils->GaussianRandom(width)/r;
+  double dtheta = 2.*pi*fUtils->GaussianRandom(width, 0.,1)[0]/r;
   double x_r = x*cos(dtheta)-y*sin(dtheta);
   double y_r = x*sin(dtheta)+y*cos(dtheta);
   x = x_r;
   y = y_r;
+  return;
+}
+/**
+ * gaussian shift along concentric circle (retains r-distribution), but
+ * looks odd with TaylorCordes spirals
+ */
+void Astro::RandomGaussianShift(double r, double width, double &x, double &y) {
+  x += fUtils->GaussianRandom(sqrt(width), 0.,1)[0];
+  y += fUtils->GaussianRandom(sqrt(width), 0.,1)[0];
   return;
 }
 
@@ -1041,7 +1099,8 @@ void Astro::TaylorCordesSpiral(double r, int arm, double &x, double &y) {
     std::cout<<"Astro::TaylorCordesSpiral: Arm number "<<arm<<" not there. Returning zero value."<<std::endl;
     return;
   }
-  double theta = EvalArmTheta(r,arm);
+  double theta = EvalTaylorCordesArmTheta(r,arm);
+  if(!theta) return;
   x = r*cos(theta);
   y = r*sin(theta);
   return;
@@ -1058,7 +1117,7 @@ double Astro::TaylorCordesSpiralAngular(double theta, int arm) {
     std::cout<<"Astro::TaylorCordesSpiral: Arm number "<<arm<<" not there. Returning zero value."<<std::endl;
     return 0.;
   }
-  double r = TGraphToTF1(TaylorCordesArms[arm-1])->GetX(theta);
+  double r = EvalTaylorCordesArmGalactocentricRadius(theta,arm);
   return r;
 }
 
@@ -1080,7 +1139,7 @@ void Astro::Bar(double r, double &x, double &y) {
   double angle = 90. - barAngle ; //90 - x because angle is relative to Sun-GC line (y-dir)
   angle *= pi/180.;
   x = y = 0.;
-  r *= fUtils->SignRandom();
+  r *= fUtils->SignRandom(1)[0];
   x = r*cos(angle);
   y = r*sin(angle);
   return;

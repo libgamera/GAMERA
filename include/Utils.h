@@ -8,6 +8,7 @@
 #include <vector>
 #include <ctime>
 #include <gsl/gsl_rng.h>
+#include <gsl/gsl_spline.h>
 
 /* TeV->erg */
 #define TeV_to_erg 1.602
@@ -86,13 +87,16 @@ class Utils {
   void DrawGamera();
   void WriteOut(vector<vector<double> > sp, string outname);
   void ReadIn(string inname, vector< vector<double> > &sp);
-  double LinearRandom(double slope, double x_min, double x_max);
-  double PowerLawRandom(double index, double x_min, double x_max);
-  double GaussianRandom(double width, double offset);
-  double SignRandom();
-  double ExponentialRandom(double ind_norm, double x_min, double x_max);
-
-
+  double Random();
+  vector<double>  LinearRandom(double slope, double x_min, double x_max, int n);
+  vector<double>  PowerLawRandom(double index, double x_min, double x_max,
+                                 int n);
+  vector<double>  GaussianRandom(double width, double offset, int n);
+  vector<double>  SignRandom(int n);
+  vector<double>  ExponentialRandom(double ind_norm, double x_min,
+                                    double x_max, int n);
+  vector<double>  CustomFunctionRandom(vector< vector<double> > f,
+                                       double xmin, double xmax, int n);
 
 
 };

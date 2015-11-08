@@ -214,52 +214,139 @@ double Utils::Random() {
 /**
 * get linearly distributed variates
 */
-double Utils::LinearRandom(double slope, double x_min, double x_max) {
- double rand_min = 0.5*slope*pow(x_min,2.);
- double rand_max = 0.5*slope*pow(x_max,2.);
- double rand = rand_min + (rand_max - rand_min)*gsl_rng_uniform(r);
- return sqrt(2.*rand/slope);
+vector<double> Utils::LinearRandom(double slope, double x_min,
+                                   double x_max, int n) {
+  vector<double> v;
+  for(int i=0;i<n;i++) {
+    if(!slope) v.push_back((x_max-x_min)*gsl_rng_uniform(r)+x_min);
+    else {
+      double rand_min = 0.5*slope*pow(x_min,2.);
+      double rand_max = 0.5*slope*pow(x_max,2.);
+      double rand = rand_min + (rand_max - rand_min)*gsl_rng_uniform(r);
+      v.push_back(sqrt(2.*rand/slope));
+    }
+  }
+  return v;
 }
 
 /**
 * get power-law distributed variates
 */
-double Utils::PowerLawRandom(double index, double x_min, double x_max) {
- double rand = -100.;
- double k = 0.03;
- while(rand<x_min || rand>x_max) {
-   rand=pow(((index-1.)/k)*gsl_rng_uniform(r),-1./(index-1.));
- }
- return rand;
+vector<double> Utils::PowerLawRandom(double index, double x_min,
+                                     double x_max, int n) {
+  vector<double> v;
+  for(int i=0;i<n;i++) {
+    double rand = -100.;
+    double k = 0.03;
+    while(rand<x_min || rand>x_max) {
+      rand=pow(((index-1.)/k)*gsl_rng_uniform(r),-1./(index-1.));
+    }
+    v.push_back(rand);
+  }
+  return v;
 }
 
 /**
 * get gaussian distributed variate using the Box-Muller method
 */
-double Utils::GaussianRandom(double width, double offset) {
- double random_gaussian = sqrt(-2.*log(gsl_rng_uniform(r)))
+vector<double> Utils::GaussianRandom(double width, double offset, int n) {
+  vector<double> v;
+  for(int i=0;i<n;i++) {
+    double random_gaussian = sqrt(-2.*log(gsl_rng_uniform(r)))
                         * cos(2*pi*gsl_rng_uniform(r));
- return offset + width*random_gaussian;
+    v.push_back(offset + width*random_gaussian);
+  }
+  return v;
 }
 
 /**
 * return a random sign
 */
-double Utils::SignRandom() {
- if(gsl_rng_uniform(r)< 0.5) return 1.;
- else return -1.;
+vector<double> Utils::SignRandom(int n) {
+  vector<double> v;
+  for(int i=0;i<n;i++) {
+    if(gsl_rng_uniform(r)< 0.5) v.push_back(1.);
+    else v.push_back(-1.);
+  }
+  return v;
 }
 
 /**
 * return a exponentially distributed variate
 */
-double Utils::ExponentialRandom(double ind_norm, double x_min, double x_max)
-{
- ind_norm = -1./ind_norm;
- double rand_min = (1./ind_norm)*(exp(ind_norm*x_min)-1.);
- double rand_max = (1./ind_norm)*(exp(ind_norm*x_max)-1.);
- double rand = rand_min + (rand_max-rand_min)*gsl_rng_uniform(r);
- return pow(ind_norm,-1.)*log((ind_norm)*rand+1.);
+vector<double> Utils::ExponentialRandom(double ind_norm, double x_min,
+                                        double x_max, int n) {
+  vector<double> v;
+  ind_norm = -1./ind_norm;
+  double rand_min = (1./ind_norm)*(exp(ind_norm*x_min)-1.);
+  double rand_max = (1./ind_norm)*(exp(ind_norm*x_max)-1.);
+  for(int i=0;i<n;i++) {
+    double rand = rand_min + (rand_max-rand_min)*gsl_rng_uniform(r);
+    v.push_back(pow(ind_norm,-1.)*log((ind_norm)*rand+1.));
+  }
+  return v;
+}
+
+/**
+ * Sample Variate that follows the input 2D-Vector
+ */
+vector<double> Utils::CustomFunctionRandom(vector< vector<double> > f,
+                                           double xmin, double xmax, int n) {
+
+                                             cout<<"1.0"<<std::endl;
+  vector<double> v;
+  if(!f.size()) {
+    cout << "Utils::CustomFunctionRandom: function vector empty! "
+            "Exiting!" << endl;
+    return v;
+  }
+  if(!xmin && !xmax) {
+    xmin = f[0][0];
+    xmax = f[f.size()-1][0];
+  }
+  if( xmin < f[0][0] || xmax > f[f.size()-1][0] ) {
+    cout << "Utils::CustomFunctionRandom: requested sampling range outside "
+            "of boundaries req.:(" << xmin << "," << xmax << ") vs. "
+            "avail.:(" << f[0][0] << "," << f[f.size()-1][0] << "). "
+            "Returning emptyvector." << endl;
+    return v;
+  }
+  cout<<"1.1"<<std::endl;
+  int size = (int)f.size();
+  double x[size];
+  double y[size];
+  double ymax = -1.e-100;
+  for (unsigned int i=0;i<f.size();i++) {
+    x[i] = f[i][0];
+    y[i] = f[i][1];
+    if(x[i] > xmin && x[i] < xmax && y[i] > ymax) ymax = y[i];
+  }
+  gsl_spline *lookup = gsl_spline_alloc(gsl_interp_linear, size);
+  gsl_spline_init(lookup, x, y, size);
+  gsl_interp_accel *a = gsl_interp_accel_alloc();
+
+  cout<<"1.2"<<std::endl;
+  for(int i=0;i<n;i++) {
+    double x;
+    while(1) {
+      x = (xmax-xmin)*gsl_rng_uniform(r)+xmin;
+      double u = gsl_rng_uniform(r);
+      double val = 0.;
+      if (gsl_spline_eval_e(lookup, x, a, &val)) {
+        cout << "Utils::CustomFunctionRandom: Function interpolation "
+        "failed. Exiting!" << endl;
+        return v;
+      }
+      if (isnan(val) || isinf(val)) {
+        cout << "Utils::CustomFunctionRandom: Function interpolation returned "
+             << val << "! Exiting! " << endl;
+        return v;
+      }
+      if(u < val/ymax) break;
+    }
+    v.push_back(x);
+  }
+  return v;
 }
 
 ///**

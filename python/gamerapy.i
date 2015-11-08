@@ -3,6 +3,7 @@
 #include "../include/Radiation.h"
 #include "../include/Particles.h"
 #include "../include/Utils.h"
+#include "../include/Astro.h"
 %}
 
 %include "typemaps.i"
@@ -17,3 +18,4 @@ namespace std
 %include "../include/Radiation.h"
 %include "../include/Particles.h"
 %include "../include/Utils.h"
+%include "../include/Astro.h"
