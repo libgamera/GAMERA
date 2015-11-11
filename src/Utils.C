@@ -395,3 +395,59 @@ double Utils::Integrate(vector< vector<double> > f, double xmin, double xmax) {
   }
   return integral;
 }
+
+vector< vector< double> > Utils::IntegratedProfile(vector< vector<double> > f) {
+  vector< vector<double> > v;
+  double x0 = f[0][0];
+  for(unsigned int i=1;i<f.size();i++) {
+    double x = f[i][0];
+    double y = Integrate(f,x0,x);
+    v.push_back(vector<double>());
+    v[v.size()-1].push_back(x);
+    v[v.size()-1].push_back(y);
+  }
+  return v;
+}
+
+gsl_spline *Utils::GSLsplineFromTwoDVector(vector< vector<double> > v) {
+  int size = (int)v.size();
+  double x[size];
+  double y[size];
+  for(int i=0;i<size;i++) {
+    x[i] = v[i][0];
+    y[i] = v[i][1];
+  }
+  gsl_spline *s = gsl_spline_alloc(gsl_interp_linear, size);
+  gsl_spline_init(s, x, y, size);
+  return s;
+}
+
+vector< vector<double> > Utils::SortTwoDVector(vector< vector<double> > v,
+                                               int column) {
+  if(!v.size()) {
+    cout << "Utils::SortTwoDVector: function vector empty! "
+    "Exiting!" << endl;
+    return v;
+  }
+  if(column<0 || column>1) {
+    cout << "Utils::SortTwoDVector: Sorting column must be 0 or 1! "
+    "Exiting!" << endl;
+    return v;
+  }
+  if(!column) sort (v.begin(), v.end(), sortcriterionfirstcolumn);
+  else  sort (v.begin(), v.end(), sortcriterionsecondcolumn);
+
+  return v;
+}
+
+/**
+ * Private method that is used in the sorting of 2D vectors.
+ */
+bool sortcriterionfirstcolumn (vector<double> i,
+                                             vector<double> j) {
+  return (i[0]<j[0]);
+}
+bool sortcriterionsecondcolumn (vector<double> i,
+                                              vector<double> j) {
+ return (i[1]<j[1]);
+}

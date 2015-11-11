@@ -71,6 +71,9 @@ using namespace std;
  * GAMERA programs.
  */
 
+bool sortcriterionfirstcolumn (vector<double> i,vector<double> j);
+bool sortcriterionsecondcolumn (vector<double> i,vector<double> j);
+
 class Utils {
  private:
   bool QUIETMODE;
@@ -99,5 +102,12 @@ class Utils {
   vector<double>  CustomFunctionRandom(vector< vector<double> > f,
                                        double xmin, double xmax, int n);
   double Integrate(vector< vector<double> > f, double xmin, double xmax);
+  vector< vector< double> > IntegratedProfile(vector< vector<double> > f);
+  gsl_spline *GSLsplineFromTwoDVector(vector< vector<double> > v);
+  vector< vector<double> > SortTwoDVector(vector< vector<double> > v,
+                                                 int column);
+
+
+
 };
 #endif

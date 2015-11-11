@@ -87,6 +87,10 @@ class Astro  {
     double scaleHeight;
     bool QUIETMODE;
     double rMax;
+    double rMinInternalBoundary;
+    double rMaxInternalBoundary;
+    double tMinInternalBoundary;
+    double tMaxInternalBoundary;
     int SPIRALARMMODEL;
     int SURFACEDENSITYMODEL;
     int CENTRALSTRUCTUREMODEL;
@@ -96,9 +100,13 @@ class Astro  {
     bool WRAPPINGHAPPENED;
     gsl_spline *TaylorCordesArm1,*TaylorCordesArm2,*TaylorCordesArm3,
                *TaylorCordesArm4,*TaylorCordesArm1Inv,*TaylorCordesArm2Inv,
-               *TaylorCordesArm3Inv,*TaylorCordesArm4Inv;
+               *TaylorCordesArm3Inv,*TaylorCordesArm4Inv,
+               *thinshellvelocitylookup,*thinshellradiuslookup;
     gsl_interp_accel *accArm1,*accArm2,*accArm3,*accArm4,
-                     *accArm1Inv,*accArm2Inv,*accArm3Inv,*accArm4Inv;
+                     *accArm1Inv,*accArm2Inv,*accArm3Inv,*accArm4Inv,
+                     *atsrad,*atsvel;
+    vector< vector<double> > thinshellradius;
+    vector< vector<double> > thinshellvelocity;
   public:
     Astro();
     ~Astro();
@@ -151,11 +159,16 @@ class Astro  {
     void SetMainSequenceBubbleModel(string msbubblemodel);
     void SetScaleHeight(double SCALEHEIGHT) {scaleHeight=SCALEHEIGHT;}
     void SetArmWidth(double ARMWIDTH) {armWidth=ARMWIDTH;}
-    vector< vector<double> > CreateDensityProfile(double RGWRadius, double mDotRGWind, double vRGWind, double MSBubbleRadius, double MSBubbleDensity, double ISMDensity, double mEj, double rSWRGW, double rSWMS);
+    vector< vector<double> > CreateDensityProfile(vector<double> pars,
+                                                  double rmin,double rmax);
     double EvalTaylorCordesArmTheta(double r, int arm);
     double EvalTaylorCordesArmGalactocentricRadius(double theta, int arm);
     double CaseBhattacharyaProfile(double r);
     double IusifovKucukProfile(double r);
+    void CalculateThinShellApproximation(vector< vector<double> > dProfile,
+                                         double E,
+                                         double AdiabIndex=1.333);
+    vector<double> ThinShellRadiusAndSpeed(double t);
 
 };
 #endif
