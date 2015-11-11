@@ -3,7 +3,7 @@
 Astro::Astro() {
 
   fUtils = new Utils();
-
+  QUIETMODE = 0;
   /* Standard assumption of 4 spiral arms */
   ArmsVector.push_back(1);
   ArmsVector.push_back(2);
@@ -711,16 +711,37 @@ void Astro::DisableArm(int arm) {
   bool Set = false;
   for(unsigned int i=0;i<ArmsVector.size();i++) {
     if(ArmsVector[i]==arm) {
-      ArmsVector[i]=0;
+      ArmsVector.erase(ArmsVector.begin()+i);
       Set = true;
+      break;
     }
   }
-  if(Set==false) std::cout<<"Arm "<<1<<" already disabled."<<std::endl;
-  vector<int> tempvec;
-  for(unsigned int i=0;i<ArmsVector.size();i++) {
-    if(ArmsVector[i]) tempvec.push_back(ArmsVector[i]);
+  if(Set==false) std::cout<<"Arm "<<arm<<" already disabled."
+                            "Nothing to do! "<<std::endl;
+  if(!QUIETMODE) {
+    for(unsigned int i=0;i<ArmsVector.size();i++) std::cout<<"Arm["<<i<<"]="<<ArmsVector[i]<<std::endl;
   }
-  ArmsVector = tempvec;
+  return;
+}
+
+/**
+ * Switch off an individual arm in Astro spiral model
+ */
+void Astro::EnableArm(int arm) {
+  if(!QUIETMODE) std::cout<<"Enabling Arm no. "<<arm<<"."<<std::endl;
+  bool AlreadyThere = false;
+  for(unsigned int i=0;i<ArmsVector.size();i++) {
+    if(ArmsVector[i] == arm) AlreadyThere = true;
+  }
+  if(AlreadyThere==true)  {
+    std::cout<<"Arm "<<arm<<" already there! Nothing to do..."<<std::endl;
+    if(!QUIETMODE) {
+      for(unsigned int i=0;i<ArmsVector.size();i++) std::cout<<"Arm["<<i<<"]="<<ArmsVector[i]<<std::endl;
+    }
+    return;
+  }
+  ArmsVector.push_back(arm);
+  sort(ArmsVector.begin(), ArmsVector.end());
   if(!QUIETMODE) {
     for(unsigned int i=0;i<ArmsVector.size();i++) std::cout<<"Arm["<<i<<"]="<<ArmsVector[i]<<std::endl;
   }
@@ -823,7 +844,8 @@ double Astro::EvalTaylorCordesArmTheta(double r, int arm) {
     return 0.;
   }
   gsl_interp_accel *a = NULL;
-  double rmin,rmax;
+  double rmin = 0.;
+  double rmax = 0.;
   switch (arm){
     case 1:
       a = accArm1;
@@ -848,7 +870,7 @@ double Astro::EvalTaylorCordesArmTheta(double r, int arm) {
          << arm << " failed. Exiting with 0. return." << endl;
     return 0.;
   }
-  if (isnan(theta) || isinf(theta)) return 0.;
+  if (std::isnan(theta) || std::isinf(theta)) return 0.;
   theta *= (pi/180.);
   return theta;
 }
@@ -861,7 +883,8 @@ double Astro::EvalTaylorCordesArmGalactocentricRadius(double theta, int arm) {
     return 0.;
   }
   gsl_interp_accel *a = NULL;
-  double thetamin,thetamax;
+  double thetamin = 0.;
+  double thetamax = 0.;
   switch (arm){
     case 1:
       a = accArm1Inv;
@@ -886,7 +909,7 @@ double Astro::EvalTaylorCordesArmGalactocentricRadius(double theta, int arm) {
          << arm << " failed. Exiting with 0. return." << endl;
     return 0.;
   }
-  if (isnan(r) || isinf(r)) return 0.;
+  if (std::isnan(r) || std::isinf(r)) return 0.;
   gsl_interp_accel_free(a);
   return r;
 }
@@ -932,13 +955,15 @@ vector< vector<double> > Astro::DiceGalacticPositions(int n) {
   vector< vector<double> > v;
   double x,y,z;
   for(int i=0;i<n;i++) {
-    v.push_back(vector<double>());
-    GalacticPositionXY(r[i],GetRandomArm(),x,y);
-    RandomGaussianShift(r[i], armWidth, x, y);
-    z = GetRandomZValue(scaleHeight);
-    v[v.size()-1].push_back(x);
-    v[v.size()-1].push_back(y);
-    v[v.size()-1].push_back(z);
+    GalacticPositionXY(r[i],GetRandomArm(r[i]),x,y);
+    if(x && y) {
+      z = GetRandomZValue(scaleHeight);
+      RandomGaussianShift(r[i], armWidth, x, y);
+      v.push_back(vector<double>());
+      v[v.size()-1].push_back(x);
+      v[v.size()-1].push_back(y);
+      v[v.size()-1].push_back(z);
+    }
   }
   return v;
 }
@@ -947,14 +972,30 @@ vector< vector<double> > Astro::DiceGalacticPositions(int n) {
 /**
  * return a random spiral arm (identifier, i.e. an unsigned integer)
  */
-unsigned int Astro::GetRandomArm() {
+unsigned int Astro::GetRandomArm(double r) {
+    cout << " --------------------- " << endl;
+  vector<int> vint = ArmsVector;
+  for (unsigned int i=0;i<ArmsVector.size();i++) cout<< ArmsVector[i] << endl;
+  if(SPIRALARMMODEL==1) {
+
+    //QUIETMODE = 1;
+    if(r<x_a1[0] || r>x_a1[6]) DisableArm(1);
+    if(r<x_a2[0] || r>x_a2[6]) DisableArm(2);
+    if(r<x_a3[0] || r>x_a3[6]) DisableArm(3);
+    if(r<x_a4[0] || r>x_a4[6]) DisableArm(4);
+  }
   unsigned int size = ArmsVector.size();
   double v = fUtils->Random();
-  for(unsigned int i=1;i<=size;i++) {
+  unsigned int i = 1;
+  for(;i<=size;i++) {
+    //cout << "-- " << i << std::endl;
     double x = (double)i/size;
-    if(x>v) return ArmsVector[i-1];
+    if(x>v) break;
   }
-  return 0;
+  int arm = ArmsVector[i-1];
+  cout <<  ArmsVector[i-1] << " " << i << endl;
+  ArmsVector = vint;
+  return arm;
 }
 
 /**
@@ -963,12 +1004,17 @@ unsigned int Astro::GetRandomArm() {
  */
 void Astro::GalacticPositionXY(double r, int arm, double &x, double &y) {
   x = y = 0.;
+  if(!arm) {
+    cout << "Astro::GalacticPositionXY: Arm 0 does not exits! Returing 0. "
+            "values" << endl;
+  }
   /* Central Structure */
-  if(r<3.6 + fUtils->GaussianRandom(0.36, 0.,1)[0]) {
+  if(r<barRadius) {
     if(!CENTRALSTRUCTUREMODEL) Bar(r,x,y);
     else if(CENTRALSTRUCTUREMODEL==1) Disk(r,x,y);
     else {
-      std::cout<<"Astro::LogarithmicSpiral: Please specify proper central galactic structure. Options: Bar,Bulge. Exiting"<<std::endl;
+      cout << "Astro::GalacticPositionXY: Please specify proper central galactic"
+              "structure. Options: Bar,Bulge. Exiting" << endl;
     }
     return;
   }
@@ -977,8 +1023,7 @@ void Astro::GalacticPositionXY(double r, int arm, double &x, double &y) {
   else if(SPIRALARMMODEL==1) TaylorCordesSpiral(r,arm,x,y);
   else if(SPIRALARMMODEL==2) Disk(r,x,y);
   else {
-    std::cout<<"Astro::LogarithmicSpiral: Please specify proper available spiral arm model. Options: Vallee,TaylorCordes. Returning zero coordinates"<<std::endl;
-    x = y = 0.;
+    std::cout<<"Astro::GalacticPositionXY: Please specify proper available spiral arm model. Options: Vallee,TaylorCordes. Returning zero coordinates"<<std::endl;
   }
   return;
 }
@@ -1043,8 +1088,8 @@ void Astro::RandomTangentialShift(double r, double width, double &x, double &y) 
  * looks odd with TaylorCordes spirals
  */
 void Astro::RandomGaussianShift(double r, double width, double &x, double &y) {
-  x += fUtils->GaussianRandom(sqrt(width), 0.,1)[0];
-  y += fUtils->GaussianRandom(sqrt(width), 0.,1)[0];
+  x += fUtils->GaussianRandom(width, 0.,1)[0];
+  y += fUtils->GaussianRandom(width, 0.,1)[0];
   return;
 }
 

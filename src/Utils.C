@@ -337,7 +337,7 @@ vector<double> Utils::CustomFunctionRandom(vector< vector<double> > f,
         "failed. Exiting!" << endl;
         return v;
       }
-      if (isnan(val) || isinf(val)) {
+      if (std::isnan(val) || std::isinf(val)) {
         cout << "Utils::CustomFunctionRandom: Function interpolation returned "
              << val << "! Exiting! " << endl;
         return v;
@@ -357,3 +357,41 @@ vector<double> Utils::CustomFunctionRandom(vector< vector<double> > f,
 //  return rand;
 
 //}
+/**
+ * Integration function using the GSL spline integrator functionality
+ *
+ */
+double Utils::Integrate(vector< vector<double> > f, double xmin, double xmax) {
+  if(!f.size()) {
+    cout << "Utils::CustomFunctionRandom: function vector empty! "
+    "Exiting & returning 0." << endl;
+    return 0.;
+  }
+  if(!xmin && !xmax) {
+    xmin = f[0][0];
+    xmax = f[f.size()-1][0];
+  }
+  if( xmin < f[0][0]) xmin = f[0][0];
+  if( xmax > f[f.size()-1][0]) xmax = f[f.size()-1][0];
+
+  int size = (int)f.size();
+  double x[size];
+  double y[size];
+  double ymax = -1.e-100;
+  for (unsigned int i=0;i<f.size();i++) {
+    x[i] = f[i][0];
+    y[i] = f[i][1];
+    if(x[i] > xmin && x[i] < xmax && y[i] > ymax) ymax = y[i];
+  }
+  gsl_spline *lookup = gsl_spline_alloc(gsl_interp_linear, size);
+  gsl_spline_init(lookup, x, y, size);
+  gsl_interp_accel *a = gsl_interp_accel_alloc();
+  double integral = 0.;
+  int errcode = gsl_spline_eval_integ_e(lookup, xmin, xmax, a, &integral);
+  if(errcode) {
+    cout << "Utils::Integrate: Someting went wrong in the integration!"
+            "Errorcode " << errcode << ". Returning 0. value. " << endl;
+    integral = 0.;
+  }
+  return integral;
+}

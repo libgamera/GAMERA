@@ -103,6 +103,7 @@ class Astro  {
     Astro();
     ~Astro();
     void DisableArm(int arm);///< Switch off an individual arm in Galaxy spiral model
+    void EnableArm(int arm);///< Switch on an individual arm in Galaxy spiral model
     double RandomSalpeterInitialMass();///< Dice an initial star mass following the Salpeter law
     double MainSequenceBubbleRadius(double mDotMS, double vMSWind, double timeMS, double n, double initialMass);///< calculate the radius created by the main sequence wind of a star
     double CalculateMSBubbleDensity(double mDotMS, double vMSWind, double timeMS, double n, double bubbleRadius);///< Density inside the main-sequence wind blown bubble.
@@ -127,7 +128,7 @@ class Astro  {
     void RotateCoordinates(double &x, double &y, double &z, double phi, double theta, double psi);///< rotate coordinate around (0,0,0) by (phi,theta,psi)
     void RandomTangentialShift(double r, double width, double &x, double &y);///< gaussian shift along concentric circle (retains r-distribution)
     void RandomGaussianShift(double r, double width, double &x, double &y);
-    unsigned int GetRandomArm();///< return a random spiral arm (identifier, i.e. an unsigned integer)
+    unsigned int GetRandomArm(double r);///< return a random spiral arm (identifier, i.e. an unsigned integer)
     void Bar(double r, double &x, double &y);///< Get xy Coordinates on a central bar inclined with an angle 'angle' clockwise
     void Disk(double r, double &x, double &y);///< Get random xy Coordinates  on a disk
     double LinearSurfDens(double *x, double *par);///< radial distribution that gives a flat appearance of the galaxy

@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <ctime>
+#include <algorithm>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_spline.h>
 
@@ -97,7 +98,6 @@ class Utils {
                                     double x_max, int n);
   vector<double>  CustomFunctionRandom(vector< vector<double> > f,
                                        double xmin, double xmax, int n);
-
-
+  double Integrate(vector< vector<double> > f, double xmin, double xmax);
 };
 #endif
