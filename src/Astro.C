@@ -15,12 +15,12 @@ Astro::Astro() {
   accArm3 = gsl_interp_accel_alloc();
   accArm4 = gsl_interp_accel_alloc();
 
-  TaylorCordesArm1 = gsl_spline_alloc(gsl_interp_linear, 7);
+  TaylorCordesArm1 = gsl_spline_alloc(gsl_interp_linear, 6);
   TaylorCordesArm2 = gsl_spline_alloc(gsl_interp_linear, 7);
   TaylorCordesArm3 = gsl_spline_alloc(gsl_interp_linear, 7);
   TaylorCordesArm4 = gsl_spline_alloc(gsl_interp_linear, 7);
 
-  TaylorCordesArm1Inv = gsl_spline_alloc(gsl_interp_linear, 7);
+  TaylorCordesArm1Inv = gsl_spline_alloc(gsl_interp_linear, 6);
   TaylorCordesArm2Inv = gsl_spline_alloc(gsl_interp_linear, 7);
   TaylorCordesArm3Inv = gsl_spline_alloc(gsl_interp_linear, 7);
   TaylorCordesArm4Inv = gsl_spline_alloc(gsl_interp_linear, 7);
@@ -32,10 +32,10 @@ Astro::Astro() {
   x_a1[3]=5.24;   y_a1[3]=280.-90.;
   x_a1[4]=5.36;   y_a1[4]=290.-90.;
   x_a1[5]=5.81;   y_a1[5]=315.-90.;
-  x_a1[6]=5.8101; y_a1[6]=330.-90.;
+  //x_a1[6]=5.8101; y_a1[6]=330.-90.; FIXME this last point breaks interoplation
 
-  gsl_spline_init(TaylorCordesArm1, x_a1, y_a1, 7);
-  gsl_spline_init(TaylorCordesArm1Inv, y_a1, x_a1, 7);
+  gsl_spline_init(TaylorCordesArm1, x_a1, y_a1, 6);
+  gsl_spline_init(TaylorCordesArm1Inv, y_a1, x_a1, 6);
 
   x_a2[0]=3.76;  y_a2[0]=63.-90.;
   x_a2[1]=4.56;  y_a2[1]=120.-90.;
@@ -111,8 +111,19 @@ Astro::Astro() {
   tMinInternalBoundary = 0.01*yr_to_sec;
   tMaxInternalBoundary = 1.e7*yr_to_sec;
 
+  thinshellsolutiontmin = 0.;
+  thinshellsolutiontmax = 0.;
+
   atsrad = gsl_interp_accel_alloc();
   atsvel = gsl_interp_accel_alloc();
+  aredr = gsl_interp_accel_alloc();
+  avedr = gsl_interp_accel_alloc();
+  aredf = gsl_interp_accel_alloc();
+  avedf = gsl_interp_accel_alloc();
+  arstr = gsl_interp_accel_alloc();
+  avstr = gsl_interp_accel_alloc();
+  arstf = gsl_interp_accel_alloc();
+  avstf = gsl_interp_accel_alloc();
 
 }
 
@@ -286,7 +297,7 @@ vector< vector<double> > Astro::CreateDensityProfile(vector<double> pars,
   double stepSizeNormal=log(rmax/rmin)/1000.;
   double stepSizeFine=stepSizeNormal/10.;
   double stepSize=stepSizeNormal;
-  double n;
+  double n = 0.;;
   for(double r=rmin;r<rmax;r=pow(10.,log10(r)+stepSize)) {
     /* adapt step size in regions of transition */
     if(r<0.9*RGWRadius) stepSize=stepSizeNormal;
@@ -303,9 +314,7 @@ vector< vector<double> > Astro::CreateDensityProfile(vector<double> pars,
     }
     else if(r>=MSBubbleRadius && r<MSBubbleRadius+rSWMS) n = nSWMS;
     else n = ISMDensity;
-    dProfile.push_back(vector<double>());
-    dProfile[dProfile.size()-1].push_back(r);
-    dProfile[dProfile.size()-1].push_back(n);
+    fUtils->TwoDVectorPushBack(r,n,dProfile);
   }
   return dProfile;
 }
@@ -877,8 +886,8 @@ double Astro::GetDistanceToGivenSpiralArm(double x, double y, int arm) {
 double Astro::EvalTaylorCordesArmTheta(double r, int arm) {
   double theta = 0.;
   if(!arm) {
-    cout << "Astro::EvalTaylorCordesArmTheta: Requested Arm 0! (Arm Index starts a 1, not 0.) "
-            "Returning 0. " << endl;
+    cout << "Astro::EvalTaylorCordesArmTheta: Requested Arm 0! (Arm Index "
+            "starts a 1, not 0. Returning 0. " << endl;
     return 0.;
   }
   gsl_interp_accel *a = NULL;
@@ -887,7 +896,7 @@ double Astro::EvalTaylorCordesArmTheta(double r, int arm) {
   switch (arm){
     case 1:
       a = accArm1;
-      rmin = x_a1[0]; rmax = x_a1[6];
+      rmin = x_a1[0]; rmax = x_a1[5];
       break;
     case 2:
       a = accArm2;
@@ -903,12 +912,9 @@ double Astro::EvalTaylorCordesArmTheta(double r, int arm) {
       break;
   }
   if(r<rmin || r>rmax) return 0.;
-  if (gsl_spline_eval_e(TaylorCordesArms[arm - 1], r, a, &theta)) {
-    cout << "Astro::EvalTaylorCordesArmTheta: Interpolation in arm "
-         << arm << " failed. Exiting with 0. return." << endl;
-    return 0.;
-  }
-  if (std::isnan(theta) || std::isinf(theta)) return 0.;
+  //cout << "-> " << arm << " " << r<<" " << rmin << " " <<rmax << endl;
+  theta = fUtils->EvalSpline(r,TaylorCordesArms[arm - 1],a,
+                             __func__,__LINE__);
   theta *= (pi/180.);
   return theta;
 }
@@ -926,7 +932,7 @@ double Astro::EvalTaylorCordesArmGalactocentricRadius(double theta, int arm) {
   switch (arm){
     case 1:
       a = accArm1Inv;
-      thetamin = y_a1[0]; thetamax = y_a1[6];
+      thetamin = y_a1[0]; thetamax = y_a1[5];
       break;
     case 2:
       a = accArm2Inv;
@@ -942,13 +948,8 @@ double Astro::EvalTaylorCordesArmGalactocentricRadius(double theta, int arm) {
       break;
   }
   if(theta<thetamin || theta>thetamax) return 0.;
-  if (gsl_spline_eval_e(TaylorCordesArmsInv[arm - 1], theta, a, &r)) {
-    cout << "Astro::EvalTaylorCordesArmGalactocentricRadius: Interpolation in arm "
-         << arm << " failed. Exiting with 0. return." << endl;
-    return 0.;
-  }
-  if (std::isnan(r) || std::isinf(r)) return 0.;
-  gsl_interp_accel_free(a);
+  r = fUtils->EvalSpline(theta,TaylorCordesArmsInv[arm - 1],a,
+                             __func__,__LINE__);
   return r;
 }
 
@@ -1016,7 +1017,7 @@ unsigned int Astro::GetRandomArm(double r) {
   if(SPIRALARMMODEL==1) {
 
     //QUIETMODE = 1;
-    if(r<x_a1[0] || r>x_a1[6]) DisableArm(1);
+    if(r<x_a1[0] || r>x_a1[5]) DisableArm(1);
     if(r<x_a2[0] || r>x_a2[6]) DisableArm(2);
     if(r<x_a3[0] || r>x_a3[6]) DisableArm(3);
     if(r<x_a4[0] || r>x_a4[6]) DisableArm(4);
@@ -1090,9 +1091,7 @@ vector<double> Astro::GetRandomGalactocentricRadii(int n) {
     if(!SURFACEDENSITYMODEL) val = CaseBhattacharyaProfile(r);
     else if(SURFACEDENSITYMODEL==1) val = IusifovKucukProfile(r);
     else break;
-    v.push_back(vector<double>());
-    v[v.size()-1].push_back(r);
-    v[v.size()-1].push_back(val);
+    fUtils->TwoDVectorPushBack(r,val,v);
   }
   return fUtils->CustomFunctionRandom(v,v[0][0],v[v.size()-1][0],n);
 }
@@ -1243,44 +1242,30 @@ double Astro::LinearSurfDens(double *x, double *par) {
  * CalculateThinShellApproximation() member function.
  */
 vector<double> Astro::ThinShellRadiusAndSpeed(double t) {
-  vector<double> v;
-  v.push_back(0.);
-  v.push_back(0.);
+  vector<double> v,vzero;
+  vzero.push_back(0.);
+  vzero.push_back(0.);
   double R,V;
   t*=yr_to_sec;
+
   if(!thinshellradius.size() || !thinshellvelocity.size()) {
     cout << "Astro::ThinShellRadiusAndSpeed: You have to run the calculation "
-            "first via CalculateThinShellApproximation()!Exiting!" << std::endl;
-    return v;
+            "first via CalculateThinShellApproximation()! Returning (r=0,v=0)!"
+            << std::endl;
+    return vzero;
   }
-  if(( t < thinshellradius[0][0]
-       || t > thinshellradius[thinshellradius.size()-1][0])
-     &&!QUIETMODE) {
-      cout << "Astro::ThinShellRadiusAndSpeed: time outside of boundaries. "
-              "Returning zero values." << std::endl;
-    return v;
+  if(t<thinshellsolutiontmin || t>thinshellsolutiontmax) {
+    if(!QUIETMODE) {
+      cout << "Astro::ThinShellRadiusAndSpeed: time outside solution boundaries "
+           << "(t=" << t/yr_to_sec << " outside ["
+           << thinshellsolutiontmin/yr_to_sec << ","
+           << thinshellsolutiontmax/yr_to_sec << "]). " << endl;
+      cout << "Returning (r=0,v=0)!" << std::endl;
+    }
+    return vzero;
   }
-  if (gsl_spline_eval_e(thinshellradiuslookup, t, atsrad, &R)) {
-    cout << "Astro::ThinShellRadiusAndSpeed: Interpolation of the radius "
-            "lookup failed. Exiting!" <<endl;
-    return v;
-  }
-  if (std::isnan(R) || std::isinf(R)) {
-    cout << "Astro::ThinShellRadiusAndSpeed: Returned R = "
-            << R << ". Exiting!" <<endl;
-    return v;
-  }
-  if (gsl_spline_eval_e(thinshellvelocitylookup, t, atsvel, &V)) {
-    cout << "Astro::ThinShellRadiusAndSpeed: Interpolation of the velocity "
-            "lookup failed. Exiting!" <<endl;
-    return v;
-  }
-  if (std::isnan(V) || std::isinf(V)) {
-    cout << "Astro::ThinShellRadiusAndSpeed: Returned V = "
-            << V << ". Exiting!" <<endl;
-    return v;
-  }
-  v.clear();
+  R = fUtils->EvalSpline(t,thinshellradiuslookup,atsrad,__func__,__LINE__);
+  V = fUtils->EvalSpline(t,thinshellvelocitylookup,atsvel,__func__,__LINE__);
   v.push_back(R);
   v.push_back(V);
 
@@ -1293,7 +1278,9 @@ vector<double> Astro::ThinShellRadiusAndSpeed(double t) {
  * Ptuskin&Zirakashvili 2005 (A&A 429, 755–765 (2005)).
  */
 void Astro::CalculateThinShellApproximation(vector< vector<double> > dProfile,
-                                            double E, double AdiabIndex) {
+                                            double E, double AdiabIndex,
+                                            double tmin, double tmax,
+                                            int steps) {
 
   if(!dProfile.size()) {
     cout << "Astro::CalculateThinShellApproximation: density profile empty."
@@ -1318,9 +1305,8 @@ void Astro::CalculateThinShellApproximation(vector< vector<double> > dProfile,
   for(unsigned int i=0;i<dProfile.size();i++) {
     double r = dProfile[i][0];
     double n = dProfile[i][1];
-    massintegrand.push_back(vector<double>());
-    massintegrand[massintegrand.size()-1].push_back(r);
-    massintegrand[massintegrand.size()-1].push_back(4.* pi * m_p_g * n * r * r);
+
+    fUtils->TwoDVectorPushBack(r,4.* pi * m_p_g * n * r * r,massintegrand);
   }
   mass = fUtils->IntegratedProfile(massintegrand);
 
@@ -1332,9 +1318,7 @@ void Astro::CalculateThinShellApproximation(vector< vector<double> > dProfile,
   for(unsigned int i=0;i<mass.size();i++) {
     r = mass[i][0];
     m = mass[i][1];
-    fintegrand.push_back(vector<double>());
-    fintegrand[fintegrand.size()-1].push_back(r);
-    fintegrand[fintegrand.size()-1].push_back(pow(r,w-1.)*m);
+    fUtils->TwoDVectorPushBack(r,pow(r,w-1.)*m,fintegrand);
   }
   fintegral = fUtils->IntegratedProfile(fintegrand);
 
@@ -1347,18 +1331,12 @@ void Astro::CalculateThinShellApproximation(vector< vector<double> > dProfile,
   for(unsigned int i=0;i<fintegral.size();i++) {
     r = fintegral[i][0];
     y = fintegral[i][1];
-    if (gsl_spline_eval_e(masslookup, r, amass, &m)) continue;
-    if (std::isnan(m) || std::isinf(m)) continue;
+    m = fUtils->EvalSpline(r,masslookup,amass,__func__,__LINE__);
     v = k*sqrt(y/(m*m*pow(r,w)));
     if(!v) continue;
 
-    velocity.push_back(vector<double>());
-    velocity[velocity.size()-1].push_back(r);
-    velocity[velocity.size()-1].push_back(v);
-
-    inversevelocity.push_back(vector<double>());
-    inversevelocity[inversevelocity.size()-1].push_back(r);
-    inversevelocity[inversevelocity.size()-1].push_back(1./v);
+    fUtils->TwoDVectorPushBack(r,v,velocity);
+    fUtils->TwoDVectorPushBack(r,1./v,inversevelocity);
   }
 
   /* This fills the t vs R vector (A.4.II)*/
@@ -1368,370 +1346,500 @@ void Astro::CalculateThinShellApproximation(vector< vector<double> > dProfile,
   gsl_interp_accel *atime = gsl_interp_accel_alloc();
 
   /* but what we want is not t(r) but rather r(t) -> invert the TGraph! */
-  for(unsigned int i=0;i<inversevelocity.size();i++) {
+  for(unsigned int i=1;i<inversevelocity.size();i++) {
     r = inversevelocity[i][0];
-    if (gsl_spline_eval_e(timelookup, r, atime, &t)) continue;
-    if (std::isnan(t) || std::isinf(t)) continue;
+    t = fUtils->EvalSpline(r,timelookup,atime,__func__,__LINE__);
     r0 = velocity[i][0];
     v = velocity[i][1];
     if(r!=r0) {
-      //cout<<"->"<< r <<" " <<r0<<endl;
       cout << "Astro::CalculateThinShellApproximation: Radius and Velocity "
-                 "calculations do not match! Exiting!"
-                 << endl;
+                 "calculations do not match! Exiting!" << endl;
       return;
     }
-    //cout << r << " r " << rMinInternalBoundary << " "<< rMaxInternalBoundary <<endl;
-    //cout << t << " v " << tMinInternalBoundary << " "<< tMaxInternalBoundary <<endl;
     if(r<rMinInternalBoundary||r>rMaxInternalBoundary) continue;
     if(t<tMinInternalBoundary||t>tMaxInternalBoundary) continue;
-    //cout <<" -> "<<endl;
 
-    thinshellradius.push_back(vector<double>());
-    thinshellradius[thinshellradius.size()-1].push_back(t);
-    thinshellradius[thinshellradius.size()-1].push_back(r);
-
-    thinshellvelocity.push_back(vector<double>());
-    thinshellvelocity[thinshellvelocity.size()-1].push_back(t);
-    thinshellvelocity[thinshellvelocity.size()-1].push_back(v);
+    fUtils->TwoDVectorPushBack(t,r,thinshellradius);
+    fUtils->TwoDVectorPushBack(t,v,thinshellvelocity);
   }
-  /* sort TGraphs in time and get minimum and maximum time boundaries */
   thinshellradius = fUtils->SortTwoDVector(thinshellradius,0);
   thinshellvelocity = fUtils->SortTwoDVector(thinshellvelocity,0);
+  thinshellsolutiontmin = thinshellradius[0][0];
+  thinshellsolutiontmax = thinshellradius[thinshellradius.size()-1][0];
 
-  thinshellradiuslookup = fUtils->GSLsplineFromTwoDVector(fUtils->SortTwoDVector(thinshellradius,0));
-  thinshellvelocitylookup = fUtils->GSLsplineFromTwoDVector(fUtils->SortTwoDVector(thinshellvelocity,0));
+  thinshellradiuslookup = fUtils->GSLsplineFromTwoDVector(thinshellradius);
+  thinshellvelocitylookup = fUtils->GSLsplineFromTwoDVector(thinshellvelocity);
+
+  // make the r and v time profiles
+  if(steps && tmin && tmax) {
+    if(tmin>=tmax) {
+      cout << "Astro::CalculateThinShellApproximation: Can't create profiles"
+              "because tmin >= tmax (" << tmin <<" >= "<< tmax <<
+              ") Exiting!" << endl;
+      return;
+    }
+    double logtmin = log10(tmin);
+    double logtmax = log10(tmax);
+    double dlogt = (logtmax-logtmin)/steps;
+    fUtils->Clear2DVector(forwardshockradiusprofile);
+    fUtils->Clear2DVector(forwardshockvelocityprofile);
+    vector<double> x;
+    double t=0.;
+    for(double logt = logtmin ; logt < logtmax ; logt += dlogt) {
+      t = pow(10.,logt);
+      x = ThinShellRadiusAndSpeed(t);
+      fUtils->TwoDVectorPushBack(t,x[0]/pc_to_cm,forwardshockradiusprofile);
+      fUtils->TwoDVectorPushBack(t,x[1],forwardshockvelocityprofile);
+    }
+  }
   return;
 }
 
+vector<double> Astro::TrueloveMcKeeRadiusAndSpeed(double t, bool REVERSE) {
+  vector<double> v,vzero;
+  vzero.push_back(0.);
+  vzero.push_back(0.);
+  double R,V;
+  t*=yr_to_sec;
 
-// void Astro::TrueloveMcKeeRadiusAndSpeed(double t, double &R, double &V) {
-//   t*=yr_to_sec;
-//   if(!CharacteristicRadius||!CharacteristicTime) {
-// std::cout<<"Astro::TrueloveMcKeeRadiusAndSpeed: Characteristic Radius and/or "
-//            "Time scale couldn't be calculated. Did you set ejecta mass, "
-//            "ambient density and blast energy? Returning zeroes."<<std::endl;
-//     R=V=0.;
-//     return;
-//   }
-//   if(!TrueloveMcKeeRadiusGraphEDPhase->GetN() || !TrueloveMcKeeVelocityGraphEDPhase->GetN() ||
-//      !TrueloveMcKeeRadiusGraphSTPhase->GetN() || !TrueloveMcKeeVelocityGraphSTPhase->GetN()) CalculateTrueloveMcKeeSolution();
-//   if((t<tMinTrueloveMcKee||t>tMaxTrueloveMcKee)&&!QUIETMODE) {
-//     std::cout<<"Astro::TrueloveMcKeeRadiusAndSpeed: time outside of boundaries "
-//                "(tmin/tmax/t) = "
-//                "("<<tMinTrueloveMcKee<<"/"<<tMaxTrueloveMcKee<<"/"<<t<<")."
-//                " Returning zero values."<<std::endl;
-//     R=V=0.;
-//     return;
-//   }
-//   if(t<SedovTaylorTime) {
-//     R = TrueloveMcKeeRadiusGraphEDPhase->Eval(t);
-//     V = TrueloveMcKeeVelocityGraphEDPhase->Eval(t);
-//   }
-//   else {
-//     R = TrueloveMcKeeRadiusGraphSTPhase->Eval(t);
-//     V = TrueloveMcKeeVelocityGraphSTPhase->Eval(t);
-//   }
-//   return;
-// }
-//
-// void Astro::TrueloveMcKeeRadiusAndSpeedReverseShock(double t, double &R, double &V) {
-//   t*=yr_to_sec;
-//   if(!CharacteristicRadius||!CharacteristicTime) {
-// std::cout<<"Astro::TrueloveMcKeeRadiusAndSpeedReverseShock: Characteristic "
-//            "Radius and/or Time scale couldn't be calculated. Did you set "
-//            "ejecta mass, ambient density and blast energy? "
-//            "Returning zeroes."<<std::endl;
-//     R=V=0.;
-//     return;
-//   }
-//   if(!TrueloveMcKeeRadiusGraphReverseEDPhase->GetN() || !TrueloveMcKeeVelocityGraphReverseEDPhase->GetN() ||
-//      !TrueloveMcKeeRadiusGraphReverseSTPhase->GetN() || !TrueloveMcKeeVelocityGraphReverseSTPhase->GetN()) CalculateTrueloveMcKeeSolution();
-//   if((t<tMinTrueloveMcKeeReverse||t>tMaxTrueloveMcKeeReverse)&&!QUIETMODE) {
-// std::cout<<"Astro::TrueloveMcKeeRadiusAndSpeedReverseShock: time outside of "
-//            "boundaries. Returning zero values."<<std::endl;
-//     R=V=0.;
-//     return;
-//   }
-//   double tTrans;
-//   (densityIndex<=5.)?(tTrans=SedovTaylorTime):tTrans=CoreExitTime;
-//   if(t<tTrans) {
-//     R = TrueloveMcKeeRadiusGraphReverseEDPhase->Eval(t);
-//     V = TrueloveMcKeeVelocityGraphReverseEDPhase->Eval(t);
-//   }
-//   else {
-//     R = TrueloveMcKeeRadiusGraphReverseSTPhase->Eval(t);
-//     V = TrueloveMcKeeVelocityGraphReverseSTPhase->Eval(t);
-//   }
-//   return;
-// }
-//
-// void Astro::CalculateTrueloveMcKeeSolution(int steps) {
-//   if(!HomogeneousAmbientDensity||!E||!mEj) {
-//     std::cout<<"Astro::CalculateTrueloveMcKeeSolution: missing one of the "
-//                "following (E,mEj,HomogeneousAmbientDensity):"
-//                "("<<E<<","<<mEj<<","<<HomogeneousAmbientDensity<<")."
-//                " Exiting!"<<std::endl;
-//     return;
-//   }
-//   CalculateTrueLoveMcKeeParams();
-//   if(!TrueLoveMcKeeParams.size()) {
-//     std::cout<<"Astro::CalculateTrueloveMcKeeSolution: "
-//                "No paramters given. Exiting."<<std::endl;
-//     return;
-//   }
-//   delete TrueloveMcKeeRadiusGraphEDPhase;
-//   delete TrueloveMcKeeVelocityGraphEDPhase;
-//   delete TrueloveMcKeeRadiusGraphSTPhase;
-//   delete TrueloveMcKeeVelocityGraphSTPhase;
-//   delete TrueloveMcKeeRadiusGraphReverseEDPhase;
-//   delete TrueloveMcKeeVelocityGraphReverseEDPhase;
-//   delete TrueloveMcKeeRadiusGraphReverseSTPhase;
-//   delete TrueloveMcKeeVelocityGraphReverseSTPhase;
-//   TrueloveMcKeeRadiusGraphEDPhase = new TGraph();
-//   TrueloveMcKeeVelocityGraphEDPhase = new TGraph();
-//   TrueloveMcKeeRadiusGraphSTPhase = new TGraph();
-//   TrueloveMcKeeVelocityGraphSTPhase = new TGraph();
-//   TrueloveMcKeeRadiusGraphReverseEDPhase = new TGraph();
-//   TrueloveMcKeeVelocityGraphReverseEDPhase = new TGraph();
-//   TrueloveMcKeeRadiusGraphReverseSTPhase = new TGraph();
-//   TrueloveMcKeeVelocityGraphReverseSTPhase = new TGraph();
-//
-//   bool SKIPFWS,SKIPRVS;
-//   double x0,x1,dx,y,yr,t,tr,r,rr,v,vr;
-//   if(densityIndex<5) {x0 = rMinInternalBoundary/CharacteristicRadius;x1 = rMaxInternalBoundary/CharacteristicRadius;}
-//   else {x0 = tMinInternalBoundary/CharacteristicTime;x1 = tMaxInternalBoundary/CharacteristicTime;}
-//   dx=log10(x1/x0)/steps;
-//   for(double x=x0;x<x1;x=pow(10.,log10(x)+dx)) {
-//     SKIPFWS=SKIPRVS=false;
-//     if(TrueloveMcKeeEjectaDominatedPhaseForwardShock(x,y,v)) SKIPFWS=true;
-//     if(TrueloveMcKeeEjectaDominatedPhaseReverseShock(x,yr,vr)) SKIPRVS=true;
-//     if(densityIndex<5) {r=x;t=y;tr=yr,rr=x;}
-//     else {r=y;t=x;rr=yr;tr=x;}
-//     t*=CharacteristicTime;
-//     r*=CharacteristicRadius;
-//     v*=CharacteristicVelocity;
-//     tr*=CharacteristicTime;
-//     rr*=CharacteristicRadius;
-//     vr*=CharacteristicVelocity;
-//     if(SKIPFWS==false) {
-//       TrueloveMcKeeRadiusGraphEDPhase->SetPoint(TrueloveMcKeeRadiusGraphEDPhase->GetN(),t,r);
-//       TrueloveMcKeeVelocityGraphEDPhase->SetPoint(TrueloveMcKeeVelocityGraphEDPhase->GetN(),t,v);
-//     }
-//     if(SKIPRVS==false) {
-//       TrueloveMcKeeRadiusGraphReverseEDPhase->SetPoint(TrueloveMcKeeRadiusGraphReverseEDPhase->GetN(),tr,rr);
-//       TrueloveMcKeeVelocityGraphReverseEDPhase->SetPoint(TrueloveMcKeeVelocityGraphReverseEDPhase->GetN(),tr,vr);
-//     }
-//   }
-//   x0 = tMinInternalBoundary/CharacteristicTime;
-//   x1 = tMaxInternalBoundary/CharacteristicTime;
-//   dx=log10(x1/x0)/steps;
-//   for(double x=x0;x<x1;x=pow(10.,log10(x)+dx)) {
-//     SKIPFWS=SKIPRVS=false;
-//     if(TrueloveMcKeeSedovTaylorPhaseForwardShock(x,r,v)) SKIPFWS=true;
-//     if(TrueloveMcKeeSedovTaylorPhaseReverseShock(x,rr,vr)) SKIPRVS=true;
-//     t=x*CharacteristicTime;
-//     r*=CharacteristicRadius;
-//     v*=CharacteristicVelocity;
-//     tr=x*CharacteristicTime;
-//     rr*=CharacteristicRadius;
-//     vr*=CharacteristicVelocity;
-//     if(SKIPFWS==false) {
-//       TrueloveMcKeeRadiusGraphSTPhase->SetPoint(TrueloveMcKeeRadiusGraphSTPhase->GetN(),t,r);
-//       TrueloveMcKeeVelocityGraphSTPhase->SetPoint(TrueloveMcKeeVelocityGraphSTPhase->GetN(),t,v);
-//     }
-//     if(SKIPRVS==false) {
-//       TrueloveMcKeeRadiusGraphReverseSTPhase->SetPoint(TrueloveMcKeeRadiusGraphReverseSTPhase->GetN(),tr,rr);
-//       TrueloveMcKeeVelocityGraphReverseSTPhase->SetPoint(TrueloveMcKeeVelocityGraphReverseSTPhase->GetN(),tr,vr);
-//     }
-//   }
-//
-//   /* sort TGraphs in time and get minimum and maximum time boundaries */
-//   TrueloveMcKeeRadiusGraphEDPhase->Sort();
-//   TrueloveMcKeeVelocityGraphEDPhase->Sort();
-//   TrueloveMcKeeRadiusGraphSTPhase->Sort();
-//   TrueloveMcKeeVelocityGraphSTPhase->Sort();
-//   TrueloveMcKeeRadiusGraphReverseEDPhase->Sort();
-//   TrueloveMcKeeVelocityGraphReverseEDPhase->Sort();
-//   TrueloveMcKeeRadiusGraphReverseSTPhase->Sort();
-//   TrueloveMcKeeVelocityGraphReverseSTPhase->Sort();
-//   TrueloveMcKeeRadiusGraphEDPhase->GetPoint(0,tMinTrueloveMcKee,y);
-//   TrueloveMcKeeRadiusGraphSTPhase->GetPoint(TrueloveMcKeeRadiusGraphSTPhase->GetN()-1,tMaxTrueloveMcKee,y);
-//   TrueloveMcKeeRadiusGraphReverseEDPhase->GetPoint(0,tMinTrueloveMcKeeReverse,y);
-//   TrueloveMcKeeRadiusGraphReverseSTPhase->GetPoint(TrueloveMcKeeRadiusGraphReverseSTPhase->GetN()-1,tMaxTrueloveMcKeeReverse,y);
-//   return;
-// }
-//
-// int Astro::TrueloveMcKeeEjectaDominatedPhaseForwardShock(double x, double &Y, double &V) {
-//   double l_ED = TrueLoveMcKeeParams[0];
-//   double phi_ED = TrueLoveMcKeeParams[2];
-//   double phi_EDeff = TrueLoveMcKeeParams[3];
-//   double f_n = TrueLoveMcKeeParams[14];
-//   double alpha = TrueLoveMcKeeParams[15];
-//   if(densityIndex<5.) {
-//     Y = 1.-((3.-densityIndex)/3.)*sqrt(phi_EDeff/(l_ED*f_n))*pow(x,1.5);
-//     if(Y<=0.) {Y=0.;V=0.;return 1;}
-//     Y = pow(Y,-2./(3.-densityIndex));
-//     Y *= sqrt(alpha/2.)*x/l_ED;
-//
-//     V = 1.-((3.-densityIndex)/3.)*sqrt(phi_EDeff/(l_ED*f_n))*pow(x,1.5);
-//     if(V<=0.) {Y=0.;V=0.;return 1;}
-//     V = pow(V,(5.-densityIndex)/(3.-densityIndex));
-//     V *= sqrt(2./alpha)*l_ED;
-//     V /= 1.+(densityIndex/3.)*sqrt(phi_EDeff/(l_ED*f_n))*pow(x,1.5);
-//   }
-//   else {
-//     Y = 27.*pow(l_ED,densityIndex-2.)/(phi_ED*(4.*pi)*densityIndex*(densityIndex-3.));
-//     Y*= pow((10./3.)*(densityIndex-5.)/(densityIndex-3.),(densityIndex-3.)/2.);
-//     if(Y<=0.) {Y=0.;V=0.;return 1;}
-//     Y = pow(Y,1./densityIndex);
-//     Y *= pow(x,(densityIndex-3.)/densityIndex);
-//
-//     V = 27./(4.*pi)*pow(densityIndex*(densityIndex-3.),-1.)*pow(l_ED,densityIndex-2.)/phi_ED;
-//     V *= pow((10./3.)*(densityIndex-5.)/(densityIndex-3.),(densityIndex-3.)/2.);
-//     if(V<=0.) {Y=0.;V=0.;return 1;}
-//     V = pow(V,1./densityIndex);
-//     V *= (densityIndex-3.)/densityIndex*pow(x,-3./densityIndex);
-//   }
-//   if(Y<0.) Y=0.;
-//   return 0;
-// }
-//
-// int Astro::TrueloveMcKeeSedovTaylorPhaseForwardShock(double t, double &R, double &V) {
-//   double tSt=TrueLoveMcKeeParams[4];
-//   double rSt=TrueLoveMcKeeParams[5];
-//   double eta=0.4;
-//   double zeta=2.026;
-//
-//   R = pow(pow(rSt,1./eta)+sqrt(zeta)*(t-tSt),eta);
-//   V = 0.4*sqrt(zeta)*pow(pow(rSt,2.5)+sqrt(zeta)*(t-tSt),-0.6);
-//   if(R<0.) {
-//     R=V=0.;
-//     return 1;
-//   }
-//   return 0;
-// }
-//
-// int Astro::TrueloveMcKeeSedovTaylorPhaseReverseShock(double t, double &R, double &V) {
-//   double r_rSt = TrueLoveMcKeeParams[6];
-//   double a_rSt = TrueLoveMcKeeParams[8];
-//   double tSt = TrueLoveMcKeeParams[4];
-//   double v_rSt = TrueLoveMcKeeParams[7];
-//   double r_rCore = TrueLoveMcKeeParams[11];
-//   double a_rCore = TrueLoveMcKeeParams[13];
-//   double tCore = TrueLoveMcKeeParams[10];
-//   double v_rCore = TrueLoveMcKeeParams[12];
-//   double r_rRel,tRel,a_rRel,v_rRel;
-//   r_rRel=tRel=a_rRel=v_rRel=0.;
-//   if(densityIndex<3.) {
-//     tRel = tSt;
-//     r_rRel = r_rSt;
-//     a_rRel = a_rSt;
-//     v_rRel = v_rSt;
-//   }
-//   else if(densityIndex>5.) {
-//     tRel = tCore;
-//     r_rRel = r_rCore;
-//     a_rRel = a_rCore;
-//     v_rRel = v_rCore;
-//   }
-//   else {
-//     std::cout<<"Astro::TrueloveMcKeeSedovTaylorPhaseReverseShock:  Whaaat?! I have to implement the reverse shock if densityIndex = 4! Exiting!"<<std::endl;
-//     R=V=0.;
-//     return 0;
-//   }
-//   R = t*(r_rRel/tRel - a_rRel*(t-tRel)-(v_rRel-a_rRel*tRel)*log(t/tRel));
-//   V = v_rRel+a_rRel*(t-tRel);
-//   if(R<0.) {
-//     R=V=0.;
-//     return 1;
-//   }
-//   return 0;
-// }
-//
-// int Astro::TrueloveMcKeeEjectaDominatedPhaseReverseShock(double x, double &Y, double &V) {
-//   double l_ED = TrueLoveMcKeeParams[0];
-//   double phi_ED = TrueLoveMcKeeParams[2];
-//   double f_n = TrueLoveMcKeeParams[14];
-//   double alpha = TrueLoveMcKeeParams[15];
-//   if(densityIndex<5.) {
-//     Y = 1.-((3.-densityIndex)/3.)*sqrt(phi_ED/(l_ED*f_n))*pow(x*l_ED,1.5);
-//     if(Y<=0.) {Y=0.;V=0.;return 1;}
-//     Y = pow(Y,-2./(3.-densityIndex));
-//     Y *= sqrt(alpha/2.)*x;
-//
-//     V = 1.-((3.-densityIndex)/3.)*sqrt(phi_ED/f_n)*l_ED*pow(x,1.5);
-//     if(V<=0.) {Y=0.;V=0.;return 1;}
-//     V = pow(V,2./(3.-densityIndex));
-//     V *= sqrt(2.*phi_ED/(alpha*f_n))*l_ED*pow(x,1.5);
-//     V /= 1.+(densityIndex/3.)*sqrt(phi_ED/f_n)*l_ED*pow(x,1.5);
-//   }
-//   else {
-//     Y = 27./(4.*pi)*pow(densityIndex*(densityIndex-3.),-1.)*pow(l_ED,densityIndex-2.)/phi_ED;
-//     Y *= pow((10./3.)*(densityIndex-5.)/(densityIndex-3.),(densityIndex-3.)/2.);
-//     if(Y<=0.) {Y=0.;V=0.;return 1;}
-//     Y = pow(Y,1./densityIndex);
-//     V = Y*3./(densityIndex*l_ED)*pow(x,-3./densityIndex);
-//     if(V<=0.) {Y=0.;V=0.;return 1;}
-//     Y *= pow(x,(densityIndex-3.)/densityIndex)/l_ED;
-//   }
-//   if(Y<0.) Y=0.;
-//   return 0;
-// }
-//
-// void Astro::CalculateTrueLoveMcKeeParams() {
-//   /* format: {l_ED,w_core,phi_ED,phi_EDeff,t*_ST,R*_ST,R*_r_ST,v~*_r_ST,a~*_r_ST,t*_ref,t*_core,r*_r_core,v~*_r_core,a~*_r_core,f_n,alpha,eta} */
-//   if(!densityIndex)          TrueLoveMcKeeParams = {  1.1,  0., 0.343, 0.0961, 0.495, 0.727, 0.545, 0.585, 0.106,  0.,    0.,    0.,    0.,    0., 0., 0., 0.};
-//   else if(densityIndex== 2.) TrueLoveMcKeeParams = {  1.1,  0., 0.343, 0.0947, 0.387, 0.679, 0.503, 0.686,-0.151, 1.6,    0.,    0.,    0.,    0., 0., 0., 0.};
-//   else if(densityIndex== 4.) TrueLoveMcKeeParams = {  1.1, 0.1, 0.343, 0.0791, 0.232, 0.587,    0.,    0.,    0.,  0.,   1.7,    0.,    0.,    0., 0., 0., 0.};
-//   else if(densityIndex== 6.) TrueLoveMcKeeParams = { 1.39,  0.,  0.39,     0.,  1.04,  1.07,    0.,    0.,    0.,  0., 0.513, 0.541, 0.527, 0.112, 0., 0., 0.};
-//   else if(densityIndex== 7.) TrueLoveMcKeeParams = { 1.26,  0.,  0.47,     0., 0.732, 0.881,    0.,    0.,    0.,  0., 0.363, 0.469, 0.553, 0.116, 0., 0., 0.};
-//   else if(densityIndex== 8.) TrueLoveMcKeeParams = { 1.21,  0.,  0.52,     0., 0.605, 0.788,    0.,    0.,    0.,  0., 0.292, 0.413, 0.530, 0.139, 0., 0., 0.};
-//   else if(densityIndex== 9.) TrueLoveMcKeeParams = { 1.19,  0.,  0.55,     0., 0.523, 0.725,    0.,    0.,    0.,  0., 0.249, 0.371, 0.497, 0.162, 0., 0., 0.};
-//   else if(densityIndex==10.) TrueLoveMcKeeParams = { 1.17,  0.,  0.57,     0., 0.481, 0.687,    0.,    0.,    0.,  0., 0.220, 0.340, 0.463, 0.192, 0., 0., 0.};
-//   else if(densityIndex==12.) TrueLoveMcKeeParams = { 1.15,  0.,  0.60,     0., 0.424, 0.636,    0.,    0.,    0.,  0., 0.182, 0.293, 0.403, 0.251, 0., 0., 0.};
-//   else if(densityIndex==14.) TrueLoveMcKeeParams = { 1.14,  0.,  0.62,     0., 0.389, 0.603,    0.,    0.,    0.,  0., 0.157, 0.259, 0.354, 0.277, 0., 0., 0.};
-//   else {
-//     std::cout<<"Astro::CalculateTrueLoveMcKeeParams: Density Index (index="<<densityIndex<<") not supported! Returning nothing."<<std::endl;
-//     TrueLoveMcKeeParams={};
-//     return;
-//   }
-//
-//   double f_n,alpha,eta,w_core;
-//   w_core = TrueLoveMcKeeParams[1];
-//   f_n = (3./(4.*pi))*((1.-densityIndex/3.)/(1.-(densityIndex/3.)*pow(w_core,3.-densityIndex)));
-//   if(densityIndex<3.&&!w_core) alpha = (3.-densityIndex)/(5.-densityIndex);
-//   else if(densityIndex>5.&&!w_core) alpha = (3./5.)*(densityIndex-3.)/(densityIndex-5.);
-//   else alpha = (3.-densityIndex)/(5.-densityIndex)*(pow(w_core,-(5.-densityIndex))-densityIndex/5.)/(pow(w_core,-(3.-densityIndex))-densityIndex/3.)*pow(w_core,2.);
-//   eta = 0.;
-//   if(densityIndex>0.) eta = (densityIndex-3.)/densityIndex;
-//   TrueLoveMcKeeParams[14] = f_n;
-//   TrueLoveMcKeeParams[15] = alpha;
-//   TrueLoveMcKeeParams[16] = eta;
-//
-//   SedovTaylorTime = TrueLoveMcKeeParams[4]*CharacteristicTime;
-//   CoreExitTime = TrueLoveMcKeeParams[10]*CharacteristicTime;
-//
-//   if(!QUIETMODE) {
-//     vector<string> ParNames = {"l_ED","w_core","phi_ED","phi_EDeff","t*_ST","R*_ST","R*_r_ST","v~*_r_ST","a~*_r_ST","t*_ref","t*_core","r*_r_core","v~*_r_core","a~*_r_core","f_n","alpha","eta"};
-//     std::cout<<">> Paramaters for Truelove & McKee's solution (density index = "<<densityIndex<<"):"<<std::endl;
-//     for(unsigned int i=0;i<TrueLoveMcKeeParams.size();i++) {
-//       std::cout<<"   "<<ParNames[i]<<": "<<TrueLoveMcKeeParams[i]<<std::endl;
-//     }
-//     std::cout<<std::endl;
-//   }
-//   return;
-// }
-//
-// void Astro::GetTrueLoveMcKeeTimeBoundaries(double &tmin, double &tmax) {
-//   if(!tMaxTrueloveMcKee) {
-//     std::cout<<"Astro::GetTrueLoveMcKeeTimeBoundaries: no boundaries found. Have you already run 'CalculateTrueLoveMcKeeApproximation'?. Returning zero values."<<std::endl;
-//     tmin=tmax=0.;
-//   }
-//   tmin = tMinTrueloveMcKee/yr_to_sec;
-//   tmax = tMaxTrueloveMcKee/yr_to_sec;
-//   return;
-// }
+  if(!r_edforward.size() || !v_edforward.size() || !r_stforward.size() ||
+     !v_stforward.size() || !r_edreverse.size() || !v_edreverse.size() ||
+     !r_streverse.size() || !v_streverse.size() ||
+     truelovemckeeparams.size() != 23) {
+
+     cout << "Astro::TrueloveMcKeeRadiusAndSpeed: You have to run the calculation "
+             "first via CalculateThinShellApproximation()! Returning (r=0,v=0)!"
+          << std::endl;
+  }
+  double tmin = 0.;
+  double tmax = 0.;
+  double ttrans = 0.;
+  double sedovtime = truelovemckeeparams[20];
+  double coreexittime = truelovemckeeparams[21];
+  int index = (int)truelovemckeeparams[22];
+
+  if(REVERSE) (index>5) ? ttrans = coreexittime: ttrans = sedovtime;
+  else ttrans = sedovtime;
+
+  if(t<ttrans) {
+    if(REVERSE) {
+      tmin = truelovemckeetminred;
+      tmax = truelovemckeetmaxred;
+    }
+    else {
+      tmin = truelovemckeetminfed;
+      tmax = truelovemckeetmaxfed;
+    }
+  }
+  else {
+    if(REVERSE) {
+      tmin = truelovemckeetminrst;
+      tmax = truelovemckeetmaxrst;
+    }
+    else {
+      tmin = truelovemckeetminfst;
+      tmax = truelovemckeetmaxfst;
+    }
+  }
+  if(tmin >= tmax) {
+    cout << "Astro::TrueloveMcKeeRadiusAndSpeed: Something wrong with time "
+            "boundaries "
+         << "(tmin=" << tmin/yr_to_sec << " , tmax = "
+         << tmax/yr_to_sec << "). Returning (r=0,v=0)!"
+         << std::endl;
+    return vzero;
+  }
+  if(t<tmin || t>tmax) {
+    if(!QUIETMODE) {
+      cout << "Astro::TrueloveMcKeeRadiusAndSpeed: time outside solution "
+           << "boundaries (t=" << t/yr_to_sec << " outside ["
+           << tmin/yr_to_sec << ","
+           << tmax/yr_to_sec << "]). " << endl;
+      cout << "Returning (r=0,v=0)!" << std::endl;
+    }
+    return vzero;
+  }
+
+  if(t<ttrans) {
+    if(REVERSE) {
+      R = fUtils->EvalSpline(t,r_edreverselookup,aredr,__func__,__LINE__);
+      V = fUtils->EvalSpline(t,v_edreverselookup,avedr,__func__,__LINE__);
+    }
+    else {
+      R = fUtils->EvalSpline(t,r_edforwardlookup,aredf,__func__,__LINE__);
+      V = fUtils->EvalSpline(t,v_edforwardlookup,avedf,__func__,__LINE__);
+    }
+  }
+  else {
+    if(REVERSE) {
+      R = fUtils->EvalSpline(t,r_streverselookup,arstr,__func__,__LINE__);
+      V = fUtils->EvalSpline(t,v_streverselookup,avstr,__func__,__LINE__);
+    }
+    else {
+      R = fUtils->EvalSpline(t,r_stforwardlookup,arstf,__func__,__LINE__);
+      V = fUtils->EvalSpline(t,v_stforwardlookup,avstf,__func__,__LINE__);
+    }
+  }
+  v.push_back(R);
+  v.push_back(V);
+  return v;
+}
+
+void Astro::CalculateTrueloveMcKeeSolution(vector<double> pars, double tmin,
+                                           double tmax, int steps) {
+
+  if(pars.size()!=4) {
+    cout << "Astro::CalculateTrueloveMcKeeSolution: wrong number of parameters ("
+         << pars.size() << "). Parameter list takes exactly 8 "
+            "parameters: " << endl;
+    cout << " - [0] ambient density (cm^-3) " << endl;
+    cout << " - [1] SN blast energy (erg) " << endl;
+    cout << " - [2] SN ejecta mass (mSol) " << endl;
+    cout << " - [3] density index " << endl;
+    cout << "Exiting!" <<endl;
+    return;
+  }
+
+  CalculateTrueLoveMcKeeParams(pars);
+  if(!truelovemckeeparams.size()) {
+    std::cout<<"Astro::CalculateTrueloveMcKeeSolution: "
+               "No paramters given. Exiting."<<std::endl;
+    return;
+  }
+
+
+  double charradiustruelovemckee = truelovemckeeparams[17];
+  double chartimetruelovemckee = truelovemckeeparams[18];
+  double charvelocitytruelovemckee = truelovemckeeparams[19];
+
+
+  bool SKIPFWS,SKIPRVS;
+  double x0,x1,dx,y,yr,t,tr,r,rr,v,vr;
+  int index = (int)truelovemckeeparams[22];
+  if(index<5) {
+    x0 = rMinInternalBoundary/charradiustruelovemckee;
+    x1 = rMaxInternalBoundary/charradiustruelovemckee;
+  }
+  else {
+    x0 = tMinInternalBoundary/chartimetruelovemckee;
+    x1 = tMaxInternalBoundary/chartimetruelovemckee;
+  }
+  dx=log10(x1/x0)/steps;
+  for(double x=x0;x<x1;x=pow(10.,log10(x)+dx)) {
+    SKIPFWS=SKIPRVS=false;
+    if(TrueloveMcKeeEjectaDominatedForwardShock(x,y,v)) SKIPFWS=true;
+    if(TrueloveMcKeeEjectaDominatedReverseShock(x,yr,vr)) SKIPRVS=true;
+    if(index<5) {r=x;t=y;tr=yr,rr=x;}
+    else {r=y;t=x;rr=yr;tr=x;}
+    t*=chartimetruelovemckee;
+    r*=charradiustruelovemckee;
+    v*=charvelocitytruelovemckee;
+    tr*=chartimetruelovemckee;
+    rr*=charradiustruelovemckee;
+    vr*=charvelocitytruelovemckee;
+    if(SKIPFWS==false) {
+      fUtils->TwoDVectorPushBack(t,r,r_edforward);
+      fUtils->TwoDVectorPushBack(t,v,v_edforward);
+    }
+    if(SKIPRVS==false) {
+      fUtils->TwoDVectorPushBack(tr,rr,r_edreverse);
+      fUtils->TwoDVectorPushBack(tr,vr,v_edreverse);
+    }
+  }
+  x0 = tMinInternalBoundary/chartimetruelovemckee;
+  x1 = tMaxInternalBoundary/chartimetruelovemckee;
+  dx=log10(x1/x0)/steps;
+  for(double x=x0;x<x1;x=pow(10.,log10(x)+dx)) {
+    SKIPFWS=SKIPRVS=false;
+    if(TrueloveMcKeeSedovTaylorPhaseForwardShock(x,r,v)) SKIPFWS=true;
+    if(TrueloveMcKeeSedovTaylorPhaseReverseShock(x,rr,vr)) SKIPRVS=true;
+    t=x*chartimetruelovemckee;
+    r*=charradiustruelovemckee;
+    v*=charvelocitytruelovemckee;
+    tr=x*chartimetruelovemckee;
+    rr*=charradiustruelovemckee;
+    vr*=charvelocitytruelovemckee;
+    if(SKIPFWS==false) {
+      fUtils->TwoDVectorPushBack(t,r,r_stforward);
+      fUtils->TwoDVectorPushBack(t,v,v_stforward);
+      //cout<<"f: "<<t<<" "<<r<<" "<<v<<endl;
+    }
+    if(SKIPRVS==false) {
+      fUtils->TwoDVectorPushBack(tr,rr,r_streverse);
+      fUtils->TwoDVectorPushBack(tr,vr,v_streverse);
+      //cout<<"r: "<<tr<<" "<<rr<<" "<<vr<<endl;
+    }
+  }
+
+  /* sort TGraphs in time and get minimum and maximum time boundaries */
+  r_edforward = fUtils->SortTwoDVector(r_edforward,0);
+  v_edforward = fUtils->SortTwoDVector(v_edforward,0);
+  r_edreverse = fUtils->SortTwoDVector(r_edreverse,0);
+  v_edreverse = fUtils->SortTwoDVector(v_edreverse,0);
+  r_stforward = fUtils->SortTwoDVector(r_stforward,0);
+  v_stforward = fUtils->SortTwoDVector(v_stforward,0);
+  r_streverse = fUtils->SortTwoDVector(r_streverse,0);
+  v_streverse = fUtils->SortTwoDVector(v_streverse,0);
+
+  truelovemckeetminfed = r_edforward[0][0];
+  truelovemckeetminfst = r_stforward[0][0];
+  truelovemckeetmaxfed = r_edforward[r_edforward.size()-1][0];
+  truelovemckeetmaxfst = r_stforward[r_stforward.size()-1][0];
+
+  truelovemckeetminred = r_edreverse[0][0];
+  truelovemckeetminrst = r_streverse[0][0];
+  truelovemckeetmaxred = r_edreverse[r_edreverse.size()-1][0];
+  truelovemckeetmaxrst = r_streverse[r_streverse.size()-1][0];
+
+  r_edforwardlookup = fUtils->GSLsplineFromTwoDVector(r_edforward);
+  v_edforwardlookup = fUtils->GSLsplineFromTwoDVector(v_edforward);
+  r_edreverselookup = fUtils->GSLsplineFromTwoDVector(r_edreverse);
+  v_edreverselookup = fUtils->GSLsplineFromTwoDVector(v_edreverse);
+
+  r_stforwardlookup = fUtils->GSLsplineFromTwoDVector(r_stforward);
+  v_stforwardlookup = fUtils->GSLsplineFromTwoDVector(v_stforward);
+  r_streverselookup = fUtils->GSLsplineFromTwoDVector(r_streverse);
+  v_streverselookup = fUtils->GSLsplineFromTwoDVector(v_streverse);
+
+  // make the r and v time profiles
+  if(steps && tmin && tmax) {
+    if(tmin>=tmax) {
+      cout << "Astro::CalculateThinShellApproximation: Can't create profiles"
+              "because tmin >= tmax (" << tmin <<" >= "<< tmax <<
+              ") Exiting!" << endl;
+      return;
+    }
+    double logtmin = log10(tmin);
+    double logtmax = log10(tmax);
+    double dlogt = (logtmax-logtmin)/steps;
+    fUtils->Clear2DVector(forwardshockradiusprofile);
+    fUtils->Clear2DVector(forwardshockvelocityprofile);
+    fUtils->Clear2DVector(reverseshockradiusprofile);
+    fUtils->Clear2DVector(reverseshockvelocityprofile);
+    vector<double> x;
+    double t=0.;
+    for(double logt = logtmin ; logt < logtmax ; logt += dlogt) {
+      t = pow(10.,logt);
+      x = TrueloveMcKeeRadiusAndSpeedForward(t);
+      fUtils->TwoDVectorPushBack(t,x[0]/pc_to_cm,forwardshockradiusprofile);
+      fUtils->TwoDVectorPushBack(t,x[1],forwardshockvelocityprofile);
+      x = TrueloveMcKeeRadiusAndSpeedReverse(t);
+      fUtils->TwoDVectorPushBack(t,x[0]/pc_to_cm,reverseshockradiusprofile);
+      fUtils->TwoDVectorPushBack(t,x[1],reverseshockvelocityprofile);
+    }
+  }
+  return;
+}
+
+int Astro::TrueloveMcKeeEjectaDominatedForwardShock(double x,
+                                                    double &Y, double &V) {
+  double l_ED = truelovemckeeparams[0];
+  double phi_ED = truelovemckeeparams[2];
+  double phi_EDeff = truelovemckeeparams[3];
+  double f_n = truelovemckeeparams[14];
+  double alpha = truelovemckeeparams[15];
+  int index = (int)truelovemckeeparams[22];
+
+  if(index<5.) {
+    Y = 1.-((3.-index)/3.)*sqrt(phi_EDeff/(l_ED*f_n))*pow(x,1.5);
+    if(Y<=0.) {Y=0.;V=0.;return 1;}
+    Y = pow(Y,-2./(3.-index));
+    Y *= sqrt(alpha/2.)*x/l_ED;
+
+    V = 1.-((3.-index)/3.)*sqrt(phi_EDeff/(l_ED*f_n))*pow(x,1.5);
+    if(V<=0.) {Y=0.;V=0.;return 1;}
+    V = pow(V,(5.-index)/(3.-index));
+    V *= sqrt(2./alpha)*l_ED;
+    V /= 1.+(index/3.)*sqrt(phi_EDeff/(l_ED*f_n))*pow(x,1.5);
+  }
+  else {
+    Y = 27.*pow(l_ED,index-2.)/(phi_ED*(4.*pi)*index*(index-3.));
+    Y*= pow((10./3.)*(index-5.)/(index-3.),(index-3.)/2.);
+    if(Y<=0.) {Y=0.;V=0.;return 1;}
+    Y = pow(Y,1./index);
+    Y *= pow(x,(index-3.)/index);
+
+    V = 27./(4.*pi)*pow(index*(index-3.),-1.)*pow(l_ED,index-2.)/phi_ED;
+    V *= pow((10./3.)*(index-5.)/(index-3.),(index-3.)/2.);
+    if(V<=0.) {Y=0.;V=0.;return 1;}
+    V = pow(V,1./index);
+    V *= (index-3.)/index*pow(x,-3./index);
+  }
+  if(Y<0.) Y=0.;
+  return 0;
+}
+
+int Astro::TrueloveMcKeeSedovTaylorPhaseForwardShock(double t,
+                                                     double &R, double &V) {
+  double tSt=truelovemckeeparams[4];
+  double rSt=truelovemckeeparams[5];
+  double eta=0.4;
+  double zeta=2.026;
+
+  double k = pow(rSt,1./eta);
+  double l = pow(rSt,2.5);
+  double m = sqrt(zeta)*(t-tSt);
+  if(-m >= k || -m >= l) {
+    R=V=0.;
+    return 1;
+  }
+  R = pow(k+m,eta);
+  V = 0.4*sqrt(zeta)*pow(l+m,-0.6);
+  if(R<0.) {
+    R=V=0.;
+    return 1;
+  }
+  return 0;
+}
+
+int Astro::TrueloveMcKeeSedovTaylorPhaseReverseShock(double t, double &R, double &V) {
+  double r_rSt = truelovemckeeparams[6];
+  double a_rSt = truelovemckeeparams[8];
+  double tSt = truelovemckeeparams[4];
+  double v_rSt = truelovemckeeparams[7];
+  double r_rCore = truelovemckeeparams[11];
+  double a_rCore = truelovemckeeparams[13];
+  double tCore = truelovemckeeparams[10];
+  double v_rCore = truelovemckeeparams[12];
+  int index = (int)truelovemckeeparams[22];
+
+  double r_rRel,tRel,a_rRel,v_rRel;
+  r_rRel=tRel=a_rRel=v_rRel=0.;
+  if(index<3.) {
+    tRel = tSt;
+    r_rRel = r_rSt;
+    a_rRel = a_rSt;
+    v_rRel = v_rSt;
+  }
+  else if(index>5.) {
+    tRel = tCore;
+    r_rRel = r_rCore;
+    a_rRel = a_rCore;
+    v_rRel = v_rCore;
+  }
+  else {
+    std::cout<<"Astro::TrueloveMcKeeSedovTaylorPhaseReverseShock: "
+               "Whaaat?! I have to implement the reverse shock if index = 4!"
+               "Exiting!"<<std::endl;
+    R=V=0.;
+    return 0;
+  }
+  R = t*(r_rRel/tRel - a_rRel*(t-tRel)-(v_rRel-a_rRel*tRel)*log(t/tRel));
+  V = v_rRel+a_rRel*(t-tRel);
+  if(R<0.) {
+    R=V=0.;
+    return 1;
+  }
+  return 0;
+}
+
+int Astro::TrueloveMcKeeEjectaDominatedReverseShock(double x,
+                                                    double &Y, double &V) {
+  double l_ED = truelovemckeeparams[0];
+  double phi_ED = truelovemckeeparams[2];
+  double f_n = truelovemckeeparams[14];
+  double alpha = truelovemckeeparams[15];
+  int index = (int)truelovemckeeparams[22];
+
+  if(index<5.) {
+    Y = 1.-((3.-index)/3.)*sqrt(phi_ED/(l_ED*f_n))*pow(x*l_ED,1.5);
+    if(Y<=0.) {Y=0.;V=0.;return 1;}
+    Y = pow(Y,-2./(3.-index));
+    Y *= sqrt(alpha/2.)*x;
+
+    V = 1.-((3.-index)/3.)*sqrt(phi_ED/f_n)*l_ED*pow(x,1.5);
+    if(V<=0.) {Y=0.;V=0.;return 1;}
+    V = pow(V,2./(3.-index));
+    V *= sqrt(2.*phi_ED/(alpha*f_n))*l_ED*pow(x,1.5);
+    V /= 1.+(index/3.)*sqrt(phi_ED/f_n)*l_ED*pow(x,1.5);
+  }
+  else {
+    Y = 27./(4.*pi)*pow(index*(index-3.),-1.)*pow(l_ED,index-2.)/phi_ED;
+    Y *= pow((10./3.)*(index-5.)/(index-3.),(index-3.)/2.);
+    if(Y<=0.) {Y=0.;V=0.;return 1;}
+    Y = pow(Y,1./index);
+    V = Y*3./(index*l_ED)*pow(x,-3./index);
+    if(V<=0.) {Y=0.;V=0.;return 1;}
+    Y *= pow(x,(index-3.)/index)/l_ED;
+  }
+  if(Y<0.) Y=0.;
+  return 0;
+}
+
+void Astro::CalculateTrueLoveMcKeeParams(vector<double> pars) {
+  double n = pars[0];
+  double e = pars[1];
+  double mej = pars[2]*mSol;
+  double index = pars[3];
+
+  /* Eq (1) */
+  double charradiustruelovemckee = pow(mej,1./3.)*pow(n*m_p_g,-1./3.);
+  /* Eq (2) */
+  double chartimetruelovemckee = pow(e,-1./2.)*pow(mej,5./6.)*pow(n*m_p_g,-1./3.);
+  double charvelocitytruelovemckee=charradiustruelovemckee/chartimetruelovemckee;
+
+  /* format: {l_ED,w_core,phi_ED,phi_EDeff,t*_ST,R*_ST,R*_r_ST,v~*_r_ST,a~*_r_ST,t*_ref,t*_core,r*_r_core,v~*_r_core,a~*_r_core,f_n,alpha,eta} */
+  if(!index)          truelovemckeeparams = {  1.1,  0., 0.343, 0.0961, 0.495, 0.727, 0.545, 0.585, 0.106,  0.,    0.,    0.,    0.,    0.};
+  else if(index== 2.) truelovemckeeparams = {  1.1,  0., 0.343, 0.0947, 0.387, 0.679, 0.503, 0.686,-0.151, 1.6,    0.,    0.,    0.,    0.};
+  else if(index== 4.) truelovemckeeparams = {  1.1, 0.1, 0.343, 0.0791, 0.232, 0.587,    0.,    0.,    0.,  0.,   1.7,    0.,    0.,    0.};
+  else if(index== 6.) truelovemckeeparams = { 1.39,  0.,  0.39,     0.,  1.04,  1.07,    0.,    0.,    0.,  0., 0.513, 0.541, 0.527, 0.112};
+  else if(index== 7.) truelovemckeeparams = { 1.26,  0.,  0.47,     0., 0.732, 0.881,    0.,    0.,    0.,  0., 0.363, 0.469, 0.553, 0.116};
+  else if(index== 8.) truelovemckeeparams = { 1.21,  0.,  0.52,     0., 0.605, 0.788,    0.,    0.,    0.,  0., 0.292, 0.413, 0.530, 0.139};
+  else if(index== 9.) truelovemckeeparams = { 1.19,  0.,  0.55,     0., 0.523, 0.725,    0.,    0.,    0.,  0., 0.249, 0.371, 0.497, 0.162};
+  else if(index==10.) truelovemckeeparams = { 1.17,  0.,  0.57,     0., 0.481, 0.687,    0.,    0.,    0.,  0., 0.220, 0.340, 0.463, 0.192};
+  else if(index==12.) truelovemckeeparams = { 1.15,  0.,  0.60,     0., 0.424, 0.636,    0.,    0.,    0.,  0., 0.182, 0.293, 0.403, 0.251};
+  else if(index==14.) truelovemckeeparams = { 1.14,  0.,  0.62,     0., 0.389, 0.603,    0.,    0.,    0.,  0., 0.157, 0.259, 0.354, 0.277};
+  else {
+    cout << "Astro::CalculateTrueLoveMcKeeParams: Density Index (index="
+         << index << ") not supported! Returning nothing." << endl;
+    truelovemckeeparams={};
+    return;
+  }
+
+  double f_n,alpha,eta,w_core;
+  w_core = truelovemckeeparams[1];
+  f_n = (3./(4.*pi))*((1.-index/3.)/(1.-(index/3.)*pow(w_core,3.-index)));
+  if(index<3.&&!w_core) alpha = (3.-index)/(5.-index);
+  else if(index>5.&&!w_core) alpha = (3./5.)*(index-3.)/(index-5.);
+  else alpha = (3.-index)/(5.-index)*(pow(w_core,-(5.-index))-index/5.)
+               /(pow(w_core,-(3.-index))-index/3.)*pow(w_core,2.);
+  eta = 0.;
+  if(index>0.) eta = (index-3.)/index;
+  truelovemckeeparams.push_back(f_n);
+  truelovemckeeparams.push_back(alpha);
+  truelovemckeeparams.push_back(eta);
+  truelovemckeeparams.push_back(charradiustruelovemckee);
+  truelovemckeeparams.push_back(chartimetruelovemckee);
+  truelovemckeeparams.push_back(charvelocitytruelovemckee);
+  truelovemckeeparams.push_back(truelovemckeeparams[4]*chartimetruelovemckee);
+  truelovemckeeparams.push_back(truelovemckeeparams[10]*chartimetruelovemckee);
+  truelovemckeeparams.push_back(index);
+
+  if(truelovemckeeparams.size() != 23) {
+    cout << "Astro::CalculateTrueLoveMcKeeParams: Something went wrong in the"
+            "Calculation of the necessary parameter for the Truelove & McKee "
+            "solution. Exiting!" << endl;
+    truelovemckeeparams.clear();
+    return;
+  }
+  if(!QUIETMODE) {
+    vector<string> ParNames = {"l_ED","w_core","phi_ED","phi_EDeff","t*_ST",
+                               "R*_ST","R*_r_ST","v~*_r_ST","a~*_r_ST","t*_ref",
+                               "t*_core","r*_r_core","v~*_r_core","a~*_r_core",
+                               "f_n","alpha","eta","charradiustruelovemckee",
+                               "chartimetruelovemckee",
+                               "charvelocitytruelovemckee","sedovtaylortime",
+                               "coreexittime","index"};
+    cout << ">> Paramaters for Truelove & McKee's solution (density index = "
+         << index << "):" <<std::endl;
+    for(unsigned int i=0;i<truelovemckeeparams.size();i++) {
+      cout << "   " << ParNames[i] << ": " << truelovemckeeparams[i] << endl;
+    }
+    cout << endl;
+  }
+  return;
+}
+
 //
 // /**
 //  * Free expansion phase forward shock dynamics in red giant wind.
@@ -1764,36 +1872,6 @@ void Astro::CalculateThinShellApproximation(vector< vector<double> > dProfile,
 //   }
 //   R *= pc_to_cm;
 //   V *= 1.e5;
-//   return;
-// }
-//
-// void Astro::SetBlastEnergy(double e) {
-//   E=e;
-//   if(HomogeneousAmbientDensity&&mEj) {
-//     CharacteristicRadius = pow(mEj,1./3.)*pow(HomogeneousAmbientDensity*m_p_g,-1./3.);///<Eq(1)
-//     CharacteristicTime = pow(E,-1./2.)*pow(mEj,5./6.)*pow(HomogeneousAmbientDensity*m_p_g,-1./3.);///<Eq(2)
-//     CharacteristicVelocity=CharacteristicRadius/CharacteristicTime;
-//   }
-//   return;
-// }
-//
-// void Astro::SetHomogeneousAmbientDensity(double HOMOGENEOUSAMBIENTDENSITY) {
-//   HomogeneousAmbientDensity=HOMOGENEOUSAMBIENTDENSITY;
-//   if(E&&mEj) {
-//     CharacteristicRadius = pow(mEj,1./3.)*pow(HomogeneousAmbientDensity*m_p_g,-1./3.);///<Eq(1)
-//     CharacteristicTime = pow(E,-1./2.)*pow(mEj,5./6.)*pow(HomogeneousAmbientDensity*m_p_g,-1./3.);///<Eq(2)
-//     CharacteristicVelocity=CharacteristicRadius/CharacteristicTime;
-//   }
-//   return;
-// }
-//
-// void Astro::SetEjectaMass(double MEJ) {
-//   mEj=MEJ;
-//   if(E&&HomogeneousAmbientDensity) {
-//     CharacteristicRadius = pow(mEj,1./3.)*pow(HomogeneousAmbientDensity*m_p_g,-1./3.);///<Eq(1)
-//     CharacteristicTime = pow(E,-1./2.)*pow(mEj,5./6.)*pow(HomogeneousAmbientDensity*m_p_g,-1./3.);///<Eq(2)
-//     CharacteristicVelocity=CharacteristicRadius/CharacteristicTime;
-//   }
 //   return;
 // }
 // void Astro::SetRedGiantWindSpeed(double VRGWIND) {

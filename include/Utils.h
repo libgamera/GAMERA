@@ -106,6 +106,11 @@ class Utils {
   gsl_spline *GSLsplineFromTwoDVector(vector< vector<double> > v);
   vector< vector<double> > SortTwoDVector(vector< vector<double> > v,
                                                  int column);
+  void TwoDVectorPushBack(double x, double y, vector< vector<double> > &v);
+
+  double EvalSpline(double x, gsl_spline *s, gsl_interp_accel *a,
+                    const char* t, int l);
+  void Clear2DVector(vector< vector<double> > &v);
 
 
 

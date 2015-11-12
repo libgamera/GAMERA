@@ -101,12 +101,55 @@ class Astro  {
     gsl_spline *TaylorCordesArm1,*TaylorCordesArm2,*TaylorCordesArm3,
                *TaylorCordesArm4,*TaylorCordesArm1Inv,*TaylorCordesArm2Inv,
                *TaylorCordesArm3Inv,*TaylorCordesArm4Inv,
-               *thinshellvelocitylookup,*thinshellradiuslookup;
+               *thinshellvelocitylookup,*thinshellradiuslookup,
+               *r_edreverselookup,*v_edreverselookup,*r_edforwardlookup,
+               *v_edforwardlookup,*r_streverselookup,*v_streverselookup,
+               *r_stforwardlookup,*v_stforwardlookup;
     gsl_interp_accel *accArm1,*accArm2,*accArm3,*accArm4,
                      *accArm1Inv,*accArm2Inv,*accArm3Inv,*accArm4Inv,
-                     *atsrad,*atsvel;
+                     *atsrad,*atsvel,*aredr,*avedr,*aredf,*avedf,*arstr,
+                     *avstr,*arstf,*avstf;
+
+
+    vector< vector<double> > forwardshockradiusprofile;
+    vector< vector<double> > forwardshockvelocityprofile;
+    vector< vector<double> > reverseshockradiusprofile;
+    vector< vector<double> > reverseshockvelocityprofile;
+
     vector< vector<double> > thinshellradius;
     vector< vector<double> > thinshellvelocity;
+    double thinshellsolutiontmin;
+    double thinshellsolutiontmax;
+
+    double truelovemckeetminfed;
+    double truelovemckeetminfst;
+    double truelovemckeetmaxfed;
+    double truelovemckeetmaxfst;
+
+    double truelovemckeetminred;
+    double truelovemckeetminrst;
+    double truelovemckeetmaxred;
+    double truelovemckeetmaxrst;
+
+    vector<double> truelovemckeeparams;
+    vector< vector<double> > r_edforward;
+    vector< vector<double> > v_edforward;
+    vector< vector<double> > r_edreverse;
+    vector< vector<double> > v_edreverse;
+    vector< vector<double> > r_stforward;
+    vector< vector<double> > v_stforward;
+    vector< vector<double> > r_streverse;
+    vector< vector<double> > v_streverse;
+    vector<double> TrueloveMcKeeRadiusAndSpeed(double t, bool REVERSE);
+    int TrueloveMcKeeEjectaDominatedForwardShock(double x,
+                                                 double &Y,double &V);
+    int TrueloveMcKeeEjectaDominatedReverseShock(double x,
+                                                 double &Y, double &V);
+    int TrueloveMcKeeSedovTaylorPhaseForwardShock(double t,
+                                                  double &R, double &V);
+    int TrueloveMcKeeSedovTaylorPhaseReverseShock(double t,
+                                                  double &R, double &V);
+    void CalculateTrueLoveMcKeeParams(vector<double> pars);
   public:
     Astro();
     ~Astro();
@@ -167,8 +210,27 @@ class Astro  {
     double IusifovKucukProfile(double r);
     void CalculateThinShellApproximation(vector< vector<double> > dProfile,
                                          double E,
-                                         double AdiabIndex=1.333);
-    vector<double> ThinShellRadiusAndSpeed(double t);
+                                         double AdiabIndex = 1.333,
+                                         double tmin = 1.e-2,
+                                         double tmax = 1.e4,
+                                         int steps = 200);
+    void CalculateTrueloveMcKeeSolution(vector<double> pars,
+                                        double tmin = 1.e-2,
+                                        double tmax = 1.e4,
+                                        int steps = 200);
 
+    vector<double> ThinShellRadiusAndSpeed(double t);
+    vector<double> TrueloveMcKeeRadiusAndSpeedForward(double t) {
+                                  return TrueloveMcKeeRadiusAndSpeed(t,false);}
+    vector<double> TrueloveMcKeeRadiusAndSpeedReverse(double t) {
+                                  return TrueloveMcKeeRadiusAndSpeed(t,true);}
+    vector< vector<double> > GetForwardShockRadiusEvolution() {
+                                  return forwardshockradiusprofile;}
+    vector< vector<double> > GetForwardShockVelocityEvolution() {
+                                  return forwardshockvelocityprofile;}
+    vector< vector<double> > GetReverseShockRadiusEvolution() {
+                                  return reverseshockradiusprofile;}
+    vector< vector<double> > GetReverseShockVelocityEvolution() {
+                                  return reverseshockvelocityprofile;}
 };
 #endif

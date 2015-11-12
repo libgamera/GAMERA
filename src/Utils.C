@@ -422,6 +422,24 @@ gsl_spline *Utils::GSLsplineFromTwoDVector(vector< vector<double> > v) {
   return s;
 }
 
+double Utils::EvalSpline(double x, gsl_spline *s, gsl_interp_accel *a,
+                         const char* t, int l) {
+  double y = 0.;
+
+  if (gsl_spline_eval_e(s, x, a, &y)) {
+    cout << t << ",l." << l << ": Interpolation of lookup failed with GSL error"
+              "code "
+              << GSL_EDOM
+              << ". Exiting!" <<endl;
+    exit(1);
+  }
+  if (std::isnan(y) || std::isinf(y)) {
+    cout << t << ": value is " << y << ". Exiting!" <<endl;
+    exit(1);
+  }
+  return y;
+}
+
 vector< vector<double> > Utils::SortTwoDVector(vector< vector<double> > v,
                                                int column) {
   if(!v.size()) {
@@ -440,6 +458,14 @@ vector< vector<double> > Utils::SortTwoDVector(vector< vector<double> > v,
   return v;
 }
 
+void Utils::TwoDVectorPushBack(double x, double y,
+                               vector< vector<double> > &v) {
+  v.push_back(vector<double>());
+  v[v.size()-1].push_back(x);
+  v[v.size()-1].push_back(y);
+  return;
+}
+
 /**
  * Private method that is used in the sorting of 2D vectors.
  */
@@ -450,4 +476,9 @@ bool sortcriterionfirstcolumn (vector<double> i,
 bool sortcriterionsecondcolumn (vector<double> i,
                                               vector<double> j) {
  return (i[1]<j[1]);
+}
+
+void Utils::Clear2DVector(vector< vector<double> > &v) {
+  for (unsigned int i = 0; i < v.size(); i++) v[i].clear();
+  v.clear();
 }
