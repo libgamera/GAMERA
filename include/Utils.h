@@ -89,6 +89,7 @@ class Utils {
                         vector<double> &parameter_values,
                         vector<string> &files);
   void DrawGamera();
+  void DrawGappa();
   void WriteOut(vector<vector<double> > sp, string outname);
   void ReadIn(string inname, vector< vector<double> > &sp);
   double Random();

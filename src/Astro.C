@@ -297,7 +297,7 @@ vector< vector<double> > Astro::CreateDensityProfile(vector<double> pars,
   double stepSizeNormal=log(rmax/rmin)/1000.;
   double stepSizeFine=stepSizeNormal/10.;
   double stepSize=stepSizeNormal;
-  double n = 0.;;
+  double n = 0.;
   for(double r=rmin;r<rmax;r=pow(10.,log10(r)+stepSize)) {
     /* adapt step size in regions of transition */
     if(r<0.9*RGWRadius) stepSize=stepSizeNormal;
@@ -1254,7 +1254,7 @@ vector<double> Astro::ThinShellRadiusAndSpeed(double t) {
             << std::endl;
     return vzero;
   }
-  if(t<thinshellsolutiontmin || t>thinshellsolutiontmax) {
+  if(t<=thinshellsolutiontmin || t>=thinshellsolutiontmax) {
     if(!QUIETMODE) {
       cout << "Astro::ThinShellRadiusAndSpeed: time outside solution boundaries "
            << "(t=" << t/yr_to_sec << " outside ["
@@ -1297,6 +1297,14 @@ void Astro::CalculateThinShellApproximation(vector< vector<double> > dProfile,
             "zero. Exiting." << endl;
     return;
   }
+  if(thinshellradius.size()) {
+    fUtils->Clear2DVector(thinshellradius);
+    fUtils->Clear2DVector(thinshellvelocity);
+    gsl_spline_free(thinshellradiuslookup);
+    gsl_spline_free(thinshellvelocitylookup);
+    gsl_interp_accel_reset(atsrad);
+    gsl_interp_accel_reset(atsvel);
+  }
   /* fill a lookup of mass vs. radius, needed in the integral in (A.4.1) */
   vector< vector<double> > massintegrand;
   vector< vector<double> > mass;
@@ -1305,7 +1313,6 @@ void Astro::CalculateThinShellApproximation(vector< vector<double> > dProfile,
   for(unsigned int i=0;i<dProfile.size();i++) {
     double r = dProfile[i][0];
     double n = dProfile[i][1];
-
     fUtils->TwoDVectorPushBack(r,4.* pi * m_p_g * n * r * r,massintegrand);
   }
   mass = fUtils->IntegratedProfile(massintegrand);
@@ -1490,7 +1497,7 @@ void Astro::CalculateTrueloveMcKeeSolution(vector<double> pars, double tmin,
 
   if(pars.size()!=4) {
     cout << "Astro::CalculateTrueloveMcKeeSolution: wrong number of parameters ("
-         << pars.size() << "). Parameter list takes exactly 8 "
+         << pars.size() << "). Parameter list takes exactly 4 "
             "parameters: " << endl;
     cout << " - [0] ambient density (cm^-3) " << endl;
     cout << " - [1] SN blast energy (erg) " << endl;
@@ -1562,12 +1569,10 @@ void Astro::CalculateTrueloveMcKeeSolution(vector<double> pars, double tmin,
     if(SKIPFWS==false) {
       fUtils->TwoDVectorPushBack(t,r,r_stforward);
       fUtils->TwoDVectorPushBack(t,v,v_stforward);
-      //cout<<"f: "<<t<<" "<<r<<" "<<v<<endl;
     }
     if(SKIPRVS==false) {
       fUtils->TwoDVectorPushBack(tr,rr,r_streverse);
       fUtils->TwoDVectorPushBack(tr,vr,v_streverse);
-      //cout<<"r: "<<tr<<" "<<rr<<" "<<vr<<endl;
     }
   }
 
@@ -1840,47 +1845,120 @@ void Astro::CalculateTrueLoveMcKeeParams(vector<double> pars) {
   return;
 }
 
-//
-// /**
-//  * Free expansion phase forward shock dynamics in red giant wind.
-//  * Eq. 14 from Ptuskin&Zirakashvili 2005 (A&A 429, 755–765 (2005))
-//  */
-// void Astro::GetForwardShockInRGWind(double t, double &R, double &V){
-//   if(!mEj||!vRGWind||!E||!mDotRGWind) {
-// std::cout<<"Astro::GetForwardShockInRGWind: one of (mEj,vRGWind,E,mDotRGWind) is missing: ("
-//          <<mEj<<","<<vRGWind<<","<<E<<","<<mDotRGWind<<"). Returning zeroes."<<std::endl;
-//     R=V=0.;
-//     return;
-//   }
-//   double tScaled = t/1.e3;
-//   double vRGWindScaled = vRGWind/1.e6;
-//   double Escaled = E/1.e51;
-//   double mDotRGWindScaled = mDotRGWind/(1.e-5*mSol/yr_to_sec);
-//   double mEjScaled = mEj/mSol;
-//   double k;
-//   k = pow(pow(Escaled,3.5)*vRGWindScaled/(mDotRGWindScaled*pow(mEjScaled,2.5)),1./8.);
-//   R = 7.7*k*pow(tScaled,7./8.);
-//   V = 6.6e3*k*pow(tScaled,-1./8.);
-//   R*=1.15;///<this connects the solution to the Thin Shell adiabatic solution
-//   V*=0.9;///<this connects the solution to the Thin Shell adiabatic solution
-//   if(R>RGWSedovRadius) {
-//     k = pow(Escaled*vRGWindScaled/mDotRGWindScaled,1./3.);
-//     R = 7.9*k*pow(tScaled,2./3.);
-//     V = 0.72*5.2e3*k*pow(tScaled,-1./3.);
-//     R*=0.66;///<this connects the solution to the Thin Shell adiabatic solution
-//     V*=0.94;///<this connects the solution to the Thin Shell adiabatic solution
-//   }
-//   R *= pc_to_cm;
-//   V *= 1.e5;
-//   return;
-// }
-// void Astro::SetRedGiantWindSpeed(double VRGWIND) {
-//   vRGWind=VRGWIND;
-//   if(mDotRGWind) RGWSedovRadius = mEj*vRGWind/mDotRGWind/pc_to_cm;
-//   return;
-// }
-// void Astro::SetRedGiantWindMassLuminosity(double MDOTRGWIND) {
-//   mDotRGWind=MDOTRGWIND;
-//   if(vRGWind) RGWSedovRadius = mEj*vRGWind/mDotRGWind/pc_to_cm;
-//   return;
-// }
+void Astro::CalculateForwardShockInRGWind(vector<double> pars, double tmin,
+                                          double tmax, int steps) {
+
+  if(pars.size()!=10) {
+    cout << "Astro::CalculateForwardShockInRGWind: wrong number of parameters ("
+         << pars.size() << "). Parameter list takes exactly 10 "
+            "parameters: " << endl;
+    cout << " - [0] red giant wind radius (pc) " << endl;
+    cout << " - [1] mass loss rate of progenitor red giant (mSol/yr) " << endl;
+    cout << " - [2] red giant wind speed (cm/s) " << endl;
+    cout << " - [3] radius of main-seqence wind bubble (MSWB) (pc) " << endl;
+    cout << " - [4] density inside MSWB (cm^-3) " << endl;
+    cout << " - [5] density of the ISM (cm^-3) " << endl;
+    cout << " - [6] width of the shell at RGW->MSWB transition (pc) " << endl;
+    cout << " - [7] width of the shell at MSWB->ISM transition (pc) " << endl;
+    cout << " - [8] SN ejecta mass (mSol) " << endl;
+    cout << " - [9] SN blast energy (erg) " << endl;
+    cout << "Returning empty vector!" <<endl;
+    return;
+  }
+
+  vector<double> pars1 = pars;
+  pars1.erase(pars1.end()-2,pars1.end());
+
+  double RGWSedovRadius = pars[8]*mSol*pars[2]/(pars[1]*mSol/yr_to_sec)
+                          /pc_to_cm;
+
+  vector< vector<double> > dprofile = CreateDensityProfile(pars1);
+  vector< vector<double> > massintegrand;
+  vector< vector<double> > mass;
+  vector< vector<double> > massinverse;
+  for(unsigned int i=0;i<dprofile.size();i++) {
+    double r = dprofile[i][0];
+    double n = dprofile[i][1];
+    fUtils->TwoDVectorPushBack( r, 4.* pi * m_p_g * n * r * r,massintegrand);
+  }
+  massintegrand = fUtils->SortTwoDVector(massintegrand,0);
+  mass = fUtils->IntegratedProfile(massintegrand);
+  for(unsigned int i=0;i<mass.size();i++)
+    fUtils->TwoDVectorPushBack(mass[i][1],mass[i][0],massinverse);
+  massinverse = fUtils->SortTwoDVector(massinverse,0);
+
+  gsl_spline *m = fUtils->GSLsplineFromTwoDVector(massinverse);
+  gsl_interp_accel *a = gsl_interp_accel_alloc();
+  double RGWSedovRadiusFromProfile = fUtils->EvalSpline(pars[8]*mSol,m,a,
+                                                        __func__,__LINE__);
+  RGWSedovRadiusFromProfile /= pc_to_cm;
+  cout << RGWSedovRadius << " " << RGWSedovRadiusFromProfile << endl;
+  double RGVSR = 0.;
+  (RGWSedovRadiusFromProfile > RGWSedovRadius) ? RGVSR = RGWSedovRadius:
+    RGVSR = RGWSedovRadiusFromProfile;
+  vector<double> pars2;
+  pars2.push_back(pars[1]);
+  pars2.push_back(pars[2]);
+  pars2.push_back(pars[8]);
+  pars2.push_back(pars[9]);
+  pars2.push_back(RGVSR);
+
+  CalculateThinShellApproximation(dprofile,pars[9],1.333,0.,0.,0);
+
+  // make the r and v time profiles
+  if(steps && tmin && tmax) {
+    if(tmin>=tmax) {
+      cout << "Astro::CalculateThinShellApproximation: Can't create profiles"
+              "because tmin >= tmax (" << tmin <<" >= "<< tmax <<
+              ") Exiting!" << endl;
+      return;
+    }
+    double logtmin = log10(tmin);
+    double logtmax = log10(tmax);
+    double dlogt = (logtmax-logtmin)/steps;
+    fUtils->Clear2DVector(forwardshockradiusprofile);
+    fUtils->Clear2DVector(forwardshockvelocityprofile);
+    vector<double> x;
+    double t=0.;
+    for(double logt = logtmin ; logt < logtmax ; logt += dlogt) {
+      t = pow(10.,logt);
+      x = ForwardShockInRGWind(t,pars2,dprofile);
+      fUtils->TwoDVectorPushBack(t,x[0]/pc_to_cm,forwardshockradiusprofile);
+      fUtils->TwoDVectorPushBack(t,x[1],forwardshockvelocityprofile);
+    }
+  }
+  return;
+}
+
+/**
+ * Free expansion phase forward shock dynamics in red giant wind.
+ * Eq. 14 from Ptuskin&Zirakashvili 2005 (A&A 429, 755–765 (2005))
+ */
+ vector<double> Astro::ForwardShockInRGWind(double t, vector<double> pars,
+                                            vector< vector<double> > profile){
+
+  double tScaled = t/1.e3;
+  double mDotRGWindScaled = pars[0]/1.e-5;
+  double vRGWindScaled = pars[1]/1.e6;
+  double mEjScaled = pars[2];
+  double Escaled = pars[3]/1.e51;
+  double RGWSedovRadius = pars[4];
+  double k,R,V;
+  k = pow(pow(Escaled,3.5)*vRGWindScaled/(mDotRGWindScaled*pow(mEjScaled,2.5)),1./8.);
+  R = 7.7*k*pow(tScaled,7./8.);
+  V = 6.6e3*k*pow(tScaled,-1./8.);
+  R*=1.15;///<this connects the solution to the Thin Shell adiabatic solution
+  V*=0.9;///<this connects the solution to the Thin Shell adiabatic solution
+  //cout<<t<<" "<<R<<" "<<RGWSedovRadius<<std::endl;
+  if(R>RGWSedovRadius) {
+    vector<double> v = ThinShellRadiusAndSpeed(t);
+    R = v[0]/pc_to_cm;
+    V = v[1]/1.e5;
+  }
+  R *= pc_to_cm;
+  V *= 1.e5;
+  vector<double> v;
+  v.push_back(R);
+  v.push_back(V);
+  return v;
+}

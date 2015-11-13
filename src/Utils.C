@@ -129,80 +129,103 @@ void Utils::DrawGamera() {
   if (GAMERADESTROYEDTHECONSOLE) return;
   cout << endl;
   cout << endl;
-  cout << "                               .==#W,                       "
-       << endl;
-  cout << "                             ,*''RBEB                       "
-       << endl;
-  cout << "                              $=gp-'M @                     "
-       << endl;
-  cout << "                             f  `-^;p$/W=                   "
-       << endl;
-  cout << "                               ,|5==*$Bp5BK@,               "
-       << endl;
-  cout << "                           ,=@w=>=@@$ZpB@E8BBBw             "
-       << endl;
-  cout << "                        ,4MM'^YU@`5Z3@EEEZBM , .E=@@,@p@K   "
-       << endl;
-  cout << "                ,     ;`  ,,@;E]BBWBWp@5W#UP@P;&;ET@5BBEBBp "
-       << endl;
-  cout << "              ,*pT-p/@ ',/|@p|@]BP'`!*|`;p5N@EBp@(L`(,^^EBB "
-       << endl;
-  cout << "              `*=B@/@BB@pp@5@@BM`b,@|@{Ep5E@BB@Bpp^`'''```  "
-       << endl;
-  cout << "                ''(Z@5BE``'*9y^  `*@bb]pEbE@ZBBU@Lp         "
-       << endl;
-  cout << "                 ^^']EMP `  `^w@|L|`^'$EEEEEZ@@EPP          "
-       << endl;
-  cout << "                    $E`E   ` /t u'*L=u@EbEb@UEEH@p          "
-       << endl;
-  cout << "                    $QL$.  ,,ppp,|uEp^@Z@@@@EBEEZp          "
-       << endl;
-  cout << "                    ]pp5p(4BEp3$5B@EE@B$@BBB@p5UpM          "
-       << endl;
-  cout << "                    jE@pBB5p5Bp@5bP;p{53BBBBDBB@            "
-       << endl;
-  cout << "                     8M `I5|5EEEBU@4b55]BBU5EE(Ey           "
-       << endl;
-  cout << "                     'b  ',|@EBEBUE6@@$BBB|p,/`$@B          "
-       << endl;
-  cout << "      ,,              !'``T#p6EBBUEpBp65BBE^$^@uZ6N,        "
-       << endl;
-  cout << " ,p -``:!pp,         !.,!@y58$EEBBEEEUpEBBM95P/^``$C        "
-       << endl;
-  cout << "        ^YEP;B,       4/@@E@B]H3BEE@EppBBM 4(*WQ,A!b        "
-       << endl;
-  cout << "           !' |Bw   , ,/ZE3EBBHEE6@@EEBM   E^Z`|3+@@        "
-       << endl;
-  cout << "             ' `e!h ,8EbEEEM,B`($EE@E6H    'Zp/ZEE@'        "
-       << endl;
-  cout << "              `!`.em@@(uB'``,`Y@EEEEEB      j@P5]EBw,       "
-       << endl;
-  cout << "                ` ,/'^U^ @ @P;ZZKEEB`         Z`u!E^,b@p@w  "
-       << endl;
-  cout << "           ,,=@uw@P,]EEbppppBBM^             '9Nq@@~(C'9w ' "
-       << endl;
-  cout << "            ]^ ]B` AM^                                      "
-       << endl;
+  cout << "                                                  ▄▄▄            " << endl;
+  cout << "                                              ▄▓▌▒▀▀▀▀▓▓▄▄▄      " << endl;
+  cout << "                                            ▓▀░▄▒▒   ▀    ░▀▄    " << endl;
+  cout << "                                ▒▒░░  ░░░▓▒▒▒▀▀▒▒▒░▒░░░ ░▒▒░░░▒  " << endl;
+  cout << "                            ▓░░░░      ░▒▒▒░▒▒▒░░▒░░ ▐█░░▌       " << endl;
+  cout << "                         ▄▓░ ░░          ░░▒░░░░░░  ▄█▀ ▀  ▄▀    " << endl;
+  cout << "                       ▓▓░       ░        ░░░░▒▒▒▀▀▒░░▀▐▓▄▀      " << endl;
+  cout << "                     ▓█▀░    ▒░░░░░▄   ░   ░░░▄▓       ▀▒▓▓      " << endl;
+  cout << "                    ░▀░░    ▀ ▒▒░░▒░ ▒░░░░▒ ▒▀░░ ░░              " << endl;
+  cout << "                    ▒░    ░▐▐▒▒▓▒▐▌░░░▒░▒ ░▒▓░ ░ ░▀░░▓           " << endl;
+  cout << "                 ▓▌░░    ▒░░░▒░░▒▓▓░░ ░░░░░░░▒░░ ▀ ░░     ░▌░ ░  " << endl;
+  cout << "                ▄▀░░   ▒▒░░░░░░▒▒░░▒▒▄▄▓▓▓▓▓▒▒▄░░ ░░░░░▒░▒░░░░ ░ " << endl;
+  cout << "               ▓░░░  ░▓░░░░▒▒░▒▓▓░▓▓▀▓▓▒▓▓▓▓▓▒      ▀            " << endl;
+  cout << "              ▄▒░░   ▒░░░▒▒▒░▒▒▒▒▀▀▒▒▀▒▀▒░▀▒▀                    " << endl;
+  cout << "            ▒░▒░  ░░▒░░▒▒▒░░▀▒▒░▀░▒▀░▒░▒░▒▓                      " << endl;
+  cout << "            ░▒░░ ░░▒▒░▒▒▒░▓▒░░▀▀░░▀░░░░▒▒▀                       " << endl;
+  cout << "          ▒░░░░  ░▒░░░▒▒░▒▒▒░▒▒░░▒░░░░▒▓                         " << endl;
+  cout << "           ░▒░   ░░░░░░░░░░░░░░▒▒░░ ░░░                          " << endl;
+  cout << "          ░░░░   ░░    ░░░░░▒░░▒▒   ░░░░                         " << endl;
+  cout << "          ▒░░░ ░░ ▒░▒▒▒▒░░░░░▒░░      ░░▒                        " << endl;
+  cout << "           ▒░     ▒▓▒░░░░░▒▒▒▒       ░░▒▒▓                       " << endl;
+  cout << " ▓▄▄         ▒░   ▀▒░░░░░░▒░▒    ░  ░  ░░▓                       " << endl;
+  cout << "  ░▓▒▄         ▄▒▒▒▒▒░░░▒▒▒▒         ░░░░▒                       " << endl;
+  cout << "   ▒░▄▒▄     ▓▓▒▒░ ░░░░░░▒░          ░░░░░                       " << endl;
+  cout << "    ░▒▀ ▒▓▒▒▒▓▒░░░░░░░░░▒         ░   ░░░▒                       " << endl;
+  cout << "      ░▒▒░░░░▒░░░░░░▒░▀              ░░░░                        " << endl;
+  cout << "        ▒░░░▓▒▀░░░▒▀                     ░                       " << endl;
+  cout << "           ▓▒░ ░░░                      ░░░░▒▒▒▒                 " << endl;
+  cout << "          ▓▓▓░░▓▒▒▒▒▄▒              ▒░      ▒  ░▓▀               " << endl;
+  cout << "           ▀░█▄▐█▄ ▐█▄██                                         " << endl;
+  cout << "              ▀  ▀                                               " << endl;
   cout << endl;
-  cout << "      ▄▀▀▀▀▄    ▄▀▀█▄   ▄▀▀▄ ▄▀▄  ▄▀▀█▄▄▄▄  ▄▀▀▄▀▀▀▄  ▄▀▀█▄  "
-       << endl;
-  cout << "     █         ▐ ▄▀ ▀▄ █  █ ▀  █ ▐  ▄▀   ▐ █   █   █ ▐ ▄▀ ▀▄ "
-       << endl;
-  cout << "     █    ▀▄▄    █▄▄▄█ ▐  █    █   █▄▄▄▄▄  ▐  █▀▀█▀    █▄▄▄█ "
-       << endl;
-  cout << "     █     █ █  ▄▀   █   █    █    █    ▌   ▄▀    █   ▄▀   █ "
-       << endl;
-  cout << "     ▐▀▄▄▄▄▀ ▐ █   ▄▀  ▄▀   ▄▀    ▄▀▄▄▄▄   █     █   █   ▄▀  "
-       << endl;
-  cout << "     ▐         ▐   ▐   █    █     █    ▐   ▐     ▐   ▐   ▐   "
-       << endl;
-  cout << "                       ▐    ▐     ▐                          "
-       << endl;
+  cout << "       ▄████  ▄▄▄       ███▄ ▄███▓▓█████  ██▀███   ▄▄▄      " << endl;
+  cout << "      ██▒ ▀█▒▒████▄    ▓██▒▀█▀ ██▒▓█   ▀ ▓██ ▒ ██▒▒████▄    " << endl;
+  cout << "     ▒██░▄▄▄░▒██  ▀█▄  ▓██    ▓██░▒███   ▓██ ░▄█ ▒▒██  ▀█▄  " << endl;
+  cout << "     ░▓█  ██▓░██▄▄▄▄██ ▒██    ▒██ ▒▓█  ▄ ▒██▀▀█▄  ░██▄▄▄▄██ " << endl;
+  cout << "     ░▒▓███▀▒ ▓█   ▓██▒▒██▒   ░██▒░▒████▒░██▓ ▒██▒ ▓█   ▓██▒" << endl;
+  cout << "      ░▒   ▒  ▒▒   ▓▒█░░ ▒░   ░  ░░░ ▒░ ░░ ▒▓ ░▒▓░ ▒▒   ▓▒█░" << endl;
+  cout << "       ░   ░   ▒   ▒▒ ░░  ░      ░ ░ ░  ░  ░▒ ░ ▒░  ▒   ▒▒ ░" << endl;
+  cout << "     ░ ░   ░   ░   ▒   ░      ░      ░     ░░   ░   ░   ▒   " << endl;
+  cout << "           ░       ░  ░       ░      ░  ░   ░           ░  ░" << endl;
   cout << endl;
   cout << endl;
 
   GAMERADESTROYEDTHECONSOLE = true;
 }
+
+
+void Utils::DrawGappa() {
+  if (GAMERADESTROYEDTHECONSOLE) return;
+
+  cout << endl;
+  cout << endl;
+  cout << "                                            ▄▄                                  " << endl;
+  cout << "                                            ▐▓█▄                                " << endl;
+  cout << "                                             ▓▓▒▓                               " << endl;
+  cout << "                                           ▀▓▓▓▄▄▀░                             " << endl;
+  cout << "                                            ▓▓▒▒░░ ▄░                   ▄▓▓     " << endl;
+  cout << "                                            ▓▒▒▀▒▓█▌▒▒             ▄▄▓▓▓▓▓▀     " << endl;
+  cout << "                                            ▀▒▒▒░ ░░     ░░░░░░░░▒▓▒▓▒▒▒▒▌      " << endl;
+  cout << "  ▄▄             ▄ ▄▄▄▄▄  ▒ ▒▒▀▀▒▀▀  ░░     ░▓▒░░   ░    ░░ ░░░▒▒▓▒▒░▒▀▒▀       " << endl;
+  cout << "  ▀▓▓▒░▄▄   ░  ░░░░░░                ░   ░  ▓▓▒░    ░   ░ ░  ░▄▒▒░▒▒▀▓▓         " << endl;
+  cout << "   ▀▓▒▒▒▒▒▒▒░░░░                ░ ░  ▒   ░░▓▓▒▒▒        ░ ▒░   ░▀▀░▒▓▓▀         " << endl;
+  cout << "    ▐▌▒▒░░░▒░    ░            ░░░       ░▒▌▒░▀░ ▒▄░       ░░ ▀▒░░▒▒▓▓           " << endl;
+  cout << "      ▓░▓▀░░░         ▄  ▄▀  ░░░░░░░░ ░ ▓▓▀░  ▐░  ░  ░▒  ░    ▓▒▀▒              " << endl;
+  cout << "                  ▄  ▄▒▓ ▄▀ ▒           ▓▓▒▒ ▄▀   ░  ░░      ▒▓                 " << endl;
+  cout << "              ▄▄ ▄▄▓▓▀ ▒  ░   ░        ░▐▒▓▓▓▒                                  " << endl;
+  cout << "               ▓▓▓▀  ▒                 ░▐▓▐▌░          ░▐                       " << endl;
+  cout << "                    ░               ░▒▒▐▓▒░░  ▒      ░ ░                        " << endl;
+  cout << "                      ░            ░░░ ▓▓▒    ░░     ░ ░                        " << endl;
+  cout << "                                  ▄▒░░░▓▓▒▒░            ▒                       " << endl;
+  cout << "                                   ▒▒░▐▓▒▒▒░▒           ▒                       " << endl;
+  cout << "                                     ░ ▓▒▓▓░ ▒ ░                                " << endl;
+  cout << "                                       ▐▒▒▒▒  ░▒                                " << endl;
+  cout << "                                         ░▒▒░  ▒▒▓▒                             " << endl;
+  cout << "                                        ▄▓▒▒   ░░ ░                             " << endl;
+  cout << "                                      ▐▓▀░▒   ▐▒░                               " << endl;
+  cout << "                                     ▄▀▀░     ▀▀                                " << endl;
+  cout << "                                    ▓▌▒░                                        " << endl;
+  cout << "                                    ▓▓  ▄                                       " << endl;
+  cout << "                                    ▓▄   ▀▐▄                                    " << endl;
+  cout << endl;
+  cout << "                     ▄████  ▄▄▄       ██▓███   ██▓███   ▄▄▄      " << endl;
+  cout << "                    ██▒ ▀█▒▒████▄    ▓██░  ██▒▓██░  ██▒▒████▄    " << endl;
+  cout << "                   ▒██░▄▄▄░▒██  ▀█▄  ▓██░ ██▓▒▓██░ ██▓▒▒██  ▀█▄  " << endl;
+  cout << "                   ░▓█  ██▓░██▄▄▄▄██ ▒██▄█▓▒ ▒▒██▄█▓▒ ▒░██▄▄▄▄██ " << endl;
+  cout << "                   ░▒▓███▀▒ ▓█   ▓██▒▒██▒ ░  ░▒██▒ ░  ░ ▓█   ▓██▒" << endl;
+  cout << "                    ░▒   ▒  ▒▒   ▓▒█░▒▓▒░ ░  ░▒▓▒░ ░  ░ ▒▒   ▓▒█░" << endl;
+  cout << "                     ░   ░   ▒   ▒▒ ░░▒ ░     ░▒ ░       ▒   ▒▒ ░" << endl;
+  cout << "                   ░ ░   ░   ░   ▒   ░░       ░░         ░   ▒   " << endl;
+  cout << "                         ░       ░  ░                        ░  ░" << endl;
+  cout << "                                                                 " << endl;
+  cout << endl;
+  cout << endl;
+  return;
+}
+
 
 /**
  * Return uniform random number in [0,1). GSL Wrapper function.

@@ -203,7 +203,8 @@ class Astro  {
     void SetScaleHeight(double SCALEHEIGHT) {scaleHeight=SCALEHEIGHT;}
     void SetArmWidth(double ARMWIDTH) {armWidth=ARMWIDTH;}
     vector< vector<double> > CreateDensityProfile(vector<double> pars,
-                                                  double rmin,double rmax);
+                                                  double rmin = 1.e-3,
+                                                  double rmax = 1.e3);
     double EvalTaylorCordesArmTheta(double r, int arm);
     double EvalTaylorCordesArmGalactocentricRadius(double theta, int arm);
     double CaseBhattacharyaProfile(double r);
@@ -232,5 +233,13 @@ class Astro  {
                                   return reverseshockradiusprofile;}
     vector< vector<double> > GetReverseShockVelocityEvolution() {
                                   return reverseshockvelocityprofile;}
+    void CalculateForwardShockInRGWind(vector<double> pars,
+                                       double tmin = 1.e-2,
+                                       double tmax = 1.e4,
+                                       int steps = 200);
+    vector<double> ForwardShockInRGWind(double t, vector<double> pars,
+                                       vector< vector<double> > profile);
+
+
 };
 #endif
