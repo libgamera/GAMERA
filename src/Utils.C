@@ -4,6 +4,8 @@ Utils::Utils(bool DRAWLOGO) {
   if (DRAWLOGO == true) DrawGamera();
   QUIETMODE = false;
   GAMERADESTROYEDTHECONSOLE = false;
+  r = gsl_rng_alloc (gsl_rng_mt19937);
+  gsl_rng_set(r,time(0));
 }
 
 Utils::~Utils() {}
@@ -127,115 +129,249 @@ void Utils::DrawGamera() {
   if (GAMERADESTROYEDTHECONSOLE) return;
   cout << endl;
   cout << endl;
-  cout << "                               .==#W,                       "
-       << endl;
-  cout << "                             ,*''RBEB                       "
-       << endl;
-  cout << "                              $=gp-'M @                     "
-       << endl;
-  cout << "                             f  `-^;p$/W=                   "
-       << endl;
-  cout << "                               ,|5==*$Bp5BK@,               "
-       << endl;
-  cout << "                           ,=@w=>=@@$ZpB@E8BBBw             "
-       << endl;
-  cout << "                        ,4MM'^YU@`5Z3@EEEZBM , .E=@@,@p@K   "
-       << endl;
-  cout << "                ,     ;`  ,,@;E]BBWBWp@5W#UP@P;&;ET@5BBEBBp "
-       << endl;
-  cout << "              ,*pT-p/@ ',/|@p|@]BP'`!*|`;p5N@EBp@(L`(,^^EBB "
-       << endl;
-  cout << "              `*=B@/@BB@pp@5@@BM`b,@|@{Ep5E@BB@Bpp^`'''```  "
-       << endl;
-  cout << "                ''(Z@5BE``'*9y^  `*@bb]pEbE@ZBBU@Lp         "
-       << endl;
-  cout << "                 ^^']EMP `  `^w@|L|`^'$EEEEEZ@@EPP          "
-       << endl;
-  cout << "                    $E`E   ` /t u'*L=u@EbEb@UEEH@p          "
-       << endl;
-  cout << "                    $QL$.  ,,ppp,|uEp^@Z@@@@EBEEZp          "
-       << endl;
-  cout << "                    ]pp5p(4BEp3$5B@EE@B$@BBB@p5UpM          "
-       << endl;
-  cout << "                    jE@pBB5p5Bp@5bP;p{53BBBBDBB@            "
-       << endl;
-  cout << "                     8M `I5|5EEEBU@4b55]BBU5EE(Ey           "
-       << endl;
-  cout << "                     'b  ',|@EBEBUE6@@$BBB|p,/`$@B          "
-       << endl;
-  cout << "      ,,              !'``T#p6EBBUEpBp65BBE^$^@uZ6N,        "
-       << endl;
-  cout << " ,p -``:!pp,         !.,!@y58$EEBBEEEUpEBBM95P/^``$C        "
-       << endl;
-  cout << "        ^YEP;B,       4/@@E@B]H3BEE@EppBBM 4(*WQ,A!b        "
-       << endl;
-  cout << "           !' |Bw   , ,/ZE3EBBHEE6@@EEBM   E^Z`|3+@@        "
-       << endl;
-  cout << "             ' `e!h ,8EbEEEM,B`($EE@E6H    'Zp/ZEE@'        "
-       << endl;
-  cout << "              `!`.em@@(uB'``,`Y@EEEEEB      j@P5]EBw,       "
-       << endl;
-  cout << "                ` ,/'^U^ @ @P;ZZKEEB`         Z`u!E^,b@p@w  "
-       << endl;
-  cout << "           ,,=@uw@P,]EEbppppBBM^             '9Nq@@~(C'9w ' "
-       << endl;
-  cout << "            ]^ ]B` AM^                                      "
-       << endl;
+  cout << "                                                  ▄▄▄            " << endl;
+  cout << "                                              ▄▓▌▒▀▀▀▀▓▓▄▄▄      " << endl;
+  cout << "                                            ▓▀░▄▒▒   ▀    ░▀▄    " << endl;
+  cout << "                                ▒▒░░  ░░░▓▒▒▒▀▀▒▒▒░▒░░░ ░▒▒░░░▒  " << endl;
+  cout << "                            ▓░░░░      ░▒▒▒░▒▒▒░░▒░░ ▐█░░▌       " << endl;
+  cout << "                         ▄▓░ ░░          ░░▒░░░░░░  ▄█▀ ▀  ▄▀    " << endl;
+  cout << "                       ▓▓░       ░        ░░░░▒▒▒▀▀▒░░▀▐▓▄▀      " << endl;
+  cout << "                     ▓█▀░    ▒░░░░░▄   ░   ░░░▄▓       ▀▒▓▓      " << endl;
+  cout << "                    ░▀░░    ▀ ▒▒░░▒░ ▒░░░░▒ ▒▀░░ ░░              " << endl;
+  cout << "                    ▒░    ░▐▐▒▒▓▒▐▌░░░▒░▒ ░▒▓░ ░ ░▀░░▓           " << endl;
+  cout << "                 ▓▌░░    ▒░░░▒░░▒▓▓░░ ░░░░░░░▒░░ ▀ ░░     ░▌░ ░  " << endl;
+  cout << "                ▄▀░░   ▒▒░░░░░░▒▒░░▒▒▄▄▓▓▓▓▓▒▒▄░░ ░░░░░▒░▒░░░░ ░ " << endl;
+  cout << "               ▓░░░  ░▓░░░░▒▒░▒▓▓░▓▓▀▓▓▒▓▓▓▓▓▒      ▀            " << endl;
+  cout << "              ▄▒░░   ▒░░░▒▒▒░▒▒▒▒▀▀▒▒▀▒▀▒░▀▒▀                    " << endl;
+  cout << "            ▒░▒░  ░░▒░░▒▒▒░░▀▒▒░▀░▒▀░▒░▒░▒▓                      " << endl;
+  cout << "            ░▒░░ ░░▒▒░▒▒▒░▓▒░░▀▀░░▀░░░░▒▒▀                       " << endl;
+  cout << "          ▒░░░░  ░▒░░░▒▒░▒▒▒░▒▒░░▒░░░░▒▓                         " << endl;
+  cout << "           ░▒░   ░░░░░░░░░░░░░░▒▒░░ ░░░                          " << endl;
+  cout << "          ░░░░   ░░    ░░░░░▒░░▒▒   ░░░░                         " << endl;
+  cout << "          ▒░░░ ░░ ▒░▒▒▒▒░░░░░▒░░      ░░▒                        " << endl;
+  cout << "           ▒░     ▒▓▒░░░░░▒▒▒▒       ░░▒▒▓                       " << endl;
+  cout << " ▓▄▄         ▒░   ▀▒░░░░░░▒░▒    ░  ░  ░░▓                       " << endl;
+  cout << "  ░▓▒▄         ▄▒▒▒▒▒░░░▒▒▒▒         ░░░░▒                       " << endl;
+  cout << "   ▒░▄▒▄     ▓▓▒▒░ ░░░░░░▒░          ░░░░░                       " << endl;
+  cout << "    ░▒▀ ▒▓▒▒▒▓▒░░░░░░░░░▒         ░   ░░░▒                       " << endl;
+  cout << "      ░▒▒░░░░▒░░░░░░▒░▀              ░░░░                        " << endl;
+  cout << "        ▒░░░▓▒▀░░░▒▀                     ░                       " << endl;
+  cout << "           ▓▒░ ░░░                      ░░░░▒▒▒▒                 " << endl;
+  cout << "          ▓▓▓░░▓▒▒▒▒▄▒              ▒░      ▒  ░▓▀               " << endl;
+  cout << "           ▀░█▄▐█▄ ▐█▄██                                         " << endl;
+  cout << "              ▀  ▀                                               " << endl;
   cout << endl;
-  cout << "      ▄▀▀▀▀▄    ▄▀▀█▄   ▄▀▀▄ ▄▀▄  ▄▀▀█▄▄▄▄  ▄▀▀▄▀▀▀▄  ▄▀▀█▄  "
-       << endl;
-  cout << "     █         ▐ ▄▀ ▀▄ █  █ ▀  █ ▐  ▄▀   ▐ █   █   █ ▐ ▄▀ ▀▄ "
-       << endl;
-  cout << "     █    ▀▄▄    █▄▄▄█ ▐  █    █   █▄▄▄▄▄  ▐  █▀▀█▀    █▄▄▄█ "
-       << endl;
-  cout << "     █     █ █  ▄▀   █   █    █    █    ▌   ▄▀    █   ▄▀   █ "
-       << endl;
-  cout << "     ▐▀▄▄▄▄▀ ▐ █   ▄▀  ▄▀   ▄▀    ▄▀▄▄▄▄   █     █   █   ▄▀  "
-       << endl;
-  cout << "     ▐         ▐   ▐   █    █     █    ▐   ▐     ▐   ▐   ▐   "
-       << endl;
-  cout << "                       ▐    ▐     ▐                          "
-       << endl;
+  cout << "       ▄████  ▄▄▄       ███▄ ▄███▓▓█████  ██▀███   ▄▄▄      " << endl;
+  cout << "      ██▒ ▀█▒▒████▄    ▓██▒▀█▀ ██▒▓█   ▀ ▓██ ▒ ██▒▒████▄    " << endl;
+  cout << "     ▒██░▄▄▄░▒██  ▀█▄  ▓██    ▓██░▒███   ▓██ ░▄█ ▒▒██  ▀█▄  " << endl;
+  cout << "     ░▓█  ██▓░██▄▄▄▄██ ▒██    ▒██ ▒▓█  ▄ ▒██▀▀█▄  ░██▄▄▄▄██ " << endl;
+  cout << "     ░▒▓███▀▒ ▓█   ▓██▒▒██▒   ░██▒░▒████▒░██▓ ▒██▒ ▓█   ▓██▒" << endl;
+  cout << "      ░▒   ▒  ▒▒   ▓▒█░░ ▒░   ░  ░░░ ▒░ ░░ ▒▓ ░▒▓░ ▒▒   ▓▒█░" << endl;
+  cout << "       ░   ░   ▒   ▒▒ ░░  ░      ░ ░ ░  ░  ░▒ ░ ▒░  ▒   ▒▒ ░" << endl;
+  cout << "     ░ ░   ░   ░   ▒   ░      ░      ░     ░░   ░   ░   ▒   " << endl;
+  cout << "           ░       ░  ░       ░      ░  ░   ░           ░  ░" << endl;
   cout << endl;
   cout << endl;
 
   GAMERADESTROYEDTHECONSOLE = true;
 }
 
-/// THIS IS STUFF THAT NEED TO VANISH / BE CHANGED / FREED OF ROOT ///
 
-///**
-// * get linearly distributed variates
-// */
-// double Utils::LinearRandom(double slope, double x_min, double x_max) {
-//  double rand_min = 0.5*slope*pow(x_min,2.);
-//  double rand_max = 0.5*slope*pow(x_max,2.);
-//  double rand = rand_min + (rand_max - rand_min)*randomiser->Rndm(0);
-//  return sqrt(2.*rand/slope);
-//}
+void Utils::DrawGappa() {
+  if (GAMERADESTROYEDTHECONSOLE) return;
 
-///**
-// * get power-law distributed variates
-// */
-// double Utils::PowerLawRandom(double index, double x_min, double x_max) {
-//  double rand = -100.;
-//  double k = 0.03;
-//  while(rand<x_min || rand>x_max) {
-//    rand=pow(((index-1.)/k)*randomiser->Rndm(0),-1./(index-1.));
-//  }
-//  return rand;
-//}
+  cout << endl;
+  cout << endl;
+  cout << "                                            ▄▄                                  " << endl;
+  cout << "                                            ▐▓█▄                                " << endl;
+  cout << "                                             ▓▓▒▓                               " << endl;
+  cout << "                                           ▀▓▓▓▄▄▀░                             " << endl;
+  cout << "                                            ▓▓▒▒░░ ▄░                   ▄▓▓     " << endl;
+  cout << "                                            ▓▒▒▀▒▓█▌▒▒             ▄▄▓▓▓▓▓▀     " << endl;
+  cout << "                                            ▀▒▒▒░ ░░     ░░░░░░░░▒▓▒▓▒▒▒▒▌      " << endl;
+  cout << "  ▄▄             ▄ ▄▄▄▄▄  ▒ ▒▒▀▀▒▀▀  ░░     ░▓▒░░   ░    ░░ ░░░▒▒▓▒▒░▒▀▒▀       " << endl;
+  cout << "  ▀▓▓▒░▄▄   ░  ░░░░░░                ░   ░  ▓▓▒░    ░   ░ ░  ░▄▒▒░▒▒▀▓▓         " << endl;
+  cout << "   ▀▓▒▒▒▒▒▒▒░░░░                ░ ░  ▒   ░░▓▓▒▒▒        ░ ▒░   ░▀▀░▒▓▓▀         " << endl;
+  cout << "    ▐▌▒▒░░░▒░    ░            ░░░       ░▒▌▒░▀░ ▒▄░       ░░ ▀▒░░▒▒▓▓           " << endl;
+  cout << "      ▓░▓▀░░░         ▄  ▄▀  ░░░░░░░░ ░ ▓▓▀░  ▐░  ░  ░▒  ░    ▓▒▀▒              " << endl;
+  cout << "                  ▄  ▄▒▓ ▄▀ ▒           ▓▓▒▒ ▄▀   ░  ░░      ▒▓                 " << endl;
+  cout << "              ▄▄ ▄▄▓▓▀ ▒  ░   ░        ░▐▒▓▓▓▒                                  " << endl;
+  cout << "               ▓▓▓▀  ▒                 ░▐▓▐▌░          ░▐                       " << endl;
+  cout << "                    ░               ░▒▒▐▓▒░░  ▒      ░ ░                        " << endl;
+  cout << "                      ░            ░░░ ▓▓▒    ░░     ░ ░                        " << endl;
+  cout << "                                  ▄▒░░░▓▓▒▒░            ▒                       " << endl;
+  cout << "                                   ▒▒░▐▓▒▒▒░▒           ▒                       " << endl;
+  cout << "                                     ░ ▓▒▓▓░ ▒ ░                                " << endl;
+  cout << "                                       ▐▒▒▒▒  ░▒                                " << endl;
+  cout << "                                         ░▒▒░  ▒▒▓▒                             " << endl;
+  cout << "                                        ▄▓▒▒   ░░ ░                             " << endl;
+  cout << "                                      ▐▓▀░▒   ▐▒░                               " << endl;
+  cout << "                                     ▄▀▀░     ▀▀                                " << endl;
+  cout << "                                    ▓▌▒░                                        " << endl;
+  cout << "                                    ▓▓  ▄                                       " << endl;
+  cout << "                                    ▓▄   ▀▐▄                                    " << endl;
+  cout << endl;
+  cout << "                     ▄████  ▄▄▄       ██▓███   ██▓███   ▄▄▄      " << endl;
+  cout << "                    ██▒ ▀█▒▒████▄    ▓██░  ██▒▓██░  ██▒▒████▄    " << endl;
+  cout << "                   ▒██░▄▄▄░▒██  ▀█▄  ▓██░ ██▓▒▓██░ ██▓▒▒██  ▀█▄  " << endl;
+  cout << "                   ░▓█  ██▓░██▄▄▄▄██ ▒██▄█▓▒ ▒▒██▄█▓▒ ▒░██▄▄▄▄██ " << endl;
+  cout << "                   ░▒▓███▀▒ ▓█   ▓██▒▒██▒ ░  ░▒██▒ ░  ░ ▓█   ▓██▒" << endl;
+  cout << "                    ░▒   ▒  ▒▒   ▓▒█░▒▓▒░ ░  ░▒▓▒░ ░  ░ ▒▒   ▓▒█░" << endl;
+  cout << "                     ░   ░   ▒   ▒▒ ░░▒ ░     ░▒ ░       ▒   ▒▒ ░" << endl;
+  cout << "                   ░ ░   ░   ░   ▒   ░░       ░░         ░   ▒   " << endl;
+  cout << "                         ░       ░  ░                        ░  ░" << endl;
+  cout << "                                                                 " << endl;
+  cout << endl;
+  cout << endl;
+  return;
+}
 
-///**
-// * get gaussian distributed variate using the Box-Muller method
-// */
-// double Utils::GaussianRandom(double width, double offset) {
-//  double rand1 = randomiser->Rndm(0);
-//  double rand2 = randomiser->Rndm(0);
-//  double random_gaussian = sqrt(-2.*log(rand1))*cos(2*pi*rand2);
-//  return offset + width*random_gaussian;
 
-//}
+/**
+ * Return uniform random number in [0,1). GSL Wrapper function.
+ */
+double Utils::Random() {
+  return gsl_rng_uniform(r);
+}
+
+/**
+* get linearly distributed variates
+*/
+vector<double> Utils::LinearRandom(double slope, double x_min,
+                                   double x_max, int n) {
+  vector<double> v;
+  for(int i=0;i<n;i++) {
+    if(!slope) v.push_back((x_max-x_min)*gsl_rng_uniform(r)+x_min);
+    else {
+      double rand_min = 0.5*slope*pow(x_min,2.);
+      double rand_max = 0.5*slope*pow(x_max,2.);
+      double rand = rand_min + (rand_max - rand_min)*gsl_rng_uniform(r);
+      v.push_back(sqrt(2.*rand/slope));
+    }
+  }
+  return v;
+}
+
+/**
+* get power-law distributed variates
+*/
+vector<double> Utils::PowerLawRandom(double index, double x_min,
+                                     double x_max, int n) {
+  vector<double> v;
+  for(int i=0;i<n;i++) {
+    double rand = -100.;
+    double k = 0.03;
+    while(rand<x_min || rand>x_max) {
+      rand=pow(((index-1.)/k)*gsl_rng_uniform(r),-1./(index-1.));
+    }
+    v.push_back(rand);
+  }
+  return v;
+}
+
+/**
+* get gaussian distributed variate using the Box-Muller method
+*/
+vector<double> Utils::GaussianRandom(double width, double offset, int n) {
+  vector<double> v;
+  for(int i=0;i<n;i++) {
+    double random_gaussian = sqrt(-2.*log(gsl_rng_uniform(r)))
+                        * cos(2*pi*gsl_rng_uniform(r));
+    v.push_back(offset + width*random_gaussian);
+  }
+  return v;
+}
+
+/**
+* return a random sign
+*/
+vector<double> Utils::SignRandom(int n) {
+  vector<double> v;
+  for(int i=0;i<n;i++) {
+    if(gsl_rng_uniform(r)< 0.5) v.push_back(1.);
+    else v.push_back(-1.);
+  }
+  return v;
+}
+
+/**
+* return a exponentially distributed variate
+*/
+vector<double> Utils::ExponentialRandom(double ind_norm, double x_min,
+                                        double x_max, int n) {
+  vector<double> v;
+  ind_norm = -1./ind_norm;
+  double rand_min = (1./ind_norm)*(exp(ind_norm*x_min)-1.);
+  double rand_max = (1./ind_norm)*(exp(ind_norm*x_max)-1.);
+  for(int i=0;i<n;i++) {
+    double rand = rand_min + (rand_max-rand_min)*gsl_rng_uniform(r);
+    v.push_back(pow(ind_norm,-1.)*log((ind_norm)*rand+1.));
+  }
+  return v;
+}
+
+/**
+ * Sample Variate that follows the input 2D-Vector
+ */
+vector<double> Utils::CustomFunctionRandom(vector< vector<double> > f,
+                                           double xmin, double xmax, int n) {
+
+                                             cout<<"1.0"<<std::endl;
+  vector<double> v;
+  if(!f.size()) {
+    cout << "Utils::CustomFunctionRandom: function vector empty! "
+            "Exiting!" << endl;
+    return v;
+  }
+  if(!xmin && !xmax) {
+    xmin = f[0][0];
+    xmax = f[f.size()-1][0];
+  }
+  if( xmin < f[0][0] || xmax > f[f.size()-1][0] ) {
+    cout << "Utils::CustomFunctionRandom: requested sampling range outside "
+            "of boundaries req.:(" << xmin << "," << xmax << ") vs. "
+            "avail.:(" << f[0][0] << "," << f[f.size()-1][0] << "). "
+            "Returning emptyvector." << endl;
+    return v;
+  }
+  cout<<"1.1"<<std::endl;
+  int size = (int)f.size();
+  double x[size];
+  double y[size];
+  double ymax = -1.e-100;
+  for (unsigned int i=0;i<f.size();i++) {
+    x[i] = f[i][0];
+    y[i] = f[i][1];
+    if(x[i] > xmin && x[i] < xmax && y[i] > ymax) ymax = y[i];
+  }
+  gsl_spline *lookup = gsl_spline_alloc(gsl_interp_linear, size);
+  gsl_spline_init(lookup, x, y, size);
+  gsl_interp_accel *a = gsl_interp_accel_alloc();
+
+  cout<<"1.2"<<std::endl;
+  for(int i=0;i<n;i++) {
+    double x;
+    while(1) {
+      x = (xmax-xmin)*gsl_rng_uniform(r)+xmin;
+      double u = gsl_rng_uniform(r);
+      double val = 0.;
+      if (gsl_spline_eval_e(lookup, x, a, &val)) {
+        cout << "Utils::CustomFunctionRandom: Function interpolation "
+        "failed. Exiting!" << endl;
+        return v;
+      }
+      if (std::isnan(val) || std::isinf(val)) {
+        cout << "Utils::CustomFunctionRandom: Function interpolation returned "
+             << val << "! Exiting! " << endl;
+        return v;
+      }
+      if(u < val/ymax) break;
+    }
+    v.push_back(x);
+  }
+  return v;
+}
+
 ///**
 // * get Poissonian variate (just wrapped from TRandom))
 // */
@@ -244,278 +380,128 @@ void Utils::DrawGamera() {
 //  return rand;
 
 //}
+/**
+ * Integration function using the GSL spline integrator functionality
+ *
+ */
+double Utils::Integrate(vector< vector<double> > f, double xmin, double xmax) {
+  if(!f.size()) {
+    cout << "Utils::CustomFunctionRandom: function vector empty! "
+    "Exiting & returning 0." << endl;
+    return 0.;
+  }
+  if(!xmin && !xmax) {
+    xmin = f[0][0];
+    xmax = f[f.size()-1][0];
+  }
+  if( xmin < f[0][0]) xmin = f[0][0];
+  if( xmax > f[f.size()-1][0]) xmax = f[f.size()-1][0];
 
-// double Utils::LiMaSignificance(int ON, int OFF, double ALPHA) {
-//  double nON,nOFF,alpha,significance,sign,nTOT,p,tON,tOFF;
+  int size = (int)f.size();
+  double x[size];
+  double y[size];
+  double ymax = -1.e-100;
+  for (unsigned int i=0;i<f.size();i++) {
+    x[i] = f[i][0];
+    y[i] = f[i][1];
+    if(x[i] > xmin && x[i] < xmax && y[i] > ymax) ymax = y[i];
+  }
+  gsl_spline *lookup = gsl_spline_alloc(gsl_interp_linear, size);
+  gsl_spline_init(lookup, x, y, size);
+  gsl_interp_accel *a = gsl_interp_accel_alloc();
+  double integral = 0.;
+  int errcode = gsl_spline_eval_integ_e(lookup, xmin, xmax, a, &integral);
+  if(errcode) {
+    cout << "Utils::Integrate: Someting went wrong in the integration!"
+            "Errorcode " << errcode << ". Returning 0. value. " << endl;
+    integral = 0.;
+  }
+  return integral;
+}
 
-//  if(!ALPHA) return sqrt((double)ON);
+vector< vector< double> > Utils::IntegratedProfile(vector< vector<double> > f) {
+  vector< vector<double> > v;
+  double x0 = f[0][0];
+  for(unsigned int i=1;i<f.size();i++) {
+    double x = f[i][0];
+    double y = Integrate(f,x0,x);
+    v.push_back(vector<double>());
+    v[v.size()-1].push_back(x);
+    v[v.size()-1].push_back(y);
+  }
+  return v;
+}
 
-//  double XS = (double)ON - (double)OFF*ALPHA;
-//  if (XS > 0) {
-//    nON = (double)ON;
-//    nOFF = (double)OFF;
-//    alpha = ALPHA;
-//    sign = 1.;
-//  }
-//  else {
-//    nON = (double)OFF;
-//    nOFF = (double)ON;
-//    alpha = 1./ALPHA;
-//    sign = -1.;
-//  }
+gsl_spline *Utils::GSLsplineFromTwoDVector(vector< vector<double> > v) {
+  int size = (int)v.size();
+  double x[size];
+  double y[size];
+  for(int i=0;i<size;i++) {
+    x[i] = v[i][0];
+    y[i] = v[i][1];
+  }
+  gsl_spline *s = gsl_spline_alloc(gsl_interp_linear, size);
+  gsl_spline_init(s, x, y, size);
+  return s;
+}
 
-//  if(!nON)  return sign*sqrt(2.*nOFF*log(1.+alpha));
-//  if(!nOFF) return sign*sqrt(2.*nON*log((1.+alpha)/alpha));
+double Utils::EvalSpline(double x, gsl_spline *s, gsl_interp_accel *a,
+                         const char* t, int l) {
+  double y = 0.;
 
-//  p = alpha+1.;
-//  nTOT = nON+nOFF;
-//  tON = nON*log((p/alpha)*(nON/nTOT));
-//  tOFF = nOFF*log(p*(nOFF/nTOT));
+  if (gsl_spline_eval_e(s, x, a, &y)) {
+    cout << t << ",l." << l << ": Interpolation of lookup failed with GSL error"
+              "code "
+              << GSL_EDOM
+              << ". Exiting!" <<endl;
+    exit(1);
+  }
+  if (std::isnan(y) || std::isinf(y)) {
+    cout << t << ": value is " << y << ". Exiting!" <<endl;
+    exit(1);
+  }
+  return y;
+}
 
-//  significance = sign*sqrt(2)*sqrt(fabs(tON+tOFF));
+vector< vector<double> > Utils::SortTwoDVector(vector< vector<double> > v,
+                                               int column) {
+  if(!v.size()) {
+    cout << "Utils::SortTwoDVector: function vector empty! "
+    "Exiting!" << endl;
+    return v;
+  }
+  if(column<0 || column>1) {
+    cout << "Utils::SortTwoDVector: Sorting column must be 0 or 1! "
+    "Exiting!" << endl;
+    return v;
+  }
+  if(!column) sort (v.begin(), v.end(), sortcriterionfirstcolumn);
+  else  sort (v.begin(), v.end(), sortcriterionsecondcolumn);
 
-//  return significance;
-//}
+  return v;
+}
 
-////void Utils::GetRolkeConfidenceIntervals(int ON, int OFF, double ALPHA,
-///double CL, double &xsDOWN, double &xsUP) {
-////  TRolke *rolke = new TRolke();
-////  rolke->SetCL(CL);
-////  rolke->SetPoissonBkgKnownEff(ON,OFF,1./ALPHA,1);
-////  rolke->GetLimits(xsDOWN,xsUP);
-////  delete rolke;
-////  return;
-////}
+void Utils::TwoDVectorPushBack(double x, double y,
+                               vector< vector<double> > &v) {
+  v.push_back(vector<double>());
+  v[v.size()-1].push_back(x);
+  v[v.size()-1].push_back(y);
+  return;
+}
 
-///**
-// * return a random sign
-// */
-// double Utils::SignRandom() {
-//  double rand = randomiser->Rndm(0);
-//  if(rand< 0.5) return 1.;
-//  else return -1.;
-//}
+/**
+ * Private method that is used in the sorting of 2D vectors.
+ */
+bool sortcriterionfirstcolumn (vector<double> i,
+                                             vector<double> j) {
+  return (i[0]<j[0]);
+}
+bool sortcriterionsecondcolumn (vector<double> i,
+                                              vector<double> j) {
+ return (i[1]<j[1]);
+}
 
-///**
-// * return a exponentially distributed variate
-// */
-// double Utils::ExponentialRandom(double ind_norm, double x_min, double x_max)
-// {
-//  ind_norm = -1./ind_norm;
-//  double rand_min = (1./ind_norm)*(exp(ind_norm*x_min)-1.);
-//  double rand_max = (1./ind_norm)*(exp(ind_norm*x_max)-1.);
-//  double rand = rand_min + (rand_max-rand_min)*randomiser->Rndm(0);
-//  return pow(ind_norm,-1.)*log((ind_norm)*rand+1.);
-//}
-
-// double Utils::IntegrateTGraph(TGraph *graph, double xmin, double xmax, int
-// steps, bool logarithmic) {
-//  if(xmin>=xmax) {
-//    cout<<"Utils::IntegrateTGraph: xmin>=xmax ("<<xmin<<">="<<xmax<<").
-// Returning 0!"<<endl;
-//    return 0.;
-//  }
-//  return Integrate(TGraphToTF1(graph),xmin,xmax,steps);
-//}
-
-// TF1 *Utils::TGraphToTF1(TGraph *graph) {
-//  if(WrappedTGraph!=graph) {
-//    WRAPPINGHAPPENED = true;
-//    WrappedTGraph=graph;
-//    double xmin,xmax,y;
-//    graph->GetPoint(0,xmin,y);
-//    graph->GetPoint(graph->GetN()-1,xmax,y);
-//    TGraphWrapped=new
-// TF1("TGraphWrapped",this,&Utils::TGraphWrapper,xmin,xmax,1,"Utils","TGraphWrapped");
-//  }
-//  return TGraphWrapped;
-//}
-// double Utils::TGraphWrapper(double *X, double *par) {
-////cout<<"->wrap: "<<WrappedTGraph->Eval(X[0])<<endl;
-//  return WrappedTGraph->Eval(X[0]);
-//}
-
-// TGraph *Utils::MakeTGraphIntegratedProfile(TGraph *graph) {
-//  TGraph *graphIntegrated = new TGraph();
-//  if(!graph->GetN()) {
-// cout<<"Utils::MakeTGraphIntegratedProfile: TGraph you want to integrate is
-// empty. Returning empty TGraph."<<endl;
-//    return graphIntegrated;
-//  }
-//  double x0,x,y,u;
-//  graph->GetPoint(0,x0,y);
-//  u=0.;
-//  for(int i=1;i<graph->GetN();i++) {
-//    graph->GetPoint(i,x,y);
-//    u += IntegrateTGraph(graph,x0,x,10,false);
-//    graphIntegrated->SetPoint(graphIntegrated->GetN(),x,u);
-//    x0 = x;
-//  }
-//  return graphIntegrated;
-//}
-
-// vector< vector<double> > Utils::TGraphToVector(TGraph* g) {
-//  double x,y;
-//  vector< vector<double> > v;
-//  for(int i=0;i<g->GetN();i++) {
-//    g->GetPoint(i,x,y);
-//    v.push_back(vector<double> ());
-//    v[v.size()-1].push_back(x);
-//    v[v.size()-1].push_back(y);
-//  }
-//  return v;
-//}
-
-// TGraph *Utils::VectorToTGraph(vector< vector<double> > v) {
-//  TGraph *g = new TGraph();
-//  for(unsigned int i=0;i<v.size()-1;i++) {
-//    g->SetPoint(g->GetN(),v[i][0],v[i][1]);
-//  }
-//  double xx,yy;
-//  for(int i=0;i<g->GetN();i++) g->GetPoint(i,xx,yy);
-//  return g;
-//}
-
-// TGraph *Utils::TH1FToTGraph(TH1F *h, int logtolinx) {
-//  TGraph *g = new TGraph();
-//  double x,y;
-//  for(int i=0;i<h->GetNbinsX()+1;i++) {
-//    x = h->GetBinCenter(i);
-//    y = h->GetBinContent(i);
-//    if(!logtolinx) g->SetPoint(g->GetN(),x,y);
-//    if(logtolinx==1) g->SetPoint(g->GetN(),pow(10.,x),y);
-//  }
-//  return g;
-//}
-
-// TGraphErrors *Utils::TH1FToTGraphErrors(TH1F *h) {
-//  TGraphErrors *g = new TGraphErrors();
-//  double x,y,yerr;
-//  for(int i=0;i<h->GetNbinsX()+1;i++) {
-//    x = h->GetBinCenter(i);
-//    y = h->GetBinContent(i);
-//    yerr = h->GetBinError(i);
-//    g->SetPoint(g->GetN(),x,y);
-//    g->SetPointError(g->GetN()-1,0.,yerr);
-//  }
-//  return g;
-//}
-
-// double Utils::GetSpectralIndex(TGraph *g, double Eref) {
-//  if(!g->GetN()) {
-//    cout<<"Utils::GetSpectralIndex: not spectral points to fit!
-// Exiting..."<<endl;
-//  }
-//  TF1 *fitfunction = new TF1("ff","[0]*(x/[1])^[2]",0.,1.);
-//  fitfunction->SetRange(Eref*0.1,Eref*10.);
-//  fitfunction->SetParameter(0,g->Eval(Eref));
-//  fitfunction->SetParameter(1,Eref);
-//  fitfunction->SetParLimits(0,10.,1.);
-//  fitfunction->SetParLimits(1,10.,1.);
-//  g->Fit(fitfunction,"QWR");
-//  return fitfunction->GetParameter(2);
-//}
-
-// void Utils::WriteOut(TGraph *sp, string outname) {
-//
-//  ofstream output_file(outname.c_str());
-//  if(output_file.is_open())  cout<<">> Writing to "<<outname<<endl;
-//  else  cout<<">> Problem with "<<outname<<endl;
-//
-//  for(unsigned int i=0;i<sp->GetN();i++) {
-//    double E,N;
-//    E=N=0.;
-//    sp->GetPoint(i,E,N);
-////    if(E<=0. || N<=0.) continue;
-//    output_file<<E<<" "<<N<<endl;
-//  }
-//  output_file.close();
-//}
-
-// void Utils::WriteOut(TGraphErrors *sp, string outname) {
-//
-//  ofstream output_file(outname.c_str());
-//  if(output_file.is_open())  cout<<">> Writing to "<<outname<<endl;
-//  else  cout<<">> Problem with "<<outname<<endl;
-//
-//  for(unsigned int i=0;i<sp->GetN();i++) {
-//    double E,N,dE,dN;
-//    E=N=dE=dN=0.;
-//    sp->GetPoint(i,E,N);
-//    dE = sp->GetErrorX(i);
-//    dN = sp->GetErrorY(i);
-////    if(E<=0. || N<=0.) continue;
-//    output_file<<E<<" "<<dE<<" "<<N<<" "<<dN<<endl;
-//  }
-//  output_file.close();
-//}
-
-// void Utils::WriteOut(TGraphAsymmErrors *sp, string outname) {
-//
-//  ofstream output_file(outname.c_str());
-//  if(output_file.is_open())  cout<<">> Writing to "<<outname<<endl;
-//  else  cout<<">> Problem with "<<outname<<endl;
-//
-//  for(unsigned int i=0;i<sp->GetN();i++) {
-//    double E,N,dELow,dEHigh,dNLow,dNHigh;
-//    E=N=dELow=dEHigh=dNLow=dNHigh=0.;
-//    sp->GetPoint(i,E,N);
-//    dELow = sp->GetErrorXlow(i);
-//    dEHigh = sp->GetErrorXhigh(i);
-//    dNLow = sp->GetErrorYlow(i);
-//    dNHigh = sp->GetErrorYhigh(i);
-////    if(E<=0. || N<=0.) continue;
-//    output_file<<E<<" "<<dELow<<" "<<dEHigh<<" "<<N<<" "<<dNLow<<"
-// "<<dNHigh<<endl;
-//  }
-//  output_file.close();
-//}
-
-///**
-// * Makes a nicer ROOT style and a cool sky-mappy color palette (black -> blue
-// -> yellow -> white).
-// */
-// void Utils::SetNiceStyle() {
-
-//  gROOT->SetStyle("Plain");
-//  gStyle->SetPalette(1);
-//  gStyle->SetOptStat(0);
-//  gStyle->SetLabelFont(42,"x");
-//  gStyle->SetLabelFont(42,"y");
-//  gStyle->SetLabelFont(42,"z");
-//  gStyle->SetTitleFont(42,"x");
-//  gStyle->SetTitleFont(42,"y");
-//  gStyle->SetTitleFont(42,"z");
-//  int number=5;
-//  int nb = 100;
-//  double red[5] = {0.,0.,1.,1.,1.};
-//  double green[5] = {0.,0.,0.,1.,1.};
-//  double blue[5] = {0.,1.,0.,0.,1.};
-//  double s[5] = {0.,0.3,0.6,0.9,1.};
-//  TColor::CreateGradientColorTable(number,s,red,green,blue,nb);
-//  gStyle->SetNumberContours(100);
-
-//}
-
-// TH2D *Utils::GetRightFormatHistogram(TGraph *graph, string xtitle, string
-// ytitle, string title, double lowmargin, double highmargin, double leftmargin,
-// double rightmargin) {
-//  double ymin=1.e50;
-//  double ymax=-1.e50;
-//  double x,y,xmin,xmax;
-//  graph->GetPoint(0,xmin,y);
-//  graph->GetPoint(graph->GetN()-1,xmax,y);
-//  for(int i=0;i<graph->GetN();i++) {
-//    graph->GetPoint(i,x,y);
-//    if(y<ymin) ymin = y;
-//    if(y>ymax) ymax = y;
-//  }
-//	ymin *= lowmargin;
-//  ymax *= highmargin;
-//	xmin *= leftmargin;
-//  xmax *= rightmargin;
-//  TH2D *h = new TH2D(title.c_str(),"",100,xmin,xmax,100,ymin,ymax);
-//  h->GetXaxis()->SetTitle(xtitle.c_str());
-//  h->GetYaxis()->SetTitle(ytitle.c_str());
-//  return h;
-//}
+void Utils::Clear2DVector(vector< vector<double> > &v) {
+  for (unsigned int i = 0; i < v.size(); i++) v[i].clear();
+  v.clear();
+}

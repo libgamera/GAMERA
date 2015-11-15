@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <fstream>
 #include <vector>
+#include <ctime>
+#include <algorithm>
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_spline.h>
 
 /* TeV->erg */
 #define TeV_to_erg 1.602
@@ -67,10 +71,14 @@ using namespace std;
  * GAMERA programs.
  */
 
+bool sortcriterionfirstcolumn (vector<double> i,vector<double> j);
+bool sortcriterionsecondcolumn (vector<double> i,vector<double> j);
+
 class Utils {
  private:
   bool QUIETMODE;
   bool GAMERADESTROYEDTHECONSOLE;
+  gsl_rng * r;
 
  public:
   Utils(bool DRAWLOGO = true);
@@ -81,7 +89,31 @@ class Utils {
                         vector<double> &parameter_values,
                         vector<string> &files);
   void DrawGamera();
+  void DrawGappa();
   void WriteOut(vector<vector<double> > sp, string outname);
   void ReadIn(string inname, vector< vector<double> > &sp);
+  double Random();
+  vector<double>  LinearRandom(double slope, double x_min, double x_max, int n);
+  vector<double>  PowerLawRandom(double index, double x_min, double x_max,
+                                 int n);
+  vector<double>  GaussianRandom(double width, double offset, int n);
+  vector<double>  SignRandom(int n);
+  vector<double>  ExponentialRandom(double ind_norm, double x_min,
+                                    double x_max, int n);
+  vector<double>  CustomFunctionRandom(vector< vector<double> > f,
+                                       double xmin, double xmax, int n);
+  double Integrate(vector< vector<double> > f, double xmin, double xmax);
+  vector< vector< double> > IntegratedProfile(vector< vector<double> > f);
+  gsl_spline *GSLsplineFromTwoDVector(vector< vector<double> > v);
+  vector< vector<double> > SortTwoDVector(vector< vector<double> > v,
+                                                 int column);
+  void TwoDVectorPushBack(double x, double y, vector< vector<double> > &v);
+
+  double EvalSpline(double x, gsl_spline *s, gsl_interp_accel *a,
+                    const char* t, int l);
+  void Clear2DVector(vector< vector<double> > &v);
+
+
+
 };
 #endif

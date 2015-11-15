@@ -33,7 +33,7 @@ help:
 
 all: gamera TutorialLevel1 gamerapy documentation
 
-gamera: Radiation Particles Utils libgamera
+gamera: Radiation Particles Utils Astro libgamera
 
 tutorial1: gamera TutorialLevel1
 
@@ -44,9 +44,11 @@ Particles : src/Particles.C
 	$(CXX) -g -O2 -fpic -Wall -c src/Particles.C -o $(OUTDIR)/Particles.o $(CXXFLAGS) $(INCLUDES)
 Utils : src/Utils.C
 	$(CXX) -g -O2 -fpic -Wall -c src/Utils.C -o $(OUTDIR)/Utils.o $(CXXFLAGS) $(INCLUDES)
+Astro : src/Astro.C
+	$(CXX) -g -O2 -fpic -Wall -c src/Astro.C -o $(OUTDIR)/Astro.o $(CXXFLAGS) $(INCLUDES)
 
 # create the shared library
-objectsSO = $(OUTDIR)/Radiation.o $(OUTDIR)/Particles.o $(OUTDIR)/Utils.o
+objectsSO = $(OUTDIR)/Radiation.o $(OUTDIR)/Particles.o $(OUTDIR)/Utils.o $(OUTDIR)/Astro.o
 libgamera : $(objectsSO)
 	@echo "Generating library $@..."
 	$(CXX) -shared -o $(LIBDIR)/libgamera.so $(objectsSO) $(CXXFLAGS) $(LDFLAGS)
@@ -72,13 +74,13 @@ documentation:
 	cd ../sphinx/;\
 	make html;\
 
-clean-out: 
+clean-out:
 	-rm -f out/*
-clean-bin: 
+clean-bin:
 	-rm -f bin/*
-clean-lib: 
+clean-lib:
 	-rm -f lib/*
-clean-python: 
+clean-python:
 	-rm -f python/_gamerapy.cc python/_gamerapy.so python/gamerapy.py
 	-rm -rf python/build/
 clean-docu:

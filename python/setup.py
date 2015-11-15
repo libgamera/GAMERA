@@ -9,8 +9,8 @@ if(GSL_LIBS):
 else:
   COMPILEARGS=['-std=c++11']
 
-extension_mod = Extension("_gamerapy", 
-                          ["_gamerapy.cc", "../src/Radiation.C","../src/Particles.C","../src/Utils.C"],
+extension_mod = Extension("_gamerapy",
+                          ["_gamerapy.cc", "../src/Radiation.C","../src/Particles.C","../src/Utils.C","../src/Astro.C"],
                           extra_compile_args=COMPILEARGS,
                         #   extra_link_args=[GSL_LIBS],
                           libraries=['gsl','gslcblas'],
