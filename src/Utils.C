@@ -1,3 +1,4 @@
+#include <cmath>
 #include "Utils.h"
 
 Utils::Utils(bool DRAWLOGO) {
