@@ -12,7 +12,7 @@ else:
 extension_mod = Extension("_gappa",
                           ["_gappa.cc", "../src/Radiation.C","../src/Particles.C","../src/Utils.C","../src/Astro.C"],
                           extra_compile_args=COMPILEARGS,
-                          libraries=['gsl'],
+                          libraries=['gsl','gslcblas'],
                           include_dirs=['../include'],
 )
 
