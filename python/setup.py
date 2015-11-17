@@ -1,8 +1,8 @@
 from distutils.core import setup, Extension
 import string
 import subprocess
-GSL_LIBS = string.split(subprocess.check_output(['gsl-config','--libs']))
-GSL_CFLAGS = string.split(subprocess.check_output(['gsl-config','--cflags']))
+GSL_LIBS = subprocess.check_output(['gsl-config','--libs']).split()
+GSL_CFLAGS = subprocess.check_output(['gsl-config','--cflags']).split()
 
 if(GSL_CFLAGS):
   COMPILEARGS=GSL_CFLAGS

@@ -253,7 +253,7 @@ class Radiation {
     BField = BFIELD;
   }  ///< set the source B-Field (G)
   void SetDistance(double d) {
-    distance = d;
+    distance = d*pc_to_cm;
   }  ///< set the distance to the source (cm)
   double GetDifferentialICFlux() { return fdiffic; }        ///< get FdiffIC
   double GetDifferentialSynchFlux() { return fdiffsynch; }  ///< get fdiffsynch
@@ -307,9 +307,7 @@ class Radiation {
   vector<vector<double> > GetICLossLookup() {
     return ICLossLookup;
   }  ///< return TotalTargetPhotonVector
-  void SetHadronicAmplificationFactor(double HADAMPFAC) {
-    hadronicAmpFactor = HADAMPFAC;
-  }  ///< set hadronicAmpFactor
+  double GetDistance() {return distance/pc_to_cm;}
   vector<vector<double> > GetTotalSpectrum(double emin = 0., double emax = 0.) {
     return ReturnDifferentialPhotonSpectrum(1, emin, emax);
   }  ///< return total spectrum
