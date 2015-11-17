@@ -3,7 +3,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath('./lib'))
-import gamerapy
+import gappa as gp
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -49,15 +49,15 @@ if __name__ == "__main__":
   lum = float(configParser.get('Parameters','Luminosity'))
   age = float(configParser.get('Parameters','Age'))
   tc = float(configParser.get('Parameters','CharAge'))
-  dist = gamerapy.pc_to_cm*float(configParser.get('Parameters','Distance'))
+  dist = gp.pc_to_cm*float(configParser.get('Parameters','Distance'))
   dens = float(configParser.get('Parameters','AmbientDensity'))
   bfield = float(configParser.get('Parameters','BField'))
   t = float(configParser.get('Parameters','tRAD'))
-  e = gamerapy.TeV_to_erg*1.e-12*float(configParser.get('Parameters','edensRAD'))
+  e = gp.TeV_to_erg*1.e-12*float(configParser.get('Parameters','edensRAD'))
   ebins = float(configParser.get('Parameters','Ebins'))
-  emax = gamerapy.TeV_to_erg*float(configParser.get('Parameters','Emax'))
-  emin = gamerapy.TeV_to_erg*float(configParser.get('Parameters','Emin'))
-  ebreak = gamerapy.TeV_to_erg*float(configParser.get('Parameters','Ebreak'))
+  emax = gp.TeV_to_erg*float(configParser.get('Parameters','Emax'))
+  emin = gp.TeV_to_erg*float(configParser.get('Parameters','Emin'))
+  ebreak = gp.TeV_to_erg*float(configParser.get('Parameters','Ebreak'))
   spindlow = float(configParser.get('Parameters','SpectralIndexLow'))
   spindhigh = float(configParser.get('Parameters','SpectralIndexHigh'))
   outfile = configParser.get('Files','outfile')
@@ -68,9 +68,9 @@ if __name__ == "__main__":
   emaxt = np.array(emaxt)
   denst = np.array(denst)
 
-  fr = gamerapy.Radiation()
-  fp = gamerapy.Particles()
-  fu = gamerapy.Utils()
+  fr = gp.Radiation()
+  fp = gp.Particles()
+  fu = gp.Utils()
   fu.DrawGamera()
   # set particle stuff
   fp.SetLuminosityLookup(lumt)
@@ -82,7 +82,7 @@ if __name__ == "__main__":
   fp.SetLowSpectralIndex(spindlow)
   fp.SetSpectralIndex(spindhigh)
   fp.SetEnergyBinsForNumericalSolver(ebins)
-  fp.SetAge(age) 
+  fp.SetAge(age)
 
   # set radiation stuff
   fr.SetDistance(dist)
@@ -94,24 +94,24 @@ if __name__ == "__main__":
   fp.ToggleQuietMode()
   fr.ToggleQuietMode()
 
-  f, (ax1, ax2, ax3, ax4, ax5, ax6) = plt.subplots(6, 1, sharey=False,figsize=(7, 30))  
+  f, (ax1, ax2, ax3, ax4, ax5, ax6) = plt.subplots(6, 1, sharey=False,figsize=(7, 30))
   ax1.set_yscale("log")
   ax1.set_xscale("log")
   ax2.set_yscale("log")
   ax2.set_xscale("log")
 
-  # calculate stuff 
+  # calculate stuff
   t = np.logspace(1,math.log10(age),20)
   n = 0
   for i in t:
     print i,n
-    fp.SetAge(i) 
+    fp.SetAge(i)
     fr.SetAmbientDensity(fp.GetAmbientDensity())
     fr.SetBField(fp.GetBField())
     fp.CalculateParticleSpectrum("electrons")
     fr.SetElectrons(fp.GetParticleSpectrum())
     fr.CalculateDifferentialPhotonSpectrum()
-    
+
 
     ElectronSED = np.array(fr.GetElectronSED())
     TotalSED = np.array(fr.GetTotalSED())
@@ -163,4 +163,3 @@ if __name__ == "__main__":
   ax6.plot(denst[:,0],denst[:,1],color='black',alpha=1.,label="density")
   ax6.legend(prop={'size':12},loc="lower left")
   f.savefig(outfile)
-

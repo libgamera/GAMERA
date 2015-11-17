@@ -1,4 +1,4 @@
-%module gamerapy
+%module gappa
 %{
 #include "../include/Radiation.h"
 #include "../include/Particles.h"

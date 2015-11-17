@@ -3,7 +3,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath('./lib'))
-import gamerapy
+import gappa as gp
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -13,7 +13,7 @@ def GetPulsarSpindown(tc, age, l0):
 
   t = np.logspace(0,math.log10(1.e6*age),300)
   puls = l0/(1.+t/tc)**2
-  
+
   puls = np.vstack((t, puls)).T
   return puls
 
@@ -26,22 +26,22 @@ if __name__ == "__main__":
   lum = float(configParser.get('Parameters','Luminosity'))
   age = float(configParser.get('Parameters','Age'))
   tc = float(configParser.get('Parameters','CharAge'))
-  dist = gamerapy.pc_to_cm*float(configParser.get('Parameters','Distance'))
+  dist = gp.pc_to_cm*float(configParser.get('Parameters','Distance'))
   dens = float(configParser.get('Parameters','AmbientDensity'))
   bfield = float(configParser.get('Parameters','BField'))
   t = float(configParser.get('Parameters','tRAD'))
-  e = gamerapy.TeV_to_erg*1.e-12*float(configParser.get('Parameters','edensRAD'))
+  e = gp.TeV_to_erg*1.e-12*float(configParser.get('Parameters','edensRAD'))
   ebins = float(configParser.get('Parameters','Ebins'))
-  emax = gamerapy.TeV_to_erg*float(configParser.get('Parameters','Emax'))
-  emin = gamerapy.TeV_to_erg*float(configParser.get('Parameters','Emin'))
+  emax = gp.TeV_to_erg*float(configParser.get('Parameters','Emax'))
+  emin = gp.TeV_to_erg*float(configParser.get('Parameters','Emin'))
   spind = float(configParser.get('Parameters','SpectralIndex'))
   outfile = configParser.get('Files','outfile')
 
   puls = np.array(GetPulsarSpindown(tc,age,lum))
 
-  fr = gamerapy.Radiation()
-  fp = gamerapy.Particles()
-  fu = gamerapy.Utils()
+  fr = gp.Radiation()
+  fp = gp.Particles()
+  fu = gp.Utils()
   fu.DrawGamera()
   # set particle stuff
   fp.SetLuminosityLookup(puls)
@@ -51,7 +51,7 @@ if __name__ == "__main__":
   fp.SetSpectralIndex(spind)
   fp.SetEnergyBinsForNumericalSolver(ebins)
   fp.SetAmbientDensity(dens)
-  fp.SetAge(age) 
+  fp.SetAge(age)
 
   # set radiation stuff
   fr.SetDistance(dist)
@@ -62,7 +62,7 @@ if __name__ == "__main__":
   fr.CreateICLossLookup()
   fp.SetICLossLookup(fr.GetICLossLookup())
 
-  # calculate stuff 
+  # calculate stuff
   fp.CalculateParticleSpectrum("electrons")
   fr.SetElectrons(fp.GetParticleSpectrum())
   fr.CalculateDifferentialPhotonSpectrum()
@@ -74,7 +74,7 @@ if __name__ == "__main__":
   SynchSED = np.array(fr.GetSynchrotronSED())
 
   ## plot stuff ##
-  f, (ax1, ax2, ax3) = plt.subplots(3, 1, sharey=False,figsize=(7, 15))  
+  f, (ax1, ax2, ax3) = plt.subplots(3, 1, sharey=False,figsize=(7, 15))
   ax1.set_yscale("log")
   ax1.set_xscale("log")
   ax2.set_yscale("log")
@@ -103,4 +103,3 @@ if __name__ == "__main__":
   ax3.plot(puls[:,0],puls[:,1],color='black',alpha=1.,label="luminosity")
   ax3.legend(prop={'size':12},loc="lower left")
   f.savefig(outfile)
-

@@ -23,7 +23,7 @@ help:
 	@echo 'GAMERA available make targets:'
 	@echo ''
 	@echo '  gamera           Create the GAMERA shared object (lib/libgamera.so)'
-	@echo '  gamerapy         Wrap the python module (lib/gamerapy.py and lib/_gamerapy.so)'
+	@echo '  gappa            Wrap the python module (lib/gappa.py and lib/_gappa.so)'
 	@echo '  tutorial1        Compile a simple tutorial program'
 	@echo '                   (-> bin/TutorialLevel1, see http://joachimhahn.github.io/GAMERA/)'
 	@echo '  documentation    Generate documentation'
@@ -31,7 +31,7 @@ help:
 	@echo '  clean            remove temporary files'
 
 
-all: gamera TutorialLevel1 gamerapy documentation
+all: gamera TutorialLevel1 gappa documentation
 
 gamera: Radiation Particles Utils Astro libgamera
 
@@ -59,10 +59,10 @@ TutorialLevel1 : docu/tutorial/TutorialLevel1.C
 	$(CXX) -g -O2 -Wall -c docu/tutorial/TutorialLevel1.C -o $(OUTDIR)/TutorialLevel1.o $(CXXFLAGS) $(INCLUDES)
 	$(CXX) -g -Wall -o bin/TutorialLevel1 $(OUTDIR)/TutorialLevel1.o -lgamera -L$(LIBDIR)
 
-# make gamerapy package
-gamerapy:
+# make gappa package
+gappa:
 	cd python;\
-	swig -python -c++ -nosafecstrings -outdir ../lib -o _gamerapy.cc gamerapy.i;\
+	swig -python -c++ -nosafecstrings -outdir ../lib -o _gappa.cc gappa.i;\
 	python setup.py build_ext --build-lib ../lib;\
 	cd ..;\
 
@@ -81,7 +81,7 @@ clean-bin:
 clean-lib:
 	-rm -f lib/*
 clean-python:
-	-rm -f python/_gamerapy.cc python/_gamerapy.so python/gamerapy.py
+	-rm -f python/_gappa.cc python/_gappa.so python/gappa.py
 	-rm -rf python/build/
 clean-docu:
 	-rm -rf docu/doxygen/xml/* docu/doxygen/html/* docu/sphinx/build/*

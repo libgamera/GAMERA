@@ -3,7 +3,7 @@
 import sys
 import os
 sys.path.append(os.path.abspath('./lib'))
-import gamerapy
+import gappa as gp
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -17,12 +17,12 @@ import ConfigParser
 ## Of course, a single power law is a special case and can either be achieved
 ## by setting both indices to the same value or by setting low_index = 0.
 ## electrons are subjected to Synchr., IC and Bremsstrahlung losses, determined
-## by density dens, B-Field bfield, radiation field e-density edensir and 
+## by density dens, B-Field bfield, radiation field e-density edensir and
 ## temperature tir. The CMB is hardcoded, just like in real life.
-## Finally, the radiation spectrum is calculated given a certain distance 
+## Finally, the radiation spectrum is calculated given a certain distance
 ## and plotted into outfile.
 ## All variables are detemined in the configFile and have the following units:
-## Units are: 
+## Units are:
 ## tir - K
 ## edensir - eV/cm^3
 ## dens - cm^-3
@@ -40,20 +40,20 @@ if __name__ == "__main__":
   configParser.read(configFile)
   lum = float(configParser.get('Parameters','Luminosity'))
   age = float(configParser.get('Parameters','Age'))
-  dist = gamerapy.pc_to_cm*float(configParser.get('Parameters','Distance'))
+  dist = gp.pc_to_cm*float(configParser.get('Parameters','Distance'))
   dens = float(configParser.get('Parameters','AmbientDensity'))
   bfield = float(configParser.get('Parameters','BField'))
   t = float(configParser.get('Parameters','tRAD'))
-  e = gamerapy.TeV_to_erg*1.e-12*float(configParser.get('Parameters','edensRAD'))
+  e = gp.TeV_to_erg*1.e-12*float(configParser.get('Parameters','edensRAD'))
   ebins = float(configParser.get('Parameters','Ebins'))
-  emax = gamerapy.TeV_to_erg*float(configParser.get('Parameters','Emax'))
-  emin = gamerapy.TeV_to_erg*float(configParser.get('Parameters','Emin'))
+  emax = gp.TeV_to_erg*float(configParser.get('Parameters','Emax'))
+  emin = gp.TeV_to_erg*float(configParser.get('Parameters','Emin'))
   spind = float(configParser.get('Parameters','SpectralIndex'))
   outfile = configParser.get('Files','outfile')
 
-  fr = gamerapy.Radiation()
-  fp = gamerapy.Particles()
-  fu = gamerapy.Utils()
+  fr = gp.Radiation()
+  fp = gp.Particles()
+  fu = gp.Utils()
   fu.DrawGamera()
   # set particle stuff
   fp.SetLuminosity(lum)
@@ -63,7 +63,7 @@ if __name__ == "__main__":
   fp.SetSpectralIndex(spind)
   fp.SetEnergyBinsForNumericalSolver(ebins)
   fp.SetAmbientDensity(dens)
-  fp.SetAge(age) 
+  fp.SetAge(age)
 
   # set radiation stuff
   fr.SetDistance(dist)
@@ -74,11 +74,11 @@ if __name__ == "__main__":
   fr.CreateICLossLookup()
   fp.SetICLossLookup(fr.GetICLossLookup())
 
-  # calculate stuff 
+  # calculate stuff
   fp.CalculateParticleSpectrum("electrons")
   fr.SetElectrons(fp.GetParticleSpectrum())
   fp.SetLuminosity(1.e2*lum)
-  fp.SetEmax(gamerapy.TeV_to_erg*1.e3)
+  fp.SetEmax(gp.TeV_to_erg*1.e3)
   fp.SetSpectralIndex(spind-0.1)
   fp.CalculateParticleSpectrum("protons")
   fr.SetProtons(fp.GetParticleSpectrum())
@@ -93,7 +93,7 @@ if __name__ == "__main__":
   PPSED = np.array(fr.GetPPSED())
 
   ## plot stuff ##
-  f, (ax1, ax2) = plt.subplots(1, 2, sharey=False,figsize=(15, 6))  
+  f, (ax1, ax2) = plt.subplots(1, 2, sharey=False,figsize=(15, 6))
   ax1.set_yscale("log")
   ax1.set_xscale("log")
   ax2.set_yscale("log")
@@ -120,4 +120,3 @@ if __name__ == "__main__":
   ax2.plot(ICSED[:,0],ICSED[:,1],color='red',alpha=.6,label="IC")
   ax2.legend(prop={'size':12},loc="upper right")
   f.savefig(outfile)
-
