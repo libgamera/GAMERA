@@ -1,6 +1,5 @@
 from distutils.core import setup, Extension
 import string
-import pkgconfig
 import subprocess
 GSL_LIBS = string.split(subprocess.check_output(['gsl-config','--libs']))
 GSL_CFLAGS = string.split(subprocess.check_output(['gsl-config','--cflags']))
