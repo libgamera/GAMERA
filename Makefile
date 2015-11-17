@@ -17,7 +17,10 @@ CXXFLAGS := $(GSLCFLAGS) -std=c++11
 # define additional switches to be passed to the linker
 LDFLAGS := $(GSLLIBS)
 
-
+INCS	:=	$(wildcard include/*.h)
+SRCS	:=	$(patsubst include%,src%,$(patsubst %.h,%.C,$(INCS)))
+OBJS    :=	$(patsubst include%,$(OUTDIR)%,$(patsubst %.h,%.o,$(INCS)))
+LIB		:=	$(LIBDIR)/libgamera.so
 help:
 	@echo ''
 	@echo 'GAMERA available make targets:'
@@ -33,25 +36,18 @@ help:
 
 all: gamera TutorialLevel1 gamerapy documentation
 
-gamera: Radiation Particles Utils Astro libgamera
+gamera: $(LIB)
 
 tutorial1: gamera TutorialLevel1
 
-# create the individual .o files
-Radiation : src/Radiation.C
-	$(CXX) -g -O2 -fpic -Wall -c src/Radiation.C -o $(OUTDIR)/Radiation.o $(CXXFLAGS) $(INCLUDES)
-Particles : src/Particles.C
-	$(CXX) -g -O2 -fpic -Wall -c src/Particles.C -o $(OUTDIR)/Particles.o $(CXXFLAGS) $(INCLUDES)
-Utils : src/Utils.C
-	$(CXX) -g -O2 -fpic -Wall -c src/Utils.C -o $(OUTDIR)/Utils.o $(CXXFLAGS) $(INCLUDES)
-Astro : src/Astro.C
-	$(CXX) -g -O2 -fpic -Wall -c src/Astro.C -o $(OUTDIR)/Astro.o $(CXXFLAGS) $(INCLUDES)
+$(OUTDIR)/%.o:	src/%.C include/%.h
+				@echo "Compiling" $<
+				$(CXX) -g -O2 -fpic -Wall -c $< -o $@ $(CXXFLAGS) $(INCLUDES)
 
 # create the shared library
-objectsSO = $(OUTDIR)/Radiation.o $(OUTDIR)/Particles.o $(OUTDIR)/Utils.o $(OUTDIR)/Astro.o
-libgamera : $(objectsSO)
+$(LIB) : $(OBJS)
 	@echo "Generating library $@..."
-	$(CXX) -shared -o $(LIBDIR)/libgamera.so $(objectsSO) $(CXXFLAGS) $(LDFLAGS)
+	$(CXX) -shared -o $@ $(OBJS) $(CXXFLAGS) $(LDFLAGS)
 	@echo "-> done!"
 
 # This is an example on how to use the shared library libgamera.so
