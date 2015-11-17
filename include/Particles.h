@@ -1,46 +1,10 @@
 #ifndef _PARTICLES_
 #define _PARTICLES_
 
-#include <cmath>
-#include <iostream>
-#include <stdlib.h>
-#include <fstream>
-#include <vector>
+#include "Utils.h"
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_spline.h>
 
-/* TeV->erg */
-#define TeV_to_erg 1.602
-/* GeV->erg */
-#define GeV_to_erg 1.602e-3
-/* Thomson cross section */
-#define sigma_T 6.6524e-25
-/* electron mass in erg */
-#define m_e 8.187e-7
-/* boltzmann constant (erg/K) */
-#define kb 1.380658e-16
-/* proton mass in erg */
-#define m_p 1.50310854e-3
-/* pi0 mass in erg */
-#define m_pi 2.1622194e-4
-/* parsec to cm */
-#define pc_to_cm 3.0857e18
-/* well... pi! */
-#define pi 3.1416
-/* year in seconds */
-#define yr_to_sec 3.15576e7
-/* solar mass */
-#define mSol 1.9891e33
-/* speed of light cm/s */
-#define c_speed 29979245800.
-/* elementary charge */
-#define el_charge 4.80320427e-10
-/* classical electron radius (cm) */
-#define eRadius 2.8179e-13
-/* planck's constant */
-#define hp 6.62606896e-27
-/* fine structure constant */
-#define fineStructConst 7.2974e-3
 
 using namespace std;
 
@@ -59,20 +23,7 @@ using namespace std;
  * distribution of
  *   particles is made whatsoever.
  */
-// class gsl_function_pp : public gsl_function
-// {
-//    public:
-//    gsl_function_pp(std::function<double(double,void*)> const& func) :
-// _func(func){
-//      function=&gsl_function_pp::invoke;
-//      params=this;
-//    }
-//    private:
-//    std::function<double(double,void*)> _func;
-//    static double invoke(double x, void *params) {
-//     return static_cast<gsl_function_pp*>(params)->_func(x,params);
-//   }
-//};
+
 
 template <typename F>
 class GSLfuncPart : public gsl_function {
@@ -93,6 +44,7 @@ class Particles {
   typedef double (Particles::*fPointer)(double, void *);
 
  private:
+  Utils *fUtils;
   int Type;  ///< integer indicating particle type. supported: 0-electrons and
              ///1-protons
   double theta;           ///< CR acceleration efficiency
@@ -114,10 +66,10 @@ class Particles {
   double TmaxInternal;  ///< Same as TminInternal but here it is the maximal
                         ///time
   double EminInternal;  ///< internal parameter that is relevant to the grid-
-                        /// solver. Essentially, it is used to determine the 
+                        /// solver. Essentially, it is used to determine the
                         /// starting time of the iteration. The starting time
                         /// is then determined in a way that all particles that
-                        /// are injected before that time are cooled to an 
+                        /// are injected before that time are cooled to an
                         /// energy of maximal EminInternal after a time t=age.
   double BField;        ///< amplified B-field immediately dowmstream
   double N;             ///< ambient density
@@ -272,7 +224,6 @@ class Particles {
                                          ///optionally with the 'Superbee'-Slope
                                          ///limiter
   void FillEnergyTrajectoryLookup();
-  void Clear2DVector(vector< vector<double> > &v);
   double CalcSpecSemiAnalyticConstELossIntegrand(double *x, double *par);
   void CalcSpecSemiAnalyticConstELoss();
   void CalcSpecSemiAnalyticNoELoss();
@@ -333,7 +284,7 @@ class Particles {
   double integratorTolerance;
   double Integrate(fPointer f, double *x, double emin, double emax,
                    double tolerance);
-  int gslmemory; ///< memory of the GSL workspace when integrating. 
+  int gslmemory; ///< memory of the GSL workspace when integrating.
                  /// Default = 5000
   vector<double> Constants;
   vector<gsl_spline *> splines;

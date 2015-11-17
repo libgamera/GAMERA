@@ -9,6 +9,8 @@
 #include <vector>
 #include <ctime>
 #include <algorithm>
+#include <gsl/gsl_sf_bessel.h>
+#include <gsl/gsl_integration.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_spline.h>
 

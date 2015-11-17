@@ -58,6 +58,8 @@ Particles::Particles() {
   accV = gsl_interp_accel_alloc();
   accTr = gsl_interp_accel_alloc();
   accTrInv = gsl_interp_accel_alloc();
+
+  fUtils = new Utils();
 }
 Particles::~Particles() {
   for (unsigned int i = 0; i < grid.size(); i++) grid[i].clear();
@@ -110,7 +112,7 @@ void Particles::CalculateParticleSpectrum(string type, bool onlyprepare,
     if (Type == 1) cout << "   (-> protons)     " << endl;
   }
   /* reset Particle Lookup */
-  Clear2DVector(ParticleSpectrum);
+  fUtils->Clear2DVector(ParticleSpectrum);
 
   if (Type == 1)
     Emin = m_p;  // norm for protons or for electrons if defined per e/p
@@ -506,7 +508,7 @@ void Particles::GetAxis(double min, double max, int steps, vector<double> &Axis,
  * energy in x-direction, time in y-direction
  */
 void Particles::CreateGrid() {
-  Clear2DVector(grid);
+  fUtils->Clear2DVector(grid);
   grid.push_back(vector<double>());
   for (int i = 0; i < ebins; i++) {
     grid[grid.size() - 1].push_back(0.);
@@ -775,15 +777,13 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
   /* Fill the final lookup, holding the time evolved spectrum at time = Age.
    * Also, forego edge bins in order to avoid artefacts.
    */
-  Clear2DVector(ParticleSpectrum);
+  fUtils->Clear2DVector(ParticleSpectrum);
   for (unsigned int j = 1; j < EnergyAxis.size() - 1; j++) {
     e1 = pow(10., EnergyAxis[j]);
     double val = Grid[0][j];
     if(std::isnan(val) || std::isinf(val) || !val)
       continue;
-    ParticleSpectrum.push_back(vector<double>());
-    ParticleSpectrum[ParticleSpectrum.size() - 1].push_back(e1);
-    ParticleSpectrum[ParticleSpectrum.size() - 1].push_back(val);
+    fUtils->TwoDVectorPushBack(e1,val,ParticleSpectrum);
   }
   /* Important for wrapper function 'ComputeGridInTimeInterval': remove the last
    * vector (Grid[1]) so that Grid has the same shape as in the beginning of
@@ -859,7 +859,7 @@ void Particles::ComputeGridInTimeInterval(double T1, double T2) {
     T1 = Tmin * 1.001;
   }
 
-  Clear2DVector(ParticleSpectrum);
+  fUtils->Clear2DVector(ParticleSpectrum);
   ComputeGrid(grid, energyAxis, T1, T2, timeAxis, yr_to_sec * (T2 - T1) / 100.);
   return;
 }
@@ -870,7 +870,7 @@ void Particles::CalcSpecSemiAnalyticNoELoss() {
             "than source age... Exiting" << endl;
     return;
   }
-  Clear2DVector(ParticleSpectrum);
+  fUtils->Clear2DVector(ParticleSpectrum);
   double totallum = 0.;
   if(LumConstant)
     totallum = LumConstant*Age;
@@ -888,9 +888,7 @@ void Particles::CalcSpecSemiAnalyticNoELoss() {
     double val = SourceSpectrum(e);
     if(std::isnan(val) || std::isinf(val) || !val)
       continue;
-    ParticleSpectrum.push_back(vector<double>());
-    ParticleSpectrum[ParticleSpectrum.size() - 1].push_back(e);
-    ParticleSpectrum[ParticleSpectrum.size() - 1].push_back(val);
+    fUtils->TwoDVectorPushBack(e,val,ParticleSpectrum);
   }
   return;
 }
@@ -902,7 +900,7 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
     return;
   }
   fPointer IntFunc = NULL;
-  Clear2DVector(ParticleSpectrum);
+  fUtils->Clear2DVector(ParticleSpectrum);
   double logstep = (log10(eMax) - log10(Emin)) / ebins;
 
   /* info writeout. Disable it by using 'ToggleQuietMode()' */
@@ -929,9 +927,7 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
                    EnergyLossRate(e);
       if(std::isnan(val) || std::isinf(val) || !val)
         continue;
-      ParticleSpectrum.push_back(vector<double>());
-      ParticleSpectrum[ParticleSpectrum.size() - 1].push_back(e);
-      ParticleSpectrum[ParticleSpectrum.size() - 1].push_back(val);
+      fUtils->TwoDVectorPushBack(e,val,ParticleSpectrum);
       tt++;
     }
   }
@@ -948,9 +944,7 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
       val /= EnergyLossRate(e);
       if(std::isnan(val) || std::isinf(val) || !val)
         continue;
-      ParticleSpectrum.push_back(vector<double>());
-      ParticleSpectrum[ParticleSpectrum.size() - 1].push_back(e);
-      ParticleSpectrum[ParticleSpectrum.size() - 1].push_back(val);
+      fUtils->TwoDVectorPushBack(e,val,ParticleSpectrum);
       tt++;
     }
   }
@@ -1064,7 +1058,7 @@ void Particles::CalculateEnergyTrajectory(double TExt) {
             "first by running DetermineLookupStartingTime(). Exiting." << endl;
     return;
   }
-  Clear2DVector(vETrajectory);
+  fUtils->Clear2DVector(vETrajectory);
 
   double T = TminInternal;
   double E, Edot, dt;
@@ -1075,9 +1069,7 @@ void Particles::CalculateEnergyTrajectory(double TExt) {
   E = eMax;
 
   while (E >= Emin) {
-    vETrajectory.push_back(vector<double>());
-    vETrajectory[vETrajectory.size() - 1].push_back(T);
-    vETrajectory[vETrajectory.size() - 1].push_back(E);
+    fUtils->TwoDVectorPushBack(T,E,vETrajectory);
     Edot = EnergyLossRate(E);
     dt = 2.e-2 * E / Edot;
     E -= dt * Edot;
@@ -1116,17 +1108,11 @@ vector<vector<double> > Particles::GetParticleSED() {
     double ETeV = E / TeV_to_erg;
     double N = ParticleSpectrum[i][1];
     if (!N) continue;
-    v.push_back(vector<double>());
-    v[v.size() - 1].push_back(ETeV);
-    v[v.size() - 1].push_back(E * E * N);
+    fUtils->TwoDVectorPushBack(ETeV,E * E * N,v);
   }
   return v;
 }
 
-void Particles::Clear2DVector(vector< vector<double> > &v) {
-  for (unsigned int i = 0; i < v.size(); i++) v[i].clear();
-  v.clear();
-}
 
 void Particles::SetIntegratorMemory(string mode) {
   if(!mode.compare("light")) gslmemory=1000;
