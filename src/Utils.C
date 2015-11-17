@@ -457,7 +457,7 @@ double Utils::EvalSpline(double x, gsl_spline *s, gsl_interp_accel *a,
     exit(1);
   }
   if (std::isnan(y) || std::isinf(y)) {
-    cout << t << ": value is " << y << ". Exiting!" <<endl;
+    cout << t << ",l." << l << ": value is " << y << ". Exiting!" <<endl;
     exit(1);
   }
   return y;

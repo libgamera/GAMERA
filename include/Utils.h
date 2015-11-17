@@ -2,6 +2,7 @@
 #define _UTILS_
 
 #include <math.h>
+#include <cmath>
 #include <iostream>
 #include <stdlib.h>
 #include <fstream>
@@ -13,6 +14,12 @@
 
 /* TeV->erg */
 #define TeV_to_erg 1.602
+/* GeV->erg */
+#define GeV_to_erg 1.602e-3
+/* Thomson cross section */
+#define sigma_T 6.6524e-25
+/* classical electron radius (cm) */
+#define e_radius 2.8179e-13
 /* parsec to cm */
 #define pc_to_cm 3.0857e18
 /* kiloparsec to cm */

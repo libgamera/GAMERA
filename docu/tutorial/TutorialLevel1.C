@@ -61,4 +61,3 @@ int ReadParameterFile(string inputname){
   strings_names.push_back("outfile");
   return fUtils->ReadParameterFile(inputname, parameters_names, strings_names, parameters, strings);
 }
-
