@@ -10,3 +10,4 @@ docu/doxygen/xml/
 docu/sphinx/build/
 python/_gamerapy.cc
 python/build/
+_gappa.cc
