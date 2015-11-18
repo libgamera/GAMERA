@@ -4,12 +4,12 @@ Radiation: source
 .. sourcecode:: C++
 
   #include "Radiation.h"
-  
   /**
    * Constructor. Nothing fancy, just initialises some stuff.
    */
   Radiation::Radiation() {
     /* Default values */
+    fUtils = new Utils();
     ParticleVector.clear();
     DEBUG = false;
     fintbrems = lintbrems = fintpp = lintpp = fintic = lintic = 0.;
@@ -75,7 +75,7 @@ Radiation: source
     ldiffbrems = fdiffbrems = ldiffsynch = fdiffsynch = 0.;
     ldiffic = fdiffic = ldiffpp = fdiffpp = 0.;
   
-    /* Conversion of differential photon rate to flux 
+    /* Conversion of differential photon rate to flux
      [ph/(erg*s) -> ph/(erg*s*cm^2)] */
     double lumtoflux = 0.;
     void *p = NULL;
@@ -122,7 +122,7 @@ Radiation: source
     return;
   }
   
-  /** 
+  /**
    * Calculates the integral photon Emission above energy 'e' [erg]. This gives
    * - integral fluxes, fint* [(no. of photons)/(s*cm^2)]
    * - photon rate, lint* [(no. of photons)/s]
@@ -141,7 +141,7 @@ Radiation: source
    *
    * This function calculates the appropriate (depending on the particle species)
    * radiation mechanism and their gamma-ray flux by calling
-   * the method 'CalculateLuminosityAndFlux' which integrates 
+   * the method 'CalculateLuminosityAndFlux' which integrates
    * 'DifferentialEmissionComponent'.
    */
   void Radiation::CalculateIntegralGammaEmission(double e, int particletype) {
@@ -180,10 +180,10 @@ Radiation: source
   
     return;
   }
-  /** 
-   * Calculates the differential photon rate [(no. of photons)/(erg*s)] 
+  /**
+   * Calculates the differential photon rate [(no. of photons)/(erg*s)]
    * at energy 'e' [erg] resulting from radiation mechanism
-   * 'radiationMechanism' that has been specified before in 
+   * 'radiationMechanism' that has been specified before in
    * 'CalculateDifferentialGammaEmission' or 'CalculateIntegralGammaEmission'.
    */
   double Radiation::DifferentialEmissionComponent(double e, void *par) {
@@ -248,17 +248,17 @@ Radiation: source
       return 0.;
     gsl_interp_accel_reset(acc);
     double gammas = Integrate(IntFunc, &egamma, e, emax, integratorTolerance);
-    if (isnan(gammas)) return 0.;
+    if (std::isnan(gammas)) return 0.;
   
     return gammas;
   }
   
-  /** 
-   * Calculates 
-   * - f: integrated flux [(no. of photons)/(s*cm^2)] and 
-   * - l: photon rate [(no. of photons)/s] 
+  /**
+   * Calculates
+   * - f: integrated flux [(no. of photons)/(s*cm^2)] and
+   * - l: photon rate [(no. of photons)/s]
    *
-   * above energy 'e' [erg]. 
+   * above energy 'e' [erg].
    *
    * This method integrates the 'DifferentialEmissionComponent' method
    * for the relevant radiation mechanisms:
@@ -269,8 +269,8 @@ Radiation: source
    *   + Bremsstrahlung
    *   + Synchrotron radiation
    *
-   * The integration boundaries are {e,maximum particle energy}, where the 
-   * maximum particle energy is automatically determined from the 
+   * The integration boundaries are {e,maximum particle energy}, where the
+   * maximum particle energy is automatically determined from the
    * 'ParticleVector' vector.
    */
   void Radiation::CalculateLuminosityAndFlux(string mechanism, double e,
@@ -313,10 +313,10 @@ Radiation: source
   /********* RADIATION MECHANISMS ***********************************/
   
   /* Inverse Compton part */
-   
+  
   /**
-   * Describes grey body with temperature 'temp' [K] and energy density 
-   * 'edens' [erg/cm^3] and returns differential photon 
+   * Describes grey body with temperature 'temp' [K] and energy density
+   * 'edens' [erg/cm^3] and returns differential photon
    * density [(no of photons)/(cm^3*erg)] at energy 'ephoton' [erg].
    */
   double Radiation::GreyBody(double ephoton, double temp, double edens) {
@@ -326,24 +326,24 @@ Radiation: source
   
   /**
    * IC emission from electrons integrated over the target photon population.
-   * This method has the switch INTEGRATEOVERGAMMAS, which determines its 
+   * This method has the switch INTEGRATEOVERGAMMAS, which determines its
    * output. If INTEGRATEOVERGAMMAS is set to
    *
-   * - TRUE: method returns a photon production rate [(no. of photons)/s] at 
-   *         energy 'egamma'. It is used to calculate the total loss rate due to 
-   *         IC emission for single electrons of energy 'eelectrons' by 
-   *         integrating this production rate from a (hardcoded) minimum energy of 
+   * - TRUE: method returns a photon production rate [(no. of photons)/s] at
+   *         energy 'egamma'. It is used to calculate the total loss rate due to
+   *         IC emission for single electrons of energy 'eelectrons' by
+   *         integrating this production rate from a (hardcoded) minimum energy of
    *         1.e-10 eV  up to energy 'eelectrons'.
    *         This is done in the method 'CreateICLossLookup'.
    *
    *
-   * - FALSE: method returns a differential production rate of photons 
-   *          [(no. of photons)/(erg*s)] with energy 'egamma' from the 
+   * - FALSE: method returns a differential production rate of photons
+   *          [(no. of photons)/(erg*s)] with energy 'egamma' from the
    *          differential number of electrons at energy 'eelectron', which is
    *          then used to calculate the total IC gamma-ray emission at photon
    *          energy egamma from the total electron distribution. The
    *          corresponding integration is performed from the minimum electron
-   *          energy to egamma and is implemented in the method 
+   *          energy to egamma and is implemented in the method
    *          'DifferentialEmissionComponent'
    */
   double Radiation::ICEmissivityRadFieldIntegrated(double x, void *par) {
@@ -380,21 +380,19 @@ Radiation: source
     if (k > 0.1 || boundmin >= boundmax) return 0.;
   
     icgammas = Integrate(IntFunc, xpars, boundmin, boundmax, integratorTolerance);
-    if (isnan(icgammas) || isinf(icgammas)) return 0.;
+    if (std::isnan(icgammas) || std::isinf(icgammas)) return 0.;
     if (INTEGRATEOVERGAMMAS == true)
       return icgammas * egamma;
     else {
       gsl_interp_accel_reset(acc);
-      double elnumber = 0.;
-      if (gsl_spline_eval_e(ElectronLookup, log10(eelectron), acc, &elnumber))
-        return 0.;
-      if (isnan(elnumber) || isinf(elnumber)) return 0.;
+      double elnumber = fUtils->EvalSpline(log10(eelectron),ElectronLookup,acc
+                                    ,__func__,__LINE__);
       icgammas *= pow(10., elnumber);
       return icgammas;
     }
   }
   
-  /** 
+  /**
    * emissivity from IC scattering. Taken from Blumenthal and Gould 1970,
    * Eq(2.48).
    */
@@ -414,10 +412,8 @@ Radiation: source
     /// Eq(2.48):
     double bracket = 2. * q * log(q) + (1. + 2. * q) * (1. - q)
                      + 0.5 * (1. - q) * gamma * q * gamma * q / (1. + gamma * q);
-    double targetphotons = 0.;
-    if (gsl_spline_eval_e(TargetPhotonLookup, log10(ephoton), acc,
-                          &targetphotons))
-      return 0.;
+    double targetphotons = fUtils->EvalSpline(log10(ephoton),TargetPhotonLookup,
+                                              acc,__func__,__LINE__);
     double integrand = 2. * pi * pow(e_radius, 2.) * m_e * c_speed / lorentz *
                        pow(10., targetphotons) / ephoton * bracket;
   
@@ -433,7 +429,7 @@ Radiation: source
   void Radiation::CreateICLossLookup(int bins) {
   
     INTEGRATEOVERGAMMAS = true;
-    Clear2DVector(ICLossLookup);
+    fUtils->Clear2DVector(ICLossLookup);
     /* lower integration boundary over emitted (i.e. 'loss-') IC photons */
     double EGammaMin = 1.e-22 * TeV_to_erg;
     /* Upper integration boundary over emitted (i.e. 'loss-') IC photons */
@@ -469,10 +465,12 @@ Radiation: source
         LossRate =
             (4. / 3.) * sigma_T * c_speed * TargetPhotonEdens * gamma * gamma;
       }
-      if (isnan(LossRate)) LossRate = 0.;
-      ICLossLookup.push_back(vector<double>());
-      ICLossLookup[ICLossLookup.size() - 1].push_back(Eelectron);
-      ICLossLookup[ICLossLookup.size() - 1].push_back(LossRate);
+      if (std::isnan(LossRate)) {
+        cout << __func__ << ",l." << __LINE__ <<": LossRate is nan! Exiting."
+             << endl;
+        exit(1);
+      }
+      fUtils->TwoDVectorPushBack(Eelectron,LossRate,ICLossLookup);
     }
   
     INTEGRATEOVERGAMMAS = false;
@@ -526,11 +524,8 @@ Radiation: source
     if (nu < nu_b) {
       value = 0.;
     } else {
-      double electrons = 0.;
-      if (gsl_spline_eval_e(ElectronLookup, log10(eElectron), acc, &electrons))
-        return 0.;
-      if (isnan(electrons) || isinf(electrons)) return 0.;
-  
+      double electrons = fUtils->EvalSpline(log10(eElectron),ElectronLookup,
+                               acc,__func__,__LINE__);
       value = 4. * pi * sqrt(3.) * el_charge * el_charge * nu_b /
               (hp * hp * nu * c_speed);
       value *= pow(10., electrons) * pow(j, 2.);
@@ -557,9 +552,8 @@ Radiation: source
     fPointer IntFunc = &Radiation::K_53;
     double *v = NULL;
     double F = x * Integrate(IntFunc, v, x, 1.e2 * x, integratorTolerance);
-    double electrons = 0.;
-    if (gsl_spline_eval_e(ElectronLookup, log10(eElectron), acc, &electrons))
-      return 0.;
+    double electrons = fUtils->EvalSpline(log10(eElectron),ElectronLookup,
+                                          acc,__func__,__LINE__);
     double val = norm * F * pow(10., electrons) / (hp * hp * nu);
   
     return val;
@@ -597,11 +591,8 @@ Radiation: source
       N = c_speed * b * S * (sigma1(g, e) + sigmaNR(g, e));
     else
       N = c_speed * b * S * (sigma1(g, e) + sigma_e);
-  
-    double electrons = 0.;
-    if (gsl_spline_eval_e(ElectronLookup, log10(EI), acc, &electrons)) return 0.;
-  
-    if (isnan(electrons) || isinf(electrons)) return 0.;
+    double electrons = fUtils->EvalSpline(log10(EI),ElectronLookup,
+                                          acc,__func__,__LINE__);
     return N * pow(10., electrons) / m_e;
   }
   
@@ -673,13 +664,8 @@ Radiation: source
     if (Eg <= GetMinimumGammaEnergy(Tp)) return 0.;
     if (Eg >= GetMaximumGammaEnergy(Tp)) return 0.;
     double N = DiffPPXSection(Tp, Eg);
-    double logprotons = 0.;
-    
-    if(gsl_spline_eval_e(ProtonLookup, log10(EP), acc, &logprotons)) {
-      cout << "Radiation::PPEmissivity: Something wrong  "
-              "with proton lookup interpolation! Exit!" << endl;
-      return 0.;
-    }
+    double logprotons = fUtils->EvalSpline(log10(EP),ProtonLookup,
+                                        acc,__func__,__LINE__);
     return c_speed * n * N * pow(10., logprotons);
   }
   
@@ -1020,18 +1006,17 @@ Radiation: source
     }
     double estep = (logemax - logemin) / steps;
     double ePhoton = 0.;
-    double elogs[steps];
-    double nlogs[steps];
+    double nPhoton = 0.;
+    vector< vector<double> > vint;
     int i;
     double loge;
     for (loge = logemin, i = 0; loge < logemax; loge += estep, i++) {
       ePhoton = pow(10., loge);
-      elogs[i] = loge;
-      nlogs[i] = log10(GreyBody(ePhoton, T, edens));
+      nPhoton = GreyBody(ePhoton, T, edens);
+      if(!nPhoton) continue;
+      fUtils->TwoDVectorPushBack(loge,log10(nPhoton),vint);
     }
-    gsl_spline *ThermalLookup = gsl_spline_alloc(gsl_interp_linear, steps);
-    gsl_spline_init(ThermalLookup, elogs, nlogs, steps);
-    AddToTargetPhotonVector(ThermalLookup, logemin, logemax, steps);
+    AddToTargetPhotonVector(vint);
     return;
   }
   
@@ -1044,17 +1029,14 @@ Radiation: source
    * The photons will be added to TotalTargetPhotonGraph
    */
   void Radiation::AddArbitraryTargetPhotons(vector<vector<double> > PhotonArray) {
-    int size = (int)PhotonArray.size();
-    double elogs[size];
-    double nlogs[size];
+    vector< vector<double> > vint;
     for (unsigned int i = 1; i < PhotonArray.size() - 1; i++) {
-      elogs[(int)i] = log10(PhotonArray[i][0]);
-      nlogs[(int)i] = log10(PhotonArray[i][1]);
+      double E = PhotonArray[i][0];
+      double N = PhotonArray[i][1];
+      if(E <=0. || N <=0.) continue;
+      fUtils->TwoDVectorPushBack(log10(E),log10(N),vint);
     }
-    gsl_spline *ArbitraryLookup = gsl_spline_alloc(gsl_interp_linear, size);
-    gsl_spline_init(ArbitraryLookup, elogs, nlogs, size);
-    AddToTargetPhotonVector(ArbitraryLookup, log10(PhotonArray[0][0]),
-                            log10(PhotonArray[PhotonArray.size() - 1][0]), size);
+    AddToTargetPhotonVector(vint);
     return;
   }
   
@@ -1070,21 +1052,15 @@ Radiation: source
       double e = 0.;
       double n = 0.;
       PHfile >> e >> n;
-      if (!e) continue;
-      v.push_back(vector<double>());
-      v[v.size() - 1].push_back(log10(TeV_to_erg * e * 1.e-12));
-      v[v.size() - 1].push_back(log10(1.e12 * n / TeV_to_erg));
+      if (e <= 0. || n <= 0.) continue;
+      fUtils->TwoDVectorPushBack(log10(TeV_to_erg * e * 1.e-12),
+                                 log10(1.e12 * n / TeV_to_erg),v);
     }
-    int size = (int)v.size();
-    double elogs[size];
-    double nlogs[size];
+    vector< vector<double> > vint;
     for (unsigned int i = 0; i < v.size(); i++) {
-      elogs[(int)i] = v[i][0];
-      nlogs[(int)i] = v[i][1];
+      fUtils->TwoDVectorPushBack(v[i][0],v[i][1],vint);
     }
-    gsl_spline *ImportLookup = gsl_spline_alloc(gsl_interp_linear, size);
-    gsl_spline_init(ImportLookup, elogs, nlogs, size);
-    AddToTargetPhotonVector(ImportLookup, v[0][0], v[v.size() - 1][0], size);
+    AddToTargetPhotonVector(vint);
     PHfile.close();
     return;
   }
@@ -1119,45 +1095,40 @@ Radiation: source
         log10(1.e-3 * ParticleVector[ParticleVector.size() - 1][0]);
     double estep = (logemaxxray - logeminxray) / steps;
     double E = 0.;
+    double N = 0.;
     radiationMechanism = "Synchrotron";
     double U = 2.24;
-    double elogs[steps];
-    double nlogs[steps];
-    int i = 0;
+    vector< vector<double> > vint;
     for (double loge = logeminxray; loge < logemaxxray; loge += estep) {
       E = pow(10., loge);
-      elogs[i] = loge;
-      nlogs[i] =
-          log10(DifferentialEmissionComponent(E, p) * U / (4. * pi * R * R * c_speed));
-      i++;
+      N = DifferentialEmissionComponent(E, p) * U / (4. * pi * R * R * c_speed);
+      if(N <= 0.) continue;
+      fUtils->TwoDVectorPushBack(loge,log10(N),vint);
     }
-    gsl_spline *SSCLookup = gsl_spline_alloc(gsl_interp_linear, steps);
-    gsl_spline_init(SSCLookup, elogs, nlogs, steps);
-    AddToTargetPhotonVector(SSCLookup, logeminxray, logemaxxray, steps);
+    AddToTargetPhotonVector(vint);
     return;
   }
   
-  void Radiation::AddToTargetPhotonVector(gsl_spline *Spl, double logEminSpl,
-                                          double logEmaxSpl, int stepsSpl) {
+  void Radiation::AddToTargetPhotonVector(vector< vector<double> > vint) {
   
     gsl_interp_accel *accT1 = gsl_interp_accel_alloc();
     gsl_interp_accel *accT2 = gsl_interp_accel_alloc();
+    gsl_spline *Spl = fUtils->GSLsplineFromTwoDVector(vint);
+    double logEminSpl = vint[0][0];
+    double logEmaxSpl = vint[vint.size()-1][0];
+    double stepsSpl = (double)vint.size();
     if (!TargetPhotonVector.size()) {
       gsl_interp_accel_reset(accT1);
       double logdE = (logEmaxSpl - logEminSpl) / stepsSpl;
       for (double logE = logEminSpl; logE < logEmaxSpl; logE += logdE) {
-        double val;
-        if (gsl_spline_eval_e(Spl, logE, accT1, &val)) continue;
-        if (isnan(val)) continue;
-        TargetPhotonVector.push_back(vector<double>());
-        TargetPhotonVector[TargetPhotonVector.size() - 1].push_back(logE);
-        TargetPhotonVector[TargetPhotonVector.size() - 1].push_back(val);
+        double val = fUtils->EvalSpline(logE,Spl,accT1,__func__,__LINE__);
+        fUtils->TwoDVectorPushBack(logE,val,TargetPhotonVector);
       }
     } else {
       gsl_interp_accel_reset(accT1);
       gsl_interp_accel_reset(accT2);
       /* safe the old vector */
-      Clear2DVector(TargetPhotonVectorOld);
+      fUtils->Clear2DVector(TargetPhotonVectorOld);
       for (unsigned int i = 0; i < TargetPhotonVector.size(); i++)
         TargetPhotonVectorOld.push_back(TargetPhotonVector[i]);
   
@@ -1168,32 +1139,28 @@ Radiation: source
       (logEminOld <= logEminSpl) ? (logEmin = logEminOld) : logEmin = logEminSpl;
       (logEmaxOld >= logEmaxSpl) ? (logEmax = logEmaxOld) : logEmax = logEmaxSpl;
   
-      Clear2DVector(TargetPhotonVector);
+      fUtils->Clear2DVector(TargetPhotonVector);
       int steps =
           (int)(stepsOld * (logEmax - logEmin) / (logEmaxOld - logEminOld));
       double logdE = (logEmax - logEmin) / steps;
       for (double logE = logEmin; logE < logEmax; logE += logdE) {
-        double valOld, valSpl, val;
-        valOld = valSpl = val = 0.;
-        if (logE > logEminOld && logE < logEmaxOld &&
-            !gsl_spline_eval_e(TargetPhotonLookup, logE, accT1, &valOld))
+        double val = 0.;
+        double valOld = 0.;
+        double valSpl = 0.;
+        if (logE > logEminOld && logE < logEmaxOld) {
+          valOld = fUtils->EvalSpline(logE,TargetPhotonLookup,
+                                           accT1,__func__,__LINE__);
           valOld = pow(10., valOld);
-        if (logE > logEminSpl && logE < logEmaxSpl &&
-            !gsl_spline_eval_e(Spl, logE, accT2, &valSpl))
+        }
+        if (logE > logEminSpl && logE < logEmaxSpl) {
+          valSpl = fUtils->EvalSpline(logE,Spl,
+                                           accT2,__func__,__LINE__);
           valSpl = pow(10., valSpl);
-        bool VALOLDOK = true;
-        bool VALSPLOK = true;
-        if (isnan(valSpl) || isinf(valSpl)) VALSPLOK = false;
-        if (isnan(valOld) || isinf(valOld)) VALOLDOK = false;
-        if (!VALSPLOK && !VALOLDOK) continue;
-        if (VALOLDOK && VALSPLOK) val = valOld + valSpl;
-        if (!VALOLDOK) val = valSpl;
-        if (!VALSPLOK) val = valOld;
+        }
+        val = valOld + valSpl;
         if (!val) continue;
         val = log10(val);
-        TargetPhotonVector.push_back(vector<double>());
-        TargetPhotonVector[TargetPhotonVector.size() - 1].push_back(logE);
-        TargetPhotonVector[TargetPhotonVector.size() - 1].push_back(val);
+        fUtils->TwoDVectorPushBack(logE,val,TargetPhotonVector);
       }
     }
     SetTargetPhotonVectorLookup();
@@ -1244,7 +1211,7 @@ Radiation: source
    * the total target photon spectrum
    */
   void Radiation::RemoveLastICTargetPhotonComponent() {
-    TargetPhotonVector = TargetPhotonVectorOld; 
+    TargetPhotonVector = TargetPhotonVectorOld;
     SetTargetPhotonVectorLookup();
     return;
   }
@@ -1265,7 +1232,7 @@ Radiation: source
               "Exiting..." << endl;
       return;
     }
-    Clear2DVector(diffSpec);
+    fUtils->Clear2DVector(diffSpec);
     if (!ElectronVector.size() && !ProtonVector.size()) {
       cout << "Radiation::ReturnDifferentialSpectrum: No particle spectra filled "
               "-> No gamma spectra to calculate. Exiting..." << endl;
@@ -1377,9 +1344,7 @@ Radiation: source
       if (e > emax && emax) continue;
       if (dNdE < 0.) dNdE = 0.;
       if (!dNdE) continue;
-      tempVec.push_back(vector<double>());
-      tempVec[tempVec.size() - 1].push_back(e);
-      tempVec[tempVec.size() - 1].push_back(dNdE);
+      fUtils->TwoDVectorPushBack(e,dNdE,tempVec);
     }
     return tempVec;
   }
@@ -1408,18 +1373,11 @@ Radiation: source
       if (eTeV > emax && emax) continue;
       if (dNdE < 0.) dNdE = 0.;
       if (!dNdE) continue;
-      tempVec.push_back(vector<double>());
-      tempVec[tempVec.size() - 1].push_back(eTeV);
-      tempVec[tempVec.size() - 1].push_back(e * e * dNdE);
+      fUtils->TwoDVectorPushBack(eTeV,e * e * dNdE,tempVec);
     }
     return tempVec;
   }
   
-  
-  void Radiation::Clear2DVector(vector< vector<double> > &v) {
-    for (unsigned int i = 0; i < v.size(); i++) v[i].clear();
-    v.clear();
-  }
   
   /**
    * Return a particle SED dN/dE vs E (erg vs TeV)

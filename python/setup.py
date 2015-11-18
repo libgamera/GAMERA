@@ -12,9 +12,6 @@ extra_link_args = pkgconfig.libs('gsl').split()
 extra_compile_args = pkgconfig.cflags('gsl').split()
 extra_compile_args.append('-std=c++11')
 
-if sys.platform == 'darwin':
-    extra_compile_args.append('-w')
-
 extension_mod = Extension(
     "_gappa",
     ["_gappa.cc", "../src/Radiation.C", "../src/Particles.C", "../src/Utils.C", "../src/Astro.C"],

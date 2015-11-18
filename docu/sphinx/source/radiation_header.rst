@@ -6,47 +6,12 @@ Radiation: header
   #ifndef _RADIATION_
   #define _RADIATION_
   
-  #include <math.h>
-  #include <iostream>
-  #include <stdlib.h>
-  #include <fstream>
-  #include <vector>
+  #include "Utils.h"
   #include <gsl/gsl_sf_bessel.h>
   #include <gsl/gsl_integration.h>
   #include <gsl/gsl_spline.h>
   
-  /* TeV->erg */
-  #define TeV_to_erg 1.602
-  /* GeV->erg */
-  #define GeV_to_erg 1.602e-3
-  /* Thomson cross section */
-  #define sigma_T 6.6524e-25
-  /* electron mass in erg */
-  #define m_e 8.187e-7
-  /* boltzmann constant (erg/K) */
-  #define kb 1.380658e-16
-  /* proton mass in erg */
-  #define m_p 1.50310854e-3
-  /* pi0 mass in erg */
-  #define m_pi 2.1622194e-4
-  /* parsec to cm */
-  #define pc_to_cm 3.0857e18
-  /* well... pi! */
-  #define pi 3.1416
-  /* year in seconds */
-  #define yr_to_sec 3.15576e7
-  /* solar mass */
-  #define mSol 1.9891e33
-  /* speed of light cm/s */
-  #define c_speed 29979245800.
-  /* elementary charge */
-  #define el_charge 4.80320427e-10
-  /* classical electron radius (cm) */
-  #define e_radius 2.8179e-13
-  /* planck's constant */
-  #define hp 6.62606896e-27
-  /* fine structure constant */
-  #define fineStructConst 7.2974e-3
+  
   
   using namespace std;
   
@@ -76,8 +41,8 @@ Radiation: header
     typedef double (Radiation::*fPointer)(double, void *);
   
    private:
-    void CalculateLuminosityAndFlux(string mechanism, double e, double &l, 
-                                    double &f); 
+    void CalculateLuminosityAndFlux(string mechanism, double e, double &l,
+                                    double &f);
     double DifferentialEmissionComponent(double e, void *par);
     double GreyBody(double ephoton, double temp, double edens);
     double ICEmissivityRadFieldIntegrated(double x, void *par);
@@ -215,7 +180,6 @@ Radiation: header
                      ///used. 0 - random B-field (Gisellini 1988) 1 - regular
                      ///B-Field, with perpendicularly spiraling electron around
                      ///it. DEFAULT = 0
-    void Clear2DVector(vector< vector<double> > &v);
     double PPEmissivity(double x, void *par);
     double InelasticPPXSectionKaf(double Tp);
     double InclusivePPXSection(double Tp);
@@ -242,8 +206,7 @@ Radiation: header
     gsl_spline *ElectronLookup, *ProtonLookup, *TargetPhotonLookup,
         *TargetPhotonLookupEdens;
     void SetParticles(vector<vector<double> > PARTICLES, int type);
-    void AddToTargetPhotonVector(gsl_spline *Spl, double logEminSpl,
-                                 double logEmaxSpl, int stepsSpl);
+    void AddToTargetPhotonVector(vector< vector<double> > vint);
     void SetTargetPhotonVectorLookup();
     const gsl_interp_type *interp_type;
     vector<vector<double> > ICLossLookup;
@@ -295,7 +258,7 @@ Radiation: header
       BField = BFIELD;
     }  ///< set the source B-Field (G)
     void SetDistance(double d) {
-      distance = d;
+      distance = d*pc_to_cm;
     }  ///< set the distance to the source (cm)
     double GetDifferentialICFlux() { return fdiffic; }        ///< get FdiffIC
     double GetDifferentialSynchFlux() { return fdiffsynch; }  ///< get fdiffsynch
@@ -349,9 +312,7 @@ Radiation: header
     vector<vector<double> > GetICLossLookup() {
       return ICLossLookup;
     }  ///< return TotalTargetPhotonVector
-    void SetHadronicAmplificationFactor(double HADAMPFAC) {
-      hadronicAmpFactor = HADAMPFAC;
-    }  ///< set hadronicAmpFactor
+    double GetDistance() {return distance/pc_to_cm;}
     vector<vector<double> > GetTotalSpectrum(double emin = 0., double emax = 0.) {
       return ReturnDifferentialPhotonSpectrum(1, emin, emax);
     }  ///< return total spectrum
@@ -405,5 +366,6 @@ Radiation: header
        ///SynchModel docu for options.
     vector< vector<double> > GetProtonSED() {return GetParticleSED("protons");}
     vector< vector<double> > GetElectronSED() {return GetParticleSED("electrons");}
+    Utils *fUtils;
   };
   #endif

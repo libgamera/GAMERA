@@ -15,7 +15,6 @@ before_install:
 install: make gamera gappa tutorial1
 
 script: bin/TutorialLevel1 docu/turorial/TutorialLevel1Params.dat
-script: python docu/tutorial/TutorialLevel3.py docu/tutorial/TutorialLevel3Params.dat
 
 os:
   - linux
