@@ -41,17 +41,29 @@ via git::
 
 Manual download from `github <https://github.com/JoachimHahn/GAMERA>`_
 
+ .. note::
+
+   Installation of ``gappa``, the python-wrapped version of ``GAMERA``, via
+   ``pypi`` will be available soon.
 
 Building ``GAMERA``
 -------------------
-In the source directory run::
+To build the ``C++`` library, issue ::
 
-    $ make all
+    $ make gamera
 
-which will create the following libraries / modules:
+which will create ``lib/libgamera.so``.
 
-* ``lib/libgamera.so``
-* ``lib/_gamerapy.so`` , ``lib/gamerapy.py``
+If you want to build ``gappa``, run::
+
+    $ make gappa
+
+and you will get ``lib/_gappa.so`` and ``lib/gappa.py``.
+
+ .. warning::
+
+   On MacOS, building ``GAMERA`` is only supported with ``clang``
+
 
 Usage in ``C++``
 ----------------

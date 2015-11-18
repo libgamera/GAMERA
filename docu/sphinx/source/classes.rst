@@ -7,3 +7,4 @@ Class Documentation
    radiation
    particles
    utils
+   astro

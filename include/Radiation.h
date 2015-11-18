@@ -296,9 +296,7 @@ class Radiation {
                                                   ///radiation due to current
                                                   ///electron spectrum and
                                                   ///B-Field.
-  vector<vector<double> > GetTotalTargetPhotonVector() {
-    return TargetPhotonVector;
-  }              ///< return TotalTargetPhotonVector
+  vector<vector<double> > GetTargetPhotons();///< return TotalTargetPhotonVector
   void Reset();  ///< reset ParticleLookup, Electrons, Protons, fintbrems,
                  ///lintbrems, fintpp, lintpp, fintic, lintic
   void ToggleQuietMode() {

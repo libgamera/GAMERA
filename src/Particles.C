@@ -111,6 +111,11 @@ void Particles::CalculateParticleSpectrum(string type, bool onlyprepare,
     if (Type == 0) cout << "   (-> electrons)     " << endl;
     if (Type == 1) cout << "   (-> protons)     " << endl;
   }
+
+  if(!Age) {
+    cout << "Particles::CalculateParticleSpectrum: No age set! Exiting"
+         << endl;
+  }
   /* reset Particle Lookup */
   fUtils->Clear2DVector(ParticleSpectrum);
 

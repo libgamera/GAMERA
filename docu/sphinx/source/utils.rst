@@ -12,5 +12,3 @@ Here are the public class members and the source code
     utils_members
     utils_source
     utils_header
-
-

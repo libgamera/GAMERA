@@ -18,6 +18,8 @@
 #define TeV_to_erg 1.602
 /* GeV->erg */
 #define GeV_to_erg 1.602e-3
+/* eV->erg */
+#define eV_to_erg 1.602e-12
 /* Thomson cross section */
 #define sigma_T 6.6524e-25
 /* classical electron radius (cm) */

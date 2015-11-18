@@ -70,10 +70,30 @@ for i in xrange(len(lines)):
   out_file.write("  "+lines[i])
 out_file.close()
 
-# Particles source
+# Utils source
 out_file = open('utils_source.rst','w')
 lines = open(os.path.abspath('../../../src/Utils.C'),'r').readlines()
 out_file.write("Utils: source\n")
+out_file.write("=================\n\n")
+out_file.write(".. sourcecode:: C++\n\n")
+for i in xrange(len(lines)):
+  out_file.write("  "+lines[i])
+out_file.close()
+
+# Astro header
+out_file = open('astro_header.rst','w')
+lines = open(os.path.abspath('../../../include/Astro.h'),'r').readlines()
+out_file.write("Astro: header\n")
+out_file.write("=================\n\n")
+out_file.write(".. sourcecode:: C++\n\n")
+for i in xrange(len(lines)):
+  out_file.write("  "+lines[i])
+out_file.close()
+
+# Astro source
+out_file = open('astro_source.rst','w')
+lines = open(os.path.abspath('../../../src/Astro.C'),'r').readlines()
+out_file.write("Astro: source\n")
 out_file.write("=================\n\n")
 out_file.write(".. sourcecode:: C++\n\n")
 for i in xrange(len(lines)):
