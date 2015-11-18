@@ -12,7 +12,7 @@ else:
   COMPILEARGS=['-std=c++11']
 
 if sys.platform == 'darwin':
-  COMPILEARGS.append('-Wno-error=shorten-64-to-32')
+  COMPILEARGS.append('-w')
 
 extension_mod = Extension("_gappa",
                           ["_gappa.cc", "../src/Radiation.C","../src/Particles.C","../src/Utils.C","../src/Astro.C"],
