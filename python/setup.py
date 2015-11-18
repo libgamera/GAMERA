@@ -11,6 +11,9 @@ if(GSL_CFLAGS):
 else:
   COMPILEARGS=['-std=c++11']
 
+if sys.platform == 'darwin':
+  COMPILEARGS.append('-w')
+
 extension_mod = Extension("_gappa",
                           ["_gappa.cc", "../src/Radiation.C","../src/Particles.C","../src/Utils.C","../src/Astro.C"],
                           extra_compile_args=COMPILEARGS,
