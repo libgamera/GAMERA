@@ -1437,3 +1437,14 @@ Radiation: source
     gsl_integration_workspace_free(w);
     return integral;
   }
+  
+  vector<vector<double> > Radiation::GetTargetPhotons() {
+    vector< vector<double> >  vint;
+    unsigned int size = TargetPhotonVector.size();
+    for(unsigned int i = 0 ; i < size ; i++) {
+      double e = pow(10.,TargetPhotonVector[i][0]);
+      double n = pow(10.,TargetPhotonVector[i][1]);
+      fUtils->TwoDVectorPushBack(e,n,vint);
+    }
+    return vint;
+  }
