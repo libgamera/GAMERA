@@ -95,6 +95,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="particles.html">Particles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="astro.html">Astro</a></li>
 </ul>
 </li>
 </ul>
@@ -150,47 +151,12 @@
 <div class="highlight-C++"><div class="highlight"><pre><span class="cp">#ifndef _RADIATION_</span>
 <span class="cp">#define _RADIATION_</span>
 
-<span class="cp">#include &lt;math.h&gt;</span>
-<span class="cp">#include &lt;iostream&gt;</span>
-<span class="cp">#include &lt;stdlib.h&gt;</span>
-<span class="cp">#include &lt;fstream&gt;</span>
-<span class="cp">#include &lt;vector&gt;</span>
+<span class="cp">#include &quot;Utils.h&quot;</span>
 <span class="cp">#include &lt;gsl/gsl_sf_bessel.h&gt;</span>
 <span class="cp">#include &lt;gsl/gsl_integration.h&gt;</span>
 <span class="cp">#include &lt;gsl/gsl_spline.h&gt;</span>
 
-<span class="cm">/* TeV-&gt;erg */</span>
-<span class="cp">#define TeV_to_erg 1.602</span>
-<span class="cm">/* GeV-&gt;erg */</span>
-<span class="cp">#define GeV_to_erg 1.602e-3</span>
-<span class="cm">/* Thomson cross section */</span>
-<span class="cp">#define sigma_T 6.6524e-25</span>
-<span class="cm">/* electron mass in erg */</span>
-<span class="cp">#define m_e 8.187e-7</span>
-<span class="cm">/* boltzmann constant (erg/K) */</span>
-<span class="cp">#define kb 1.380658e-16</span>
-<span class="cm">/* proton mass in erg */</span>
-<span class="cp">#define m_p 1.50310854e-3</span>
-<span class="cm">/* pi0 mass in erg */</span>
-<span class="cp">#define m_pi 2.1622194e-4</span>
-<span class="cm">/* parsec to cm */</span>
-<span class="cp">#define pc_to_cm 3.0857e18</span>
-<span class="cm">/* well... pi! */</span>
-<span class="cp">#define pi 3.1416</span>
-<span class="cm">/* year in seconds */</span>
-<span class="cp">#define yr_to_sec 3.15576e7</span>
-<span class="cm">/* solar mass */</span>
-<span class="cp">#define mSol 1.9891e33</span>
-<span class="cm">/* speed of light cm/s */</span>
-<span class="cp">#define c_speed 29979245800.</span>
-<span class="cm">/* elementary charge */</span>
-<span class="cp">#define el_charge 4.80320427e-10</span>
-<span class="cm">/* classical electron radius (cm) */</span>
-<span class="cp">#define e_radius 2.8179e-13</span>
-<span class="cm">/* planck&#39;s constant */</span>
-<span class="cp">#define hp 6.62606896e-27</span>
-<span class="cm">/* fine structure constant */</span>
-<span class="cp">#define fineStructConst 7.2974e-3</span>
+
 
 <span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
 
@@ -359,7 +325,6 @@
                    <span class="c1">///used. 0 - random B-field (Gisellini 1988) 1 - regular</span>
                    <span class="c1">///B-Field, with perpendicularly spiraling electron around</span>
                    <span class="c1">///it. DEFAULT = 0</span>
-  <span class="kt">void</span> <span class="nf">Clear2DVector</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">v</span><span class="p">);</span>
   <span class="kt">double</span> <span class="nf">PPEmissivity</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">par</span><span class="p">);</span>
   <span class="kt">double</span> <span class="nf">InelasticPPXSectionKaf</span><span class="p">(</span><span class="kt">double</span> <span class="n">Tp</span><span class="p">);</span>
   <span class="kt">double</span> <span class="nf">InclusivePPXSection</span><span class="p">(</span><span class="kt">double</span> <span class="n">Tp</span><span class="p">);</span>
@@ -386,8 +351,7 @@
   <span class="n">gsl_spline</span> <span class="o">*</span><span class="n">ElectronLookup</span><span class="p">,</span> <span class="o">*</span><span class="n">ProtonLookup</span><span class="p">,</span> <span class="o">*</span><span class="n">TargetPhotonLookup</span><span class="p">,</span>
       <span class="o">*</span><span class="n">TargetPhotonLookupEdens</span><span class="p">;</span>
   <span class="kt">void</span> <span class="nf">SetParticles</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">PARTICLES</span><span class="p">,</span> <span class="kt">int</span> <span class="n">type</span><span class="p">);</span>
-  <span class="kt">void</span> <span class="nf">AddToTargetPhotonVector</span><span class="p">(</span><span class="n">gsl_spline</span> <span class="o">*</span><span class="n">Spl</span><span class="p">,</span> <span class="kt">double</span> <span class="n">logEminSpl</span><span class="p">,</span>
-                               <span class="kt">double</span> <span class="n">logEmaxSpl</span><span class="p">,</span> <span class="kt">int</span> <span class="n">stepsSpl</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="nf">AddToTargetPhotonVector</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">vint</span><span class="p">);</span>
   <span class="kt">void</span> <span class="nf">SetTargetPhotonVectorLookup</span><span class="p">();</span>
   <span class="k">const</span> <span class="n">gsl_interp_type</span> <span class="o">*</span><span class="n">interp_type</span><span class="p">;</span>
   <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">ICLossLookup</span><span class="p">;</span>
@@ -439,7 +403,7 @@
     <span class="n">BField</span> <span class="o">=</span> <span class="n">BFIELD</span><span class="p">;</span>
   <span class="p">}</span>  <span class="c1">///&lt; set the source B-Field (G)</span>
   <span class="kt">void</span> <span class="nf">SetDistance</span><span class="p">(</span><span class="kt">double</span> <span class="n">d</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">distance</span> <span class="o">=</span> <span class="n">d</span><span class="p">;</span>
+    <span class="n">distance</span> <span class="o">=</span> <span class="n">d</span><span class="o">*</span><span class="n">pc_to_cm</span><span class="p">;</span>
   <span class="p">}</span>  <span class="c1">///&lt; set the distance to the source (cm)</span>
   <span class="kt">double</span> <span class="nf">GetDifferentialICFlux</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">fdiffic</span><span class="p">;</span> <span class="p">}</span>        <span class="c1">///&lt; get FdiffIC</span>
   <span class="kt">double</span> <span class="nf">GetDifferentialSynchFlux</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">fdiffsynch</span><span class="p">;</span> <span class="p">}</span>  <span class="c1">///&lt; get fdiffsynch</span>
@@ -482,10 +446,8 @@
                                                   <span class="c1">///radiation due to current</span>
                                                   <span class="c1">///electron spectrum and</span>
                                                   <span class="c1">///B-Field.</span>
-  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetTotalTargetPhotonVector</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">TargetPhotonVector</span><span class="p">;</span>
-  <span class="p">}</span>              <span class="c1">///&lt; return TotalTargetPhotonVector</span>
-  <span class="kt">void</span> <span class="n">Reset</span><span class="p">();</span>  <span class="c1">///&lt; reset ParticleLookup, Electrons, Protons, fintbrems,</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetTargetPhotons</span><span class="p">();</span><span class="c1">///&lt; return TotalTargetPhotonVector</span>
+  <span class="kt">void</span> <span class="nf">Reset</span><span class="p">();</span>  <span class="c1">///&lt; reset ParticleLookup, Electrons, Protons, fintbrems,</span>
                  <span class="c1">///lintbrems, fintpp, lintpp, fintic, lintic</span>
   <span class="kt">void</span> <span class="nf">ToggleQuietMode</span><span class="p">()</span> <span class="p">{</span>
     <span class="n">QUIETMODE</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
@@ -493,9 +455,7 @@
   <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetICLossLookup</span><span class="p">()</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">ICLossLookup</span><span class="p">;</span>
   <span class="p">}</span>  <span class="c1">///&lt; return TotalTargetPhotonVector</span>
-  <span class="kt">void</span> <span class="n">SetHadronicAmplificationFactor</span><span class="p">(</span><span class="kt">double</span> <span class="n">HADAMPFAC</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">hadronicAmpFactor</span> <span class="o">=</span> <span class="n">HADAMPFAC</span><span class="p">;</span>
-  <span class="p">}</span>  <span class="c1">///&lt; set hadronicAmpFactor</span>
+  <span class="kt">double</span> <span class="n">GetDistance</span><span class="p">()</span> <span class="p">{</span><span class="k">return</span> <span class="n">distance</span><span class="o">/</span><span class="n">pc_to_cm</span><span class="p">;}</span>
   <span class="n">vector</span><span class="o">&lt;</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetTotalSpectrum</span><span class="p">(</span><span class="kt">double</span> <span class="n">emin</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="kt">double</span> <span class="n">emax</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">ReturnDifferentialPhotonSpectrum</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">emin</span><span class="p">,</span> <span class="n">emax</span><span class="p">);</span>
   <span class="p">}</span>  <span class="c1">///&lt; return total spectrum</span>
@@ -549,6 +509,7 @@
      <span class="c1">///SynchModel docu for options.</span>
   <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetProtonSED</span><span class="p">()</span> <span class="p">{</span><span class="k">return</span> <span class="n">GetParticleSED</span><span class="p">(</span><span class="s">&quot;protons&quot;</span><span class="p">);}</span>
   <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetElectronSED</span><span class="p">()</span> <span class="p">{</span><span class="k">return</span> <span class="n">GetParticleSED</span><span class="p">(</span><span class="s">&quot;electrons&quot;</span><span class="p">);}</span>
+  <span class="n">Utils</span> <span class="o">*</span><span class="n">fUtils</span><span class="p">;</span>
 <span class="p">};</span>
 <span class="cp">#endif</span>
 </pre></div>

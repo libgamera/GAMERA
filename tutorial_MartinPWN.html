@@ -93,6 +93,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="">Level 5: The PWN model by Martin et al. 2012</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#population-synthesis">Population Synthesis</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="classes.html">Class Documentation</a></li>
@@ -145,8 +146,12 @@
   <div class="section" id="level-5-the-pwn-model-by-martin-et-al-2012">
 <h1>Level 5: The PWN model by Martin et al. 2012<a class="headerlink" href="#level-5-the-pwn-model-by-martin-et-al-2012" title="Permalink to this headline">¶</a></h1>
 <p>Now we have learned everything that is needed for writing a real time-dependent
-astrophysical source model. In the following, the model by Martin et al. 2012
-will be implemented in <code class="docutils literal"><span class="pre">GAMERA</span></code>.</p>
+astrophysical source model. In the following, the model by Martin et al.
+(Martin J., Torres D. F., &amp; Rea N. 2012, MNRAS 427, 415),
+(Torres, D. F., Cillis, A., Martin, J., &amp; de Ona Wilhelmi, E. 2014,
+Journal of High Energy Astrophysics, 1, 31).</p>
+<p>Again, <code class="docutils literal"><span class="pre">python</span></code>-script and parameter file are located in the
+<code class="docutils literal"><span class="pre">docu/tutorial/</span></code> directory.</p>
 <p>In principle, the whole model-specific physics is in the function that fills
 the parameter lookups, and so changing this function is all that has to be changed.
 To that end, we replace the <code class="docutils literal"><span class="pre">GetSpindownStuff</span></code> function from level 4 by</p>
@@ -181,17 +186,23 @@ energy losses).</p>
 </div>
 </div></blockquote>
 <ul class="simple">
-<li>one additional command has to be used in order to get the Synchtroton-Self-Compton (SSC)
+<li>these additional commands have to be used in order to get the Synchtroton-Self-Compton (SSC)
 component and to set the source radius and extension velocity parameter lookups:</li>
 </ul>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span class="n">fr</span><span class="o">.</span><span class="n">SetSSCTargetPhotons</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">GetRadius</span><span class="p">())</span>
-<span class="n">fp</span><span class="o">.</span><span class="n">SetRadiusLookup</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">fp</span><span class="o">.</span><span class="n">SetRadiusLookup</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 <span class="n">fp</span><span class="o">.</span><span class="n">SetVelocityLookup</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="n">fr</span><span class="o">.</span><span class="n">SetSSCTargetPhotons</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">GetRadius</span><span class="p">())</span>
 </pre></div>
 </div>
 </div></blockquote>
 </div></blockquote>
+<div class="admonition hint">
+<p class="first admonition-title">Hint</p>
+<p class="last">In this example, the SSC target field is <em>not</em> used for calculating the energy
+losses. To remove this caveat you have to iterate in time and pass the
+SSC radiation field to the particles object in each step.</p>
+</div>
 <p>The calculation will take a couple of minutes because the B-field strength and
 maximum electron energies are insane at times earlier than several hundreds of
 years</p>

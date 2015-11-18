@@ -94,6 +94,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html">Utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="astro.html">Astro</a></li>
 </ul>
 </li>
 </ul>
@@ -149,46 +150,10 @@
 <div class="highlight-C++"><div class="highlight"><pre><span class="cp">#ifndef _PARTICLES_</span>
 <span class="cp">#define _PARTICLES_</span>
 
-<span class="cp">#include &lt;cmath&gt;</span>
-<span class="cp">#include &lt;iostream&gt;</span>
-<span class="cp">#include &lt;stdlib.h&gt;</span>
-<span class="cp">#include &lt;fstream&gt;</span>
-<span class="cp">#include &lt;vector&gt;</span>
+<span class="cp">#include &quot;Utils.h&quot;</span>
 <span class="cp">#include &lt;gsl/gsl_integration.h&gt;</span>
 <span class="cp">#include &lt;gsl/gsl_spline.h&gt;</span>
 
-<span class="cm">/* TeV-&gt;erg */</span>
-<span class="cp">#define TeV_to_erg 1.602</span>
-<span class="cm">/* GeV-&gt;erg */</span>
-<span class="cp">#define GeV_to_erg 1.602e-3</span>
-<span class="cm">/* Thomson cross section */</span>
-<span class="cp">#define sigma_T 6.6524e-25</span>
-<span class="cm">/* electron mass in erg */</span>
-<span class="cp">#define m_e 8.187e-7</span>
-<span class="cm">/* boltzmann constant (erg/K) */</span>
-<span class="cp">#define kb 1.380658e-16</span>
-<span class="cm">/* proton mass in erg */</span>
-<span class="cp">#define m_p 1.50310854e-3</span>
-<span class="cm">/* pi0 mass in erg */</span>
-<span class="cp">#define m_pi 2.1622194e-4</span>
-<span class="cm">/* parsec to cm */</span>
-<span class="cp">#define pc_to_cm 3.0857e18</span>
-<span class="cm">/* well... pi! */</span>
-<span class="cp">#define pi 3.1416</span>
-<span class="cm">/* year in seconds */</span>
-<span class="cp">#define yr_to_sec 3.15576e7</span>
-<span class="cm">/* solar mass */</span>
-<span class="cp">#define mSol 1.9891e33</span>
-<span class="cm">/* speed of light cm/s */</span>
-<span class="cp">#define c_speed 29979245800.</span>
-<span class="cm">/* elementary charge */</span>
-<span class="cp">#define el_charge 4.80320427e-10</span>
-<span class="cm">/* classical electron radius (cm) */</span>
-<span class="cp">#define eRadius 2.8179e-13</span>
-<span class="cm">/* planck&#39;s constant */</span>
-<span class="cp">#define hp 6.62606896e-27</span>
-<span class="cm">/* fine structure constant */</span>
-<span class="cp">#define fineStructConst 7.2974e-3</span>
 
 <span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
 
@@ -207,20 +172,7 @@
 <span class="cm"> * distribution of</span>
 <span class="cm"> *   particles is made whatsoever.</span>
 <span class="cm"> */</span>
-<span class="c1">// class gsl_function_pp : public gsl_function</span>
-<span class="c1">// {</span>
-<span class="c1">//    public:</span>
-<span class="c1">//    gsl_function_pp(std::function&lt;double(double,void*)&gt; const&amp; func) :</span>
-<span class="c1">// _func(func){</span>
-<span class="c1">//      function=&amp;gsl_function_pp::invoke;</span>
-<span class="c1">//      params=this;</span>
-<span class="c1">//    }</span>
-<span class="c1">//    private:</span>
-<span class="c1">//    std::function&lt;double(double,void*)&gt; _func;</span>
-<span class="c1">//    static double invoke(double x, void *params) {</span>
-<span class="c1">//     return static_cast&lt;gsl_function_pp*&gt;(params)-&gt;_func(x,params);</span>
-<span class="c1">//   }</span>
-<span class="c1">//};</span>
+
 
 <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">&gt;</span>
 <span class="k">class</span> <span class="nc">GSLfuncPart</span> <span class="o">:</span> <span class="k">public</span> <span class="n">gsl_function</span> <span class="p">{</span>
@@ -241,6 +193,7 @@
   <span class="k">typedef</span> <span class="kt">double</span> <span class="p">(</span><span class="n">Particles</span><span class="o">::*</span><span class="n">fPointer</span><span class="p">)(</span><span class="kt">double</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="p">);</span>
 
  <span class="k">private</span><span class="o">:</span>
+  <span class="n">Utils</span> <span class="o">*</span><span class="n">fUtils</span><span class="p">;</span>
   <span class="kt">int</span> <span class="n">Type</span><span class="p">;</span>  <span class="c1">///&lt; integer indicating particle type. supported: 0-electrons and</span>
              <span class="c1">///1-protons</span>
   <span class="kt">double</span> <span class="n">theta</span><span class="p">;</span>           <span class="c1">///&lt; CR acceleration efficiency</span>
@@ -420,7 +373,6 @@
                                          <span class="c1">///optionally with the &#39;Superbee&#39;-Slope</span>
                                          <span class="c1">///limiter</span>
   <span class="kt">void</span> <span class="nf">FillEnergyTrajectoryLookup</span><span class="p">();</span>
-  <span class="kt">void</span> <span class="nf">Clear2DVector</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">v</span><span class="p">);</span>
   <span class="kt">double</span> <span class="nf">CalcSpecSemiAnalyticConstELossIntegrand</span><span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">par</span><span class="p">);</span>
   <span class="kt">void</span> <span class="nf">CalcSpecSemiAnalyticConstELoss</span><span class="p">();</span>
   <span class="kt">void</span> <span class="nf">CalcSpecSemiAnalyticNoELoss</span><span class="p">();</span>

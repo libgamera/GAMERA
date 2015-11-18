@@ -148,7 +148,7 @@
 </ul>
 <p><strong>on Ubuntu</strong></p>
 <p>using apt:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ sudo apt-get install libgsl0ldbl libgsl0-dev libocamlgsl-ocaml libocamlgsl-ocaml-dev swig
+<div class="highlight-python"><div class="highlight"><pre>$ sudo apt-get install libgsl0ldbl libgsl0-dev python-dev swig
 </pre></div>
 </div>
 <p>(optional):</p>
@@ -174,18 +174,32 @@ $ pip install sphinx breathe
 </pre></div>
 </div>
 <p>Manual download from <a class="reference external" href="https://github.com/JoachimHahn/GAMERA">github</a></p>
+<blockquote>
+<div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Installation of <code class="docutils literal"><span class="pre">gappa</span></code>, the python-wrapped version of <code class="docutils literal"><span class="pre">GAMERA</span></code>, via
+<code class="docutils literal"><span class="pre">pypi</span></code> will be available soon.</p>
+</div>
+</div></blockquote>
 </div>
 <div class="section" id="building-gamera">
 <h2>Building <code class="docutils literal"><span class="pre">GAMERA</span></code><a class="headerlink" href="#building-gamera" title="Permalink to this headline">¶</a></h2>
-<p>In the source directory run:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ make all
+<p>To build the <code class="docutils literal"><span class="pre">C++</span></code> library, issue</p>
+<div class="highlight-python"><div class="highlight"><pre>$ make gamera
 </pre></div>
 </div>
-<p>which will create the following libraries / modules:</p>
-<ul class="simple">
-<li><code class="docutils literal"><span class="pre">lib/libgamera.so</span></code></li>
-<li><code class="docutils literal"><span class="pre">lib/_gamerapy.so</span></code> , <code class="docutils literal"><span class="pre">lib/gamerapy.py</span></code></li>
-</ul>
+<p>which will create <code class="docutils literal"><span class="pre">lib/libgamera.so</span></code>.</p>
+<p>If you want to build <code class="docutils literal"><span class="pre">gappa</span></code>, run:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ make gappa
+</pre></div>
+</div>
+<p>and you will get <code class="docutils literal"><span class="pre">lib/_gappa.so</span></code> and <code class="docutils literal"><span class="pre">lib/gappa.py</span></code>.</p>
+<blockquote>
+<div><div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">On MacOS, building <code class="docutils literal"><span class="pre">GAMERA</span></code> is only supported with <code class="docutils literal"><span class="pre">clang</span></code></p>
+</div>
+</div></blockquote>
 </div>
 <div class="section" id="usage-in-c">
 <h2>Usage in <code class="docutils literal"><span class="pre">C++</span></code><a class="headerlink" href="#usage-in-c" title="Permalink to this headline">¶</a></h2>

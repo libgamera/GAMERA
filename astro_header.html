@@ -1,0 +1,463 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Astro: header &mdash; GAMERA 0.9 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="GAMERA 0.9 documentation" href="index.html"/>
+        <link rel="up" title="Astro" href="astro.html"/>
+        <link rel="prev" title="Astro: source" href="astro_source.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> GAMERA
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.9
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation and Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="classes.html">Class Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="radiation.html">Radiation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="particles.html">Particles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utils</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="astro.html">Astro</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="astro_source.html">Astro: source</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">Astro: header</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">GAMERA</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="classes.html">Class Documentation</a> &raquo;</li>
+      
+          <li><a href="astro.html">Astro</a> &raquo;</li>
+      
+    <li>Astro: header</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/astro_header.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="astro-header">
+<h1>Astro: header<a class="headerlink" href="#astro-header" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-C++"><div class="highlight"><pre><span class="cp">#ifndef _ASTRO_</span>
+<span class="cp">#define _ASTRO_</span>
+
+<span class="cp">#include &quot;Utils.h&quot;</span>
+
+<span class="cm">/* TeV-&gt;erg */</span>
+<span class="cp">#define TeV_to_erg 1.602</span>
+<span class="cm">/* parsec to cm */</span>
+<span class="cp">#define pc_to_cm 3.0857e18</span>
+<span class="cm">/* kiloparsec to cm */</span>
+<span class="cp">#define kpc_to_cm 3.0857e21</span>
+<span class="cm">/* proton mass in g */</span>
+<span class="cp">#define m_p_g 1.6726e-24</span>
+<span class="cm">/* well... pi! */</span>
+<span class="cp">#define pi 3.1416</span>
+<span class="cm">/* year in seconds */</span>
+<span class="cp">#define yr_to_sec 3.15576e7</span>
+<span class="cm">/* solar mass */</span>
+<span class="cp">#define mSol 1.9891e33</span>
+<span class="cm">/* Thomson cross section */</span>
+<span class="cp">#define sigma_T 6.6524e-25</span>
+<span class="cm">/* electron mass in erg */</span>
+<span class="cp">#define m_e 8.187e-7</span>
+<span class="cm">/* boltzmann constant (erg/K) */</span>
+<span class="cp">#define kb 1.380658e-16</span>
+<span class="cm">/* proton mass in erg */</span>
+<span class="cp">#define m_p 1.50310854e-3</span>
+<span class="cm">/* pi0 mass in erg */</span>
+<span class="cp">#define m_pi 2.1622194e-4</span>
+<span class="cm">/* parsec to cm */</span>
+<span class="cp">#define pc_to_cm 3.0857e18</span>
+<span class="cm">/* well... pi! */</span>
+<span class="cp">#define pi 3.1416</span>
+<span class="cm">/* year in seconds */</span>
+<span class="cp">#define yr_to_sec 3.15576e7</span>
+<span class="cm">/* solar mass */</span>
+<span class="cp">#define mSol 1.9891e33</span>
+<span class="cm">/* speed of light cm/s */</span>
+<span class="cp">#define c_speed 29979245800.</span>
+<span class="cm">/* elementary charge */</span>
+<span class="cp">#define el_charge 4.80320427e-10</span>
+<span class="cm">/* classical electron radius (cm) */</span>
+<span class="cp">#define eRadius 2.8179e-13</span>
+<span class="cm">/* planck&#39;s constant */</span>
+<span class="cp">#define hp 6.62606896e-27</span>
+<span class="cm">/* fine structure constant */</span>
+<span class="cp">#define fineStructConst 7.2974e-3</span>
+<span class="cm">/* hour in seconds */</span>
+<span class="cp">#define h_to_sec 3.6e3</span>
+<span class="cm">/* pc to lyr */</span>
+<span class="cp">#define pc_to_lyr 3.26156</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * @file Astro.C</span>
+<span class="cm"> * @author Joachim Hahn</span>
+<span class="cm"> * @short Class that provides utility functions</span>
+<span class="cm"> * Provides different things, mainly useful for population studies.</span>
+<span class="cm"> * This includes spiral galaxy models as well as gas distributions,</span>
+<span class="cm"> * B-Field distributions, coordinate transformations etc.</span>
+<span class="cm"> * Also includes more technical functions that are helpful in writing</span>
+<span class="cm"> * GAMERA programs.</span>
+<span class="cm"> */</span>
+
+<span class="k">class</span> <span class="nc">Astro</span>  <span class="p">{</span>
+  <span class="k">private</span><span class="o">:</span>
+    <span class="n">Utils</span> <span class="o">*</span><span class="n">fUtils</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">ClosestArm</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">DistanceFromClosestArm</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">x_a1</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">y_a1</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">x_a2</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">y_a2</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">x_a3</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">y_a3</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">x_a4</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span>
+    <span class="kt">double</span> <span class="n">y_a4</span><span class="p">[</span><span class="mi">7</span><span class="p">];</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">gsl_spline</span><span class="o">*&gt;</span> <span class="n">TaylorCordesArms</span><span class="p">,</span><span class="n">TaylorCordesArmsInv</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">psi0V</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">theta0V</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">r0V</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">ArmsVector</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">barRadius</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">barAngle</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">armWidth</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">scaleHeight</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="n">QUIETMODE</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">rMax</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">rMinInternalBoundary</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">rMaxInternalBoundary</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">tMinInternalBoundary</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">tMaxInternalBoundary</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">SPIRALARMMODEL</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">SURFACEDENSITYMODEL</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">CENTRALSTRUCTUREMODEL</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">MAINSEQUENCEWINDBUBBLEMODEL</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">MSBUBBLEMODEL</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="n">GAMERAALREADYONTHECONSOLE</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="n">WRAPPINGHAPPENED</span><span class="p">;</span>
+    <span class="n">gsl_spline</span> <span class="o">*</span><span class="n">TaylorCordesArm1</span><span class="p">,</span><span class="o">*</span><span class="n">TaylorCordesArm2</span><span class="p">,</span><span class="o">*</span><span class="n">TaylorCordesArm3</span><span class="p">,</span>
+               <span class="o">*</span><span class="n">TaylorCordesArm4</span><span class="p">,</span><span class="o">*</span><span class="n">TaylorCordesArm1Inv</span><span class="p">,</span><span class="o">*</span><span class="n">TaylorCordesArm2Inv</span><span class="p">,</span>
+               <span class="o">*</span><span class="n">TaylorCordesArm3Inv</span><span class="p">,</span><span class="o">*</span><span class="n">TaylorCordesArm4Inv</span><span class="p">,</span>
+               <span class="o">*</span><span class="n">thinshellvelocitylookup</span><span class="p">,</span><span class="o">*</span><span class="n">thinshellradiuslookup</span><span class="p">,</span>
+               <span class="o">*</span><span class="n">r_edreverselookup</span><span class="p">,</span><span class="o">*</span><span class="n">v_edreverselookup</span><span class="p">,</span><span class="o">*</span><span class="n">r_edforwardlookup</span><span class="p">,</span>
+               <span class="o">*</span><span class="n">v_edforwardlookup</span><span class="p">,</span><span class="o">*</span><span class="n">r_streverselookup</span><span class="p">,</span><span class="o">*</span><span class="n">v_streverselookup</span><span class="p">,</span>
+               <span class="o">*</span><span class="n">r_stforwardlookup</span><span class="p">,</span><span class="o">*</span><span class="n">v_stforwardlookup</span><span class="p">;</span>
+    <span class="n">gsl_interp_accel</span> <span class="o">*</span><span class="n">accArm1</span><span class="p">,</span><span class="o">*</span><span class="n">accArm2</span><span class="p">,</span><span class="o">*</span><span class="n">accArm3</span><span class="p">,</span><span class="o">*</span><span class="n">accArm4</span><span class="p">,</span>
+                     <span class="o">*</span><span class="n">accArm1Inv</span><span class="p">,</span><span class="o">*</span><span class="n">accArm2Inv</span><span class="p">,</span><span class="o">*</span><span class="n">accArm3Inv</span><span class="p">,</span><span class="o">*</span><span class="n">accArm4Inv</span><span class="p">,</span>
+                     <span class="o">*</span><span class="n">atsrad</span><span class="p">,</span><span class="o">*</span><span class="n">atsvel</span><span class="p">,</span><span class="o">*</span><span class="n">aredr</span><span class="p">,</span><span class="o">*</span><span class="n">avedr</span><span class="p">,</span><span class="o">*</span><span class="n">aredf</span><span class="p">,</span><span class="o">*</span><span class="n">avedf</span><span class="p">,</span><span class="o">*</span><span class="n">arstr</span><span class="p">,</span>
+                     <span class="o">*</span><span class="n">avstr</span><span class="p">,</span><span class="o">*</span><span class="n">arstf</span><span class="p">,</span><span class="o">*</span><span class="n">avstf</span><span class="p">;</span>
+
+
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">forwardshockradiusprofile</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">forwardshockvelocityprofile</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">reverseshockradiusprofile</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">reverseshockvelocityprofile</span><span class="p">;</span>
+
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">thinshellradius</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">thinshellvelocity</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">thinshellsolutiontmin</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">thinshellsolutiontmax</span><span class="p">;</span>
+
+    <span class="kt">double</span> <span class="n">truelovemckeetminfed</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">truelovemckeetminfst</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">truelovemckeetmaxfed</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">truelovemckeetmaxfst</span><span class="p">;</span>
+
+    <span class="kt">double</span> <span class="n">truelovemckeetminred</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">truelovemckeetminrst</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">truelovemckeetmaxred</span><span class="p">;</span>
+    <span class="kt">double</span> <span class="n">truelovemckeetmaxrst</span><span class="p">;</span>
+
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">truelovemckeeparams</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">r_edforward</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">v_edforward</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">r_edreverse</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">v_edreverse</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">r_stforward</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">v_stforward</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">r_streverse</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">v_streverse</span><span class="p">;</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">TrueloveMcKeeRadiusAndSpeed</span><span class="p">(</span><span class="kt">double</span> <span class="n">t</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">REVERSE</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="nf">TrueloveMcKeeEjectaDominatedForwardShock</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span>
+                                                 <span class="kt">double</span> <span class="o">&amp;</span><span class="n">Y</span><span class="p">,</span><span class="kt">double</span> <span class="o">&amp;</span><span class="n">V</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="nf">TrueloveMcKeeEjectaDominatedReverseShock</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span>
+                                                 <span class="kt">double</span> <span class="o">&amp;</span><span class="n">Y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">V</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="nf">TrueloveMcKeeSedovTaylorPhaseForwardShock</span><span class="p">(</span><span class="kt">double</span> <span class="n">t</span><span class="p">,</span>
+                                                  <span class="kt">double</span> <span class="o">&amp;</span><span class="n">R</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">V</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="nf">TrueloveMcKeeSedovTaylorPhaseReverseShock</span><span class="p">(</span><span class="kt">double</span> <span class="n">t</span><span class="p">,</span>
+                                                  <span class="kt">double</span> <span class="o">&amp;</span><span class="n">R</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">V</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="nf">CalculateTrueLoveMcKeeParams</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">pars</span><span class="p">);</span>
+  <span class="k">public</span><span class="o">:</span>
+    <span class="n">Astro</span><span class="p">();</span>
+    <span class="o">~</span><span class="n">Astro</span><span class="p">();</span>
+    <span class="kt">void</span> <span class="nf">DisableArm</span><span class="p">(</span><span class="kt">int</span> <span class="n">arm</span><span class="p">);</span><span class="c1">///&lt; Switch off an individual arm in Galaxy spiral model</span>
+    <span class="kt">void</span> <span class="nf">EnableArm</span><span class="p">(</span><span class="kt">int</span> <span class="n">arm</span><span class="p">);</span><span class="c1">///&lt; Switch on an individual arm in Galaxy spiral model</span>
+    <span class="kt">double</span> <span class="nf">RandomSalpeterInitialMass</span><span class="p">();</span><span class="c1">///&lt; Dice an initial star mass following the Salpeter law</span>
+    <span class="kt">double</span> <span class="nf">MainSequenceBubbleRadius</span><span class="p">(</span><span class="kt">double</span> <span class="n">mDotMS</span><span class="p">,</span> <span class="kt">double</span> <span class="n">vMSWind</span><span class="p">,</span> <span class="kt">double</span> <span class="n">timeMS</span><span class="p">,</span> <span class="kt">double</span> <span class="n">n</span><span class="p">,</span> <span class="kt">double</span> <span class="n">initialMass</span><span class="p">);</span><span class="c1">///&lt; calculate the radius created by the main sequence wind of a star</span>
+    <span class="kt">double</span> <span class="nf">CalculateMSBubbleDensity</span><span class="p">(</span><span class="kt">double</span> <span class="n">mDotMS</span><span class="p">,</span> <span class="kt">double</span> <span class="n">vMSWind</span><span class="p">,</span> <span class="kt">double</span> <span class="n">timeMS</span><span class="p">,</span> <span class="kt">double</span> <span class="n">n</span><span class="p">,</span> <span class="kt">double</span> <span class="n">bubbleRadius</span><span class="p">);</span><span class="c1">///&lt; Density inside the main-sequence wind blown bubble.</span>
+    <span class="kt">double</span> <span class="nf">CalculateTimeOnMainSequence</span><span class="p">(</span><span class="kt">double</span> <span class="n">initialMass</span><span class="p">);</span><span class="c1">///&lt; Time on the main sequence in years as a function of initial star mass</span>
+    <span class="kt">double</span> <span class="nf">CalculateMSMassLuminosity</span><span class="p">(</span><span class="kt">double</span> <span class="n">initialMass</span><span class="p">);</span><span class="c1">///&lt; Main sequence wind mass luminosity as a function of initial star mass</span>
+    <span class="kt">double</span> <span class="nf">CalculateMSWindSpeed</span><span class="p">(</span><span class="kt">double</span> <span class="n">initialMass</span><span class="p">);</span><span class="c1">///&lt; Main sequence wind speed as a function of initial star mass</span>
+    <span class="kt">double</span> <span class="nf">CalculateRGWRadius</span><span class="p">(</span><span class="kt">double</span> <span class="n">pBubble</span><span class="p">,</span> <span class="kt">double</span> <span class="n">mDotRGW</span><span class="p">,</span> <span class="kt">double</span> <span class="n">vRGWind</span><span class="p">);</span><span class="c1">///&lt; Radius of the red giant wind zone</span>
+    <span class="kt">void</span> <span class="nf">CalculateBField</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">z</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">B_tot</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">B_coh</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">B_ord</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">B_iso</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">regFieldDirection</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">isoFieldDirection</span><span class="p">);</span><span class="c1">///&lt; 2D-Model of the large-scale galactic magnetic field structure</span>
+    <span class="kt">double</span> <span class="nf">HIDensity</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">z</span><span class="p">);</span><span class="c1">///&lt; TODO:COMMENT</span>
+    <span class="kt">double</span> <span class="nf">H2Density</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">z</span><span class="p">);</span><span class="c1">///&lt; TODO:COMMENT</span>
+    <span class="kt">double</span> <span class="nf">CalculateHINorm</span><span class="p">(</span><span class="kt">double</span> <span class="n">R</span><span class="p">);</span><span class="c1">///&lt; TODO:COMMENT</span>
+    <span class="kt">double</span> <span class="nf">CalculateH2Norm</span><span class="p">(</span><span class="kt">double</span> <span class="n">R</span><span class="p">);</span><span class="c1">///&lt; TODO:COMMENT</span>
+    <span class="kt">double</span> <span class="nf">GetHIColumnDensity</span><span class="p">(</span><span class="kt">double</span> <span class="n">R</span><span class="p">);</span><span class="c1">///&lt; TODO:COMMENT</span>
+    <span class="kt">double</span> <span class="nf">GetH2ColumnDensity</span><span class="p">(</span><span class="kt">double</span> <span class="n">R</span><span class="p">);</span><span class="c1">///&lt; TODO:COMMENT</span>
+    <span class="kt">double</span> <span class="nf">GetHIFWHM</span><span class="p">(</span><span class="kt">double</span> <span class="n">R</span><span class="p">);</span><span class="c1">///&lt; TODO:COMMENT</span>
+    <span class="kt">double</span> <span class="nf">GetH2FWHM</span><span class="p">(</span><span class="kt">double</span> <span class="n">R</span><span class="p">);</span><span class="c1">///&lt; TODO:COMMENT</span>
+    <span class="kt">double</span> <span class="nf">ModulateGasDensityWithSpirals</span><span class="p">(</span><span class="kt">double</span> <span class="n">n</span><span class="p">,</span> <span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">z</span><span class="p">);</span>
+    <span class="c1">//double CalculateGasColumnDensity(vector&lt;double&gt; xyzReference,vector&lt;double&gt; GLGB,string gascomponent,double modulate,double range,double steps);///&lt; calculate gas column densities</span>
+    <span class="kt">double</span> <span class="nf">nRadial</span><span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">pars</span><span class="p">);</span><span class="c1">///&lt; TODO:COMMENT</span>
+    <span class="kt">void</span> <span class="nf">GetCartesian</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="p">,</span> <span class="kt">double</span> <span class="n">l</span><span class="p">,</span> <span class="kt">double</span> <span class="n">b</span><span class="p">,</span> <span class="kt">double</span> <span class="n">xref</span><span class="p">,</span> <span class="kt">double</span> <span class="n">yref</span><span class="p">,</span> <span class="kt">double</span> <span class="n">zref</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">z</span><span class="p">);</span><span class="c1">///&lt; Galactic coordinates (GL,GB,R) -&gt;Cartesian</span>
+    <span class="kt">void</span> <span class="nf">GetGalactic</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="n">z</span><span class="p">,</span> <span class="kt">double</span> <span class="n">xref</span><span class="p">,</span> <span class="kt">double</span> <span class="n">yref</span><span class="p">,</span> <span class="kt">double</span> <span class="n">zref</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">l</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">);</span><span class="c1">///&lt; Cartesian coordinates -&gt; Galactic Coordinates(GL,GB,R)</span>
+    <span class="kt">void</span> <span class="nf">RotateCoordinates</span><span class="p">(</span><span class="kt">double</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">z</span><span class="p">,</span> <span class="kt">double</span> <span class="n">phi</span><span class="p">,</span> <span class="kt">double</span> <span class="n">theta</span><span class="p">,</span> <span class="kt">double</span> <span class="n">psi</span><span class="p">);</span><span class="c1">///&lt; rotate coordinate around (0,0,0) by (phi,theta,psi)</span>
+    <span class="kt">void</span> <span class="nf">RandomTangentialShift</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="p">,</span> <span class="kt">double</span> <span class="n">width</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">);</span><span class="c1">///&lt; gaussian shift along concentric circle (retains r-distribution)</span>
+    <span class="kt">void</span> <span class="nf">RandomGaussianShift</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="p">,</span> <span class="kt">double</span> <span class="n">width</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">);</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">GetRandomArm</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="p">);</span><span class="c1">///&lt; return a random spiral arm (identifier, i.e. an unsigned integer)</span>
+    <span class="kt">void</span> <span class="nf">Bar</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">);</span><span class="c1">///&lt; Get xy Coordinates on a central bar inclined with an angle &#39;angle&#39; clockwise</span>
+    <span class="kt">void</span> <span class="nf">Disk</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">);</span><span class="c1">///&lt; Get random xy Coordinates  on a disk</span>
+    <span class="kt">double</span> <span class="nf">LinearSurfDens</span><span class="p">(</span><span class="kt">double</span> <span class="o">*</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">*</span><span class="n">par</span><span class="p">);</span><span class="c1">///&lt; radial distribution that gives a flat appearance of the galaxy</span>
+    <span class="kt">void</span> <span class="nf">TaylorCordesSpiral</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="p">,</span> <span class="kt">int</span> <span class="n">arm</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">);</span><span class="c1">///&lt;TODO: Comment</span>
+    <span class="kt">double</span> <span class="nf">TaylorCordesSpiralAngular</span><span class="p">(</span><span class="kt">double</span> <span class="n">theta</span><span class="p">,</span> <span class="kt">int</span> <span class="n">arm</span><span class="p">);</span><span class="c1">///&lt; TODO: Comment</span>
+    <span class="kt">void</span> <span class="nf">ValleeSpiral</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="p">,</span> <span class="kt">int</span> <span class="n">arm</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">);</span><span class="c1">///&lt;TODO: Comment</span>
+    <span class="kt">double</span> <span class="nf">ValleeSpiralAngular</span><span class="p">(</span><span class="kt">double</span> <span class="n">theta</span><span class="p">,</span> <span class="kt">int</span> <span class="n">arm</span><span class="p">);</span><span class="c1">///&lt;TODO: Comment</span>
+    <span class="kt">double</span> <span class="nf">GetRandomZValue</span><span class="p">(</span><span class="kt">double</span> <span class="n">scaleHeight</span><span class="p">);</span><span class="c1">///&lt;TODO: Comment</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">GetRandomGalactocentricRadii</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">);</span><span class="c1">///&lt;TODO: Comment</span>
+    <span class="kt">void</span> <span class="nf">GalacticPositionXY</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="p">,</span> <span class="kt">int</span> <span class="n">arm</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">);</span><span class="c1">///&lt;Return x,y coordinates at given galactocentric radius r and on arm number i</span>
+    <span class="kt">void</span> <span class="nf">PositionOnSpiralArmAngular</span><span class="p">(</span><span class="kt">double</span> <span class="n">theta</span><span class="p">,</span> <span class="kt">int</span> <span class="n">arm</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">y</span><span class="p">);</span> <span class="c1">///&lt; get position on arm in x-y plane given a certain polar angle in the galaxy.</span>
+    <span class="kt">void</span> <span class="nf">GetDistanceToNearestSpiralArm</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span> <span class="kt">double</span> <span class="o">&amp;</span><span class="n">DistanceToClosestArm</span><span class="p">,</span> <span class="kt">int</span> <span class="o">&amp;</span><span class="n">ClosestArm</span><span class="p">);</span>
+    <span class="kt">double</span> <span class="nf">GetDistanceToGivenSpiralArm</span><span class="p">(</span><span class="kt">double</span> <span class="n">x</span><span class="p">,</span> <span class="kt">double</span> <span class="n">y</span><span class="p">,</span> <span class="kt">int</span> <span class="n">arm</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="nf">ToggleQuietMode</span><span class="p">()</span> <span class="p">{</span><span class="n">QUIETMODE</span><span class="o">=</span><span class="nb">true</span><span class="p">;}</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">DiceGalacticPositions</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">);</span>
+    <span class="kt">double</span> <span class="nf">GetRMax</span><span class="p">()</span> <span class="p">{</span><span class="k">return</span> <span class="n">rMax</span><span class="p">;}</span>
+    <span class="kt">void</span> <span class="nf">SetSpiralArmModel</span><span class="p">(</span><span class="n">string</span> <span class="n">centralstructuremodel</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="nf">SetCentralStructureModel</span><span class="p">(</span><span class="n">string</span> <span class="n">centralstructuremodel</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="nf">SetSurfaceDensityModel</span><span class="p">(</span><span class="n">string</span> <span class="n">surfacedensitymodel</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="nf">SetMainSequenceBubbleModel</span><span class="p">(</span><span class="n">string</span> <span class="n">msbubblemodel</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="nf">SetScaleHeight</span><span class="p">(</span><span class="kt">double</span> <span class="n">SCALEHEIGHT</span><span class="p">)</span> <span class="p">{</span><span class="n">scaleHeight</span><span class="o">=</span><span class="n">SCALEHEIGHT</span><span class="p">;}</span>
+    <span class="kt">void</span> <span class="nf">SetArmWidth</span><span class="p">(</span><span class="kt">double</span> <span class="n">ARMWIDTH</span><span class="p">)</span> <span class="p">{</span><span class="n">armWidth</span><span class="o">=</span><span class="n">ARMWIDTH</span><span class="p">;}</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">CreateDensityProfile</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">pars</span><span class="p">,</span>
+                                                  <span class="kt">double</span> <span class="n">rmin</span> <span class="o">=</span> <span class="mf">1.e-3</span><span class="p">,</span>
+                                                  <span class="kt">double</span> <span class="n">rmax</span> <span class="o">=</span> <span class="mf">1.e3</span><span class="p">);</span>
+    <span class="kt">double</span> <span class="nf">EvalTaylorCordesArmTheta</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="p">,</span> <span class="kt">int</span> <span class="n">arm</span><span class="p">);</span>
+    <span class="kt">double</span> <span class="nf">EvalTaylorCordesArmGalactocentricRadius</span><span class="p">(</span><span class="kt">double</span> <span class="n">theta</span><span class="p">,</span> <span class="kt">int</span> <span class="n">arm</span><span class="p">);</span>
+    <span class="kt">double</span> <span class="nf">CaseBhattacharyaProfile</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="p">);</span>
+    <span class="kt">double</span> <span class="nf">IusifovKucukProfile</span><span class="p">(</span><span class="kt">double</span> <span class="n">r</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="nf">CalculateThinShellApproximation</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">dProfile</span><span class="p">,</span>
+                                         <span class="kt">double</span> <span class="n">E</span><span class="p">,</span>
+                                         <span class="kt">double</span> <span class="n">AdiabIndex</span> <span class="o">=</span> <span class="mf">1.333</span><span class="p">,</span>
+                                         <span class="kt">double</span> <span class="n">tmin</span> <span class="o">=</span> <span class="mf">1.e-2</span><span class="p">,</span>
+                                         <span class="kt">double</span> <span class="n">tmax</span> <span class="o">=</span> <span class="mf">1.e4</span><span class="p">,</span>
+                                         <span class="kt">int</span> <span class="n">steps</span> <span class="o">=</span> <span class="mi">200</span><span class="p">);</span>
+    <span class="kt">void</span> <span class="nf">CalculateTrueloveMcKeeSolution</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">pars</span><span class="p">,</span>
+                                        <span class="kt">double</span> <span class="n">tmin</span> <span class="o">=</span> <span class="mf">1.e-2</span><span class="p">,</span>
+                                        <span class="kt">double</span> <span class="n">tmax</span> <span class="o">=</span> <span class="mf">1.e4</span><span class="p">,</span>
+                                        <span class="kt">int</span> <span class="n">steps</span> <span class="o">=</span> <span class="mi">200</span><span class="p">);</span>
+
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">ThinShellRadiusAndSpeed</span><span class="p">(</span><span class="kt">double</span> <span class="n">t</span><span class="p">);</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">TrueloveMcKeeRadiusAndSpeedForward</span><span class="p">(</span><span class="kt">double</span> <span class="n">t</span><span class="p">)</span> <span class="p">{</span>
+                                  <span class="k">return</span> <span class="n">TrueloveMcKeeRadiusAndSpeed</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="nb">false</span><span class="p">);}</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">TrueloveMcKeeRadiusAndSpeedReverse</span><span class="p">(</span><span class="kt">double</span> <span class="n">t</span><span class="p">)</span> <span class="p">{</span>
+                                  <span class="k">return</span> <span class="n">TrueloveMcKeeRadiusAndSpeed</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="nb">true</span><span class="p">);}</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetForwardShockRadiusEvolution</span><span class="p">()</span> <span class="p">{</span>
+                                  <span class="k">return</span> <span class="n">forwardshockradiusprofile</span><span class="p">;}</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetForwardShockVelocityEvolution</span><span class="p">()</span> <span class="p">{</span>
+                                  <span class="k">return</span> <span class="n">forwardshockvelocityprofile</span><span class="p">;}</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetReverseShockRadiusEvolution</span><span class="p">()</span> <span class="p">{</span>
+                                  <span class="k">return</span> <span class="n">reverseshockradiusprofile</span><span class="p">;}</span>
+    <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">GetReverseShockVelocityEvolution</span><span class="p">()</span> <span class="p">{</span>
+                                  <span class="k">return</span> <span class="n">reverseshockvelocityprofile</span><span class="p">;}</span>
+    <span class="kt">void</span> <span class="n">CalculateForwardShockInRGWind</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">pars</span><span class="p">,</span>
+                                       <span class="kt">double</span> <span class="n">tmin</span> <span class="o">=</span> <span class="mf">1.e-2</span><span class="p">,</span>
+                                       <span class="kt">double</span> <span class="n">tmax</span> <span class="o">=</span> <span class="mf">1.e4</span><span class="p">,</span>
+                                       <span class="kt">int</span> <span class="n">steps</span> <span class="o">=</span> <span class="mi">200</span><span class="p">);</span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">ForwardShockInRGWind</span><span class="p">(</span><span class="kt">double</span> <span class="n">t</span><span class="p">,</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">pars</span><span class="p">,</span>
+                                       <span class="n">vector</span><span class="o">&lt;</span> <span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="o">&gt;</span> <span class="n">profile</span><span class="p">);</span>
+
+
+<span class="p">};</span>
+<span class="cp">#endif</span>
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="astro_source.html" class="btn btn-neutral" title="Astro: source" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Joachim Hahn.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.9',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -94,6 +94,7 @@
 <li class="toctree-l3"><a class="reference internal" href="utils_header.html">Utils: header</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="astro.html">Astro</a></li>
 </ul>
 </li>
 </ul>
@@ -162,6 +163,54 @@
 <p><em>datafile &#8220;data/points.dat&#8221;</em></p>
 <p><em></em></p>
 <p>This function will scan through the parameter file and fill the vectors &#8220;parameter_values&#8221; and &#8220;strings_values&#8221; with the korresponding values provided in the parameter file. It keeps the order of the input vectors. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N5Utils6RandomEv">
+<span id="Utils::Random"></span><span class="target" id="ParticlesclassUtils_1ab337f790592c75bd1e45a598a1fef633"></span>double <code class="descname">Random</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N5Utils6RandomEv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return uniform random number in [0,1). GSL Wrapper function. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N5Utils12LinearRandomEdddi">
+<span id="Utils::LinearRandom__double.double.double.i"></span><span class="target" id="ParticlesclassUtils_1ab675dd62f0d3a881874c40c257313a36"></span>vector&lt;double&gt; <code class="descname">LinearRandom</code><span class="sig-paren">(</span>double <em>slope</em>, double <em>x_min</em>, double <em>x_max</em>, int <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N5Utils12LinearRandomEdddi" title="Permalink to this definition">¶</a></dt>
+<dd><p>get linearly distributed variates </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N5Utils14PowerLawRandomEdddi">
+<span id="Utils::PowerLawRandom__double.double.double.i"></span><span class="target" id="ParticlesclassUtils_1a5e6e6cb935b3333d4a9ad8fb4c336b78"></span>vector&lt;double&gt; <code class="descname">PowerLawRandom</code><span class="sig-paren">(</span>double <em>index</em>, double <em>x_min</em>, double <em>x_max</em>, int <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N5Utils14PowerLawRandomEdddi" title="Permalink to this definition">¶</a></dt>
+<dd><p>get power-law distributed variates </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N5Utils14GaussianRandomEddi">
+<span id="Utils::GaussianRandom__double.double.i"></span><span class="target" id="ParticlesclassUtils_1a30aca39cb4285494edf233d9c1220f53"></span>vector&lt;double&gt; <code class="descname">GaussianRandom</code><span class="sig-paren">(</span>double <em>width</em>, double <em>offset</em>, int <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N5Utils14GaussianRandomEddi" title="Permalink to this definition">¶</a></dt>
+<dd><p>get gaussian distributed variate using the Box-Muller method </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N5Utils10SignRandomEi">
+<span id="Utils::SignRandom__i"></span><span class="target" id="ParticlesclassUtils_1a50b8377e63889e866169d76bf9c47dac"></span>vector&lt;double&gt; <code class="descname">SignRandom</code><span class="sig-paren">(</span>int <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N5Utils10SignRandomEi" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a random sign </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N5Utils17ExponentialRandomEdddi">
+<span id="Utils::ExponentialRandom__double.double.double.i"></span><span class="target" id="ParticlesclassUtils_1ae52909d80cbf043270dc729d62654f72"></span>vector&lt;double&gt; <code class="descname">ExponentialRandom</code><span class="sig-paren">(</span>double <em>ind_norm</em>, double <em>x_min</em>, double <em>x_max</em>, int <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N5Utils17ExponentialRandomEdddi" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a exponentially distributed variate </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N5Utils20CustomFunctionRandomE6vectorI6vectorIdEEddi">
+<span id="Utils::CustomFunctionRandom__vector:vector:double::.double.double.i"></span><span class="target" id="ParticlesclassUtils_1aa637936fa15b1d654906af765ed8f1e2"></span>vector&lt;double&gt; <code class="descname">CustomFunctionRandom</code><span class="sig-paren">(</span>vector&lt;vector&lt;double&gt;&gt; <em>f</em>, double <em>xmin</em>, double <em>xmax</em>, int <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N5Utils20CustomFunctionRandomE6vectorI6vectorIdEEddi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample Variate that follows the input 2D-Vector </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N5Utils9IntegrateE6vectorI6vectorIdEEdd">
+<span id="Utils::Integrate__vector:vector:double::.double.double"></span><span class="target" id="ParticlesclassUtils_1a6a6af01b8847b619b0fb7b488f7ee77d"></span>double <code class="descname">Integrate</code><span class="sig-paren">(</span>vector&lt;vector&lt;double&gt;&gt; <em>f</em>, double <em>xmin</em>, double <em>xmax</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N5Utils9IntegrateE6vectorI6vectorIdEEdd" title="Permalink to this definition">¶</a></dt>
+<dd><p>get Poissonian variate (just wrapped from TRandom)) Integration function using the GSL spline integrator functionality </p>
 </dd></dl>
 
 </div>
