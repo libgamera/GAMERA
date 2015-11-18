@@ -31,7 +31,7 @@ help:
 	@echo '  clean            remove temporary files'
 
 
-all: gamera TutorialLevel1 gappa documentation
+all: gamera TutorialLevel1 gappa
 
 gamera: Radiation Particles Utils Astro libgamera
 
