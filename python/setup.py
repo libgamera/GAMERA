@@ -8,16 +8,18 @@ sys.path.insert(0, here)
 import pkgconfig
 
 extra_link_args = pkgconfig.libs('gsl').split()
+extra_link_args += ['-L../lib']
 
 extra_compile_args = pkgconfig.cflags('gsl').split()
 extra_compile_args.append('-std=c++11')
 
 extension_mod = Extension(
     "_gappa",
-    ["_gappa.cc", "../src/Radiation.C", "../src/Particles.C", "../src/Utils.C", "../src/Astro.C"],
+    ["_gappa.cc"],#, "../src/Radiation.C", "../src/Particles.C", "../src/Utils.C", "../src/Astro.C"],
     extra_compile_args=extra_compile_args,
     extra_link_args=extra_link_args,
     include_dirs=['../include'],
+    libraries = ['gamera', 'gsl']
 )
 
 setup(
