@@ -214,7 +214,6 @@ class Particles {
                            double startTime);  ///< set initial condition
                                                ///(a.k.a. set the first time
                                                ///spectrum in the grid)
-  double EnergyLossRate(double E);  ///< total energy loss rate of particles
   void ComputeGrid(vector<vector<double> > &Grid, vector<double> EnergyAxis,
                    double startTime, double Age, vector<double> &TimeAxis,
                    double minTimeBin =
@@ -300,13 +299,15 @@ class Particles {
   ~Particles();
   void SetMembers(double t);  ///< set the values for the class variables
                               ///BField,eElectronMax and Ecr at a given time t
-  void CalculateParticleSpectrum(string type, bool onlyprepare = false,
+  void CalculateParticleSpectrum(string type, int bins = 100, bool onlyprepare = false,
                                  bool dontinitialise =
                                      false);  ///< fill the lookup that holds
                                               ///the particle spectrum.
   void CalculateProtonSpectrum() {CalculateParticleSpectrum("protons");}
   void CalculateElectronSpectrum() {CalculateParticleSpectrum("electrons");}
   void SetType(string type);
+  double EnergyLossRate(double E);  ///< total energy loss rate of particles
+
   void SetAge(double age) {
     Age = age;
     SetMembers(Age);
@@ -407,10 +408,10 @@ class Particles {
   }  ///<
   vector<vector<double> > GetICLossLookup() { return ICLossVector; }
   double GetEnergyLossRate(double E) { return EnergyLossRate(E); }
-  void SetEnergyBinsForNumericalSolver(double EBINS) {
+  void SetEnergyBins(double EBINS) {
     ebins = EBINS;
   }  ///< set energy binning of the numerical solution
-  double GetEnergyBinsForNumericalSolver() {
+  double GetEnergyBins() {
     return ebins;
   }  ///< get energy binning of the numerical solution
   vector<vector<double> > GetParticleSpectrum() {

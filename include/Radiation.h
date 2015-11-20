@@ -157,6 +157,7 @@ class Radiation {
   int TargetPhotonSteps;  ///< binning of the target photon spectrum
   bool DEBUG;             ///< debugging boolean
   double integratorTolerance;///
+  int integratorKronrodRule;///
   string radiationMechanism;  ///< string query the radiation mechanism that is
                               ///to be calculated
   double hadronicAmpFactor;   ///< amplification factor of the p-p emission (due
@@ -196,7 +197,7 @@ class Radiation {
   static double GSLFunctionWrapper(double x, void *params);
   /*    Utils *fUtils;*/
   double Integrate(fPointer f, double *x, double emin, double emax,
-                   double tolerance);  ///< generic integration routine
+                   double tolerance, int pointslevel);  ///< generic integration routine
   gsl_interp_accel *acc;  ///< gsl accelerator object for interpolation
   gsl_spline *ElectronLookup, *ProtonLookup, *TargetPhotonLookup,
       *TargetPhotonLookupEdens;
@@ -265,7 +266,7 @@ class Radiation {
   double GetICLuminosity() { return lintic; }               ///< get lintic
   double GetBremsLuminosity() { return lintbrems; }         ///< get lintbrems
   double GetPPLuminosity() { return lintpp; }               ///< get lintpp
-  void CreateICLossLookup(int bins = 200);  ///< creates a 2D vector holding the
+  void CreateICLossLookup(int bins = 100);  ///< creates a 2D vector holding the
                                             ///energy-dependent energy loss rate
                                             ///due to IC cooling. Useful to
                                             ///apply in spectral iterations in
@@ -357,6 +358,7 @@ class Radiation {
     return SynchModel;
   }  ///< return the parameterisation of the synchrotron emission model. See
      ///SynchModel docu for options.
+  void CheckSanityOfTargetPhotonLookup();
   vector< vector<double> > GetProtonSED() {return GetParticleSED("protons");}
   vector< vector<double> > GetElectronSED() {return GetParticleSED("electrons");}
   Utils *fUtils;

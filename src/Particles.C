@@ -12,6 +12,8 @@ Particles::Particles() {
   energyMarginFactor = 1.e-3;
   energyMargin = 1.;
   ebins = 100;
+  BField = 0.;
+  N = 0.;
   SACELI_Told = 0.;
   R = -1.;
   V = -1.;
@@ -94,7 +96,7 @@ void Particles::CalculateConstants() {
 }
 
 /** fill the lookup holding the particle spectrum {E(erg) - N(erg^-1) */
-void Particles::CalculateParticleSpectrum(string type, bool onlyprepare,
+void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepare,
                                           bool dontinitialise) {
 
   if (!type.compare("electrons")) {
@@ -116,8 +118,11 @@ void Particles::CalculateParticleSpectrum(string type, bool onlyprepare,
     cout << "Particles::CalculateParticleSpectrum: No age set! Exiting"
          << endl;
   }
+
   /* reset Particle Lookup */
   fUtils->Clear2DVector(ParticleSpectrum);
+
+  ebins = bins;
 
   if (Type == 1)
     Emin = m_p;  // norm for protons or for electrons if defined per e/p
@@ -134,6 +139,7 @@ void Particles::CalculateParticleSpectrum(string type, bool onlyprepare,
     EminInternal = 1.1*EminConstant;
   }
   CalculateConstants();
+
   DetermineLookupTimeBoundaries();
   /* determine time from where to start the iteration. Particles that would have
    * been injected before that time are injected as a blob at Tmin. This can
@@ -173,7 +179,8 @@ void Particles::CalculateParticleSpectrum(string type, bool onlyprepare,
     /* call numerical solver. */
     PrepareAndRunNumericalSolver(ParticleSpectrum, onlyprepare, dontinitialise);
   }
-  else if (Type==0 && (BConstant || NConstant || VConstant)) {
+  else if (Type==0 && (BConstant || NConstant ||
+                       VConstant || ICLossVector.size())) {
     /* if B-Field, ambient density and speed are set externally thus constant.
      * This means constant energy losses due to Brems- and Synchrotronstrahlung
      * as well as adiabatic expansion (currently IC losses are always constant
@@ -291,7 +298,7 @@ void Particles::SetMembers(double t) {
   vals = {&Lum, &N, &BField, &eMax, &escapeTime};
   vs = {LumVector, NVector, BVector, eMaxVector, escapeTimeVector};
   for (unsigned int i = 0; i < Constants.size(); i++) {
-    *vals[i] = -1.;
+    *vals[i] = 0.;
     if (Constants[i])
       *vals[i] = Constants[i];
     else if (splines[i] == NULL)
@@ -360,8 +367,7 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType,
           *spl[i] = NULL;
         } else {
           cout << "Particles::SetLookup: " << st[i]
-               << " lookup already set earlier. Exiting." << endl;
-          return;
+               << " lookup already set earlier. Replacing it!" << endl;
         }
       }
       *spl[i] = ImportLookup;
@@ -462,6 +468,7 @@ double Particles::EnergyLossRate(double E) {
     bremsl = 0.;
     adl = 0.;
   }
+  //cout<<synchl <<" "<< icl  <<" "<< adl  <<" "<< bremsl<<"  "<<synchl + icl + adl + bremsl<<endl;
   return synchl + icl + adl + bremsl;
 }
 
@@ -877,8 +884,7 @@ void Particles::CalcSpecSemiAnalyticNoELoss() {
   }
   fUtils->Clear2DVector(ParticleSpectrum);
   double totallum = 0.;
-  if(LumConstant)
-    totallum = LumConstant*Age;
+  if(LumConstant) totallum = LumConstant*Age;
   else if(LumVector.size()) {
     gsl_interp_accel_reset(accLum);
     if(gsl_spline_eval_integ_e(LumLookup, Tmin, Age, accLum, &totallum))
@@ -899,6 +905,7 @@ void Particles::CalcSpecSemiAnalyticNoELoss() {
 }
 
 void Particles::CalcSpecSemiAnalyticConstELoss() {
+
   if (Tmin >= Age) {
     cout << "Particles::CalcSpecSemiAnalyticConstELoss: Tmin is larger/equal "
             "than source age... Exiting" << endl;
@@ -1067,7 +1074,6 @@ void Particles::CalculateEnergyTrajectory(double TExt) {
 
   double T = TminInternal;
   double E, Edot, dt;
-  vETrajectory.clear();
   if (TExt) (TExt > T) ? T = TExt : 1;
   T *= 1.1;
   SetMembers(T);
@@ -1092,10 +1098,11 @@ void Particles::CalculateEnergyTrajectory(double TExt) {
     if (std::isnan(xVal) || std::isnan(eVal)) continue;
     x1[i] = xVal;
     y1[i] = eVal;
+    if(i && x1[i]<=x1[i-1])  return;
     x2[size - 1 - i] = eVal;
     y2[size - 1 - i] = xVal;
   }
-
+  //for(int i=0;i<size;i++) cout<<x1[i]<<" "<<y1[i]<<endl;
   energyTrajectory = gsl_spline_alloc(gsl_interp_linear, size);
   gsl_spline_init(energyTrajectory, x1, y1, size);
   energyTrajectoryInverse = gsl_spline_alloc(gsl_interp_linear, size);

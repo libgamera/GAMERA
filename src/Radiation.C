@@ -18,6 +18,7 @@ Radiation::Radiation() {
   PiModel = 1;
   SynchModel = 0;
   integratorTolerance = 5.e-2;
+  integratorKronrodRule = 2;
   acc = gsl_interp_accel_alloc();
 }
 
@@ -203,8 +204,9 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
   fPointer IntFunc = NULL;
   if (!radiationMechanism.compare("Synchrotron")) {
     if (!BField) {
-      cout << "Radiation::DifferentialEmissionComponent: No BField value set for "
-              "Synchrotron radiation. Returning zero value." << endl;
+      if(!QUIETMODE) cout << "Radiation::DifferentialEmissionComponent: No "
+                             "BField value set for Synchrotron radiation. "
+                             "Returning zero value." << endl;
       return 0.;
     }
     if (!SynchModel)
@@ -212,37 +214,53 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
     else if (SynchModel == 1)
       IntFunc = &Radiation::SynchEmissivityExplicit;
     else {
-      cout << "Radiation::DifferentialEmissionComponent: Specify valid Synchrotron "
-              "emission model. 0 - random B-Field, 1 - regular B-Field with 90 "
-              "degree electron-BField pitch angle. Returning zero value."
+      cout << "Radiation::DifferentialEmissionComponent: Specify valid "
+              "Synchrotron emission model. 0 - random B-Field, 1 - regular "
+              "B-Field with 90 degree electron-BField pitch angle. "
+              "Returning zero value."
            << endl;
       return 0.;
     }
   } else if (!radiationMechanism.compare("Bremsstrahlung")) {
     if (!n) {
-      cout << "Radiation::DifferentialEmissionComponent: No ambient density value set "
-              "for Bremsstrahlung. Returning zero value." << endl;
+      if(!QUIETMODE) cout << "Radiation::DifferentialEmissionComponent: "
+                             "No ambient density value set "
+                             "for Bremsstrahlung. Returning zero value." << endl;
       return 0.;
     }
     IntFunc = &Radiation::BremsEmissivity;
   } else if (!radiationMechanism.compare("InverseCompton")) {
     if (!TargetPhotonVector.size()) {
-      cout << "Radiation::DifferentialEmissionComponent: No radiation fields set for IC "
-              "emission. Returning zero value." << endl;
+      if(!QUIETMODE) cout << "Radiation::DifferentialEmissionComponent: "
+                             "No radiation fields set for IC "
+                             "emission. Returning zero value." << endl;
       return 0.;
     }
     IntFunc = &Radiation::ICEmissivityRadFieldIntegrated;
   } else if (!radiationMechanism.compare("ppEmission")) {
     if (!n) {
-      cout << "Radiation::DifferentialEmissionComponent: No ambient density value set "
-              "for p-p scattering. Returning zero value." << endl;
+      if(!QUIETMODE) cout << "Radiation::DifferentialEmissionComponent:"
+                             "No ambient density value set for"
+                             "p-p scattering. Returning zero value." << endl;
+      return 0.;
+    }
+    if(PiModel<0 || PiModel>3)  {
+      cout << "Radiation::DifferentialEmissionComponent:"
+              "Please specify valid p-p interaction model." << endl;
+      cout << "Options are: " << endl;
+      cout << "  0 - Geant4"  << endl;
+      cout << "  1 - Pythia8" << endl;
+      cout << "  2 - SIBYLL2" << endl;
+      cout << "  3 - QGSJET I"  << endl;
+      cout << "Set it via the SetPPEmissionModel(<OPTION>) method. " << endl;
       return 0.;
     }
     IntFunc = &Radiation::PPEmissivity;
   } else
     return 0.;
   gsl_interp_accel_reset(acc);
-  double gammas = Integrate(IntFunc, &egamma, e, emax, integratorTolerance);
+  double gammas = Integrate(IntFunc, &egamma, e, emax, integratorTolerance,
+                            integratorKronrodRule);
   if (std::isnan(gammas)) return 0.;
 
   return gammas;
@@ -299,7 +317,8 @@ void Radiation::CalculateLuminosityAndFlux(string mechanism, double e,
   radiationMechanism = mechanism;
   fPointer IntFunc = &Radiation::DifferentialEmissionComponent;
 
-  l = Integrate(IntFunc, &emingamma, e, emax, integratorTolerance);
+  l = Integrate(IntFunc, &emingamma, e, emax, integratorTolerance,
+                integratorKronrodRule);
   f = lumtoflux * l;
 
   return;
@@ -315,8 +334,10 @@ void Radiation::CalculateLuminosityAndFlux(string mechanism, double e,
  * density [(no of photons)/(cm^3*erg)] at energy 'ephoton' [erg].
  */
 double Radiation::GreyBody(double ephoton, double temp, double edens) {
-  return 15. * edens * pow(pi, -4.) * pow(kb * temp, -4.) *
-                        pow(ephoton, 2.) / (exp(ephoton / (kb * temp)) - 1.);
+  double val = 15. * edens * pow(pi, -4.) * pow(kb * temp, -4.) *
+                       pow(ephoton, 2.) / (exp(ephoton / (kb * temp)) - 1.);
+  if(fabs(log10(val))>30.) val = 0.;
+  return val;
 }
 
 /**
@@ -373,8 +394,7 @@ double Radiation::ICEmissivityRadFieldIntegrated(double x, void *par) {
   (edash > targetphotonenergymax) ? (boundmax = targetphotonenergymax)
                                   : boundmax = edash;
   if (k > 0.1 || boundmin >= boundmax) return 0.;
-
-  icgammas = Integrate(IntFunc, xpars, boundmin, boundmax, integratorTolerance);
+  icgammas = Integrate(IntFunc, xpars, boundmin, boundmax, integratorTolerance*0.1,6);
   if (std::isnan(icgammas) || std::isinf(icgammas)) return 0.;
   if (INTEGRATEOVERGAMMAS == true)
     return icgammas * egamma;
@@ -392,6 +412,7 @@ double Radiation::ICEmissivityRadFieldIntegrated(double x, void *par) {
  * Eq(2.48).
  */
 double Radiation::ICEmissivity(double x, void *par) {
+
   double ephoton = x;  ///< energy of the target photon
   double *p = (double *)par;
   double lorentz = (p[0] + m_e) / m_e;
@@ -404,6 +425,9 @@ double Radiation::ICEmissivity(double x, void *par) {
                                                 ///regime, large: KN-regime
   double q = e1 / (gamma * (1. - e1));  ///< yet another parameter telling us
                                         ///the scattering domain
+  double f = 1./(4.*lorentz*lorentz);
+  if(f > 0.1) return 0.;
+  if(q>1. ||  q<f) return 0.;
   /// Eq(2.48):
   double bracket = 2. * q * log(q) + (1. + 2. * q) * (1. - q)
                    + 0.5 * (1. - q) * gamma * q * gamma * q / (1. + gamma * q);
@@ -412,7 +436,7 @@ double Radiation::ICEmissivity(double x, void *par) {
   double integrand = 2. * pi * pow(e_radius, 2.) * m_e * c_speed / lorentz *
                      pow(10., targetphotons) / ephoton * bracket;
 
-  integrand /= p[0];
+  integrand /= lorentz*m_e;
   return integrand;
 }
 
@@ -423,12 +447,16 @@ double Radiation::ICEmissivity(double x, void *par) {
  */
 void Radiation::CreateICLossLookup(int bins) {
 
+  if(!TargetPhotonVector.size()) {
+    cout << "Radiation::CreateICLossLookup: No target photons! Exiting." <<endl;
+    return;
+  }
   INTEGRATEOVERGAMMAS = true;
   fUtils->Clear2DVector(ICLossLookup);
   /* lower integration boundary over emitted (i.e. 'loss-') IC photons */
-  double EGammaMin = 1.e-22 * TeV_to_erg;
+  double EGammaMin = 1.e-25 * TeV_to_erg;
   /* Upper integration boundary over emitted (i.e. 'loss-') IC photons */
-  double EGammaMax = 1.e7 * TeV_to_erg;
+  double EGammaMax = 1.e8 * TeV_to_erg;
   /* lower integration boundary for the IC loss lookup (i.e. here simply the
    * electron rest mass) */
   double logemin = log10(0.1 * m_e);
@@ -440,6 +468,12 @@ void Radiation::CreateICLossLookup(int bins) {
   if (!QUIETMODE) {
     cout << ">> CALCULATING IC LOSS LOOKUP " << endl;
   }
+
+  double phEmax = pow(10.,TargetPhotonVector[TargetPhotonVector.size()-1][0]);
+  /* gamma value that indicates Thomson regime (see Blumenthal&Gould) */
+  double GammaLow = 1.e-1;
+  /* transition energy to Thomson regime. Losses are then simply Edot~E*E*edens*/
+  double Etrans = m_e * m_e * GammaLow / phEmax;
   for (double loge = logemin; loge < logemax; loge += logestep) {
 
     if ((double)ii / bins > 0.0001 * tt && QUIETMODE == false) {
@@ -449,14 +483,16 @@ void Radiation::CreateICLossLookup(int bins) {
     }
     ii++;
     double LossRate = 0.;
-    double Emax = pow(10., loge);
-    double Eelectron = Emax;
-    if (Emax > 0.001) {
+    double Eelectron = pow(10., loge);
+    double ee = Eelectron;
+    //double Eelectron = Emax;
+    if (Eelectron>Etrans) {
       fPointer IntFunc = &Radiation::ICEmissivityRadFieldIntegrated;
       LossRate =
-          Integrate(IntFunc, &Eelectron, EGammaMin, Emax, integratorTolerance);
+          Integrate(IntFunc, &Eelectron, EGammaMin, Eelectron,
+                    integratorTolerance,integratorKronrodRule);
     } else {
-      double gamma = (Emax + m_e) / m_e;
+      double gamma = (Eelectron + m_e) / m_e;
       LossRate =
           (4. / 3.) * sigma_T * c_speed * TargetPhotonEdens * gamma * gamma;
     }
@@ -546,7 +582,8 @@ double Radiation::SynchEmissivityExplicit(double e, void *par) {
 
   fPointer IntFunc = &Radiation::K_53;
   double *v = NULL;
-  double F = x * Integrate(IntFunc, v, x, 1.e2 * x, integratorTolerance);
+  double F = x * Integrate(IntFunc, v, x, 1.e2 * x, integratorTolerance,
+                           integratorKronrodRule);
   double electrons = fUtils->EvalSpline(log10(eElectron),ElectronLookup,
                                         acc,__func__,__LINE__);
   double val = norm * F * pow(10., electrons) / (hp * hp * nu);
@@ -986,7 +1023,7 @@ void Radiation::AddThermalTargetPhotons(double T, double edens, int steps) {
   }
   double logemin, logemax, low_boundary, high_boundary, low, high, lowtp,
       hightp;
-  low_boundary = 1.e-5;
+  low_boundary = 1.e-12;
   high_boundary = 1.e6;
   low = log10(low_boundary * kb * T);
   high = log10(high_boundary * kb * T);
@@ -1148,8 +1185,7 @@ void Radiation::AddToTargetPhotonVector(vector< vector<double> > vint) {
         valOld = pow(10., valOld);
       }
       if (logE > logEminSpl && logE < logEmaxSpl) {
-        valSpl = fUtils->EvalSpline(logE,Spl,
-                                         accT2,__func__,__LINE__);
+        valSpl = fUtils->EvalSpline(logE,Spl,accT2,__func__,__LINE__);
         valSpl = pow(10., valSpl);
       }
       val = valOld + valSpl;
@@ -1189,6 +1225,10 @@ void Radiation::SetTargetPhotonVectorLookup() {
   }
   targetphotonenergymin = pow(10., e[0]);
   targetphotonenergymax = pow(10., e[size - 1]);
+  if(TargetPhotonVectorOld.size()) {
+    gsl_spline_free(TargetPhotonLookup);
+    gsl_spline_free(TargetPhotonLookupEdens);
+  }
   TargetPhotonLookup = gsl_spline_alloc(gsl_interp_linear, size);
   TargetPhotonLookupEdens = gsl_spline_alloc(gsl_interp_linear, size);
   gsl_spline_init(TargetPhotonLookup, e, n, size);
@@ -1198,6 +1238,18 @@ void Radiation::SetTargetPhotonVectorLookup() {
   if (gsl_spline_eval_integ_e(TargetPhotonLookupEdens, targetphotonenergymin,
                               targetphotonenergymax, acc, &TargetPhotonEdens))
     TargetPhotonEdens = 0.;
+  return;
+}
+
+void Radiation::CheckSanityOfTargetPhotonLookup() {
+
+  gsl_interp_accel *acc = gsl_interp_accel_alloc();
+  for(unsigned int i=0;i<TargetPhotonVector.size();i++) {
+    double e = TargetPhotonVector[i][0];
+    double n = TargetPhotonVector[i][1];
+    double nl = fUtils->EvalSpline(e,TargetPhotonLookup,acc,__func__,__LINE__);
+    cout << "rel. diff: " << nl/n - 1. << " " << nl << " " << n <<endl;
+  }
   return;
 }
 
@@ -1418,7 +1470,7 @@ vector<vector<double> > Radiation::GetParticleSED(string type) {
  *
  */
 double Radiation::Integrate(fPointer f, double *x, double emin, double emax,
-                            double tolerance) {
+                            double tolerance, int pointslevel) {
   double integral, error;
   auto ptr = [=](double xx)->double {
     return (this->*f)(xx, (void *)x);
@@ -1426,7 +1478,7 @@ double Radiation::Integrate(fPointer f, double *x, double emin, double emax,
   gsl_integration_workspace *w = gsl_integration_workspace_alloc(10000);
   GSLfuncRad<decltype(ptr)> Fp(ptr);
   gsl_function F = *static_cast<gsl_function *>(&Fp);
-  if (gsl_integration_qag(&F, emin, emax, 0, tolerance, 10000, 1, w, &integral,
+  if (gsl_integration_qag(&F, emin, emax, 0, tolerance, 10000, pointslevel, w, &integral,
                           &error))
     return 0.;
   gsl_integration_workspace_free(w);
@@ -1435,11 +1487,10 @@ double Radiation::Integrate(fPointer f, double *x, double emin, double emax,
 
 vector<vector<double> > Radiation::GetTargetPhotons() {
   vector< vector<double> >  vint;
-  unsigned int size = TargetPhotonVector.size();
-  for(unsigned int i = 0 ; i < size ; i++) {
-    double e = pow(10.,TargetPhotonVector[i][0]);
-    double n = pow(10.,TargetPhotonVector[i][1]);
-    fUtils->TwoDVectorPushBack(e,n,vint);
+  for(double i = targetphotonenergymin ; i < targetphotonenergymax ; i*=1.01) {
+    double targetphotons = pow(10.,fUtils->EvalSpline(log10(i),TargetPhotonLookup,
+                           acc,__func__,__LINE__));
+     fUtils->TwoDVectorPushBack(i,targetphotons,vint);
   }
   return vint;
 }
