@@ -32,7 +32,7 @@ class GSLfuncPart : public gsl_function {
     function = &GSLfuncPart::Call;
     params = this;
   }
-
+ ~GSLfuncPart() {}
  private:
   const F &_func;
   static double Call(double x, void *params) {
@@ -275,16 +275,16 @@ class Particles {
                                                   ///specified, returns a broken
                                                   ///power law.
   double InverseLossRate(double *x, double *par);
-  void SetLookup(vector<vector<double> > v, string LookupType,
-                 bool UPDATE = false);  ///<
+  void SetLookup(vector<vector<double> > v, string LookupType);  ///<
   void ExtendLookup(vector<vector<double> > v, string LookupType);
   double SemiAnalyticConstELossIntegrand(double T, void *par);
   double SourceSpectrumWrapper(double E, void *par);
   double integratorTolerance;
   double Integrate(fPointer f, double *x, double emin, double emax,
-                   double tolerance);
+                   double tolerance, int kronrodrule);
   int gslmemory; ///< memory of the GSL workspace when integrating.
                  /// Default = 5000
+  int kronrodrule;
   vector<double> Constants;
   vector<gsl_spline *> splines;
   vector<gsl_interp_accel *> accs;

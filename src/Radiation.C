@@ -385,7 +385,7 @@ double Radiation::ICEmissivityRadFieldIntegrated(double x, void *par) {
 
   /* detemine integration boundaries for the target photon energy from Eq. 2.50
      in Blumenthal&Gould (Reviews of Modern Physics, vol. 42, no. 2, 1970) */
-  double lorentz = (eelectron + m_e) / m_e;
+  double lorentz = eelectron / m_e;
   double edash = egamma / (1. - egamma / (lorentz * m_e));
   double k = 1. / (4. * lorentz * lorentz);
   double boundmin, boundmax;
@@ -415,7 +415,7 @@ double Radiation::ICEmissivity(double x, void *par) {
 
   double ephoton = x;  ///< energy of the target photon
   double *p = (double *)par;
-  double lorentz = (p[0] + m_e) / m_e;
+  double lorentz = p[0] / m_e;
   double egamma = p[1];  ///< energy of the resulting gamma photon
   double e1 = egamma / (lorentz * m_e);  ///< gamma-ray energy in units of the
                                          ///electron energy
@@ -484,7 +484,6 @@ void Radiation::CreateICLossLookup(int bins) {
     ii++;
     double LossRate = 0.;
     double Eelectron = pow(10., loge);
-    double ee = Eelectron;
     //double Eelectron = Emax;
     if (Eelectron>Etrans) {
       fPointer IntFunc = &Radiation::ICEmissivityRadFieldIntegrated;
@@ -544,7 +543,7 @@ double Radiation::SynchEmissivity(double x, void *par) {
   /* electron energy */
   double eElectron = x;
   /* lorentz-factor of electrons */
-  double gamma = (eElectron + m_e) / m_e;
+  double gamma = eElectron / m_e;
   double nu_b = el_charge * BField * c_speed * pow(2. * pi * m_e, -1.);
   double j = nu / (3. * nu_b * pow(gamma, 2.));
   /* bessel fct. K_1/3 */
@@ -608,7 +607,7 @@ double Radiation::BremsEmissivity(double x, void *par) {
   /* kinematic threshold */
   if (EI - EP <= m_e) return 0.;
   /* electron lorentz factor */
-  double g = (EI + m_e) / m_e;
+  double g = EI / m_e;
   /* electron velocity */
   double b = sqrt(1. - 1. / (g * g));
   /* photon energy in units of electron rest mass */
@@ -1114,6 +1113,7 @@ void Radiation::AddSSCTargetPhotons(double R, int steps) {
         << endl;
     return;
   }
+  R *= pc_to_cm;
   ParticleVector = ElectronVector;
   if (!ParticleVector.size()) {
     cout << "Radiation::SetSSCTargetPhotons: No particles in spectrum... "
@@ -1470,7 +1470,7 @@ vector<vector<double> > Radiation::GetParticleSED(string type) {
  *
  */
 double Radiation::Integrate(fPointer f, double *x, double emin, double emax,
-                            double tolerance, int pointslevel) {
+                            double tolerance, int kronrodrule) {
   double integral, error;
   auto ptr = [=](double xx)->double {
     return (this->*f)(xx, (void *)x);
@@ -1478,8 +1478,8 @@ double Radiation::Integrate(fPointer f, double *x, double emin, double emax,
   gsl_integration_workspace *w = gsl_integration_workspace_alloc(10000);
   GSLfuncRad<decltype(ptr)> Fp(ptr);
   gsl_function F = *static_cast<gsl_function *>(&Fp);
-  if (gsl_integration_qag(&F, emin, emax, 0, tolerance, 10000, pointslevel, w, &integral,
-                          &error))
+  if (gsl_integration_qag(&F, emin, emax, 0, tolerance, 10000, kronrodrule, w,
+                          &integral, &error))
     return 0.;
   gsl_integration_workspace_free(w);
   return integral;

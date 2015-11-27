@@ -5,6 +5,7 @@ Particles::Particles() {
   eElectronMax = 100000.;
   SpectralIndex = 2.000;
   Tmin = 1.;
+  Type = 0;
   CutOffFactor = 1000.;
   TminInternal = 1.e-10;
   TmaxInternal = 1.e100;
@@ -18,6 +19,7 @@ Particles::Particles() {
   R = -1.;
   V = -1.;
   gslmemory=5000;
+  kronrodrule = 4;
   QUIETMODE = false;
   EminConstantForNormalisationOnly = false;
   DEBUG = false;
@@ -74,22 +76,19 @@ Particles::~Particles() {
  * loops
  */
 void Particles::CalculateConstants() {
-  double emin = Emin;
-  if ((Kep && !Type) || Type == 1)
-    emin = m_p;  // norm for protons or for electrons if defined per e/p
-                 // fraction
   eBreakS2 = pow(eBreak, SpectralIndex2);
   eBreak2mS2 = pow(eBreak, 2. - SpectralIndex2);
   eBreak2mSInd2 = log(eBreak);
   eBreakS = pow(eBreak, SpectralIndex);
   eBreak2mS = pow(eBreak, 2. - SpectralIndex);
-  emin2mS2 = pow(emin, 2. - SpectralIndex2);
-  emin2mS = pow(emin, 2. - SpectralIndex);
-  emin2mSInd2 = log(emin);
-  emineBreak2mS2 = pow(emin / eBreak, 2. - SpectralIndex2);
-  emineBreak2mSInd2 = log(emin / eBreak);
+  emin2mS2 = pow(Emin, 2. - SpectralIndex2);
+  emin2mS = pow(Emin, 2. - SpectralIndex);
+  emin2mSInd2 = log(Emin);
+  emineBreak2mS2 = pow(Emin / eBreak, 2. - SpectralIndex2);
+  emineBreak2mSInd2 = log(Emin / eBreak);
   fS = 1. / (2. - SpectralIndex);
   fS2 = 1. / (2. - SpectralIndex2);
+
   bremsl_epf = 3. * fineStructConst * sigma_T * c_speed * m_e / pi;
   bremsl_eef = (3. * fineStructConst * sigma_T * c_speed * m_e / (2. * pi));
   return;
@@ -146,12 +145,24 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
    * lead to bumps at low energies, depending on cooling.
    */
 
-  if (TminConstant)
-    Tmin = TminConstant;
-  else if (Type == 1)
-    Tmin = 1.e-3;
-  else
-    DetermineTMin(EminInternal, Tmin);
+  int METHOD = -1;
+  if(Type==0 && (BVector.size() || NVector.size() ||
+                (RVector.size() && VVector.size())))
+    METHOD = 0;
+  else if(Type==1 && RVector.size() && VVector.size())
+    METHOD = 0;
+  else if (Type==0 && (BConstant || NConstant ||
+           VConstant || ICLossVector.size()))
+    METHOD = 1;
+  else if(Type==1 && VConstant)
+    METHOD = 1;
+  else METHOD = 2;
+
+  if(!METHOD) DetermineTMin(EminInternal, Tmin);
+  else if(METHOD == 1) Tmin = TminInternal;
+  else Tmin = 1.e-3;
+
+  if (TminConstant) Tmin = TminConstant;
   if(Tmin<TminInternal) Tmin=TminInternal;
   /* get the upper energy boundary of the spectrum. This can either be
    * externally
@@ -175,31 +186,15 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
     return;
   }
 
-  if (BVector.size() || NVector.size() || (RVector.size() && VVector.size())) {
-    /* call numerical solver. */
+
+  if (!METHOD)
     PrepareAndRunNumericalSolver(ParticleSpectrum, onlyprepare, dontinitialise);
-  }
-  else if (Type==0 && (BConstant || NConstant ||
-                       VConstant || ICLossVector.size())) {
-    /* if B-Field, ambient density and speed are set externally thus constant.
-     * This means constant energy losses due to Brems- and Synchrotronstrahlung
-     * as well as adiabatic expansion (currently IC losses are always constant
-     * in GAMERA.).
-     */
-    CalculateEnergyTrajectory();
+  else if (METHOD==1) {
+    //CalculateEnergyTrajectory();
     CalcSpecSemiAnalyticConstELoss();
   }
-  else if (Type==1 && VConstant) {
-    /* if B-Field, ambient density and speed are set externally thus constant.
-     * This means constant energy losses due to Brems- and Synchrotronstrahlung
-     * as well as adiabatic expansion (currently IC losses are always constant
-     * in GAMERA.).
-     */
-    CalculateEnergyTrajectory();
-    CalcSpecSemiAnalyticConstELoss();
-  } else {
-    CalcSpecSemiAnalyticNoELoss();
-  }
+  else CalcSpecSemiAnalyticNoELoss();
+
   if (!QUIETMODE) {
     cout << ">> PARTICLE EVOLUTION DONE. EXITING." << endl;
     cout << endl;
@@ -335,22 +330,13 @@ void Particles::SetMembers(double t) {
   return;
 }
 
-void Particles::SetLookup(vector<vector<double> > v, string LookupType,
-                          bool UPDATE) {
+void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
   int size = (int)v.size();
   if (!size) {
     cout << "Particles::SetLookup: lookup vector empty. Exiting." << endl;
     return;
   }
-  double x[size];
-  double y[size];
-  for (int i = 0; i < size; i++) {
-    x[i] = v[i][0];
-    y[i] = v[i][1];
-  }
-  gsl_spline *ImportLookup = gsl_spline_alloc(gsl_interp_akima, size);
-  gsl_spline_init(ImportLookup, x, y, size);
-
+  gsl_spline *ImportLookup = fUtils->GSLsplineFromTwoDVector(v);
   vector<string> st{"ICLoss", "Luminosity", "AmbientDensity", "BField",
                     "Emax",   "EscapeTime", "Radius",         "Speed"};
   vector<gsl_spline **> spl{&ICLossLookup, &LumLookup,  &NLookup,
@@ -362,13 +348,9 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType,
   for (unsigned int i = 0; i < st.size(); i++) {
     if (!LookupType.compare(st[i])) {
       if (*spl[i] != NULL) {
-        if (UPDATE == true) {
-          gsl_spline_free(*spl[i]);
-          *spl[i] = NULL;
-        } else {
-          cout << "Particles::SetLookup: " << st[i]
-               << " lookup already set earlier. Replacing it!" << endl;
-        }
+        cout << "Particles::SetLookup: " << st[i]
+        << " lookup already set earlier. Replacing it!" << endl;
+        gsl_spline_free(*spl[i]);
       }
       *spl[i] = ImportLookup;
       *vs[i] = v;
@@ -405,7 +387,7 @@ void Particles::ExtendLookup(vector<vector<double> > v, string LookupType) {
         return;
       }
       vs[i].insert(vs[i].end(), v.begin(), v.end());
-      SetLookup(vs[i], LookupType, true);
+      SetLookup(vs[i], LookupType);
       return;
     }
   }
@@ -935,27 +917,28 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
     for (double e = Emin; e < eMax; e = pow(10., log10(e) + logstep)) {
       if (QUIETMODE == false)
         cout << "    " << (int)(100. * tt / ebins) << "\% done\r" << std::flush;
-      double val = Integrate(IntFunc, &dummy, e, eMax, integratorTolerance) /
-                   EnergyLossRate(e);
-      if(std::isnan(val) || std::isinf(val) || !val)
-        continue;
+      double lossrate = EnergyLossRate(e);
+      if(lossrate <= 0.) break;
+      double val = Integrate(IntFunc, &dummy, e, eMax, integratorTolerance*0.01,
+                             kronrodrule) / lossrate;
       fUtils->TwoDVectorPushBack(e,val,ParticleSpectrum);
       tt++;
     }
   }
   // time integration (constant energy losses)
   else {
-    Tmin = vETrajectory[0][0];
+    //Tmin = pow(10.,vETrajectory[0][0]);
     IntFunc = &Particles::SemiAnalyticConstELossIntegrand;
     int tt = 0;
     for (double e = Emin; e < eMax; e = pow(10., log10(e) + logstep)) {
       if (QUIETMODE == false)
         cout << "    " << (int)(100. * tt / ebins) << "\% done\r" << std::flush;
-      double val = Integrate(IntFunc, &e, log10(Tmin), log10(Age), 5.e-3);
+      double val = Integrate(IntFunc, &e, log10(Tmin), log10(Age),
+                             integratorTolerance*0.01,kronrodrule);
       SetMembers(Age);
-      val /= EnergyLossRate(e);
-      if(std::isnan(val) || std::isinf(val) || !val)
-        continue;
+      double lossrate = EnergyLossRate(e);
+      if(lossrate <= 0.) break;
+      val /= lossrate;
       fUtils->TwoDVectorPushBack(e,val,ParticleSpectrum);
       tt++;
     }
@@ -1070,43 +1053,45 @@ void Particles::CalculateEnergyTrajectory(double TExt) {
             "first by running DetermineLookupStartingTime(). Exiting." << endl;
     return;
   }
+  cout<< "1212hier!!" << endl;
+  bool UPDATE = false;
+  if(vETrajectory.size()) UPDATE = true;
   fUtils->Clear2DVector(vETrajectory);
 
-  double T = TminInternal;
-  double E, Edot, dt;
-  if (TExt) (TExt > T) ? T = TExt : 1;
+  double E, Edot, dt, T;
+  (TExt > TminInternal) ? T = TExt : T = TminInternal;
   T *= 1.1;
   SetMembers(T);
   E = eMax;
-
   while (E >= Emin) {
-    fUtils->TwoDVectorPushBack(T,E,vETrajectory);
+    if(E<=0.) {
+      cout << "Particles::CalculateEnergyTrajectory: Energy smaller 0. Exiting."
+           << endl;
+      return;
+    }
+    fUtils->TwoDVectorPushBack(log10(T),log10(E),vETrajectory);
     Edot = EnergyLossRate(E);
-    dt = 2.e-2 * E / Edot;
+    dt = 5.e-2 * E / Edot;
     E -= dt * Edot;
     T += dt / yr_to_sec;
-    if(T>TmaxInternal) break;
+    if(T>TmaxInternal || Edot < 0.) break;
     SetMembers(T);
   }
-  int size = (int)vETrajectory.size();
-  double x1[size], y1[size], x2[size], y2[size];
-  for (int i = 0; i < size; i++) {
-    double xVal = log10(vETrajectory[i][0]);
-    double eVal = log10(vETrajectory[i][1]);
-    if (std::isinf(xVal) || std::isinf(eVal)) continue;
-    if (std::isnan(xVal) || std::isnan(eVal)) continue;
-    if (std::isnan(xVal) || std::isnan(eVal)) continue;
-    x1[i] = xVal;
-    y1[i] = eVal;
-    if(i && x1[i]<=x1[i-1])  return;
-    x2[size - 1 - i] = eVal;
-    y2[size - 1 - i] = xVal;
+  unsigned int size = vETrajectory.size();
+
+  if(size<3) return;
+  if(fabs(vETrajectory[0][0]/vETrajectory[size-1][0]-1.) < 1.e-3) return;
+  // make an inverse of the energy loss trajectory, holding x=E(t),y=t
+  vector< vector<double> > vETrajectoryInverse;
+  for (unsigned int i = size-1; i > 0; i--)
+    fUtils->TwoDVectorPushBack(vETrajectory[i][1],vETrajectory[i][0],
+                               vETrajectoryInverse);
+  if(UPDATE == true) {
+    gsl_spline_free(energyTrajectory);
+    gsl_spline_free(energyTrajectoryInverse);
   }
-  //for(int i=0;i<size;i++) cout<<x1[i]<<" "<<y1[i]<<endl;
-  energyTrajectory = gsl_spline_alloc(gsl_interp_linear, size);
-  gsl_spline_init(energyTrajectory, x1, y1, size);
-  energyTrajectoryInverse = gsl_spline_alloc(gsl_interp_linear, size);
-  gsl_spline_init(energyTrajectoryInverse, x2, y2, size);
+  energyTrajectory = fUtils->GSLsplineFromTwoDVector(vETrajectory);
+  energyTrajectoryInverse = fUtils->GSLsplineFromTwoDVector(vETrajectoryInverse);
   return;
 }
 
@@ -1141,7 +1126,7 @@ void Particles::SetIntegratorMemory(string mode) {
  *
  */
 double Particles::Integrate(fPointer f, double *x, double emin, double emax,
-                            double tolerance) {
+                            double tolerance, int kronrodrule) {
   double integral, error;
   /* no comment */
   auto ptr = [=](double xx)->double {
@@ -1150,8 +1135,8 @@ double Particles::Integrate(fPointer f, double *x, double emin, double emax,
   GSLfuncPart<decltype(ptr)> Fp(ptr);
   gsl_function F = *static_cast<gsl_function *>(&Fp);
   gsl_integration_workspace *w = gsl_integration_workspace_alloc(gslmemory);
-  if (gsl_integration_qag(&F, emin, emax, 0, tolerance, gslmemory, 1, w, &integral,
-                          &error)) {
+  if (gsl_integration_qag(&F, emin, emax, 0, tolerance, gslmemory, kronrodrule,
+                          w, &integral,&error)) {
     gsl_integration_workspace_free(w);
     return 0.;
   }

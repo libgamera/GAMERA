@@ -440,7 +440,7 @@ gsl_spline *Utils::GSLsplineFromTwoDVector(vector< vector<double> > v) {
     x[i] = v[i][0];
     y[i] = v[i][1];
   }
-  gsl_spline *s = gsl_spline_alloc(gsl_interp_linear, size);
+  gsl_spline *s = gsl_spline_alloc(gsl_interp_cspline, size);
   gsl_spline_init(s, x, y, size);
   return s;
 }
