@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <fstream>
 #include <vector>
+#include <cmath>
 #include <ctime>
 #include <algorithm>
 #include <gsl/gsl_sf_bessel.h>
