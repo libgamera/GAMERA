@@ -4,7 +4,7 @@ Utils::Utils(bool DRAWLOGO) {
   if (DRAWLOGO == true) DrawGamera();
   QUIETMODE = false;
   GAMERADESTROYEDTHECONSOLE = false;
-  INTERMETH = (gsl_interp_type*)gsl_interp_linear;
+  INTERMETH = (gsl_interp_type*)gsl_interp_cspline;
   r = gsl_rng_alloc (gsl_rng_mt19937);
   gsl_rng_set(r,time(0));
 }
