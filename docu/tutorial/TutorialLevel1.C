@@ -46,7 +46,7 @@ int main(int argc, char **argv){
   fUtils->WriteOut(fRad->GetBremsstrahlungSED(),outtag+"_BremsSpectrum.dat");
   fUtils->WriteOut(fRad->GetSynchrotronSED(),outtag+"_SynchSpectrum.dat");
   fUtils->WriteOut(fRad->GetPPSED(),outtag+"_PPSpectrum.dat");
-  fUtils->WriteOut(fRad->GetTotalTargetPhotonVector(),outtag+"_TargetPhotons.dat");
+  fUtils->WriteOut(fRad->GetTargetPhotons(),outtag+"_TargetPhotons.dat");
   return 0;
 }
 
