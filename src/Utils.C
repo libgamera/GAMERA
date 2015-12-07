@@ -4,6 +4,7 @@ Utils::Utils(bool DRAWLOGO) {
   if (DRAWLOGO == true) DrawGamera();
   QUIETMODE = false;
   GAMERADESTROYEDTHECONSOLE = false;
+  INTERMETH = (gsl_interp_type*)gsl_interp_linear;
   r = gsl_rng_alloc (gsl_rng_mt19937);
   gsl_rng_set(r,time(0));
 }
@@ -440,7 +441,7 @@ gsl_spline *Utils::GSLsplineFromTwoDVector(vector< vector<double> > v) {
     x[i] = v[i][0];
     y[i] = v[i][1];
   }
-  gsl_spline *s = gsl_spline_alloc(gsl_interp_cspline, size);
+  gsl_spline *s = gsl_spline_alloc((const gsl_interp_type*)INTERMETH, size);
   gsl_spline_init(s, x, y, size);
   return s;
 }
@@ -504,4 +505,17 @@ bool sortcriterionsecondcolumn (vector<double> i,
 void Utils::Clear2DVector(vector< vector<double> > &v) {
   for (unsigned int i = 0; i < v.size(); i++) v[i].clear();
   v.clear();
+}
+
+void Utils::SetInterpolationMethod(string intermeth) {
+  if(!intermeth.compare("CUBICSPLINE")) INTERMETH = (gsl_interp_type*)gsl_interp_cspline;
+  else if(!intermeth.compare("LINEAR")) INTERMETH = (gsl_interp_type*)gsl_interp_linear;
+  else if(!intermeth.compare("AKIMA")) INTERMETH = (gsl_interp_type*)gsl_interp_akima;
+  else if(!intermeth.compare("POLYNOMIAL")) INTERMETH = (gsl_interp_type*)gsl_interp_polynomial;
+  else {
+    std::cout<<"Utils::SetInterpolationMethod: " << intermeth
+             <<" is not a valid interpolation type. Options: " << endl;
+    std::cout<<"  'LINEAR','CUBICSPLINE','AKIMA','POLYNOMIAL'" << endl;
+  }
+  return;
 }

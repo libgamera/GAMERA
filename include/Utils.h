@@ -89,6 +89,7 @@ class Utils {
  private:
   bool QUIETMODE;
   bool GAMERADESTROYEDTHECONSOLE;
+  gsl_interp_type *INTERMETH;
   gsl_rng * r;
 
  public:
@@ -122,6 +123,7 @@ class Utils {
 
   double EvalSpline(double x, gsl_spline *s, gsl_interp_accel *a,
                     const char* t, int l);
+  void SetInterpolationMethod(string intermeth);
   void Clear2DVector(vector< vector<double> > &v);
 
 

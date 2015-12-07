@@ -240,6 +240,8 @@ class Astro  {
     vector<double> ForwardShockInRGWind(double t, vector<double> pars,
                                        vector< vector<double> > profile);
 
+    void SetInterpolationMethod(string intermeth)
+       {fUtils->SetInterpolationMethod(intermeth);}
 
 };
 #endif

@@ -362,5 +362,8 @@ class Radiation {
   vector< vector<double> > GetProtonSED() {return GetParticleSED("protons");}
   vector< vector<double> > GetElectronSED() {return GetParticleSED("electrons");}
   Utils *fUtils;
+  void SetInterpolationMethod(string intermeth)
+    {fUtils->SetInterpolationMethod(intermeth);}
+
 };
 #endif

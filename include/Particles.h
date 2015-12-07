@@ -487,5 +487,7 @@ class Particles {
   vector<vector<double> > GetParticleSED();
   void SetCriticalMinEnergyForGridSolver(double eminint) {EminInternal=eminint;}
   void SetIntegratorMemory(string mode);
+  void SetInterpolationMethod(string intermeth)
+    {fUtils->SetInterpolationMethod(intermeth);}
 };
 #endif
