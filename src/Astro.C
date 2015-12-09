@@ -1013,8 +1013,7 @@ vector< vector<double> > Astro::DiceGalacticPositions(int n) {
  */
 unsigned int Astro::GetRandomArm(double r) {
   vector<int> vint = ArmsVector;
-  for (unsigned int i=0;i<ArmsVector.size();i++) cout<< ArmsVector[i] << endl;
-  if(SPIRALARMMODEL==1) {
+    if(SPIRALARMMODEL==1) {
 
     //QUIETMODE = 1;
     if(r<x_a1[0] || r>x_a1[5]) DisableArm(1);

@@ -190,7 +190,7 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   if (!METHOD)
     PrepareAndRunNumericalSolver(ParticleSpectrum, onlyprepare, dontinitialise);
   else if (METHOD==1) {
-    //CalculateEnergyTrajectory();
+    CalculateEnergyTrajectory();
     CalcSpecSemiAnalyticConstELoss();
   }
   else CalcSpecSemiAnalyticNoELoss();
@@ -887,7 +887,6 @@ void Particles::CalcSpecSemiAnalyticNoELoss() {
 }
 
 void Particles::CalcSpecSemiAnalyticConstELoss() {
-
   if (Tmin >= Age) {
     cout << "Particles::CalcSpecSemiAnalyticConstELoss: Tmin is larger/equal "
             "than source age... Exiting" << endl;
@@ -927,7 +926,7 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
   }
   // time integration (constant energy losses)
   else {
-    //Tmin = pow(10.,vETrajectory[0][0]);
+    Tmin = pow(10.,vETrajectory[0][0]);
     IntFunc = &Particles::SemiAnalyticConstELossIntegrand;
     int tt = 0;
     for (double e = Emin; e < eMax; e = pow(10., log10(e) + logstep)) {
@@ -939,7 +938,7 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
       double lossrate = EnergyLossRate(e);
       if(lossrate <= 0.) break;
       val /= lossrate;
-      fUtils->TwoDVectorPushBack(e,val,ParticleSpectrum);
+      if(val) fUtils->TwoDVectorPushBack(e,val,ParticleSpectrum);
       tt++;
     }
   }
@@ -1053,7 +1052,6 @@ void Particles::CalculateEnergyTrajectory(double TExt) {
             "first by running DetermineLookupStartingTime(). Exiting." << endl;
     return;
   }
-  cout<< "1212hier!!" << endl;
   bool UPDATE = false;
   if(vETrajectory.size()) UPDATE = true;
   fUtils->Clear2DVector(vETrajectory);

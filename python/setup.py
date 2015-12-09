@@ -15,7 +15,15 @@ extra_compile_args.append('-m64')
 
 extension_mod = Extension(
     "_gappa",
-    ["_gappa.cc", "../src/Radiation.C", "../src/Particles.C", "../src/Utils.C", "../src/Astro.C"],
+    ["_gappa.cc",
+     "../src/Radiation.C",
+     "../src/Particles.C",
+     "../src/Utils.C",
+     "../src/Astro.C",
+     "../src/2D_interp/interp2d.c",
+     "../src/2D_interp/interp2d_spline.c",
+     "../src/2D_interp/bilinear.c",
+     "../src/2D_interp/bicubic.c"],
     extra_compile_args=extra_compile_args,
     extra_link_args=extra_link_args,
     include_dirs=['../include'],

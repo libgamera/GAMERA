@@ -4,6 +4,8 @@
 #include "../include/Particles.h"
 #include "../include/Utils.h"
 #include "../include/Astro.h"
+#include "../include/2D_interp/interp2d_spline.h"
+#include "../include/2D_interp/interp2d.h"
 %}
 
 %include "typemaps.i"
@@ -19,3 +21,5 @@ namespace std
 %include "../include/Particles.h"
 %include "../include/Utils.h"
 %include "../include/Astro.h"
+%include "../include/2D_interp/interp2d_spline.h"
+%include "../include/2D_interp/interp2d.h"

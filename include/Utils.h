@@ -13,6 +13,8 @@
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_spline.h>
+#include "2D_interp/interp2d.h"
+#include "2D_interp/interp2d_spline.h"
 
 /* TeV->erg */
 #define TeV_to_erg 1.602
@@ -91,6 +93,12 @@ class Utils {
   bool GAMERADESTROYEDTHECONSOLE;
   gsl_interp_type *INTERMETH;
   gsl_rng * r;
+  gsl_spline *INTERNAL1DSPLINE;
+  interp2d_spline *INTERNAL2DSPLINE;
+
+  gsl_interp_accel *acc;
+  gsl_interp_accel *xacc;
+  gsl_interp_accel *yacc;
 
  public:
   Utils(bool DRAWLOGO = true);
@@ -125,7 +133,20 @@ class Utils {
                     const char* t, int l);
   void SetInterpolationMethod(string intermeth);
   void Clear2DVector(vector< vector<double> > &v);
-
+  interp2d_spline *TwoDsplineFromTwoDVector(vector< vector<double> > v);
+  void SetInternal1DSpline(vector< vector<double> > v) {
+    gsl_interp_accel_reset(acc);
+    if(INTERNAL1DSPLINE!=NULL) gsl_spline_free(INTERNAL1DSPLINE);
+    INTERNAL1DSPLINE = GSLsplineFromTwoDVector(v);}
+  void SetInternal2DSpline(vector< vector<double> > v) {
+    gsl_interp_accel_reset(xacc);
+    gsl_interp_accel_reset(yacc);
+    if(INTERNAL2DSPLINE!=NULL) interp2d_spline_free(INTERNAL2DSPLINE);
+    INTERNAL2DSPLINE = TwoDsplineFromTwoDVector(v);}
+  double EvalInternal1DSpline(double x) {
+    return gsl_spline_eval(INTERNAL1DSPLINE, x, acc);}
+  double EvalInternal2DSpline(double x, double y) {
+    return interp2d_spline_eval(INTERNAL2DSPLINE,x,y,xacc,yacc);}
 
 
 };

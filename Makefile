@@ -33,9 +33,11 @@ help:
 
 all: gamera TutorialLevel1 gappa
 
-gamera: Radiation Particles Utils Astro libgamera
+gamera: Radiation Particles Utils Astro bicubic bilinear interp2d interp2d_spline libgamera
 
 tutorial1: gamera TutorialLevel1
+
+
 
 # create the individual .o files
 Radiation : src/Radiation.C
@@ -47,8 +49,20 @@ Utils : src/Utils.C
 Astro : src/Astro.C
 	$(CXX) -g -O2 -fpic -Wall -c src/Astro.C -o $(OUTDIR)/Astro.o $(CXXFLAGS) $(INCLUDES)
 
+
+
+bicubic : src/2D_interp/bicubic.c
+	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/bicubic.c -o $(OUTDIR)/bicubic.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
+bilinear : src/2D_interp/bilinear.c
+	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/bilinear.c -o $(OUTDIR)/bilinear.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
+interp2d : src/2D_interp/interp2d.c
+	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/interp2d.c -o $(OUTDIR)/interp2d.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
+interp2d_spline : src/2D_interp/interp2d_spline.c
+	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/interp2d_spline.c -o $(OUTDIR)/interp2d_spline.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
+
+
 # create the shared library
-objectsSO = $(OUTDIR)/Radiation.o $(OUTDIR)/Particles.o $(OUTDIR)/Utils.o $(OUTDIR)/Astro.o
+objectsSO = $(OUTDIR)/Radiation.o $(OUTDIR)/Particles.o $(OUTDIR)/Utils.o $(OUTDIR)/Astro.o $(OUTDIR)/bicubic.o $(OUTDIR)/bilinear.o $(OUTDIR)/interp2d.o $(OUTDIR)/interp2d_spline.o
 libgamera : $(objectsSO)
 	@echo "Generating library $@..."
 	$(CXX) -shared -o $(LIBDIR)/libgamera.so $(objectsSO) $(CXXFLAGS) $(LDFLAGS)
@@ -58,6 +72,11 @@ libgamera : $(objectsSO)
 TutorialLevel1 : docu/tutorial/TutorialLevel1.C
 	$(CXX) -g -O2 -Wall -c docu/tutorial/TutorialLevel1.C -o $(OUTDIR)/TutorialLevel1.o $(CXXFLAGS) $(INCLUDES)
 	$(CXX) -g -Wall -o bin/TutorialLevel1 $(OUTDIR)/TutorialLevel1.o -lgamera -L$(LIBDIR)
+
+interp2D : testscripts/interp2Dtest.C
+	$(CXX) -g -O2 -Wall -c testscripts/interp2Dtest.C -o $(OUTDIR)/interp2Dtest.o $(CXXFLAGS) $(INCLUDES) $(LDFLAGS)
+	$(CXX) -g -Wall -o bin/interp2Dtest $(OUTDIR)/interp2Dtest.o $(OUTDIR)/bilinear.o $(OUTDIR)/bicubic.o $(OUTDIR)/interp2d.o $(OUTDIR)/interp2d_spline.o $(GSLCFLAGS) $(GSLLIBS)
+
 
 # make gappa package
 gappa:

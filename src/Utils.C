@@ -7,6 +7,13 @@ Utils::Utils(bool DRAWLOGO) {
   INTERMETH = (gsl_interp_type*)gsl_interp_cspline;
   r = gsl_rng_alloc (gsl_rng_mt19937);
   gsl_rng_set(r,time(0));
+
+  INTERNAL1DSPLINE = NULL;
+  INTERNAL2DSPLINE = NULL;
+
+  acc = gsl_interp_accel_alloc();
+  xacc = gsl_interp_accel_alloc();
+  yacc = gsl_interp_accel_alloc();
 }
 
 Utils::~Utils() {}
@@ -445,6 +452,43 @@ gsl_spline *Utils::GSLsplineFromTwoDVector(vector< vector<double> > v) {
   gsl_spline_init(s, x, y, size);
   return s;
 }
+
+
+interp2d_spline *Utils::TwoDsplineFromTwoDVector(vector< vector<double> > v) {
+
+  vector<double> vx;
+  vector<double> vy;
+  double az[(int)v.size()];
+  for(unsigned int i=0;i<v.size();i++) {
+      double x = v[i][0];
+      double y = v[i][1];
+      double z = v[i][2];
+
+      if(!vx.size()) vx.push_back(x);
+      else if (x != vx[vx.size()-1]) vx.push_back(x);
+
+      if(vx.size()==1) vy.push_back(y);
+      az[i] = z;
+  }
+  unsigned long xs = (unsigned long)vx.size();
+  unsigned long ys = (unsigned long)vy.size();
+  double ax[(int)xs];
+  double ay[(int)ys];
+  for(unsigned int i=0;i<vx.size();i++) ax[i] = vx[i];
+  for(unsigned int i=0;i<vy.size();i++) ay[i] = vy[i];
+
+  for(unsigned int i=0;i<vx.size();i++) cout << ax[i] <<endl;
+  cout << " - - - - - - " << endl;
+  for(unsigned int i=0;i<vy.size();i++) cout << ay[i] <<endl;
+  cout << " - - - - - - " << endl;
+  for(unsigned int i=0;i<v.size();i++) cout << az[i] <<endl;
+  cout << " - - - - - - " << endl;
+  interp2d_spline *s = interp2d_spline_alloc(interp2d_bilinear, xs, ys);
+  interp2d_spline_init (s, ax, ay, az, xs, ys);
+  return s;
+}
+
+
 
 double Utils::EvalSpline(double x, gsl_spline *s, gsl_interp_accel *a,
                          const char* t, int l) {

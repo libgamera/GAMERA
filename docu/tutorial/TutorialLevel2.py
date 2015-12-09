@@ -61,7 +61,7 @@ if __name__ == "__main__":
   fp.SetEmax(emax)
   fp.SetEmin(emin)
   fp.SetSpectralIndex(spind)
-  fp.SetEnergyBinsForNumericalSolver(ebins)
+  fp.SetEnergyBins(ebins)
   fp.SetAmbientDensity(dens)
   fp.SetAge(age)
 
