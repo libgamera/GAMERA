@@ -158,6 +158,8 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
     METHOD = 1;
   else METHOD = 2;
 
+  if(escapeTimeConstant) METHOD = 0;
+
   if(!METHOD) DetermineTMin(EminInternal, Tmin);
   else if(METHOD == 1) Tmin = TminInternal;
   else Tmin = 1.e-3;

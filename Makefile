@@ -51,14 +51,14 @@ Astro : src/Astro.C
 
 
 
-bicubic : src/2D_interp/bicubic.c
-	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/bicubic.c -o $(OUTDIR)/bicubic.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
-bilinear : src/2D_interp/bilinear.c
-	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/bilinear.c -o $(OUTDIR)/bilinear.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
-interp2d : src/2D_interp/interp2d.c
-	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/interp2d.c -o $(OUTDIR)/interp2d.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
-interp2d_spline : src/2D_interp/interp2d_spline.c
-	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/interp2d_spline.c -o $(OUTDIR)/interp2d_spline.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
+bicubic : src/2D_interp/bicubic.C
+	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/bicubic.C -o $(OUTDIR)/bicubic.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
+bilinear : src/2D_interp/bilinear.C
+	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/bilinear.C -o $(OUTDIR)/bilinear.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
+interp2d : src/2D_interp/interp2d.C
+	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/interp2d.C -o $(OUTDIR)/interp2d.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
+interp2d_spline : src/2D_interp/interp2d_spline.C
+	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/interp2d_spline.C -o $(OUTDIR)/interp2d_spline.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
 
 
 # create the shared library
