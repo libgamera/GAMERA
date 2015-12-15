@@ -751,6 +751,9 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
        */
       if (escapeTime > 0.) value -= tbin * Grid[0][i] / escapeTime;
 
+      /* if value is smaller 0 (can happen if escape time scale is low), set
+       * to 0. */
+      if (value < 0.) value = 0.;
       /* Determine the largest filled energy bin (needed for the efficient
        * calculation of the next iterative time bin.
        */
@@ -920,7 +923,7 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
         cout << "    " << (int)(100. * tt / ebins) << "\% done\r" << std::flush;
       double lossrate = EnergyLossRate(e);
       if(lossrate <= 0.) break;
-      double val = Integrate(IntFunc, &dummy, e, eMax, integratorTolerance*0.01,
+      double val = Integrate(IntFunc, &dummy, e, eMax, integratorTolerance*0.1,
                              kronrodrule) / lossrate;
       fUtils->TwoDVectorPushBack(e,val,ParticleSpectrum);
       tt++;
@@ -935,7 +938,7 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
       if (QUIETMODE == false)
         cout << "    " << (int)(100. * tt / ebins) << "\% done\r" << std::flush;
       double val = Integrate(IntFunc, &e, log10(Tmin), log10(Age),
-                             integratorTolerance*0.01,kronrodrule);
+                             integratorTolerance*0.1,kronrodrule);
       SetMembers(Age);
       double lossrate = EnergyLossRate(e);
       if(lossrate <= 0.) break;
