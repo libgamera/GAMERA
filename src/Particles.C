@@ -406,7 +406,7 @@ double Particles::EnergyLossRate(double E) {
   double bremsl = 0.;
   double bremsl_ep = 0.;
   double bremsl_ee = 0.;
-  double gamma = (E + m_e) / m_e;
+  double gamma = E / m_e;
   if (gamma < 1.) gamma = 1.;
   double gamma2 = gamma * gamma;
   double p = sqrt(gamma2 - 1.);
@@ -418,11 +418,12 @@ double Particles::EnergyLossRate(double E) {
   /* synchrotron losses */
   synchl = (4. / 3.) * sigma_T * c_speed * BField * BField * gamma * gamma /
            (8. * pi);
-  if(!ICLossVector.size()) icl=0.;
-  else {
-    /* IC losses from the lookup table (ICLossLookup) */
+
+  /* IC losses from the lookup table (ICLossLookup) */
+  if(ICLossVector.size()) {
     icl = gsl_spline_eval(ICLossLookup, E, accIC);
   }
+
   /* adiabatic losses (adlossCoeff = V/R) */
   adl = adLossCoeff * E;
 
@@ -447,12 +448,7 @@ double Particles::EnergyLossRate(double E) {
     icl = 0.;
     bremsl = 0.;
   }
-  if (DEBUG == true) {
-    synchl = 0.;
-    bremsl = 0.;
-    adl = 0.;
-  }
-  //cout<<synchl <<" "<< icl  <<" "<< adl  <<" "<< bremsl<<"  "<<synchl + icl + adl + bremsl<<endl;
+
   return synchl + icl + adl + bremsl;
 }
 
