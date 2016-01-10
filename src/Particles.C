@@ -208,14 +208,16 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   }
 
 
-  if (!METHOD)
+  if (!METHOD){
     PrepareAndRunNumericalSolver(ParticleSpectrum, onlyprepare, dontinitialise);
+  }
   else if (METHOD==1) {
     CalculateEnergyTrajectory();
     CalcSpecSemiAnalyticConstELoss();
   }
-  else CalcSpecSemiAnalyticNoELoss();
-
+  else {
+    CalcSpecSemiAnalyticNoELoss();
+  }   
   if (!QUIETMODE) {
     cout << ">> PARTICLE EVOLUTION DONE. EXITING." << endl;
     cout << endl;
@@ -494,9 +496,18 @@ double Particles::EnergyLossRate(double E) {
   double bremsl = 0.;
   double bremsl_ep = 0.;
   double bremsl_ee = 0.;
-  double gamma = E / m_e;
+  double ionization = 0.;
+  double ppcol=0;
+  double gamma;
+  if (Type) {
+    gamma = (E + m_p) / m_p;
+  }
+  else{
+    gamma = (E + m_e) / m_e;
+  }
   if (gamma < 1.) gamma = 1.;
   double gamma2 = gamma * gamma;
+  double beta=sqrt(1-1/gamma2);
   double p = sqrt(gamma2 - 1.);
   /* S-parameter. This is only the case in a pure hydrogen gas environment. For
    * more comlex mixture,
@@ -506,9 +517,19 @@ double Particles::EnergyLossRate(double E) {
   /* synchrotron losses */
   synchl = (4. / 3.) * sigma_T * c_speed * BField * BField * gamma * gamma /
            (8. * pi);
-
-  /* IC losses from the lookup table (ICLossLookup) */
-  if(ICLossVector.size()) {
+  /* ionization losses */
+  //Mean value in the interstellar medium if you consider 10% He
+  double z=1.2;
+  //The ions are the protons
+  double Z=1;  
+  double I=15*eV_to_erg; //erg
+  
+  ionization=N*z*4.*pi*pow(el_charge,4)*(Z*Z)/(m_e*beta/c_speed)*(log((2*m_e*pow(beta,2)/I)*gamma2)-pow(beta,2));
+  
+  
+  if(!ICLossVector.size()) icl=0.;
+  else {
+    /* IC losses from the lookup table (ICLossLookup) */
     icl = gsl_spline_eval(ICLossLookup, E, accIC);
   }
 
@@ -532,11 +553,31 @@ double Particles::EnergyLossRate(double E) {
 
   /* in case of protons, only take adiabatic losses into account */
   if (Type) {
-    synchl = 0.;
+    //synchl = 0.;
     icl = 0.;
-    bremsl = 0.;
+    //bremsl = 0.;
+    //Collision pp
+    double Tpth=2*m_pi+(m_pi*m_pi/(2*m_p));
+    if(E>Tpth) {
+      double e=E/Tpth;
+      double k=0.3;
+      double Cbarn_cm=1e-24;
+      double sigma;
+      double sigma1=30.7-0.96*log(e)+0.18*log(e)*log(e);
+      double sigma2=1-pow(1/e,1.9);
+      sigma=sigma1*pow(sigma2,3)*1e-3*Cbarn_cm;
+      ppcol=N*E*k*c_speed*sigma;
+    }
+    else {
+      ppcol=0;
+      }
   }
-  return synchl + icl + adl + bremsl;
+  if (DEBUG == true) {
+    synchl = 0.;
+    bremsl = 0.;
+    adl = 0.;
+  }
+  return synchl + icl + adl + bremsl + ionization + ppcol;
 }
 
 /** Prepare axes for the numerical solver (and if onlyprepare==false) call the
@@ -1342,6 +1383,7 @@ double Particles::Integrate(fPointer f, double *x, double emin, double emax,
   return integral;
 }
 
+<<<<<<< HEAD
 /**
  * Set a custom injection spectrum. Input is a 2D vector with 2 colums, first
  * column holds energy in erg. 
@@ -1446,3 +1488,14 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
   return;    
 }
 
+=======
+double Particles::LossTimeScale(string type, double E){
+  if (!type.compare("electrons")){
+    Type = 0;
+  }
+  else if(!type.compare("protons")){
+      Type = 1;
+    }
+  return E/GetEnergyLossRate(E);
+}
+>>>>>>> ajout des pertes par ionization et par collision pp ainsi que de la fonction qui calcule le tlossrate
