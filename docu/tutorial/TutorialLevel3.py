@@ -26,7 +26,7 @@ if __name__ == "__main__":
   lum = float(configParser.get('Parameters','Luminosity'))
   age = float(configParser.get('Parameters','Age'))
   tc = float(configParser.get('Parameters','CharAge'))
-  dist = gp.pc_to_cm*float(configParser.get('Parameters','Distance'))
+  dist = float(configParser.get('Parameters','Distance'))
   dens = float(configParser.get('Parameters','AmbientDensity'))
   bfield = float(configParser.get('Parameters','BField'))
   t = float(configParser.get('Parameters','tRAD'))
@@ -49,7 +49,7 @@ if __name__ == "__main__":
   fp.SetEmax(emax)
   fp.SetEmin(emin)
   fp.SetSpectralIndex(spind)
-  fp.SetEnergyBinsForNumericalSolver(ebins)
+  fp.SetEnergyBins(ebins)
   fp.SetAmbientDensity(dens)
   fp.SetAge(age)
 

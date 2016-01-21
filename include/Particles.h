@@ -403,7 +403,7 @@ class Particles {
   void ExtendRadiusLookup(vector<vector<double> > RLOOKUP) {
     ExtendLookup(RLOOKUP, "Radius");
   }  ///<
-  void ExtendSpeedLookup(vector<vector<double> > VLOOKUP) {
+  void ExtendVelocityLookup(vector<vector<double> > VLOOKUP) {
     ExtendLookup(VLOOKUP, "Speed");
   }  ///<
   vector<vector<double> > GetICLossLookup() { return ICLossVector; }
@@ -485,6 +485,7 @@ class Particles {
   }  ///< set minimal time from where to start the iteration (default: 1yr).
   vector<vector<double> > GetEnergyTrajectoryVector() { return vETrajectory; }
   vector<vector<double> > GetParticleSED();
+  double GetParticleEnergyContent(double E1, double E2);
   void SetCriticalMinEnergyForGridSolver(double eminint) {EminInternal=eminint;}
   void SetIntegratorMemory(string mode);
   void SetInterpolationMethod(string intermeth)

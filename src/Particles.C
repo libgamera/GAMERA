@@ -160,11 +160,14 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
 
   if(escapeTimeConstant) METHOD = 0;
 
-  if(!METHOD) DetermineTMin(EminInternal, Tmin);
+    cout << "1 . " << METHOD << endl;
+
+  if (TminConstant) Tmin = TminConstant;
+  else if(!METHOD) DetermineTMin(EminInternal, Tmin);
   else if(METHOD == 1) Tmin = TminInternal;
   else Tmin = 1.e-3;
 
-  if (TminConstant) Tmin = TminConstant;
+    cout << "2" << endl;
   if(Tmin<TminInternal) Tmin=TminInternal;
   /* get the upper energy boundary of the spectrum. This can either be
    * externally
@@ -175,12 +178,14 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   else
     eMax = DetermineEmax(Tmin);
 
+      cout << "3" << endl;
   /* apply a safe margin to the upper energy boundary
    * in order to prevent numerical effects at the upper end of the spectrum.
    */
   energyMargin = pow(-log(energyMarginFactor), 1. / CutOffFactor);
   eMax *= energyMargin;
 
+    cout << "4" << endl;
   /* if emax falls below emin, return dummy vector with zeroes */
   if (eMax <= Emin) {
     cout << "Particles::FillParticleSpectrumLookup Whaat? eMax lower than "
@@ -192,8 +197,11 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   if (!METHOD)
     PrepareAndRunNumericalSolver(ParticleSpectrum, onlyprepare, dontinitialise);
   else if (METHOD==1) {
+    cout << "5" << endl;
     CalculateEnergyTrajectory();
+      cout << "6" << endl;
     CalcSpecSemiAnalyticConstELoss();
+      cout << "7" << endl;
   }
   else CalcSpecSemiAnalyticNoELoss();
 
@@ -350,8 +358,8 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
   for (unsigned int i = 0; i < st.size(); i++) {
     if (!LookupType.compare(st[i])) {
       if (*spl[i] != NULL) {
-        cout << "Particles::SetLookup: " << st[i]
-        << " lookup already set earlier. Replacing it!" << endl;
+        //cout << "Particles::SetLookup: " << st[i]
+        //<< " lookup already set earlier. Replacing it!" << endl;
         gsl_spline_free(*spl[i]);
       }
       *spl[i] = ImportLookup;
@@ -381,15 +389,18 @@ void Particles::ExtendLookup(vector<vector<double> > v, string LookupType) {
                                          VVector};
   for (unsigned int i = 0; i < st.size(); i++) {
     if (!LookupType.compare(st[i])) {
-      if (vs[i][vs[i].size() - 1][0] >= v[0][0]) {
+      if (vs[i][vs[i].size() - 1][0] > v[0][0]) {
         cout << "Particles::ExtendCRLumLookup - WTF, the vector which to add ("
              << st[i] << ") to the existing one starts at earlier times than "
                          "the existing ones ends. Please keep time order in "
                          "the vector! exiting." << endl;
         return;
       }
-      vs[i].insert(vs[i].end(), v.begin(), v.end());
-      SetLookup(vs[i], LookupType);
+      if(vs[i][vs[i].size() - 1][0] == v[0][0])
+        vs[i].insert(vs[i].end(), v.begin()+1, v.end());
+      else vs[i].insert(vs[i].end(), v.begin(), v.end());
+      SetLookup(vs[i], LookupType);      
+      DetermineLookupTimeBoundaries();
       return;
     }
   }
@@ -525,6 +536,7 @@ void Particles::DetermineTMin(double emin, double &tmin) {
   logsteps = 30.;
   logdt = (logtmax - logtmin) / logsteps;
   for (logt = logtmin; logt < logtmax; logt += logdt) {
+    std::cout << logt << endl;
     CalculateEnergyTrajectory(pow(10., logt));
     gsl_interp_accel_reset(accTrInv);
     if (gsl_spline_eval_e(energyTrajectoryInverse, log10(emin), accTrInv,
@@ -685,6 +697,9 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
 
     /* This is the new time! */
     t = T + 0.5 * tbin / yr_to_sec;
+    
+    /* if t is larger than age, exit! */
+    if(t>Age) break;
     /* update the Members at the new time. */
     Lum = 0.;
     SetMembers(t);
@@ -896,7 +911,6 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
   fPointer IntFunc = NULL;
   fUtils->Clear2DVector(ParticleSpectrum);
   double logstep = (log10(eMax) - log10(Emin)) / ebins;
-
   /* info writeout. Disable it by using 'ToggleQuietMode()' */
   if (!Type && QUIETMODE == false)
     cout << "** Evolving Electron Spectrum:" << endl;
@@ -1014,7 +1028,7 @@ void Particles::DetermineLookupTimeBoundaries() {
   if (BVector.size()) btmax = BVector[BVector.size() - 1][0];
   if (RVector.size()) rtmax = RVector[RVector.size() - 1][0];
   if (VVector.size()) vtmax = VVector[VVector.size() - 1][0];
-  if (EscapeVector.size()) esctmin = EscapeVector[EscapeVector.size() - 1][0];
+  if (EscapeVector.size()) esctmax = EscapeVector[EscapeVector.size() - 1][0];
 
   double T0, T1, T2, T3, T4, T;
 
@@ -1109,6 +1123,36 @@ vector<vector<double> > Particles::GetParticleSED() {
   return v;
 }
 
+/**
+ * Return total energy in particles. Input energy bounds in TeV
+ */
+
+double Particles::GetParticleEnergyContent(double E1, double E2) {
+
+  if(E2 <= E1) {
+    cout << "Particles::GetParticleEnergyContent: upper energy bound "
+            "equal/lower than lower energy bound: " << E2 << " <= " << E1 <<
+            " Returning 0 value." << endl;
+    return 0.;
+  }
+  
+  E1 *= TeV_to_erg;
+  E2 *= TeV_to_erg;
+  vector<vector<double> > v;
+  for (unsigned int i = 0; i < ParticleSpectrum.size(); i++) {
+    double E = ParticleSpectrum[i][0];
+    double N = ParticleSpectrum[i][1];
+    if (!N) continue;
+    fUtils->TwoDVectorPushBack(E,E * N,v);
+  }
+
+  if(Type && E1 < m_p ) E1 = m_p;
+  if(!Type && E1 < m_e ) E1 = m_e;
+  if(E2 > ParticleSpectrum[ParticleSpectrum.size()-1][1])
+    E2 = ParticleSpectrum[ParticleSpectrum.size()-1][1];
+
+  return fUtils->Integrate(v,E1,E2);
+}
 
 void Particles::SetIntegratorMemory(string mode) {
   if(!mode.compare("light")) gslmemory=1000;

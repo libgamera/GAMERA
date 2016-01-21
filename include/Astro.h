@@ -163,8 +163,22 @@ class Astro  {
     double CalculateMSWindSpeed(double initialMass);///< Main sequence wind speed as a function of initial star mass
     double CalculateRGWRadius(double pBubble, double mDotRGW, double vRGWind);///< Radius of the red giant wind zone
     void CalculateBField(double x, double y, double z, double &B_tot, double &B_coh, double &B_ord, double &B_iso, vector<double> &regFieldDirection, vector<double> &isoFieldDirection);///< 2D-Model of the large-scale galactic magnetic field structure
-    double HIDensity(double x, double y, double z);///< TODO:COMMENT
-    double H2Density(double x, double y, double z);///< TODO:COMMENT
+    double HTotalDensity(double x, double y, double z);
+    double HIDensity(double x, double y, double z, bool MODULATE = true);///< TODO:COMMENT
+    double H2Density(double x, double y, double z, bool MODULATE = true);///< TODO:COMMENT
+    double HIIDensity(double x, double y, double z, bool MODULATE = true);///< TODO:COMMENT
+    double H_I_2_CMZ(double x, double y, double z, double H_c, double norm);
+    double H_I_2_InnerDisk(double x, double y, double z, double H_d, double norm);
+    double H2CMZ(double x, double y, double z);
+    double HICMZ(double x, double y, double z);
+    double H2InnerDisk(double x, double y, double z);
+    double HIIThickDisk(double x, double y, double z);
+    double HIIThinDisk(double x, double y, double z);
+    double HIInnerDisk(double x, double y, double z);
+    double WarmHIIDensity(double x, double y, double z);
+    double HotHIIDensity(double x, double y, double z);
+    double VeryHotHIIDensity(double x, double y, double z);
+    double GravitationalPotential(double r, double z);
     double CalculateHINorm(double R);///< TODO:COMMENT
     double CalculateH2Norm(double R);///< TODO:COMMENT
     double GetHIColumnDensity(double R);///< TODO:COMMENT
@@ -174,7 +188,7 @@ class Astro  {
     double ModulateGasDensityWithSpirals(double n, double x, double y, double z);
     //double CalculateGasColumnDensity(vector<double> xyzReference,vector<double> GLGB,string gascomponent,double modulate,double range,double steps);///< calculate gas column densities
     double nRadial(double *x, double *pars);///< TODO:COMMENT
-    void GetCartesian(double r, double l, double b, double xref, double yref, double zref, double &x, double &y, double &z);///< Galactic coordinates (GL,GB,R) ->Cartesian
+    vector<double> GetCartesian(double r, double l, double b, vector<double> xyzref);///< Galactic coordinates (GL,GB,R) ->Cartesian
     void GetGalactic(double x, double y, double z, double xref, double yref, double zref, double &l, double &b);///< Cartesian coordinates -> Galactic Coordinates(GL,GB,R)
     void RotateCoordinates(double &x, double &y, double &z, double phi, double theta, double psi);///< rotate coordinate around (0,0,0) by (phi,theta,psi)
     void RandomTangentialShift(double r, double width, double &x, double &y);///< gaussian shift along concentric circle (retains r-distribution)

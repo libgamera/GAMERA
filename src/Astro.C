@@ -473,29 +473,248 @@ void Astro::CalculateBField(double x, double y, double z, double &B_tot, double 
 /**
  *
  */
-double Astro::HIDensity(double x, double y, double z) {
+
+double Astro::HTotalDensity(double x, double y, double z) {
+  
+  double n = H2Density(x,y,z,false) + HIDensity(x,y,z,false) + HIIDensity(x,y,z,false);
+  if(SPIRALARMMODEL != 2) n = ModulateGasDensityWithSpirals(n,x,y,z);
+  return n;
+}
+
+double Astro::HIDensity(double x, double y, double z, bool MODULATE) {
   double R = sqrt(pow(x,2.)+pow(y,2.));
-  double h1density = 0.;
-  double norm = CalculateHINorm(R);
-  double FWHM = GetHIFWHM(R)/1000.;
-  h1density = 0.7*exp(-pow(z/(0.55*FWHM),2.));
-  h1density += 0.19*exp(-pow(z/(1.38*FWHM),2.));
-  h1density += 0.11*exp(-fabs(z)/(1.75*FWHM));
-  h1density *= norm;
-  return h1density;
+  double n = 0.;
+  if( R < 3.) {
+    n = HICMZ(x,y,z);
+    n += HIInnerDisk(x,y,z);
+  }
+  else {
+    double norm = CalculateHINorm(R);
+    double FWHM = GetHIFWHM(R)/1000.;
+    n = 0.7*exp(-pow(z/(0.55*FWHM),2.));
+    n += 0.19*exp(-pow(z/(1.38*FWHM),2.));
+    n += 0.11*exp(-fabs(z)/(1.75*FWHM));
+    n *= norm;
+  }
+  if(MODULATE && SPIRALARMMODEL != 2) n = ModulateGasDensityWithSpirals(n,x,y,z);
+  return n;
 }
 
 /**
  *
  */
-double Astro::H2Density(double x, double y, double z) {
+double Astro::H2Density(double x, double y, double z, bool MODULATE) {
   double R = sqrt(pow(x,2.)+pow(y,2.));
-  double h2density = 0.;
-  double norm = CalculateH2Norm(R);
-  double sigma = GetH2FWHM(R)/(2.*sqrt(2.*log(2.)));
-  sigma /= 1000.;
-  h2density = norm*exp(-pow(z/(sqrt(2.)*sigma),2.));
-  return h2density;
+  double n = 0.;
+  if( R < 3.) {
+    n = H2CMZ(x,y,z);
+    n += H2InnerDisk(x,y,z);
+    n *= 2.;
+  }
+  else {
+    double norm = CalculateH2Norm(R);
+    double sigma = GetH2FWHM(R)/(2.*sqrt(2.*log(2.)));
+    sigma /= 1000.;
+    n = norm*exp(-pow(z/(sqrt(2.)*sigma),2.));
+  }
+  if(MODULATE && SPIRALARMMODEL != 2) n = ModulateGasDensityWithSpirals(n,x,y,z);
+  return n;
+}
+
+
+/**
+ *
+ */
+double Astro::HIIDensity(double x, double y, double z, bool MODULATE) {
+  double Rsquare = x * x + y * y;
+  double n = 0.;
+  if( Rsquare < 9.) {
+    n = WarmHIIDensity(x,y,z);
+    n += HotHIIDensity(x,y,z);
+    n += VeryHotHIIDensity(x,y,z);
+  }
+  else n = HIIThickDisk(x,y,z) + HIIThinDisk(x,y,z);
+
+  if(MODULATE && SPIRALARMMODEL != 2) n = ModulateGasDensityWithSpirals(n,x,y,z);
+  return n;
+}
+
+// TODO: can't implement this solution because infos in paper are not complete!
+//double Astro::HIISpiralArms(double x, double y, double z, double fna, double hHa, double wwa, double F) {
+//  double Aa = 8.5;
+//  double sech2 = 1. / cosh(r - Aa);
+//  double f = {}
+//  for(i = 0; i < 5; i++) {
+//    double sech1 = 1. / cosh( z / hjha[i] );
+//    double Ga = f[i] * sech1 * sech1 * sech2 * sech2;  
+//    
+//  }
+//}
+
+
+double Astro::HIIThickDisk(double x, double y, double z) {
+
+  double n1 = 3.3e-2 / 0.95;
+  double H1 = 0.95;
+  double A1 = 17.;
+  double r = sqrt(x * x + y * y);
+  double Rsol = 8.5;
+  double sech = 1. / cosh( z / H1 );
+  double g1 = 0.;
+  if( r < A1 ) {
+    g1 = cos(pi * r / (2. * A1)) / cos(pi * Rsol / (2. * A1));
+  }
+  
+  return n1 * g1 * sech * sech;
+}
+
+double Astro::HIIThinDisk(double x, double y, double z) {
+
+  double n2 = 9.e-2;
+  double H2 = 0.14;
+  double A2 = 3.7;
+  double A2corr = 1.8;
+  double sech = 1. / cosh(z / H2);
+  double r = sqrt(x * x + y * y );
+  double g2 = exp(- (r - A2) * (r - A2) / (A2corr * A2corr));
+  return n2 * g2 * sech * sech;
+
+}
+
+
+double Astro::WarmHIIDensity(double x, double y, double z) {
+  double y3 = -1.e-2;
+  double z3 = -2.e-2;
+  double L3 = 0.145;
+  double H3 = 2.6e-2;
+  double L2 = 3.7;
+  double H2 = 0.14;
+  double L1 = 17.;
+  double H1 = 0.95;
+  double r = sqrt( x * x + y * y );
+
+  double sech1 = 1. / cosh( z / H1 );
+  double sech2 = 1. / cosh( z / H2 );
+
+  double n = exp(-( x * x + (y - y3)*(y - y3) )/( L3 * L3 ))
+           * exp(-( z - z3 )*( z - z3 )/( H3 * H3 ))
+           + 9.e-3 * exp(-( r - L2 )*( r - L2 )/( 0.25 * L2 * L2 )) *sech2 *sech2;
+  if(r<L1) {
+    n += 5.e-3 * cos( 0.5 * pi * r / L1 ) * sech1 * sech1;
+  }
+  n *= 8.;
+  return n;
+}
+
+
+double Astro::H_I_2_CMZ(double x, double y, double z, double H_c, double norm) {
+
+  double x_c = -5.e-2;
+  double y_c = 5.e-2;
+  double theta_c = pi * 70. / 180.;
+  double X_c = 0.125;
+  double L_c = 0.137;
+
+  double X = ( x - x_c ) * cos( theta_c ) + ( y - y_c ) * sin( theta_c );
+  double Y = -( x - x_c ) * sin( theta_c ) + ( y - y_c ) * cos( theta_c );
+
+  double n = exp(-pow( sqrt(X * X + (2.5 * Y) * (2.5 * Y) ) - X_c, 4.) / L_c)
+              * exp(- z * z / (H_c * H_c)) * norm;
+
+  return n;
+}
+
+double Astro::H2CMZ(double x, double y, double z) {
+  double norm = 150.;
+  double H_c = 1.8e-2;
+  return H_I_2_CMZ(x,y,z,H_c,norm);
+}
+
+double Astro::HICMZ(double x, double y, double z) {
+  double norm = 8.8;
+  double H_c = 5.4e-2;
+  return H_I_2_CMZ(x,y,z,H_c,norm);
+}
+
+double Astro::H_I_2_InnerDisk(double x, double y, double z, double H_d, double norm) { 
+
+  double X_d = 1.2;
+  double L_d = 0.438;
+
+  double alpha = pi * 13.5 / 180.;
+  double beta = pi * 20. / 180.;
+  double theta_d = pi * 48.5 / 180.;
+  
+  double sa = sin(alpha);
+  double sb = sin(beta);
+  double st = sin(theta_d);
+
+  double ca = cos(alpha);
+  double cb = cos(beta);
+  double ct = cos(theta_d);
+
+  double X = x * cb * ct - y * (sa * sb * ct - ca * st) - z * (ca * sb * ct + sa * st);
+  double Y = - x * cb * st + y * (sa * sb * st + ca * ct) + z * (ca * sb * st - sa * ct);
+  double Z = x * sb + y * sa * cb + z * ca * cb;
+
+  double n = exp(-pow( sqrt(X * X + (3.1 * Y) * (3.1 * Y) ) - X_d, 4.) / L_d)
+           * exp(- Z * Z / (H_d * H_d)) * norm;
+ 
+  return n; 
+}
+
+
+double Astro::H2InnerDisk(double x, double y, double z) {
+  double norm = 4.8;
+  double H_d = 4.2e-2;
+  return H_I_2_InnerDisk(x,y,z,H_d,norm);
+}
+
+double Astro::HIInnerDisk(double x, double y, double z) {
+  double norm = 0.34;
+  double H_d = 0.12;
+  return H_I_2_InnerDisk(x,y,z,H_d,norm);
+}
+
+double Astro::HotHIIDensity(double x, double y, double z) {
+
+  double r = sqrt( x * x + y * y );
+  double n = pow( pow(9.e-3,2./3.) - 1.54e-17 * ( GravitationalPotential( r, z ) - GravitationalPotential(0., 0.) ),1.5);
+  return n;
+
+}
+
+double Astro::VeryHotHIIDensity(double x, double y, double z) {
+
+  double alpha = pi * 21. / 180.;
+  double eta = y * cos (alpha) + z * sin (alpha);
+  double zeta = -y * sin (alpha) + z * cos (alpha);
+  double Lvh = 0.162;
+  double Hvh = 0.09;
+    
+  double n = 0.29 * exp( - ( (x * x + eta * eta)/(Lvh * Lvh) + zeta * zeta / (Hvh * Hvh) ) );
+  return n;
+}
+double Astro::GravitationalPotential(double r, double z) {
+
+  double C1 = 8.887;
+  double a1 = 6.5;
+  double b1 = 0.26;
+  double C2 = 3.;
+  double a2 = 0.7;
+  double C3  = 0.325;
+  double a3 = 12.;
+  double rh = 210.;
+  double k = sqrt(1. + (a3 * a3 + r * r + z * z) / (rh * rh));
+  double l = a1 + sqrt(z * z + b1 * b1);
+
+  double phi = C1 / sqrt( r * r + l * l )
+             + C2 / (a2 + sqrt(r * r + z * z))
+             - C3 * log((k-1)/(k+1));
+
+  phi *= -225.e5 * 225.e5;
+  return phi;
+
 }
 
 /**
@@ -627,14 +846,18 @@ double Astro::nRadial(double *x, double *pars) {
   double r = x[0];
   double l = pars[0];
   double b = pars[1];
-  double xRef = pars[2];
-  double yRef = pars[3];
-  double zRef = pars[4];
+  vector<double> xyzref;
+  xyzref.resize(3);
+  xyzref[0] = pars[2];
+  xyzref[1] = pars[3];
+  xyzref[2] = pars[4];
   int gasspecies = pars[5];
   int modulatewitharms = (int)pars[6];
 
-  double xActual,yActual,zActual;
-  GetCartesian(r,l,b,xRef,yRef,zRef,xActual,yActual,zActual);
+  vector<double> xyzactual = GetCartesian(r,l,b,xyzref);
+  double xActual = xyzactual[0];
+  double yActual = xyzactual[1];
+  double zActual = xyzactual[2];
 
   double n=0.;
   if(!gasspecies) n = HIDensity(xActual,yActual,zActual);
@@ -652,18 +875,25 @@ double Astro::nRadial(double *x, double *pars) {
 /**
  * Galactic coordinates (R,GL,GB) ->Cartesian
  */
-void Astro::GetCartesian(double r, double l, double b, double xref, double yref, double zref, double &x, double &y, double &z) {
+vector<double> Astro::GetCartesian(double r, double l, double b, vector<double> xyzref) {
 
   double dl, db;
+  vector<double> xyz;
+  xyz.resize(3);
+  double xref = xyzref[0];
+  double yref = xyzref[1];
+  double zref = xyzref[2];
+
   dl = db = 0.;
   dl = atan2(yref,xref);
   db = atan(zref/sqrt(xref*xref+yref*yref));
   double phi = (pi/180.)*l+dl;
   double theta = pi/2. - (pi/180.)*b+db;
-  x = xref - r*sin(theta)*cos(phi);
-  y = yref - r*sin(theta)*sin(phi);
-  z = zref + r*cos(theta);
-  return;
+  xyz[0] = xref - r*sin(theta)*cos(phi);
+  xyz[1] = yref - r*sin(theta)*sin(phi);
+  xyz[2] = zref + r*cos(theta);
+
+  return xyz;
 }
 
 /**
@@ -754,7 +984,6 @@ void Astro::RotateCoordinates(double &x, double &y, double &z, double phi, doubl
  * Switch off an individual arm in Astro spiral model
  */
 void Astro::DisableArm(int arm) {
-  if(!QUIETMODE) std::cout<<"Disabling Arm no. "<<arm<<"."<<std::endl;
   bool Set = false;
   for(unsigned int i=0;i<ArmsVector.size();i++) {
     if(ArmsVector[i]==arm) {
@@ -765,9 +994,7 @@ void Astro::DisableArm(int arm) {
   }
   if(Set==false) std::cout<<"Arm "<<arm<<" already disabled."
                             "Nothing to do! "<<std::endl;
-  if(!QUIETMODE) {
-    for(unsigned int i=0;i<ArmsVector.size();i++) std::cout<<"Arm["<<i<<"]="<<ArmsVector[i]<<std::endl;
-  }
+ 
   return;
 }
 
