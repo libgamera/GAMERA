@@ -17,7 +17,7 @@ Radiation::Radiation() {
   QUIETMODE = false;
   PiModel = 1;
   SynchModel = 0;
-  integratorTolerance = 5.e-2;
+  integratorTolerance = 1.e-1;
   integratorKronrodRule = 2;
   acc = gsl_interp_accel_alloc();
 }
@@ -394,7 +394,7 @@ double Radiation::ICEmissivityRadFieldIntegrated(double x, void *par) {
   (edash > targetphotonenergymax) ? (boundmax = targetphotonenergymax)
                                   : boundmax = edash;
   if (k > 0.1 || boundmin >= boundmax) return 0.;
-  icgammas = Integrate(IntFunc, xpars, boundmin, boundmax, integratorTolerance*0.1,6);
+  icgammas = Integrate(IntFunc, xpars, boundmin, boundmax, integratorTolerance,6);
   if (std::isnan(icgammas) || std::isinf(icgammas)) return 0.;
   if (INTEGRATEOVERGAMMAS == true)
     return icgammas * egamma;

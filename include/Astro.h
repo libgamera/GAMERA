@@ -11,8 +11,6 @@
 #define kpc_to_cm 3.0857e21
 /* proton mass in g */
 #define m_p_g 1.6726e-24
-/* well... pi! */
-#define pi 3.1416
 /* year in seconds */
 #define yr_to_sec 3.15576e7
 /* solar mass */
@@ -29,8 +27,6 @@
 #define m_pi 2.1622194e-4
 /* parsec to cm */
 #define pc_to_cm 3.0857e18
-/* well... pi! */
-#define pi 3.1416
 /* year in seconds */
 #define yr_to_sec 3.15576e7
 /* solar mass */

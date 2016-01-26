@@ -407,6 +407,9 @@ class Particles {
     ExtendLookup(VLOOKUP, "Speed");
   }  ///<
   vector<vector<double> > GetICLossLookup() { return ICLossVector; }
+  vector<vector<double> > GetLuminosityLookup() { 
+    return fUtils->VectorAxisPow10(LumVector,1); 
+  }
   double GetEnergyLossRate(double E) { return EnergyLossRate(E); }
   void SetEnergyBins(double EBINS) {
     ebins = EBINS;
@@ -430,21 +433,27 @@ class Particles {
     TminConstant = TMIN;
   }  ///< Constanty set minimal time of injected particles
   void SetEmax(double EMAX) {
+    eMaxVector.clear();
     eMaxConstant = EMAX;
   }  ///< Constanty set maximal energy of particle spectrum
   void SetBField(double BEXT) {
+    BVector.clear();
     BConstant = BEXT;
   }  ///< Constanty set B-Field value
   void SetAmbientDensity(double NCONSTANT) {
+    NVector.clear();
     NConstant = NCONSTANT;
   }  ///< Constanty set value of ambient density
   void SetLuminosity(double LUMConstant) {
+    LumVector.clear();
     LumConstant = LUMConstant;
   }  ///< Constantly set value of source luminosity
   void SetSourceExtension(double r) {
+    RVector.clear();
     RConstant = pc_to_cm*r;
   }  ///< Constanty set value of source extension (pc)
   void SetSourceExpansionSpeed(double v) {
+    VVector.clear();
     VConstant = v;
   }  ///< Constanty set value of source expansion speed (cm/s)
   void SetCutOffFactor(double CUTOFFFACTOR) {

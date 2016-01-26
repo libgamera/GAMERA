@@ -131,6 +131,11 @@ class Utils {
                     const char* t, int l);
   void SetInterpolationMethod(string intermeth);
   void Clear2DVector(vector< vector<double> > &v);
+  vector< vector<double> > VectorAxisLogarithm(vector< vector<double> > v,
+                                               int column);
+
+  vector< vector<double> > VectorAxisPow10(vector< vector<double> > v,
+                                                    int column);
   interp2d_spline *TwoDsplineFromTwoDVector(vector< vector<double> > v);
   void SetInternal1DSpline(vector< vector<double> > v) {
     gsl_interp_accel_reset(acc);

@@ -394,7 +394,7 @@ vector<double> Utils::CustomFunctionRandom(vector< vector<double> > f,
  */
 double Utils::Integrate(vector< vector<double> > f, double xmin, double xmax) {
   if(!f.size()) {
-    cout << "Utils::CustomFunctionRandom: function vector empty! "
+    cout << "Utils::Integrate: function vector empty! "
     "Exiting & returning 0." << endl;
     return 0.;
   }
@@ -522,6 +522,38 @@ vector< vector<double> > Utils::SortTwoDVector(vector< vector<double> > v,
   }
   if(!column) sort (v.begin(), v.end(), sortcriterionfirstcolumn);
   else  sort (v.begin(), v.end(), sortcriterionsecondcolumn);
+
+  return v;
+}
+
+vector< vector<double> > Utils::VectorAxisLogarithm(vector< vector<double> > v,
+                                                    int column) {
+  for(unsigned int i = 0; i < v.size() ; i++) {
+    double xval = v[i][0];
+    double yval = v[i][1];
+
+    if(column == 0) 
+      v[i][0] = log10(xval);
+    if(column == 1) 
+      v[i][1] = log10(yval);
+    
+  }
+
+  return v;
+}
+
+vector< vector<double> > Utils::VectorAxisPow10(vector< vector<double> > v,
+                                                    int column) {
+  for(unsigned int i = 0; i < v.size() ; i++) {
+    double xval = v[i][0];
+    double yval = v[i][1];
+
+    if(column == 0) 
+      v[i][0] = pow(10.,xval);
+    if(column == 1) 
+      v[i][1] = pow(10.,yval);
+    
+  }
 
   return v;
 }
