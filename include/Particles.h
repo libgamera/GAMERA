@@ -405,11 +405,17 @@ class Particles {
   }  ///<
   void ExtendVelocityLookup(vector<vector<double> > VLOOKUP) {
     ExtendLookup(VLOOKUP, "Speed");
-  }  ///<
+  }  ///< 
   vector<vector<double> > GetICLossLookup() { return ICLossVector; }
   vector<vector<double> > GetLuminosityLookup() { 
     return fUtils->VectorAxisPow10(LumVector,1); 
   }
+  vector<vector<double> > GetEmaxLookup() { 
+    return fUtils->VectorAxisPow10(eMaxVector,1); 
+  }
+  vector<vector<double> > GetBFieldLookup() {return BVector; }
+  vector<vector<double> > GetRadiusLookup() {return RVector; }
+  vector<vector<double> > GetVelocityLookup() {return VVector; }
   double GetEnergyLossRate(double E) { return EnergyLossRate(E); }
   void SetEnergyBins(double EBINS) {
     ebins = EBINS;

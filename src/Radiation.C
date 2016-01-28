@@ -1362,6 +1362,92 @@ void Radiation::CalculateDifferentialPhotonSpectrum(int steps, double emin,
   return;
 }
 
+/** Calculate differential photon spectra for the different radiation processes.
+ *  Spectral points will be calculated for energy points given in 'points'.
+ *  These points have to be in units of 'erg'!
+ *  They are stored in the 2D 'diffspec' vector and can be accessed via the
+ *  Radiation::ReturnDifferentialSpectrum() member function.
+ */
+void Radiation::CalculateDifferentialPhotonSpectrum(vector<double> points) {
+  if (!points.size()) {
+    cout << "Radiation::ReturnDifferentialSpectrum: Emin>Emax! Check your "
+            "boundaries. Exiting..." << endl;
+    return;
+  }
+  fUtils->Clear2DVector(diffSpec);
+  if (!ElectronVector.size() && !ProtonVector.size()) {
+    cout << "Radiation::ReturnDifferentialSpectrum: No particle spectra filled "
+            "-> No gamma spectra to calculate. Exiting..." << endl;
+    return;
+  }
+  if (!QUIETMODE) {
+    cout << "_________________________________________" << endl;
+    cout << ">> CALCULATING SED FROM PARENT PARTICLES " << endl;
+  }
+  double ICVal, SynchVal, BremsVal, ppVal, E, Emin, Emax;
+  if (!ProtonVector.size()) {
+    Emax = ElectronVector[ElectronVector.size() - 1][0];
+    Emin = ElectronVector[0][0] * 1.e-6;
+    if (BField)
+      Emin *= 1.e-10;  // because in this case we have to go to radio energies
+                       // (synchrotron)
+  } else if (!ElectronVector.size()) {
+    Emax = ProtonVector[ProtonVector.size() - 1][0];
+    Emin = ProtonVector[0][0] * 1.e-6;
+  } else {
+    (ElectronVector[ElectronVector.size() - 1][0] >
+     ProtonVector[ProtonVector.size() - 1][0])
+        ? (Emax = ElectronVector[ElectronVector.size() - 1][0])
+        : (Emax = ProtonVector[ProtonVector.size() - 1][0]);
+    Emin = ElectronVector[0][0] * 1.e-6;
+    if (BField)
+      Emin *= 1.e-10;  // because in this case we have to go to radio energies
+                       // (synchrotron)
+  }
+  if (QUIETMODE == false)
+    cout << "** Calculating differential gamma-ray emission:" << endl;
+  int size = (int)points.size();
+  for (int i = 0; i < size; i++) {
+    if (QUIETMODE == false) {
+      cout << "\r";
+      cout << "    "
+           << i+1 << " / " << size
+           << " points calculated" << std::flush;
+    }
+    E = points[i];
+
+    ICVal = SynchVal = BremsVal = ppVal = 0.;
+
+    if (ElectronVector.size()) {
+      CalculateDifferentialGammaEmission(E, 0);
+      ICVal = GetDifferentialICFlux();
+      SynchVal = GetDifferentialSynchFlux();
+      BremsVal = GetDifferentialBremsFlux();
+    } else
+      ICVal = SynchVal = BremsVal = 0.;
+    if (ProtonVector.size()) {
+      CalculateDifferentialGammaEmission(E, 1);
+      ppVal = GetDifferentialPPFlux();
+    } else
+      ppVal = 0.;
+    diffSpec.push_back(vector<double>());
+    diffSpec[diffSpec.size() - 1].push_back(E);
+    diffSpec[diffSpec.size() - 1]
+        .push_back(ppVal + ICVal + BremsVal + SynchVal);
+    diffSpec[diffSpec.size() - 1].push_back(ppVal);
+    diffSpec[diffSpec.size() - 1].push_back(ICVal);
+    diffSpec[diffSpec.size() - 1].push_back(BremsVal);
+    diffSpec[diffSpec.size() - 1].push_back(SynchVal);
+  }
+  if (QUIETMODE == false) {
+    cout << endl;
+    cout << "    -> DONE!   " << endl;
+    cout << endl;
+    cout << ">> SED CALCULATION DONE. EXITING." << endl;
+    cout << endl;
+  }
+  return;
+}
 /**
  * Return the differential photon spectra dN/dE [number of photons/(erg*s*cm^2)]
  * vs E [erg] in a 2D-Vector

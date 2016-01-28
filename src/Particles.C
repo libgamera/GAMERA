@@ -323,7 +323,6 @@ void Particles::SetMembers(double t) {
 //      }
 //      else {
        double value = gsl_spline_eval(splines[i], t, accs[i]);
-        
 //  std::cout << "33.2 " << endl;
 //      }
 //      std::cout<<".."<< t << "."<<value<<endl;
@@ -502,7 +501,6 @@ double Particles::EnergyLossRate(double E) {
 void Particles::PrepareAndRunNumericalSolver(
     vector<vector<double> > &particlespectrum, bool onlyprepare,
     bool dontinitialise) {
-  std::cout<< "eMax: " << eMax << std::endl;
   if (EnergyAxisUpperBoundary) {
     GetAxis(Emin, EnergyAxisUpperBoundary, ebins, energyAxis, true);
   } else if (EnergyAxisLowerBoundary) {
@@ -570,7 +568,6 @@ void Particles::DetermineTMin(double emin, double &tmin) {
   logsteps = 30.;
   logdt = (logtmax - logtmin) / logsteps;
   for (logt = logtmin; logt < logtmax; logt += logdt) {
-    std::cout << logt << endl;
     CalculateEnergyTrajectory(pow(10., logt));
     gsl_interp_accel_reset(accTrInv);
     if (gsl_spline_eval_e(energyTrajectoryInverse, log10(emin), accTrInv,

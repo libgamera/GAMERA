@@ -243,6 +243,7 @@ class Radiation {
   void CalculateDifferentialGammaEmission(double e, int particletype);
   void CalculateDifferentialPhotonSpectrum(int steps = 100, double emin = 0.,
                                            double emax = 0.);
+  void CalculateDifferentialPhotonSpectrum(vector<double> points);
   vector<vector<double> > ReturnDifferentialPhotonSpectrum(int i,
                                                            double emin = 0.,
                                                            double emax = 0.);
