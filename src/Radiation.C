@@ -508,7 +508,7 @@ void Radiation::CreateICLossLookup(int bins) {
     cout << endl;
     cout << "    -> DONE!   " << endl;
     cout << endl;
-    cout << ">> CALCULATING OF IC LOSS LOOKUP COMPLETE " << endl;
+    cout << ">> COMPUTATION OF IC LOSS LOOKUP COMPLETE " << endl;
     cout << endl;
   }
   return;

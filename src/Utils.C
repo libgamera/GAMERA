@@ -454,22 +454,39 @@ gsl_spline *Utils::GSLsplineFromTwoDVector(vector< vector<double> > v) {
 }
 
 
-interp2d_spline *Utils::TwoDsplineFromTwoDVector(vector< vector<double> > v) {
+interp2d_spline *Utils::TwoDsplineFromTwoDVector(vector< vector<double> > v, 
+                                                 double &xmin, double &xmax,
+                                                 double &ymin, double &ymax) {
 
   vector<double> vx;
   vector<double> vy;
+  // get x and y -dimensions
+//  int xdim = 0;
+//  int ydim = 0;
+//  double x == v[0][0];
+//  while(x == v[0][0]) 
+//    x = v[]
+//xdim++;
+//  ydim = (int)v.size()/xdim;
+
+//  std::cout<<xdim<<" "<<ydim<<std::endl;
+
   double az[(int)v.size()];
   for(unsigned int i=0;i<v.size();i++) {
       double x = v[i][0];
       double y = v[i][1];
       double z = v[i][2];
 
-      if(!vx.size()) vx.push_back(x);
-      else if (x != vx[vx.size()-1]) vx.push_back(x);
+      if(!vy.size()) vy.push_back(y);
+      else if (y != vy[vy.size()-1]) vy.push_back(y);
 
-      if(vx.size()==1) vy.push_back(y);
+      if(vy.size()==1) vx.push_back(x);
       az[i] = z;
   }
+  xmin = vx[0];
+  xmax = vx[vx.size()-1];
+  ymin = vy[0];
+  ymax = vy[vy.size()-1];
   unsigned long xs = (unsigned long)vx.size();
   unsigned long ys = (unsigned long)vy.size();
   double ax[(int)xs];
@@ -477,12 +494,12 @@ interp2d_spline *Utils::TwoDsplineFromTwoDVector(vector< vector<double> > v) {
   for(unsigned int i=0;i<vx.size();i++) ax[i] = vx[i];
   for(unsigned int i=0;i<vy.size();i++) ay[i] = vy[i];
 
-  for(unsigned int i=0;i<vx.size();i++) cout << ax[i] <<endl;
-  cout << " - - - - - - " << endl;
-  for(unsigned int i=0;i<vy.size();i++) cout << ay[i] <<endl;
-  cout << " - - - - - - " << endl;
-  for(unsigned int i=0;i<v.size();i++) cout << az[i] <<endl;
-  cout << " - - - - - - " << endl;
+//  for(unsigned int i=0;i<vx.size();i++) cout << ax[i] <<endl;
+////  cout << " - - - - - - " << endl;
+//  for(unsigned int i=0;i<vy.size();i++) cout << ay[i] <<endl;
+////  cout << " - - - - - - " << endl;
+//  for(unsigned int i=0;i<v.size();i++) cout << az[i] <<endl;
+////  cout << " - - - - - - " << endl;
   interp2d_spline *s = interp2d_spline_alloc(interp2d_bilinear, xs, ys);
   interp2d_spline_init (s, ax, ay, az, xs, ys);
   return s;
@@ -527,18 +544,22 @@ vector< vector<double> > Utils::SortTwoDVector(vector< vector<double> > v,
 }
 
 vector< vector<double> > Utils::VectorAxisLogarithm(vector< vector<double> > v,
-                                                    int column) {
-  for(unsigned int i = 0; i < v.size() ; i++) {
-    double xval = v[i][0];
-    double yval = v[i][1];
-
-    if(column == 0) 
-      v[i][0] = log10(xval);
-    if(column == 1) 
-      v[i][1] = log10(yval);
-    
+                                                    unsigned int column) {
+  if(!v.size()) {
+    cout << "Utils::VectorAxisLogarithm: Input vector empty."
+            "Doing nothing." << endl;
+    return v;
   }
-
+  
+  if(column >= v[0].size()) {
+    cout << "Utils::VectorAxisLogarithm: Input vector has "<< v[0].size() << 
+            "columns, but you want to logharithmise column " << column << "!"
+            "Doing nothing." << endl;
+    return v;
+  }
+  for(unsigned int i = 0; i < v.size() ; i++) 
+      v[i][column] = log10(v[i][column]);
+    
   return v;
 }
 

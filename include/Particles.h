@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_spline.h>
+#include <time.h>
 
 
 using namespace std;
@@ -43,6 +44,7 @@ class GSLfuncPart : public gsl_function {
 class Particles {
   typedef double (Particles::*fPointer)(double, void *);
 
+struct timespec time0, time1, time2, time3;
  private:
   Utils *fUtils;
   int Type;  ///< integer indicating particle type. supported: 0-electrons and
@@ -65,12 +67,21 @@ class Particles {
                         ///(constant losses etc), it is set to 0.
   double TmaxInternal;  ///< Same as TminInternal but here it is the maximal
                         ///time
+  double TActual;  ///< Actual time of iteration time step
   double EminInternal;  ///< internal parameter that is relevant to the grid-
                         /// solver. Essentially, it is used to determine the
                         /// starting time of the iteration. The starting time
                         /// is then determined in a way that all particles that
                         /// are injected before that time are cooled to an
                         /// energy of maximal EminInternal after a time t=age.
+  double MinELookup;    ///< Lower energy bound of custom injection lookup.  
+                        ///  If time evolution of custom spectrum is given, this
+                        ///  is reset at every T = Age step.
+  double MaxELookup;    ///< Upper energy bound of custom injection lookup.  
+                        ///  If time evolution of custom spectrum is given, this
+                        ///  is reset at every T = Age step.
+  double TminLookup;    ///< Lower time bound of custom injection lookup. 
+  double TmaxLookup;    ///< Higher time bound of custom injection lookup.  
   double BField;        ///< amplified B-field immediately dowmstream
   double N;             ///< ambient density
   double R;             ///< source extension (cm)
@@ -180,13 +191,19 @@ class Particles {
                                         ///electrons (erg) - escape time
 
   vector<vector<double> > ICLossVector, LumVector, NVector, BVector, eMaxVector,
-      escapeTimeVector, RVector, VVector;
+      escapeTimeVector, RVector, VVector,tempspec,
+      CustomInjectionSpectrumTimeEvolutionVector,
+      EscapeTimeEnergyTimeEvolutionVector;
   gsl_spline *ICLossLookup, *LumLookup, *NLookup, *BFieldLookup, *eMaxLookup,
       *escapeTimeLookup, *RLookup, *VLookup, *energyTrajectory,
-      *energyTrajectoryInverse;
+      *energyTrajectoryInverse,*CustomInjectionSpectrum;
+  interp2d_spline *CustomInjectionSpectrumTimeEvolution,
+      *EscapeTimeEnergyTimeEvolution;
   gsl_interp_accel *accIC, *accLum, *accN, *accBField, *acceMax, *accescapeTime,
-      *accR, *accV, *accTr, *accTrInv;
+      *accR, *accV, *accTr, *accTrInv,*accCustInj,
+      *taccsp,*eaccsp,*taccesc,*eaccesc;
   double SourceSpectrum(double e);  ///< particle injection spectrum
+  double EscapeTime(double e);  ///< particle escape time spectrum
   vector<double> timeAxis;          ///< time axis for numerical integrator
   vector<double> energyAxis;        ///< energy axis for numerical integrator
   vector<vector<double> > grid;     ///< 2D grid on which solving takes place
@@ -263,11 +280,6 @@ class Particles {
                                                 ///wiggling.
   void CalculateConstants();  ///< speed hack where often used constants are
                               ///calculated ahead of the grid solving
-  double CustomInjectionSpectrum(double e, double emax,
-                                 double thr = 1.e-2);  ///< custom injection
-                                                       ///spectrum, following
-                                                       ///the shape specified in
-                                                       ///CustomSpectrum
   double PowerLawInjectionSpectrum(double e, double ecut,
                                    double emax);  ///< power law injection
                                                   ///spectrum. If eBreak and
@@ -303,8 +315,8 @@ class Particles {
                                  bool dontinitialise =
                                      false);  ///< fill the lookup that holds
                                               ///the particle spectrum.
-  void CalculateProtonSpectrum() {CalculateParticleSpectrum("protons");}
-  void CalculateElectronSpectrum() {CalculateParticleSpectrum("electrons");}
+  void CalculateProtonSpectrum(int bins = 100) {CalculateParticleSpectrum("protons",bins);}
+  void CalculateElectronSpectrum(int bins = 100) {CalculateParticleSpectrum("electrons",bins);}
   void SetType(string type);
   double EnergyLossRate(double E);  ///< total energy loss rate of particles
 
@@ -338,7 +350,7 @@ class Particles {
   void SetEElectronMax(double EElectronMax) {
     eElectronMax = EElectronMax;
   }  ///< set the maximum energy of electrons in the accelerator
-  void SetEscapeTime(double EscapeTime) {
+  void SetConstantEscapeTime(double EscapeTime) {
     escapeTimeConstant = EscapeTime;
   }  ///< set the time scale of particle escape
   void SetSpectralIndex(double spectralindex) {
@@ -505,5 +517,16 @@ class Particles {
   void SetIntegratorMemory(string mode);
   void SetInterpolationMethod(string intermeth)
     {fUtils->SetInterpolationMethod(intermeth);}
+  void SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int mode);
+  void SetCustomEnergylookup(vector< vector<double> > vCustom,int mode);
+
+  void SetCustomInjectionSpectrumTimeEvolution(vector< vector<double> > vCustomSpectrum) {
+    SetCustomTimeEnergyLookup(vCustomSpectrum,0);}
+  void SetCustomInjectionSpectrum(vector< vector<double> > vSpectrum) {
+    SetCustomEnergylookup(vSpectrum,0);}
+  void SetTimeAndEnergyDependentEscapeTime(vector< vector<double> > vEsc) {
+    SetCustomTimeEnergyLookup(vEsc,1);}
+  void SetEnergyDependentEscapeTime(vector< vector<double> > vEsc) {
+    SetCustomEnergylookup(vEsc,1);}
 };
 #endif

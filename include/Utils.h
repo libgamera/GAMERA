@@ -132,20 +132,34 @@ class Utils {
   void SetInterpolationMethod(string intermeth);
   void Clear2DVector(vector< vector<double> > &v);
   vector< vector<double> > VectorAxisLogarithm(vector< vector<double> > v,
-                                               int column);
+                                               unsigned int column);
 
   vector< vector<double> > VectorAxisPow10(vector< vector<double> > v,
                                                     int column);
-  interp2d_spline *TwoDsplineFromTwoDVector(vector< vector<double> > v);
+  interp2d_spline *TwoDsplineFromTwoDVector(vector< vector<double> > v, 
+                                            double &xmin, double &xmax,
+                                            double &ymin, double &ymax);
   void SetInternal1DSpline(vector< vector<double> > v) {
     gsl_interp_accel_reset(acc);
     if(INTERNAL1DSPLINE!=NULL) gsl_spline_free(INTERNAL1DSPLINE);
     INTERNAL1DSPLINE = GSLsplineFromTwoDVector(v);}
   void SetInternal2DSpline(vector< vector<double> > v) {
+//    std::cout<<" -- - --- --- " <<std::endl;
+//    for(unsigned int i=0;i<v.size();i++) {
+//      for(unsigned int j=0;j<v[i].size();j++) {
+//          std::cout<<" "<<v[i][j];
+//      } 
+//      std::cout<<std::endl;
+//    }
+//    std::cout<<" -- - --- --- " <<std::endl;
     gsl_interp_accel_reset(xacc);
     gsl_interp_accel_reset(yacc);
+//    std::cout<<INTERNAL2DSPLINE<<std::endl;
+//    printf("%p\n", INTERNAL2DSPLINE);
     if(INTERNAL2DSPLINE!=NULL) interp2d_spline_free(INTERNAL2DSPLINE);
-    INTERNAL2DSPLINE = TwoDsplineFromTwoDVector(v);}
+//    printf("%p\n", INTERNAL2DSPLINE);
+    double xmin,xmax,ymin,ymax;
+    INTERNAL2DSPLINE = TwoDsplineFromTwoDVector(v,xmin,xmax,ymin,ymax);}
   double EvalInternal1DSpline(double x) {
     return gsl_spline_eval(INTERNAL1DSPLINE, x, acc);}
   double EvalInternal2DSpline(double x, double y) {

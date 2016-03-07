@@ -9,6 +9,7 @@ Particles::Particles() {
   CutOffFactor = 1000.;
   TminInternal = 1.e-10;
   TmaxInternal = 1.e100;
+  TminLookup = 0.;
   EminInternal = 1.e-3;
   energyMarginFactor = 1.e-3;
   energyMargin = 1.;
@@ -18,10 +19,11 @@ Particles::Particles() {
   SACELI_Told = 0.;
   R = -1.;
   V = -1.;
+  TActual  = 0.;
   gslmemory=5000;
   kronrodrule = 4;
   QUIETMODE = false;
-  EminConstantForNormalisationOnly = false;
+  EminConstantForNormalisationOnly = false; 
   DEBUG = false;
   ICLossLookup = NULL;
   LumLookup = NULL;
@@ -31,7 +33,10 @@ Particles::Particles() {
   RLookup = NULL;
   VLookup = NULL;
   escapeTimeLookup = NULL;
-  integratorTolerance = 1.e-1;
+  EscapeTimeEnergyTimeEvolution = NULL;
+  CustomInjectionSpectrum = NULL;
+  CustomInjectionSpectrumTimeEvolution = NULL;
+  integratorTolerance = 5.e-2;
   ParticleSpectrum.clear();
   ParticleSpectrum.resize(0);
   ICLossVector.resize(0);
@@ -42,6 +47,11 @@ Particles::Particles() {
   escapeTimeVector.resize(0);
   RVector.resize(0);
   VVector.resize(0);
+  Constants.resize(4,NAN);
+  splines.resize(4);
+  vals.resize(4);
+  accs.resize(4);
+  vs.resize(4);
 
   SpectralIndex2 = eBreak = TminConstant = adLossCoeff = EminConstant = 0.;
   
@@ -52,6 +62,7 @@ Particles::Particles() {
       bremsl_eef = 0.;
   LumConstant = BConstant = NConstant = VConstant = RConstant = eMaxConstant = 
       escapeTimeConstant = NAN;
+  MinELookup = MaxELookup = 0.;
   accIC = gsl_interp_accel_alloc();
   accLum = gsl_interp_accel_alloc();
   accN = gsl_interp_accel_alloc();
@@ -62,6 +73,11 @@ Particles::Particles() {
   accV = gsl_interp_accel_alloc();
   accTr = gsl_interp_accel_alloc();
   accTrInv = gsl_interp_accel_alloc();
+  accCustInj = gsl_interp_accel_alloc();
+  taccsp = gsl_interp_accel_alloc();
+  eaccsp = gsl_interp_accel_alloc();
+  taccesc = gsl_interp_accel_alloc();
+  eaccesc = gsl_interp_accel_alloc();
 
   fUtils = new Utils();
 }
@@ -140,10 +156,8 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   CalculateConstants();
 
   DetermineLookupTimeBoundaries();
-  /* determine time from where to start the iteration. Particles that would have
-   * been injected before that time are injected as a blob at Tmin. This can
-   * lead to bumps at low energies, depending on cooling.
-   */
+
+  /* determine algorithm to calculate the particle spectrum */
 
   int METHOD = -1;
   if(Type==0 && (BVector.size() || NVector.size() ||
@@ -157,15 +171,20 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   else if(Type==1 && !std::isnan(VConstant))
     METHOD = 1;
   else METHOD = 2;
+  if(escapeTimeConstant > 0. || escapeTimeLookup != NULL || 
+     EscapeTimeEnergyTimeEvolution != NULL) METHOD = 0;
 
-  if(escapeTimeConstant > 0.) METHOD = 0;
+  /* determine time from where to start the iteration. Particles that would have
+   * been injected before that time are injected as a blob at Tmin. This can
+   * lead to bumps at low energies, depending on cooling.
+   */
+
 
 
   if (TminConstant) Tmin = TminConstant;
   else if(!METHOD) DetermineTMin(EminInternal, Tmin);
   else if(METHOD == 1) Tmin = TminInternal;
   else Tmin = 1.e-3;
-
   if(Tmin<TminInternal) Tmin=TminInternal;
   /* get the upper energy boundary of the spectrum. This can either be
    * externally
@@ -215,7 +234,34 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
  * - exponential cut-offs can be mitigated by very high values of "CutOffFactor"
  */
 double Particles::SourceSpectrum(double e) {
-  return PowerLawInjectionSpectrum(e, eMax, 10. * eMax);
+  if(CustomInjectionSpectrumTimeEvolution != NULL) {
+    if(e < MinELookup || e > MaxELookup) return 0.;
+    return pow(10.,interp2d_spline_eval(
+              CustomInjectionSpectrumTimeEvolution,TActual,log10(e),taccsp,eaccsp));
+  }
+  else if(CustomInjectionSpectrum != NULL) {
+    if(e < MinELookup || e > MaxELookup) return 0.;
+    return pow(10.,
+               gsl_spline_eval(CustomInjectionSpectrum, log10(e), accCustInj));
+  }
+  else {
+    return PowerLawInjectionSpectrum(e, eMax, 10. * eMax);
+  }
+}
+
+double Particles::EscapeTime(double e) {
+  if(EscapeTimeEnergyTimeEvolution != NULL) {
+    if(e < MinELookup || e > MaxELookup) return 0.;
+    return pow(10.,interp2d_spline_eval(
+              EscapeTimeEnergyTimeEvolution,TActual,log10(e),taccesc,eaccesc));
+  }
+  else if(escapeTimeLookup != NULL) {
+    if(e < MinELookup || e > MaxELookup) return 0.;
+    return pow(10.,
+               gsl_spline_eval(escapeTimeLookup, log10(e), accescapeTime));
+  }
+  else if(!std::isnan(escapeTimeConstant)) return escapeTimeConstant;
+  else return 0.;
 }
 
 double Particles::PowerLawInjectionSpectrum(double e, double ecut,
@@ -291,44 +337,44 @@ void Particles::SetMembers(double t) {
   }
   if (t == TminInternal) t *= 1. + 1.e-10;
   if (t == TmaxInternal) t /= 1. + 1.e-10;
-  Constants = {LumConstant,  NConstant,         BConstant,
-               eMaxConstant, escapeTimeConstant};
-  splines = {LumLookup, NLookup, BFieldLookup, eMaxLookup, escapeTimeLookup};
-  accs = {accLum, accN, accBField, acceMax, accescapeTime};
-  vals = {&Lum, &N, &BField, &eMax, &escapeTime};
-  vs = {LumVector, NVector, BVector, eMaxVector, escapeTimeVector};
-//  for  (unsigned int i = 0; i < LumVector.size(); i++) 
-//    std::cout << t << " " << LumVector[i][0] <<  " " <<  LumVector[i][1] << endl;
-//  std::cout << "11" << endl;
+  TActual = t;
+//  Constants = {LumConstant,  NConstant,         BConstant,
+//               eMaxConstant, escapeTimeConstant};
+  Constants[0] = LumConstant;
+  Constants[1] = NConstant;
+  Constants[2] = BConstant;
+  Constants[3] = eMaxConstant;
+
+  splines[0] = LumLookup;
+  splines[1] = NLookup;
+  splines[2] = BFieldLookup;
+  splines[3] = eMaxLookup;
+//  splines = {LumLookup, NLookup, BFieldLookup, eMaxLookup, escapeTimeLookup};
+  accs[0] = accLum;
+  accs[1] = accN;
+  accs[2] = accBField;
+  accs[3] = acceMax;
+
+  vals[0] = &Lum;
+  vals[1] = &N;
+  vals[2] = &BField;
+  vals[3] = &eMax;
+
+  vs[0] =  LumVector;
+  vs[1] =  NVector;
+  vs[2] =  BVector;
+  vs[3] =  eMaxVector;
+
   for (unsigned int i = 0; i < Constants.size(); i++) {
-//    std::cout<<"i="<<i<<endl;
     *vals[i] = 0.;
     if (!std::isnan(Constants[i]))
       *vals[i] = Constants[i];
     else if (splines[i] == NULL)
       continue;
     else {
-      
-//  std::cout << "33 " << i << " " << t << " " <<  vs[i][0][0] << " " << TminInternal <<  endl;
-//      for(unsigned int j=0;j<vs[i].size();j++)
-//        std::cout<< "####" << vs[i][j][0] << " " << vs[i][j][1]-35.4436 << endl;
-//      for(unsigned int j=0;j<splines[i]->size;j++)
-//        std::cout<< ">>>>" << splines[i]->x[j] << " " << splines[i]->y[j] << endl;
-//  std::cout << "-> "<< vs[i].size() << " " << vs[i][0][1] << " " << vs[i][vs[i].size()-1][1]-35.4436 <<endl;
-//      double value = 0.;
-//      if(fabs(1. - vs[i][0][1]/vs[i][vs[i].size()-1][1]) < 1.e-2) {
-//        
-//  std::cout << "33.1 " << endl;
-//        value = vs[i][0][1];
-//      }
-//      else {
        double value = gsl_spline_eval(splines[i], t, accs[i]);
-//  std::cout << "33.2 " << endl;
-//      }
-//      std::cout<<".."<< t << "."<<value<<endl;
       if(i == 0 || i == 3) value = pow(10.,value);
       *vals[i] = value;
-//      std::cout<<".."<< t << ".."<<value<<endl;
     }
   }
 
@@ -375,13 +421,13 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
   }
   gsl_spline *ImportLookup = fUtils->GSLsplineFromTwoDVector(lookup);
   vector<string> st{"ICLoss", "Luminosity", "AmbientDensity", "BField",
-                    "Emax",   "EscapeTime", "Radius",         "Speed"};
+                    "Emax", "Radius",         "Speed"};
   vector<gsl_spline **> spl{&ICLossLookup, &LumLookup,  &NLookup,
-                            &BFieldLookup, &eMaxLookup, &escapeTimeLookup,
+                            &BFieldLookup, &eMaxLookup,
                             &RLookup,      &VLookup};
   vector<vector<vector<double> > *> vs{
       &ICLossVector, &LumVector,        &NVector, &BVector,
-      &eMaxVector,   &escapeTimeVector, &RVector, &VVector};
+      &eMaxVector, &RVector, &VVector};
   for (unsigned int i = 0; i < st.size(); i++) {
     if (!LookupType.compare(st[i])) {
       if (*spl[i] != NULL) {
@@ -409,10 +455,9 @@ void Particles::ExtendLookup(vector<vector<double> > v, string LookupType) {
     return;
   }
   vector<string> st = {"Luminosity", "AmbientDensity", "BField", "Emax",
-                       "EscapeTime", "Radius",         "Speed"};
+                       "Radius",         "Speed"};
   vector<vector<vector<double> > > vs = {LumVector,  NVector,          BVector,
-                                         eMaxVector, escapeTimeVector, RVector,
-                                         VVector};
+                                         eMaxVector, RVector,  VVector};
   vector< vector< double > > lookup;
   if (!LookupType.compare("Luminosity") || !LookupType.compare("Emax")) {
     lookup = fUtils->VectorAxisLogarithm(v,1);
@@ -585,6 +630,12 @@ void Particles::DetermineTMin(double emin, double &tmin) {
  * grid.
  */
 double Particles::DetermineEmax(double tmin) {
+  if(eMaxLookup==NULL) {
+    cout << "Particles::DetermineEmax: Neither constant value for maximum "
+            "particle energy set nor time evolution lookup... Exiting." << endl;
+    exit(1);
+  }
+  
   double t = 0.;
   double dt = 0.;
   double tt = 0.;
@@ -651,22 +702,20 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
   int tt = 1;
   int largestFilledBin = Esize;
   long int count = 0;
-  //std::cout << " min Time bin = " << minTimeBin << std::endl;
   minTimeBin = (Age - startTime) * yr_to_sec / 100;
-  //std::cout << " min Time bin2 = " << minTimeBin << std::endl;
   /* append a new energy vector that will always hold the energy spectrum at the
    *  next time step and initialise it with zeroes.
    */
 
   vector<double> E;
   vector<double> Ecuts;
+  vector<double> EscTime;
   Grid.push_back(vector<double>());
   for (unsigned int i = 0; i < EnergyAxis.size(); i++) {
     Grid[Grid.size() - 1].push_back(0.);
     double e =  pow(10., EnergyAxis[i]);
     E.push_back(e);
   }
-//  std::cout << ".> " << endl;
   /* info writeout. Disable it by using 'ToggleQuietMode()' */
   if (!Type && QUIETMODE == false)
     cout << "** Evolving Electron Spectrum:" << endl;
@@ -675,12 +724,12 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
   /* main loop over time  */
   for (double T = startTime; T < Age; T += tbin / yr_to_sec) {
     /* Set Members (CR luminosity, B-field etc.) at time T */
-//    std::cout << " . . . . . . . " << endl;
     SetMembers(T);
     Ecuts.clear();
-//    std::cout <<"--"<< Lum<<" "<<eMax << " " << LumVector.size() << " " << BField << " " << T << " " << Age << endl;
+    EscTime.clear();
     for (unsigned int i = 0; i < E.size(); i++) {
       Ecuts.push_back(exp(-pow( E[i] / eMax, CutOffFactor)));
+      EscTime.push_back(EscapeTime(E[i]));
     }
     /* dynamically determine tbin size. This is a critical step
      * for the speed of the algorithm. Since the time step size is
@@ -812,23 +861,25 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
 //                                 (ebin - deltaE1) -
 //                             GetMinModSlope(i + 1, ebin, &Grid) * ElossRate_e2 *
 //                                 (ebin - deltaE2));
-      value *= Ecuts[i];
 
-      /* Increase in particles in bin 'i' due to particle injection from the
-       * source */
-      value += tbin * SourceSpectrum(e1);
-
-      /* Decrease in particles in bin 'i' due to particle escape.
-       */
+      /* Decrease in particles in bin 'i' due to particle escape.*/
+      escapeTime = EscTime[i];
       if (escapeTime > 0.) value -= tbin * Grid[0][i] / escapeTime;
 
       /* if value is smaller 0 (can happen if escape time scale is low), set
        * to 0. */
       if (value < 0.) value = 0.;
+
+      /* Increase in particles in bin 'i' due to particle injection from the
+       * source */
+      value += tbin * SourceSpectrum(e1);
+      value *= Ecuts[i];
+
       /* Determine the largest filled energy bin (needed for the efficient
        * calculation of the next iterative time bin.
        */
       if (value > 0.) largestFilledBin = i;
+
       /* set the particle number (value) in at bin 'i' in Grid[i] */
       Grid[1][i] = value;
       particleCount += value * ebin;
@@ -841,7 +892,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
      * This way, only 2 vectors are needed for the calculation of the spectrum
      */
     double Econt = 0.;
-    for (unsigned int ii = 0; ii < Grid[1].size(); ii++) Econt += Grid[0][ii];
+    for (unsigned int ii = 0; ii < Grid[1].size(); ii++) Econt += Grid[1][ii];
     if (fabs(Econt) > 1.) Grid[0] = Grid[1];
   }
 
@@ -999,7 +1050,6 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
   int tt = 0;
   // steady state solution
   if (Age > maxCoolingTime) {
-    cout << "hier nicht!" << endl;
     IntFunc = &Particles::SourceSpectrumWrapper;
     SetMembers(Age);
     for (e = Emin, tt = 0; e < eMax; e = pow(10., log10(e) + logstep), tt++) {
@@ -1015,14 +1065,13 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
   }
   // time integration (constant energy losses)
   else {
-    cout << "hier!" << endl;
     Tmin = pow(10.,vETrajectory[0][0]);
     IntFunc = &Particles::SemiAnalyticConstELossIntegrand;
     for (e = Emin, tt = 0; e < eMax; e = pow(10., log10(e) + logstep), tt++) {
       if (QUIETMODE == false)
         cout << "    " << (int)(100. * tt / ebins) << "\% done\r" << std::flush;
       val = Integrate(IntFunc, &e, log10(Tmin), 10.*log10(Age),
-                             integratorTolerance,kronrodrule);
+                             0.1*integratorTolerance,kronrodrule);
       SetMembers(Age);
       lossrate = EnergyLossRate(e);
       if(lossrate <= 0.) break;
@@ -1037,8 +1086,8 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
 double Particles::SemiAnalyticConstELossIntegrand(double T, void *par) {
   double tdash, E, Enow;
   Enow = *(double *)par;
-  if (gsl_spline_eval_e(energyTrajectoryInverse, log10(Enow), accTrInv, &tdash))
-    return 0.;
+  int err = gsl_spline_eval_e(energyTrajectoryInverse, log10(Enow), accTrInv, &tdash);
+  if(err) return 0.;
   if (T > tdash) return 0.;
   T = pow(10., T);
   if(Age - T < Tmin) return 0.;
@@ -1055,7 +1104,9 @@ double Particles::SemiAnalyticConstELossIntegrand(double T, void *par) {
   double dT = (T - SACELI_Told) * yr_to_sec;
   double dlogT = log10(T) - log10(SACELI_Told);
   SACELI_Told = T;
-  return EnergyLossRate(E) * SourceSpectrum(E) * dT / dlogT;
+  double dE = EnergyLossRate(E);
+  double Sp =   SourceSpectrum(E);
+  return dE * Sp * dT / dlogT;
 }
 
 void Particles::SetType(string type) {
@@ -1083,9 +1134,11 @@ void Particles::DetermineLookupTimeBoundaries() {
 
   // determine starting time and energy
   double lumtmin, emaxtmin, ntmin, btmin, rtmin, vtmin, esctmin, lumtmax,
-      emaxtmax, ntmax, btmax, rtmax, vtmax, esctmax;
-  lumtmin = emaxtmin = ntmin = btmin = rtmin = vtmin = esctmin = 1.e-10;
-  lumtmax = emaxtmax = ntmax = btmax = rtmax = vtmax = esctmax = 1.e100;
+      emaxtmax, ntmax, btmax, rtmax, vtmax, esctmax,custspinjtmin,custspinjtmax;
+  lumtmin = emaxtmin = ntmin = btmin = rtmin = vtmin = esctmin = custspinjtmin 
+    = 1.e-10;
+  lumtmax = emaxtmax = ntmax = btmax = rtmax = vtmax = esctmax = custspinjtmax
+    = 1.e100;
 
   if (LumVector.size()) lumtmin = LumVector[0][0];
   if (eMaxVector.size()) emaxtmin = eMaxVector[0][0];
@@ -1093,7 +1146,10 @@ void Particles::DetermineLookupTimeBoundaries() {
   if (BVector.size()) btmin = BVector[0][0];
   if (RVector.size()) rtmin = RVector[0][0];
   if (VVector.size()) vtmin = VVector[0][0];
-  if (EscapeVector.size()) esctmin = EscapeVector[0][0];
+  if (EscapeTimeEnergyTimeEvolutionVector.size()) 
+        esctmin = EscapeTimeEnergyTimeEvolutionVector[0][0];
+  if (CustomInjectionSpectrumTimeEvolutionVector.size()) 
+        custspinjtmin = CustomInjectionSpectrumTimeEvolutionVector[0][0];
 
   if (LumVector.size()) lumtmax = LumVector[LumVector.size() - 1][0];
   if (eMaxVector.size()) emaxtmax = eMaxVector[eMaxVector.size() - 1][0];
@@ -1101,12 +1157,16 @@ void Particles::DetermineLookupTimeBoundaries() {
   if (BVector.size()) btmax = BVector[BVector.size() - 1][0];
   if (RVector.size()) rtmax = RVector[RVector.size() - 1][0];
   if (VVector.size()) vtmax = VVector[VVector.size() - 1][0];
-  if (EscapeVector.size()) esctmax = EscapeVector[EscapeVector.size() - 1][0];
+  if (EscapeTimeEnergyTimeEvolutionVector.size()) esctmax = 
+    EscapeTimeEnergyTimeEvolutionVector[EscapeTimeEnergyTimeEvolutionVector.size() - 1][0];
+  if (CustomInjectionSpectrumTimeEvolutionVector.size()) custspinjtmax = 
+    CustomInjectionSpectrumTimeEvolutionVector[CustomInjectionSpectrumTimeEvolutionVector.size() - 1][0];
 
-  double T0, T1, T2, T3, T4, T;
+  double T0, T1, T2, T3, T4, T5, T;
 
   // first determine highest common lower boundary time of the lookups
-  if (!emaxtmin && !ntmin && !btmin && !rtmin && !vtmin)
+  if (!emaxtmin && !ntmin && !btmin && !rtmin && !vtmin && !esctmin && 
+      !custspinjtmin)
     T = TminInternal;
   else {
     (rtmin > vtmin) ? T0 = rtmin : T0 = vtmin;
@@ -1114,7 +1174,8 @@ void Particles::DetermineLookupTimeBoundaries() {
     (btmin > T1) ? T2 = btmin : T2 = T1;
     (esctmin > T2) ? T3 = esctmin : T3 = T2;
     (lumtmin > T3) ? T4 = lumtmin : T4 = T3;
-    (emaxtmin > T4) ? T = emaxtmin : T = T4;
+    (emaxtmin > T4) ? T5 = emaxtmin : T5 = T4;
+    (custspinjtmin > T5) ? T = custspinjtmin : T = T5;
   }
   TminInternal = T;
 
@@ -1127,7 +1188,8 @@ void Particles::DetermineLookupTimeBoundaries() {
     (btmax < T1) ? T2 = btmax : T2 = T1;
     (esctmax < T2) ? T3 = esctmax : T3 = T2;
     (lumtmax < T3) ? T4 = lumtmax : T4 = T3;
-    (emaxtmax < T4) ? T = emaxtmax : T = T4;
+    (emaxtmax < T4) ? T5 = emaxtmax : T5 = T4;
+    (custspinjtmax < T5) ? T = custspinjtmax : T = T5;
   }
   TmaxInternal = T;
 
@@ -1157,7 +1219,7 @@ void Particles::CalculateEnergyTrajectory(double TExt) {
     }
     fUtils->TwoDVectorPushBack(log10(T),log10(E),vETrajectory);
     Edot = EnergyLossRate(E);
-    dt = 5.e-2 * E / Edot;
+    dt = 1.e-3 * E / Edot;
     E -= dt * Edot;
     T += dt / yr_to_sec;
     if(T>TmaxInternal || Edot < 0.) break;
@@ -1198,6 +1260,7 @@ vector<vector<double> > Particles::GetParticleSED() {
 
 /**
  * Return total energy in particles. Input energy bounds in TeV
+ * FIXME:This function sucks, have to think of something better!
  */
 
 double Particles::GetParticleEnergyContent(double E1, double E2) {
@@ -1267,3 +1330,108 @@ double Particles::Integrate(fPointer f, double *x, double emin, double emax,
   gsl_integration_workspace_free(w);
   return integral;
 }
+
+/**
+ * Set a custom injection spectrum. Input is a 2D vector with 2 colums, first
+ * column holds energy in erg. 
+ * mode = 0 -> custom injection spectrum lookup:
+ * second column holds differential rate in 
+ * erg^-1 s^-1. If this is specified, otherwise defined spectral parameters 
+ * like luminosity lookups and specified spectral index will be ignored.
+ * NOTE: you still have to specify emax (either via lookup or constant value).
+ * mode = 1 -> energy dependent particle escape time lookup:
+ * second column holds particle escape time in seconds
+ */
+void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
+                                      int mode){
+  if(!vCustom.size()) {
+    cout << "Particles::SetCustomInjectionSpectrum: Input vector empty."
+            "Exiting." << endl;
+    return;
+  }
+  if(vCustom[0].size() != 2) {
+    cout << "Particles::SetCustomInjectionSpectrum:This function supports "
+            "only input vectors with 2 columns, energy vs. differential "
+            "injection rate / escape time. The vector you specified has " << 
+            vCustom[0].size() << " columns. Exiting." << endl;
+    return;
+  }
+  if(!MaxELookup) MinELookup = vCustom[0][0];
+  if(!MaxELookup) MaxELookup = vCustom[vCustom.size()-1][0];
+  vCustom = fUtils->VectorAxisLogarithm(vCustom,0);
+  vCustom = fUtils->VectorAxisLogarithm(vCustom,1);
+  if(!mode) {  
+    CustomInjectionSpectrum = fUtils->GSLsplineFromTwoDVector(vCustom);
+  }
+  else if(mode == 1) {
+    escapeTimeLookup = fUtils->GSLsplineFromTwoDVector(vCustom);
+  }
+  else {
+    cout << "Particles::SetCustomEnergylookup:"
+            "You specified unsupported mode " << 
+            mode << ". Supported options are mode = 0 -> custom time-dependent"
+            " injection spectrum, mode = 1 -> time and energy dependent escape "
+            " time. Doing nothing." << endl;
+  }
+  return;    
+}
+
+/**
+ * Set a custom injection spectrum or escape time. Input is a 2D vector with 3 colums.
+ * mode 0 = custom injection spectrum: first column holds time in yrs, second 
+ * energy in erg, third holds differential rate in 
+ * erg^-1 s^-1. If this is specified, otherwise defined spectral parameters 
+ * like luminosity lookups and specified spectral index will be ignored.
+ * NOTE: you still have to specify emax (either via lookup or constant value).
+ * mode 1 = time and energy dependent escape time:
+ * first column holds time in yrs, second 
+ * energy in erg, third holds escape time in seconds 
+ */
+void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int mode){
+
+  if(!vCustom.size()) {
+    cout << "Particles::SetCustomInjectionSpectrumTimeEvolution: Input vector empty."
+            "Exiting." << endl;
+    return;
+  }
+  if(vCustom[0].size() != 3) {
+    cout << "Particles::SetCustomTimeEnergyLookup:"
+            "This function supports "
+            "only input vectors with 3 columns, time vs energy vs. differential "
+            "injection rate / escape time. The vector you specified has " << 
+            vCustom[0].size() << " columns. Exiting." << endl;
+    return;
+  }
+  
+  vCustom = fUtils->VectorAxisLogarithm(vCustom,1);
+  vCustom = fUtils->VectorAxisLogarithm(vCustom,2);
+  if(!mode) {
+    CustomInjectionSpectrumTimeEvolution = 
+                      fUtils->TwoDsplineFromTwoDVector(vCustom,
+                                                       TminLookup,TmaxLookup,
+                                                       MinELookup,MaxELookup);
+    CustomInjectionSpectrumTimeEvolutionVector = vCustom;
+  }
+  else if(mode == 1) {
+    EscapeTimeEnergyTimeEvolution = 
+                      fUtils->TwoDsplineFromTwoDVector(vCustom,
+                                                       TminLookup,TmaxLookup,
+                                                       MinELookup,MaxELookup);
+    EscapeTimeEnergyTimeEvolutionVector = vCustom;
+
+  }
+  else {
+    cout << "Particles::SetCustomTimeEnergyLookup:"
+            "You specified unsupported mode " << 
+            mode << ". Supported options are mode = 0 -> custom time-dependent"
+            " injection spectrum, mode = 1 -> time and energy dependent escape "
+            " time. Exiting." << endl;
+    return;
+  }
+  DetermineLookupTimeBoundaries();
+  MinELookup = pow(10.,MinELookup);
+  MaxELookup = pow(10.,MaxELookup);
+
+  return;    
+}
+

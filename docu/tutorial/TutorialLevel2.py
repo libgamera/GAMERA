@@ -40,7 +40,7 @@ if __name__ == "__main__":
   configParser.read(configFile)
   lum = float(configParser.get('Parameters','Luminosity'))
   age = float(configParser.get('Parameters','Age'))
-  dist = gp.pc_to_cm*float(configParser.get('Parameters','Distance'))
+  dist = float(configParser.get('Parameters','Distance'))
   dens = float(configParser.get('Parameters','AmbientDensity'))
   bfield = float(configParser.get('Parameters','BField'))
   t = float(configParser.get('Parameters','tRAD'))
