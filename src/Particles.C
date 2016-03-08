@@ -1383,7 +1383,6 @@ double Particles::Integrate(fPointer f, double *x, double emin, double emax,
   return integral;
 }
 
-<<<<<<< HEAD
 /**
  * Set a custom injection spectrum. Input is a 2D vector with 2 colums, first
  * column holds energy in erg. 
@@ -1488,7 +1487,7 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
   return;    
 }
 
-=======
+
 double Particles::LossTimeScale(string type, double E){
   if (!type.compare("electrons")){
     Type = 0;
@@ -1498,4 +1497,3 @@ double Particles::LossTimeScale(string type, double E){
     }
   return E/GetEnergyLossRate(E);
 }
->>>>>>> ajout des pertes par ionization et par collision pp ainsi que de la fonction qui calcule le tlossrate
