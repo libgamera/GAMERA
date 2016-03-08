@@ -320,7 +320,7 @@ struct timespec time0, time1, time2, time3;
   void CalculateElectronSpectrum(int bins = 100) {CalculateParticleSpectrum("electrons",bins);}
   void SetType(string type);
   double EnergyLossRate(double E);  ///< total energy loss rate of particles
-
+  double LossTimeScale(string type, double E);
   void SetAge(double age) {
     Age = age;
     SetMembers(Age);
