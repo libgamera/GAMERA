@@ -311,10 +311,11 @@ struct timespec time0, time1, time2, time3;
   ~Particles();
   void SetMembers(double t);  ///< set the values for the class variables
                               ///BField,eElectronMax and Ecr at a given time t
-  void CalculateParticleSpectrum(string type, int bins = 100, bool onlyprepare = false,
-                                 bool dontinitialise =
-                                     false);  ///< fill the lookup that holds
-                                              ///the particle spectrum.
+  void CalculateParticleSpectrum(string type = "electrons", int bins = 100,
+                                 bool onlyprepare = false,
+                                 bool dontinitialise = false); ///< fill the 
+                                                        ///lookup that holds
+                                                    ///the particle spectrum.
   void CalculateProtonSpectrum(int bins = 100) {CalculateParticleSpectrum("protons",bins);}
   void CalculateElectronSpectrum(int bins = 100) {CalculateParticleSpectrum("electrons",bins);}
   void SetType(string type);

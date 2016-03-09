@@ -173,15 +173,14 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   else METHOD = 2;
   if(escapeTimeConstant > 0. || escapeTimeLookup != NULL || 
      EscapeTimeEnergyTimeEvolution != NULL) METHOD = 0;
-
   /* determine time from where to start the iteration. Particles that would have
    * been injected before that time are injected as a blob at Tmin. This can
    * lead to bumps at low energies, depending on cooling.
    */
 
-
-
-  if (TminConstant) Tmin = TminConstant;
+  if(Type && (escapeTimeConstant > 0. || escapeTimeLookup != NULL || 
+     EscapeTimeEnergyTimeEvolution != NULL)) Tmin = 1.e-3;
+  else if (TminConstant) Tmin = TminConstant;
   else if(!METHOD) DetermineTMin(EminInternal, Tmin);
   else if(METHOD == 1) Tmin = TminInternal;
   else Tmin = 1.e-3;
@@ -702,7 +701,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
   int tt = 1;
   int largestFilledBin = Esize;
   long int count = 0;
-  minTimeBin = (Age - startTime) * yr_to_sec / 100;
+  minTimeBin = (Age - startTime) * yr_to_sec / 200;
   /* append a new energy vector that will always hold the energy spectrum at the
    *  next time step and initialise it with zeroes.
    */
@@ -727,9 +726,12 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
     SetMembers(T);
     Ecuts.clear();
     EscTime.clear();
+    double MinEscTime = 1.e100;
     for (unsigned int i = 0; i < E.size(); i++) {
       Ecuts.push_back(exp(-pow( E[i] / eMax, CutOffFactor)));
-      EscTime.push_back(EscapeTime(E[i]));
+      double esctime = EscapeTime(E[i]);
+      if(esctime < MinEscTime) MinEscTime = esctime;
+      EscTime.push_back(esctime);
     }
     /* dynamically determine tbin size. This is a critical step
      * for the speed of the algorithm. Since the time step size is
@@ -740,7 +742,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
      * This is 'largestFilledBin' which is time-dependent and is defined
      * in the next for-loop.
      * If an external emax is specified, always choose the highest energy bin
-     * value
+     * value.
      */
     if (!std::isnan(eMaxConstant)) largestFilledBin = Esize - 1;
     e1 = pow(10., EnergyAxis[largestFilledBin - 1]);
@@ -748,27 +750,14 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
     ebin = e2 - e1;
 
     /* the tbin size is then simply defined as deltaE/Edot_max */
-    tbin = ebin / fabs(EnergyLossRate(e2));
-    /* info writeout */
-    if (T > 0.01 * tt * (Age - startTime) && QUIETMODE == false) {
-      cout << "\r";
-      if (tbin / (yr_to_sec * Age) > 1.e-7) {
-        cout << "                                                              "
-                "         \r" << std::flush;
-        cout << "    " << (int)(100. * (T - startTime) / (Age - startTime))
-             << "\% done \r" << std::flush;
-      } else {
-        cout << "    " << (int)(100. * (T - startTime) / (Age - startTime))
-             << "\% done (Energy losses are very high, iteration might take a "
-                "while)" << std::flush;
-      }
-      tt++;
-    }
-    /* in case of protons, energy losses are negligible and the computation
-     * is very fast. Thus, there is no reason not to use very fine time bins in
-     * this case.
+    double elr = fabs(EnergyLossRate(e2));
+    tbin = elr ? ebin / elr : minTimeBin;
+
+    /* compare minimum timescale to that of particle escape 
+     * and choose the smaller one
      */
-    if (Type) tbin = 0.05 * ebin / EnergyLossRate(e2);
+    if (MinEscTime && MinEscTime < tbin) tbin = MinEscTime;
+
     /* if losses become small (e.g. degrading B-field, or low eMax), time bins
      * may become very large. This can become problematic if tbin << Age no
      * longer
@@ -783,6 +772,22 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
       cout << "Particles::ComputeGrid: ebin = " << ebin << " (e2,e1) = " << e2
            << "," << e1 << ") elossrate(" << e2 << ") = " << EnergyLossRate(e2)
            << " lastbin = " << largestFilledBin << endl;
+    }
+
+    /* info writeout */
+    if (T > 0.01 * tt * (Age - startTime) && QUIETMODE == false) {
+      cout << "\r";
+      if (tbin / (yr_to_sec * Age) > 1.e-7) {
+        cout << "                                                              "
+                "         \r" << std::flush;
+        cout << "    " << (int)(100. * (T - startTime) / (Age - startTime))
+             << "\% done \r" << std::flush;
+      } else {
+        cout << "    " << (int)(100. * (T - startTime) / (Age - startTime))
+             << "\% done (Energy losses are very high, iteration might take a "
+                "while)" << std::flush;
+      }
+      tt++;
     }
 
     /* if eMax drops below the lower energy bound of the grid, exit. */
@@ -831,8 +836,16 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
 
       deltaE1 = tbin * ElossRate_e1;
       deltaE2 = tbin * ElossRate_e2;
+
+
+      /* Increase in particles in bin 'i' due to particle injection from the
+       * source */
+      value = tbin * SourceSpectrum(e1);
+      value *= Ecuts[i];
+
+
       /* Donor-cell advection */
-      value = Grid[0][i] - quot * Grid[0][i] * ElossRate_e1 +
+      value += Grid[0][i] - quot * Grid[0][i] * ElossRate_e1 +
               quot * Grid[0][i + 1] * ElossRate_e2;
       if (!i) value += quot * Grid[0][i] * ElossRate_e1;
 
@@ -870,10 +883,6 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
        * to 0. */
       if (value < 0.) value = 0.;
 
-      /* Increase in particles in bin 'i' due to particle injection from the
-       * source */
-      value += tbin * SourceSpectrum(e1);
-      value *= Ecuts[i];
 
       /* Determine the largest filled energy bin (needed for the efficient
        * calculation of the next iterative time bin.
@@ -992,7 +1001,6 @@ void Particles::CalcSpecSemiAnalyticNoELoss() {
             "than source age... Exiting" << endl;
     return;
   }
-  fUtils->Clear2DVector(ParticleSpectrum);
   double totallum = 0.;
   if(!std::isnan(LumConstant)) totallum = LumConstant*Age;
   else if(LumVector.size()) {
@@ -1001,6 +1009,7 @@ void Particles::CalcSpecSemiAnalyticNoELoss() {
       totallum = 0.;
   }
   else return;
+  double LumConstantTemp = LumConstant;
   LumConstant = totallum*yr_to_sec;
   SetMembers(Age);
 
@@ -1011,6 +1020,7 @@ void Particles::CalcSpecSemiAnalyticNoELoss() {
       continue;
     fUtils->TwoDVectorPushBack(e,val,ParticleSpectrum);
   }
+  LumConstant = LumConstantTemp;
   return;
 }
 
@@ -1169,13 +1179,15 @@ void Particles::DetermineLookupTimeBoundaries() {
       !custspinjtmin)
     T = TminInternal;
   else {
-    (rtmin > vtmin) ? T0 = rtmin : T0 = vtmin;
-    (ntmin > T0) ? T1 = ntmin : T1 = T0;
-    (btmin > T1) ? T2 = btmin : T2 = T1;
-    (esctmin > T2) ? T3 = esctmin : T3 = T2;
-    (lumtmin > T3) ? T4 = lumtmin : T4 = T3;
-    (emaxtmin > T4) ? T5 = emaxtmin : T5 = T4;
-    (custspinjtmin > T5) ? T = custspinjtmin : T = T5;
+
+    T0 = rtmin > vtmin ? rtmin : vtmin;
+    T1 = ntmin > T0 ?  ntmin : T0;
+    T2 = btmin > T1 ?  btmin : T1;
+    T3 = esctmin > T2 ?  esctmin : T2;
+    T4 = lumtmin > T3 ?  lumtmin : T3;
+    T5 = emaxtmin > T4 ?  emaxtmin : T4;
+    T = custspinjtmin > T5 ?  custspinjtmin : T5;
+
   }
   TminInternal = T;
 
@@ -1183,13 +1195,14 @@ void Particles::DetermineLookupTimeBoundaries() {
   if (!emaxtmin && !ntmin && !btmin && !rtmin && !vtmin)
     T = TmaxInternal;
   else {
-    (rtmax < vtmax) ? T0 = rtmax : T0 = vtmax;
-    (ntmax < T0) ? T1 = ntmax : T1 = T0;
-    (btmax < T1) ? T2 = btmax : T2 = T1;
-    (esctmax < T2) ? T3 = esctmax : T3 = T2;
-    (lumtmax < T3) ? T4 = lumtmax : T4 = T3;
-    (emaxtmax < T4) ? T5 = emaxtmax : T5 = T4;
-    (custspinjtmax < T5) ? T = custspinjtmax : T = T5;
+    T0 = rtmax < vtmax ? rtmax : vtmax;
+    T1 = ntmax < T0 ?  ntmax : T0;
+    T2 = btmax < T1 ?  btmax : T1;
+    T3 = esctmax < T2 ?  esctmax : T2;
+    T4 = lumtmax < T3 ?  lumtmax : T3;
+    T5 = emaxtmax < T4 ?  emaxtmax : T4;
+    T = custspinjtmax < T5 ?  custspinjtmax : T5;
+
   }
   TmaxInternal = T;
 
@@ -1226,7 +1239,6 @@ void Particles::CalculateEnergyTrajectory(double TExt) {
     SetMembers(T);
   }
   unsigned int size = vETrajectory.size();
-
   if(size<3) return;
   if(fabs(vETrajectory[0][0]/vETrajectory[size-1][0]-1.) < 1.e-3) return;
   // make an inverse of the energy loss trajectory, holding x=E(t),y=t
