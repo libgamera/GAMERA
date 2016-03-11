@@ -730,7 +730,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
     for (unsigned int i = 0; i < E.size(); i++) {
       Ecuts.push_back(exp(-pow( E[i] / eMax, CutOffFactor)));
       double esctime = EscapeTime(E[i]);
-      if(esctime < MinEscTime) MinEscTime = esctime;
+      if(esctime && esctime < MinEscTime) MinEscTime = esctime;
       EscTime.push_back(esctime);
     }
     /* dynamically determine tbin size. This is a critical step
@@ -752,7 +752,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
     /* the tbin size is then simply defined as deltaE/Edot_max */
     double elr = fabs(EnergyLossRate(e2));
     tbin = elr ? ebin / elr : minTimeBin;
-
+    
     /* compare minimum timescale to that of particle escape 
      * and choose the smaller one
      */
@@ -765,7 +765,6 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
      * tbin>minTimeBin.
      */
     if (tbin > minTimeBin) tbin = minTimeBin;
-
     /* negative time steps are not what we want! In this case shout out some
      * debug. */
     if (tbin < 0.) {
