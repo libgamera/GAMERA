@@ -297,7 +297,7 @@ class Radiation {
                                                   ///resulting from Synchrotron
                                                   ///radiation due to current
                                                   ///electron spectrum and
-                                                  ///B-Field.
+                                                  ///B-Field. R (source extension) in pc
   vector<vector<double> > GetTargetPhotons();///< return TotalTargetPhotonVector
   void Reset();  ///< reset ParticleLookup, Electrons, Protons, fintbrems,
                  ///lintbrems, fintpp, lintpp, fintic, lintic

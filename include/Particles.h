@@ -49,6 +49,14 @@ struct timespec time0, time1, time2, time3;
   Utils *fUtils;
   int Type;  ///< integer indicating particle type. supported: 0-electrons and
              ///1-protons
+  int METHOD; /// calculation method. This is determined automatically, but can
+              /// be force set via SetSolverMethod(). However, if an inappropriate
+              /// method is chosen manually, the result might be wrong or 
+              /// the program might crash.
+              /// 0: grid solver,
+              /// 1: semi-analytical method in the presence of constant losses
+              /// 2: no losses (simply adds up according to luminosity)
+                
   double theta;           ///< CR acceleration efficiency
   double SpectralIndex;   ///< spectral index of injected particles
   double SpectralIndex2;  ///< low-energy spectral index for broken power law
@@ -98,7 +106,7 @@ struct timespec time0, time1, time2, time3;
                 ///within which the particle spectrum is calculated
   double EminConstant;  ///< Constantly set lower energy boundary within which
                         ///the particle spectrum is calculated (optional)
-  double eMaxConstant;  ///< Constantly set upper energy boundary within which
+  double EmaxConstant;  ///< Constantly set upper energy boundary within which
                         ///the particle spectrum is calculated (optional)
   double TminConstant;  ///< Constantly set lower time boundary at which the
                         ///particle iteration is started
@@ -108,7 +116,6 @@ struct timespec time0, time1, time2, time3;
   double RConstant;     ///< Constantly set source extension
   double VConstant;     ///< Constantly set source expansion speed
   double eMax;          ///< maximum energy of particles the shock can contain
-  double eElectronMax;  ///< maximum energy of electrons at the shock
   double eBreak;  ///< break energy for a broken power-law particle injection
                   ///spectrum
   double eBreakConstant;  ///< break energy for a broken power-law particle
@@ -271,7 +278,7 @@ struct timespec time0, time1, time2, time3;
   double EnergyAxisLowerBoundary;  ///< might be superfluous (compare to
                                    ///EminConstant)
   double EnergyAxisUpperBoundary;  ///< might be superfluous (compare to
-                                   ///eMaxConstant)
+                                   ///EmaxConstant)
   bool QUIETMODE;  ///< Quietmode boolean: no output text at all if set to true
                    ///. Default is false.
   double Polynomial(double x, vector<double>);  ///< polynomial function, used
@@ -305,6 +312,11 @@ struct timespec time0, time1, time2, time3;
   vector<vector<vector<double> > > vs;
   void CalculateEnergyTrajectory(double TExt = 0.);
   void DetermineLookupTimeBoundaries();
+  void SetSolverMethod(int method);
+  void ComputeGridInTimeInterval(double T1, double T2, string type, int bins);  
+                                              ///< wrapper function to calculate
+                                              ///the grid only in a specified
+                                              ///time interval dT = T2-T2 (yrs)
 
  public:
   Particles();
@@ -318,6 +330,13 @@ struct timespec time0, time1, time2, time3;
                                                     ///the particle spectrum.
   void CalculateProtonSpectrum(int bins = 100) {CalculateParticleSpectrum("protons",bins);}
   void CalculateElectronSpectrum(int bins = 100) {CalculateParticleSpectrum("electrons",bins);}
+  void CalculateProtonSpectrumInTimeInterval(double T1, double T2, 
+                                             int bins = 100) {
+    ComputeGridInTimeInterval(T1,T2,"protons",bins);}
+  void CalculateElectronSpectrumInTimeInterval(double T1, double T2, 
+                                               int bins = 100) {
+    ComputeGridInTimeInterval(T1,T2,"electrons",bins);}
+  void CalculateElectronSpectrumInTimeInterval(int bins = 100) {CalculateParticleSpectrum("electrons",bins);}
   void SetType(string type);
   double EnergyLossRate(double E);  ///< total energy loss rate of particles
 
@@ -347,10 +366,6 @@ struct timespec time0, time1, time2, time3;
   double GetEscapeTime() {
     return escapeTime;
   }  ///< the particle escape time scale (s)
-
-  void SetEElectronMax(double EElectronMax) {
-    eElectronMax = EElectronMax;
-  }  ///< set the maximum energy of electrons in the accelerator
   void SetConstantEscapeTime(double EscapeTime) {
     escapeTimeConstant = EscapeTime;
   }  ///< set the time scale of particle escape
@@ -453,7 +468,7 @@ struct timespec time0, time1, time2, time3;
   }  ///< Constanty set minimal time of injected particles
   void SetEmax(double EMAX) {
     eMaxVector.clear();
-    eMaxConstant = EMAX;
+    EmaxConstant = EMAX;
   }  ///< Constanty set maximal energy of particle spectrum
   void SetBField(double BEXT) {
     BVector.clear();
@@ -495,10 +510,6 @@ struct timespec time0, time1, time2, time3;
   void ToggleQuietMode() {
     QUIETMODE = true;
   }  ///< untoggle quiet mode (no progress printout on the console)
-  void ComputeGridInTimeInterval(double T1,
-                                 double T2);  ///< wrapper function to calculate
-                                              ///the grid only in a specified
-                                              ///time interval dT = T2-T2 (yrs)
   void SetEnergyAxisLowerBoundary(double BOUND) {
     EnergyAxisLowerBoundary = BOUND;
   }  ///< might be superflous

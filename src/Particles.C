@@ -2,8 +2,8 @@
 
 Particles::Particles() {
   /* Default values */
-  eElectronMax = 100000.;
   SpectralIndex = 2.000;
+  METHOD = -1;
   Tmin = 1.;
   Type = 0;
   CutOffFactor = 1000.;
@@ -60,7 +60,7 @@ Particles::Particles() {
       emineBreak2mS2 = 0.;
   eBreak2mSInd2 = emin2mSInd2 = emineBreak2mSInd2 = fS = fS2 = bremsl_epf =
       bremsl_eef = 0.;
-  LumConstant = BConstant = NConstant = VConstant = RConstant = eMaxConstant = 
+  LumConstant = BConstant = NConstant = VConstant = RConstant = EmaxConstant = 
       escapeTimeConstant = NAN;
   MinELookup = MaxELookup = 0.;
   accIC = gsl_interp_accel_alloc();
@@ -107,6 +107,16 @@ void Particles::CalculateConstants() {
 
   bremsl_epf = 3. * fineStructConst * sigma_T * c_speed * m_e / pi;
   bremsl_eef = (3. * fineStructConst * sigma_T * c_speed * m_e / (2. * pi));
+  return;
+}
+
+void Particles::SetSolverMethod(int method) {
+  if(method != 0 && method != 1 && method != 2) {
+      cout << "Particles::SetSolverMethod: Unsupported solver method ("
+           << method << "). Ignoring this foolishness." << endl;
+      return;
+  }
+  METHOD = method;
   return;
 }
 
@@ -159,18 +169,19 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
 
   /* determine algorithm to calculate the particle spectrum */
 
-  int METHOD = -1;
-  if(Type==0 && (BVector.size() || NVector.size() ||
+  if(METHOD == -1) {
+    if(Type==0 && (BVector.size() || NVector.size() ||
                 (RVector.size() && VVector.size())))
-    METHOD = 0;
-  else if(Type==1 && RVector.size() && VVector.size())
-    METHOD = 0;
-  else if (Type==0 && (!std::isnan(BConstant) || !std::isnan(NConstant) ||
+      METHOD = 0;
+    else if(Type==1 && RVector.size() && VVector.size())
+      METHOD = 0;
+    else if (Type==0 && (!std::isnan(BConstant) || !std::isnan(NConstant) ||
            !std::isnan(VConstant) || ICLossVector.size()))
-    METHOD = 1;
-  else if(Type==1 && !std::isnan(VConstant))
-    METHOD = 1;
-  else METHOD = 2;
+      METHOD = 1;
+    else if(Type==1 && !std::isnan(VConstant))
+      METHOD = 1;
+    else METHOD = 2;
+  }
   if(escapeTimeConstant > 0. || escapeTimeLookup != NULL || 
      EscapeTimeEnergyTimeEvolution != NULL) METHOD = 0;
   /* determine time from where to start the iteration. Particles that would have
@@ -189,8 +200,8 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
    * externally
    * set (if) or dynamically determined by the code (else).
    */
-  if (!std::isnan(eMaxConstant))
-    eMax = eMaxConstant;
+  if (!std::isnan(EmaxConstant))
+    eMax = EmaxConstant;
   else
     eMax = DetermineEmax(Tmin);
 
@@ -338,11 +349,11 @@ void Particles::SetMembers(double t) {
   if (t == TmaxInternal) t /= 1. + 1.e-10;
   TActual = t;
 //  Constants = {LumConstant,  NConstant,         BConstant,
-//               eMaxConstant, escapeTimeConstant};
+//               EmaxConstant, escapeTimeConstant};
   Constants[0] = LumConstant;
   Constants[1] = NConstant;
   Constants[2] = BConstant;
-  Constants[3] = eMaxConstant;
+  Constants[3] = EmaxConstant;
 
   splines[0] = LumLookup;
   splines[1] = NLookup;
@@ -744,7 +755,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
      * If an external emax is specified, always choose the highest energy bin
      * value.
      */
-    if (!std::isnan(eMaxConstant)) largestFilledBin = Esize - 1;
+    if (!std::isnan(EmaxConstant)) largestFilledBin = Esize - 1;
     e1 = pow(10., EnergyAxis[largestFilledBin - 1]);
     e2 = pow(10., EnergyAxis[largestFilledBin]);
     ebin = e2 - e1;
@@ -981,15 +992,20 @@ double Particles::MinMod(double a, double b) {
  * that in the
  * time step before) due to memory storage reasons.
  */
-void Particles::ComputeGridInTimeInterval(double T1, double T2) {
+void Particles::ComputeGridInTimeInterval(double T1, double T2, string type, 
+                                          int bins) {
   if (T1 <= Tmin) {
-    cout << "Particles::ComputeGridInTimeInterval T1<internal min time (" << T1
-         << "<" << Tmin << "). set it artificially to " << Tmin << "yrs."
+    cout << "Particles::ComputeGridInTimeInterval T1<=internal min time (" << T1
+         << "<=" << Tmin << "). set it artificially to " << Tmin << "yrs."
          << endl;
     T1 = Tmin * 1.001;
   }
-
   fUtils->Clear2DVector(ParticleSpectrum);
+  SetSolverMethod(0);
+  if(!grid.size()) {
+    Age = T1;
+    CalculateParticleSpectrum(type, bins);
+  }
   ComputeGrid(grid, energyAxis, T1, T2, timeAxis, yr_to_sec * (T2 - T1) / 100.);
   return;
 }
@@ -1369,6 +1385,12 @@ void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
   }
   if(!MaxELookup) MinELookup = vCustom[0][0];
   if(!MaxELookup) MaxELookup = vCustom[vCustom.size()-1][0];
+  if(std::isnan(EmaxConstant)) {
+    EmaxConstant = MaxELookup;
+  }
+  if(!EminConstant) {
+    EminConstant = MinELookup;
+  }
   vCustom = fUtils->VectorAxisLogarithm(vCustom,0);
   vCustom = fUtils->VectorAxisLogarithm(vCustom,1);
   if(!mode) {  
@@ -1442,6 +1464,12 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
   DetermineLookupTimeBoundaries();
   MinELookup = pow(10.,MinELookup);
   MaxELookup = pow(10.,MaxELookup);
+  if(std::isnan(EmaxConstant)) {
+    EmaxConstant = MaxELookup;
+  }
+  if(!EminConstant) {
+    EminConstant = MinELookup;
+  }
 
   return;    
 }
