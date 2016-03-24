@@ -441,32 +441,14 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
 //    std::cout<< " ... ... ... "<<std::endl;
 //  }
   gsl_spline *ImportLookup = fUtils->GSLsplineFromTwoDVector(lookup);
-  vector<string> st;
-  st.push_back("ICLoss");
-  st.push_back("Luminosity");
-  st.push_back("AmbientDensity");
-  st.push_back("BField");
-  st.push_back("Emax");
-  st.push_back("Radius");
-  st.push_back("Speed");
-
-  vector<gsl_spline **> spl;
-  spl.push_back(&ICLossLookup); 
-  spl.push_back(&LumLookup);
-  spl.push_back(&NLookup);  
-  spl.push_back(&BFieldLookup);
-  spl.push_back(&eMaxLookup);                            
-  spl.push_back(&RLookup);      
-  spl.push_back(&VLookup);
-
-  vector<vector<vector<double> > *> vs;
-  vs.push_back(&ICLossVector);
-  vs.push_back(&LumVector);        
-  vs.push_back(&NVector);
-  vs.push_back(&BVector);
-  vs.push_back(&eMaxVector);
-  vs.push_back(&RVector);
-  vs.push_back(&VVector);
+  vector<string> st{"ICLoss", "Luminosity", "AmbientDensity", "BField",
+                    "Emax", "Radius",         "Speed"};
+  vector<gsl_spline **> spl{&ICLossLookup, &LumLookup,  &NLookup,
+                            &BFieldLookup, &eMaxLookup,
+                            &RLookup,      &VLookup};
+  vector<vector<vector<double> > *> vs{
+      &ICLossVector, &LumVector,        &NVector, &BVector,
+      &eMaxVector, &RVector, &VVector};
   
   for (unsigned int i = 0; i < st.size(); i++) {
     if (!LookupType.compare(st[i])) {
@@ -498,29 +480,10 @@ void Particles::ExtendLookup(vector<vector<double> > v, string LookupType) {
     cout << "Particles::ExtendLookup: Input vector empty. Exiting." << endl;
     return;
   }
-//  vector<string> st = {"Luminosity", "AmbientDensity", "BField", "Emax",
-//                       "Radius",         "Speed"};
-
-  vector<string> st;
-  st.push_back("ICLoss");
-  st.push_back("Luminosity");
-  st.push_back("AmbientDensity"); 
-  st.push_back("BField");
-  st.push_back("Emax");
-  st.push_back("Radius");
-  st.push_back("Speed");
-//  vector<vector<vector<double> > > vs = {LumVector,  NVector,          BVector,
-//                                         eMaxVector, RVector,  VVector};
-
-  vector<vector<vector<double> > > vs;
-  vs.push_back(ICLossVector);
-  vs.push_back(LumVector);        
-  vs.push_back(NVector);
-  vs.push_back(BVector);
-  vs.push_back(eMaxVector);
-  vs.push_back(RVector);
-  vs.push_back(VVector);
-
+  vector<string> st = {"Luminosity", "AmbientDensity", "BField", "Emax",
+                       "Radius",         "Speed"};
+  vector<vector<vector<double> > > vs = {LumVector,  NVector,          BVector,
+                                         eMaxVector, RVector,  VVector};
   vector< vector< double > > lookup;
   if (!LookupType.compare("Luminosity") || !LookupType.compare("Emax")) {
     lookup = fUtils->VectorAxisLogarithm(v,1);
@@ -1530,6 +1493,7 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
 
 Radiation *Particles::GetSSCEquilibrium(Radiation *fr, double t, double tolerance) {
   Age = t;
+  METHOD = 1;
   SetMembers(Age);
   fr->CreateICLossLookup();
   SetLookup(fr->GetICLossLookup(), "ICLoss");
