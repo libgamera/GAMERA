@@ -208,6 +208,7 @@ class Radiation {
   vector<vector<double> > ICLossLookup;
   double TargetPhotonEdens;
   vector<vector<double> > GetParticleSED(string type);
+  bool SSCSET; ///< boolean that states if SSC target photons have already been added.
 
  public:
   Radiation();                                       ///< standard constructor
@@ -254,6 +255,7 @@ class Radiation {
   void SetBField(double BFIELD) {
     BField = BFIELD;
   }  ///< set the source B-Field (G)
+  double GetBField() {return BField;}
   void SetDistance(double d) {
     distance = d*pc_to_cm;
   }  ///< set the distance to the source (cm)

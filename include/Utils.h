@@ -164,7 +164,7 @@ class Utils {
     return gsl_spline_eval(INTERNAL1DSPLINE, x, acc);}
   double EvalInternal2DSpline(double x, double y) {
     return interp2d_spline_eval(INTERNAL2DSPLINE,x,y,xacc,yacc);}
-
-
+  double EnergyContent(vector< vector<double> > f, double emin=0., double emax=0.);
+  double EnergyContentFast(vector< vector<double> > f);
 };
 #endif

@@ -7,6 +7,7 @@ Radiation::Radiation() {
   fUtils = new Utils();
   ParticleVector.clear();
   DEBUG = false;
+  SSCSET = false;
   fintbrems = lintbrems = fintpp = lintpp = fintic = lintic = 0.;
   ldiffbrems = fdiffbrems = ldiffsynch = fdiffsynch = 0.;
   ldiffic = fdiffic = ldiffpp = fdiffpp = 0.;
@@ -1020,6 +1021,12 @@ void Radiation::AddThermalTargetPhotons(double T, double edens, int steps) {
             "radiation field negative or zero? Exiting." << endl;
     return;
   }
+  if(SSCSET) {
+    cout << "Radiation::AddThermalTargetPhotons: !!DANGER!! You set this "
+            "radiation field *after* you add SSC target photons. This is not " 
+            " how it is intended and will likely screw up your results. Call "
+            " Radiation::AddSSCTargetPhotons last!" << endl;
+  }
   double logemin, logemax, low_boundary, high_boundary, low, high, lowtp,
       hightp;
   low_boundary = 1.e-12;
@@ -1060,6 +1067,12 @@ void Radiation::AddThermalTargetPhotons(double T, double edens, int steps) {
  * The photons will be added to TotalTargetPhotonGraph
  */
 void Radiation::AddArbitraryTargetPhotons(vector<vector<double> > PhotonArray) {
+  if(SSCSET) {
+    cout << "Radiation::AddArbitraryTargetPhotons: !!DANGER!! You set this "
+            "radiation field *after* you add SSC target photons. This is not " 
+            " how it is intended and will likely screw up your results. Call "
+            " Radiation::AddSSCTargetPhotons last!" << endl;
+  }
   vector< vector<double> > vint;
   for (unsigned int i = 1; i < PhotonArray.size() - 1; i++) {
     double E = PhotonArray[i][0];
@@ -1076,6 +1089,12 @@ void Radiation::AddArbitraryTargetPhotons(vector<vector<double> > PhotonArray) {
  * The photons will be added to TotalTargetPhotonGraph
  */
 void Radiation::ImportTargetPhotonsFromFile(const char *phFile) {
+  if(SSCSET) {
+    cout << "Radiation::ImportTargetPhotonsFromFile: !!DANGER!! You set this "
+            "radiation field *after* you add SSC target photons. This is not " 
+            " how it is intended and will likely screw up your results. Call "
+            " Radiation::AddSSCTargetPhotons last!" << endl;
+  }
   ifstream PHfile(phFile);
   vector<vector<double> > v;
   while (1) {
@@ -1122,7 +1141,7 @@ void Radiation::AddSSCTargetPhotons(double R, int steps) {
   }
   void *p = NULL;
   double eminxray = 1.e-19;
-  double logeminxray = log10(eminxray);
+  double logeminxray = TargetPhotonVector[0][0];
   double logemaxxray =
       log10(1.e-3 * ParticleVector[ParticleVector.size() - 1][0]);
   double estep = (logemaxxray - logeminxray) / steps;
@@ -1137,6 +1156,8 @@ void Radiation::AddSSCTargetPhotons(double R, int steps) {
     if(N <= 0.) continue;
     fUtils->TwoDVectorPushBack(loge,log10(N),vint);
   }
+  if(!SSCSET) SSCSET = true;
+  else RemoveLastICTargetPhotonComponent();
   AddToTargetPhotonVector(vint);
   return;
 }

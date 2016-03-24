@@ -61,7 +61,7 @@ Particles::Particles() {
   eBreak2mSInd2 = emin2mSInd2 = emineBreak2mSInd2 = fS = fS2 = bremsl_epf =
       bremsl_eef = 0.;
   LumConstant = BConstant = NConstant = VConstant = RConstant = EmaxConstant = 
-      escapeTimeConstant = NAN;
+      escapeTimeConstant = CustomInjectionNorm = NAN;
   MinELookup = MaxELookup = 0.;
   accIC = gsl_interp_accel_alloc();
   accLum = gsl_interp_accel_alloc();
@@ -141,9 +141,15 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
 
   if(!Age) {
     cout << "Particles::CalculateParticleSpectrum: No age set! Exiting"
-         << endl;
+         << endl; 
+    return;
   }
-
+  std::cout<<".."<<LumVector.size() <<" "<<LumConstant<<std::endl;
+  if(!LumVector.size() && std::isnan(LumConstant)) {
+    cout << "Particles::CalculateParticleSpectrum: Particle vector empty! Exiting"
+         << endl;
+    return;
+  }
   /* reset Particle Lookup */
   fUtils->Clear2DVector(ParticleSpectrum);
 
@@ -251,8 +257,9 @@ double Particles::SourceSpectrum(double e) {
   }
   else if(CustomInjectionSpectrum != NULL) {
     if(e < MinELookup || e > MaxELookup) return 0.;
-    return pow(10.,
-               gsl_spline_eval(CustomInjectionSpectrum, log10(e), accCustInj));
+    return Lum * 
+      pow(10.,gsl_spline_eval(CustomInjectionSpectrum, log10(e), accCustInj)) 
+      / CustomInjectionNorm;
   }
   else {
     return PowerLawInjectionSpectrum(e, eMax, 10. * eMax);
@@ -374,7 +381,6 @@ void Particles::SetMembers(double t) {
   vs[1] =  NVector;
   vs[2] =  BVector;
   vs[3] =  eMaxVector;
-
   for (unsigned int i = 0; i < Constants.size(); i++) {
     *vals[i] = 0.;
     if (!std::isnan(Constants[i]))
@@ -390,16 +396,16 @@ void Particles::SetMembers(double t) {
 
   R = V = adLossCoeff = 0.;
   if(RConstant > 0. && !std::isnan(VConstant)) {
-    R = VConstant*yr_to_sec + RConstant;
+    R = VConstant*yr_to_sec*t + RConstant;
     V = VConstant;
   }
 
-  else if(RConstant > 0. && !VConstant) {
+  else if(RConstant > 0. && std::isnan(VConstant)) {
     R = RConstant;
     V = 0.;
   }
   else {
-    R = yr_to_sec*V;
+    R = yr_to_sec*t*V;
     V = VConstant;
   }
 
@@ -429,15 +435,39 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
   else {
     lookup = v;
   }
+//  if(!LookupType.compare("ICLoss") && lookup.size()) {
+//    for(unsigned int i=0;i<lookup.size();i++)
+//      std::cout<<lookup[i][0]<<" "<<lookup[i][1]<<std::endl;
+//    std::cout<< " ... ... ... "<<std::endl;
+//  }
   gsl_spline *ImportLookup = fUtils->GSLsplineFromTwoDVector(lookup);
-  vector<string> st{"ICLoss", "Luminosity", "AmbientDensity", "BField",
-                    "Emax", "Radius",         "Speed"};
-  vector<gsl_spline **> spl{&ICLossLookup, &LumLookup,  &NLookup,
-                            &BFieldLookup, &eMaxLookup,
-                            &RLookup,      &VLookup};
-  vector<vector<vector<double> > *> vs{
-      &ICLossVector, &LumVector,        &NVector, &BVector,
-      &eMaxVector, &RVector, &VVector};
+  vector<string> st;
+  st.push_back("ICLoss");
+  st.push_back("Luminosity");
+  st.push_back("AmbientDensity");
+  st.push_back("BField");
+  st.push_back("Emax");
+  st.push_back("Radius");
+  st.push_back("Speed");
+
+  vector<gsl_spline **> spl;
+  spl.push_back(&ICLossLookup); 
+  spl.push_back(&LumLookup);
+  spl.push_back(&NLookup);  
+  spl.push_back(&BFieldLookup);
+  spl.push_back(&eMaxLookup);                            
+  spl.push_back(&RLookup);      
+  spl.push_back(&VLookup);
+
+  vector<vector<vector<double> > *> vs;
+  vs.push_back(&ICLossVector);
+  vs.push_back(&LumVector);        
+  vs.push_back(&NVector);
+  vs.push_back(&BVector);
+  vs.push_back(&eMaxVector);
+  vs.push_back(&RVector);
+  vs.push_back(&VVector);
+  
   for (unsigned int i = 0; i < st.size(); i++) {
     if (!LookupType.compare(st[i])) {
       if (*spl[i] != NULL) {
@@ -446,6 +476,10 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
       *spl[i] = ImportLookup;
       *vs[i] = lookup;   
       DetermineLookupTimeBoundaries();
+      
+//  if(!LookupType.compare("ICLoss") && lookup.size()) 
+//    for(unsigned int i=0;i<lookup.size();i++)
+//      std::cout<<lookup[i][0]<<" "<<lookup[i][1]<<std::endl;
       return;
     }
   }
@@ -464,10 +498,29 @@ void Particles::ExtendLookup(vector<vector<double> > v, string LookupType) {
     cout << "Particles::ExtendLookup: Input vector empty. Exiting." << endl;
     return;
   }
-  vector<string> st = {"Luminosity", "AmbientDensity", "BField", "Emax",
-                       "Radius",         "Speed"};
-  vector<vector<vector<double> > > vs = {LumVector,  NVector,          BVector,
-                                         eMaxVector, RVector,  VVector};
+//  vector<string> st = {"Luminosity", "AmbientDensity", "BField", "Emax",
+//                       "Radius",         "Speed"};
+
+  vector<string> st;
+  st.push_back("ICLoss");
+  st.push_back("Luminosity");
+  st.push_back("AmbientDensity"); 
+  st.push_back("BField");
+  st.push_back("Emax");
+  st.push_back("Radius");
+  st.push_back("Speed");
+//  vector<vector<vector<double> > > vs = {LumVector,  NVector,          BVector,
+//                                         eMaxVector, RVector,  VVector};
+
+  vector<vector<vector<double> > > vs;
+  vs.push_back(ICLossVector);
+  vs.push_back(LumVector);        
+  vs.push_back(NVector);
+  vs.push_back(BVector);
+  vs.push_back(eMaxVector);
+  vs.push_back(RVector);
+  vs.push_back(VVector);
+
   vector< vector< double > > lookup;
   if (!LookupType.compare("Luminosity") || !LookupType.compare("Emax")) {
     lookup = fUtils->VectorAxisLogarithm(v,1);
@@ -1391,6 +1444,7 @@ void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
   if(!EminConstant) {
     EminConstant = MinELookup;
   }
+  if(!mode) CustomInjectionNorm = fUtils->EnergyContent(vCustom);
   vCustom = fUtils->VectorAxisLogarithm(vCustom,0);
   vCustom = fUtils->VectorAxisLogarithm(vCustom,1);
   if(!mode) {  
@@ -1473,4 +1527,38 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
 
   return;    
 }
+
+Radiation *Particles::GetSSCEquilibrium(Radiation *fr, double t, double tolerance) {
+  Age = t;
+  SetMembers(Age);
+  fr->CreateICLossLookup();
+  SetLookup(fr->GetICLossLookup(), "ICLoss");
+  CalculateElectronSpectrum();
+  fr->SetBField(BField);
+  for(unsigned int i=0;i<ParticleSpectrum.size();i++)
+    std::cout<<ParticleSpectrum[i][0]<<" "<<ParticleSpectrum[i][1]<<std::endl;
+  fr->SetElectrons(ParticleSpectrum);
+ 
+  double new_sum,old_sum;
+  new_sum = old_sum = -1.;
+  while (1) {
+    fr->AddSSCTargetPhotons(R/pc_to_cm,100);
+    vector< vector <double> > tph = fr->GetTargetPhotons();
+    new_sum = fUtils->EnergyContent(tph);
+    std::cout<<new_sum<< " " << old_sum<<std::endl;
+    if( fabs(1. - new_sum/old_sum) < tolerance ) break;
+    fr->CreateICLossLookup();
+    SetLookup(fr->GetICLossLookup(), "ICLoss");
+    CalculateElectronSpectrum();
+    for(unsigned int i=0;i<ParticleSpectrum.size();i++)
+      std::cout<<ParticleSpectrum[i][0]<<" "<<ParticleSpectrum[i][1]<<std::endl;
+    fr->SetElectrons(ParticleSpectrum);
+    old_sum = new_sum;
+  }
+  
+//  BConstant = LConstant = NConstant = NAN;
+  return fr;
+}
+
+
 

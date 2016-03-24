@@ -2,6 +2,7 @@
 #define _PARTICLES_
 
 #include "Utils.h"
+#include "Radiation.h"
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_spline.h>
 #include <time.h>
@@ -118,6 +119,7 @@ struct timespec time0, time1, time2, time3;
   double eMax;          ///< maximum energy of particles the shock can contain
   double eBreak;  ///< break energy for a broken power-law particle injection
                   ///spectrum
+  double CustomInjectionNorm;///< energy content in injection spectrum before normalisation
   double eBreakConstant;  ///< break energy for a broken power-law particle
                           ///injection spectrum manually set to a constant value
   double energyMarginFactor;  ///< energy safety margin above the spectral
@@ -531,7 +533,6 @@ struct timespec time0, time1, time2, time3;
     {fUtils->SetInterpolationMethod(intermeth);}
   void SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int mode);
   void SetCustomEnergylookup(vector< vector<double> > vCustom,int mode);
-
   void SetCustomInjectionSpectrumTimeEvolution(vector< vector<double> > vCustomSpectrum) {
     SetCustomTimeEnergyLookup(vCustomSpectrum,0);}
   void SetCustomInjectionSpectrum(vector< vector<double> > vSpectrum) {
@@ -540,5 +541,6 @@ struct timespec time0, time1, time2, time3;
     SetCustomTimeEnergyLookup(vEsc,1);}
   void SetEnergyDependentEscapeTime(vector< vector<double> > vEsc) {
     SetCustomEnergylookup(vEsc,1);}
+  Radiation *GetSSCEquilibrium(Radiation *fr,double t, double tolerance=1e-2);
 };
 #endif

@@ -380,6 +380,24 @@ vector<double> Utils::CustomFunctionRandom(vector< vector<double> > f,
   return v;
 }
 
+double Utils::EnergyContent(vector< vector<double> > f, double emin, double emax) {
+  if(!f.size()) {
+    cout << "Utils::EnergyContent: spectrum vector empty! "
+    "Exiting & returning 0." << endl;
+    return 0.;
+  }
+  for(unsigned int i=0;i<f.size();i++) f[i][1] = f[i][0] * f[i][1];
+  std::cout<<Integrate(f,emin,emax)<<std::endl;
+  return Integrate(f,emin,emax);
+}
+
+double Utils::EnergyContentFast(vector< vector<double> > f) {
+  double sum = 0.;  
+  for(unsigned int i=1;i<f.size();i++) 
+    sum += f[i][0] * f[i][1] * (f[i][0] - f[i-1][0]);
+  return sum;
+}
+
 ///**
 // * get Poissonian variate (just wrapped from TRandom))
 // */
