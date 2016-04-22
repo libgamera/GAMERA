@@ -25,7 +25,7 @@ def CalculateTimeDependentStuff():
 
   lum = np.vstack((t, lum)).T
   b = np.vstack((t, b)).T
-  emax = 0.1*np.vstack((t, emax)).T
+  emax = np.vstack((t, emax)).T
   r = np.vstack((t, r)).T
   v = np.vstack((t, v)).T
 
@@ -77,15 +77,14 @@ if __name__ == "__main__":
   fp.SetBreakEnergy(ebreak)
   fp.SetLowSpectralIndex(spindlow)
   fp.SetSpectralIndex(spindhigh)
-#  fp.SetEnergyBinsForNumericalSolver(ebins)
   fp.SetAge(age)
 
   # set radiation stuff
   fr = gp.Radiation()
   fr.SetDistance(dist)
-#  fr.AddThermalTargetPhotons(2.7,0.25*1.602*1.e-12)
-#  fr.AddThermalTargetPhotons(tFIR,eFIR)
-#  fr.AddThermalTargetPhotons(tNIR,eNIR)
+  fr.AddThermalTargetPhotons(2.7,0.25*1.602*1.e-12)
+  fr.AddThermalTargetPhotons(tFIR,eFIR)
+  fr.AddThermalTargetPhotons(tNIR,eNIR)
   fr.SetAmbientDensity(fp.GetAmbientDensity())
   fr.SetSynchrotronEmissionModel(1)
   fr.CreateICLossLookup()
@@ -96,8 +95,7 @@ if __name__ == "__main__":
   fr.SetBField(fp.GetBField())
   fp.CalculateElectronSpectrum(ebins)
   fr.SetElectrons(fp.GetParticleSpectrum())
-  fr.AddSSCTargetPhotons(fp.GetRadius(),1000)
-  print "hello nachi!"
+  fr.AddSSCTargetPhotons(fp.GetRadius())
   fr.CalculateDifferentialPhotonSpectrum()
   ElectronSED = np.array(fr.GetElectronSED())
   TotalSED = np.array(fr.GetTotalSED())
