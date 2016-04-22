@@ -8,12 +8,17 @@ Radiation::Radiation() {
   ParticleVector.clear();
   DEBUG = false;
   SSCSET = false;
+  lumtoflux = 0.;
   fintbrems = lintbrems = fintpp = lintpp = fintic = lintic = 0.;
   ldiffbrems = fdiffbrems = ldiffsynch = fdiffsynch = 0.;
   ldiffic = fdiffic = ldiffpp = fdiffpp = 0.;
+  distance = BField = 0.;
+  ElectronLookup = NULL;
+  ProtonLookup = NULL;
   TargetPhotonEdens = 0.;
   TargetPhotonVector.clear();
   TargetPhotonVectorOld.clear();
+  LUMFLAG = false;
   INTEGRATEOVERGAMMAS = false;
   QUIETMODE = false;
   PiModel = 1;
@@ -72,18 +77,19 @@ void Radiation::CalculateDifferentialGammaEmission(double e, int particletype) {
   ldiffbrems = fdiffbrems = ldiffsynch = fdiffsynch = 0.;
   ldiffic = fdiffic = ldiffpp = fdiffpp = 0.;
 
-  /* Conversion of differential photon rate to flux
-   [ph/(erg*s) -> ph/(erg*s*cm^2)] */
-  double lumtoflux = 0.;
   void *p = NULL;
-  if (!distance) {
-    cout << "### Radiation::CalculateDifferentialGammaEmission: Distance to "
-            "particles not specified -> Flux equals now the luminosity! ###"
-         << endl;
-    lumtoflux = 1.;
-  } else
-    lumtoflux = 1. / (4. * pi * distance * distance);
-
+  if(!lumtoflux) {
+    if (!distance) {
+      if(LUMFLAG == false) {
+        cout << "### Radiation::CalculateDifferentialGammaEmission: Distance to "
+                "particles not specified -> Flux equals now the luminosity! ###"
+             << endl;
+      }
+      LUMFLAG = true;
+      lumtoflux = 1.;
+    } else
+      lumtoflux = 1. / (4. * pi * distance * distance);
+  }
   if (particletype != 0. && particletype != 1) {
     cout << "### Radiation::CalculateDifferentialGammaEmission: Please provide "
             "proper particle spectrum and particle type!  ###" << endl;
@@ -96,17 +102,19 @@ void Radiation::CalculateDifferentialGammaEmission(double e, int particletype) {
     return;
   } else if (!particletype) {
     ParticleVector = ElectronVector;
-    radiationMechanism = "Bremsstrahlung";
-    ldiffbrems = DifferentialEmissionComponent(e, p);
-    fdiffbrems = lumtoflux * ldiffbrems;
-
+    if(n) {
+      radiationMechanism = "Bremsstrahlung";
+      ldiffbrems = DifferentialEmissionComponent(e, p);
+      fdiffbrems = lumtoflux * ldiffbrems;
+    }
     radiationMechanism = "InverseCompton";
     ldiffic = DifferentialEmissionComponent(e, p);
     fdiffic = lumtoflux * ldiffic;
-
-    radiationMechanism = "Synchrotron";
-    ldiffsynch = DifferentialEmissionComponent(e, p);
-    fdiffsynch = lumtoflux * ldiffsynch;
+    if(BField) {
+      radiationMechanism = "Synchrotron";
+      ldiffsynch = DifferentialEmissionComponent(e, p);
+      fdiffsynch = lumtoflux * ldiffsynch;
+    }
   } else if (particletype == 1) {
     ParticleVector = ProtonVector;
     radiationMechanism = "ppEmission";
@@ -966,6 +974,14 @@ void Radiation::SetParticles(vector<vector<double> > PARTICLES, int type) {
       cout << "Radiation::SetParticles: proton vector empty. Exiting." << endl;
     return;
   }
+  if(!type && ElectronLookup) {
+      cout << "Radiation::SetParticles: Overriding existing electron lookup."
+           << endl;
+  }
+  if(type && ProtonLookup) {
+      cout << "Radiation::SetParticles: Overriding existing proton lookup."
+           << endl;
+  }
   int size = (int)PARTICLES.size();
   double x[PARTICLES.size()];
   double y[PARTICLES.size()];
@@ -1140,8 +1156,9 @@ void Radiation::AddSSCTargetPhotons(double R, int steps) {
     return;
   }
   void *p = NULL;
-  double eminxray = 1.e-19;
-  double logeminxray = TargetPhotonVector[0][0];
+  double logeminxray = 0.;
+  if(!TargetPhotonVector.size()) logeminxray = log10(1e-6*eV_to_erg);
+  else logeminxray = TargetPhotonVector[0][0];
   double logemaxxray =
       log10(1.e-3 * ParticleVector[ParticleVector.size() - 1][0]);
   double estep = (logemaxxray - logeminxray) / steps;
@@ -1355,7 +1372,7 @@ void Radiation::CalculateDifferentialPhotonSpectrum(int steps, double emin,
     if (ElectronVector.size()) {
       CalculateDifferentialGammaEmission(E, 0);
       ICVal = GetDifferentialICFlux();
-      SynchVal = GetDifferentialSynchFlux();
+      if(BField) SynchVal = GetDifferentialSynchFlux();
       BremsVal = GetDifferentialBremsFlux();
     } else
       ICVal = SynchVal = BremsVal = 0.;

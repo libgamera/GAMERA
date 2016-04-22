@@ -38,6 +38,12 @@ class Radiation {
  private:
   void CalculateLuminosityAndFlux(string mechanism, double e, double &l,
                                   double &f);
+
+  
+  double lumtoflux;///< Conversion of differential photon rate to flux
+                   /// [ph/(erg*s) -> ph/(erg*s*cm^2)]
+  bool LUMFLAG; ///< this boolean is set to TRUE if no distance is given. 
+                /// In this case, the luminosity is calculated.
   double DifferentialEmissionComponent(double e, void *par);
   double GreyBody(double ephoton, double temp, double edens);
   double ICEmissivityRadFieldIntegrated(double x, void *par);

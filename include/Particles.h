@@ -484,7 +484,7 @@ struct timespec time0, time1, time2, time3;
     LumVector.clear();
     LumConstant = LUMConstant;
   }  ///< Constantly set value of source luminosity
-  void SetSourceExtension(double r) {
+  void SetRadius(double r) {
     RVector.clear();
     RConstant = pc_to_cm*r;
   }  ///< Constanty set value of source extension (pc)

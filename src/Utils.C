@@ -416,6 +416,12 @@ double Utils::Integrate(vector< vector<double> > f, double xmin, double xmax) {
     "Exiting & returning 0." << endl;
     return 0.;
   }
+  if(f[0].size() != 2) {
+    cout << "Utils::Integrate: Input is 2D-array. This one has only "
+         << f[0].size() 
+         << " dimensions. Exiting & returning 0." << endl;
+    return 0.;
+  }
   if(!xmin && !xmax) {
     xmin = f[0][0];
     xmax = f[f.size()-1][0];

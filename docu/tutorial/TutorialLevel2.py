@@ -75,12 +75,12 @@ if __name__ == "__main__":
   fp.SetICLossLookup(fr.GetICLossLookup())
 
   # calculate stuff
-  fp.CalculateParticleSpectrum("electrons")
+  fp.CalculateElectronSpectrum()
   fr.SetElectrons(fp.GetParticleSpectrum())
   fp.SetLuminosity(1.e2*lum)
   fp.SetEmax(gp.TeV_to_erg*1.e3)
   fp.SetSpectralIndex(spind-0.1)
-  fp.CalculateParticleSpectrum("protons")
+  fp.CalculateProtonSpectrum()
   fr.SetProtons(fp.GetParticleSpectrum())
   fr.CalculateDifferentialPhotonSpectrum()
 

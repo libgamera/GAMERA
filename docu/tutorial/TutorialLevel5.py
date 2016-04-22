@@ -19,13 +19,13 @@ def CalculateTimeDependentStuff():
 
   lum = (1.-etab)*lum0*(1.+t/tc)**(-1.*(brind+1.)/(brind-1.))
   emax = 3.*eps*gp.el_charge*np.sqrt(etab*lum/((1.-etab)*gp.c_speed))
-  r = c*(lum0*t*gp.yr_to_sec/e0)**0.2 * vej*t*gp.yr_to_sec
+  r = c*(lum0*t*gp.yr_to_sec/e0)**0.2 * vej*t*gp.yr_to_sec / gp.pc_to_cm # in pc
   v = 1.2*r/(gp.yr_to_sec*t)
   b = np.sqrt(gp.yr_to_sec*etab*6./r**4 * np.concatenate(([0], ((lum * r)[1:] * np.diff(t)).cumsum())))
 
   lum = np.vstack((t, lum)).T
   b = np.vstack((t, b)).T
-  emax = np.vstack((t, emax)).T
+  emax = 0.1*np.vstack((t, emax)).T
   r = np.vstack((t, r)).T
   v = np.vstack((t, v)).T
 
@@ -42,13 +42,13 @@ if __name__ == "__main__":
   lum0 = configParser.getfloat('Parameters','InitialLuminosity')
   age = configParser.getfloat('Parameters','Age')
   tc = configParser.getfloat('Parameters','CharAge')
-  dist = gp.pc_to_cm*configParser.getfloat('Parameters','Distance')
+  dist = configParser.getfloat('Parameters','Distance')
   dens = configParser.getfloat('Parameters','AmbientDensity')
   tNIR = configParser.getfloat('Parameters','tNIR')
   eNIR = gp.TeV_to_erg*1.e-12*configParser.getfloat('Parameters','edensNIR')
   tFIR = configParser.getfloat('Parameters','tFIR')
   eFIR = gp.TeV_to_erg*1.e-12*configParser.getfloat('Parameters','edensFIR')
-  ebins = configParser.getfloat('Parameters','Ebins')
+  ebins = configParser.getint('Parameters','Ebins')
   emin = gp.TeV_to_erg*configParser.getfloat('Parameters','Emin')
   ebreak = gp.TeV_to_erg*configParser.getfloat('Parameters','Ebreak')
   spindlow = configParser.getfloat('Parameters','SpectralIndexLow')
@@ -77,15 +77,15 @@ if __name__ == "__main__":
   fp.SetBreakEnergy(ebreak)
   fp.SetLowSpectralIndex(spindlow)
   fp.SetSpectralIndex(spindhigh)
-  fp.SetEnergyBinsForNumericalSolver(ebins)
+#  fp.SetEnergyBinsForNumericalSolver(ebins)
   fp.SetAge(age)
 
   # set radiation stuff
   fr = gp.Radiation()
   fr.SetDistance(dist)
-  fr.AddThermalTargetPhotons(2.7,0.25*1.602*1.e-12)
-  fr.AddThermalTargetPhotons(tFIR,eFIR)
-  fr.AddThermalTargetPhotons(tNIR,eNIR)
+#  fr.AddThermalTargetPhotons(2.7,0.25*1.602*1.e-12)
+#  fr.AddThermalTargetPhotons(tFIR,eFIR)
+#  fr.AddThermalTargetPhotons(tNIR,eNIR)
   fr.SetAmbientDensity(fp.GetAmbientDensity())
   fr.SetSynchrotronEmissionModel(1)
   fr.CreateICLossLookup()
@@ -94,9 +94,10 @@ if __name__ == "__main__":
   # calculate stuff
   fp.SetAge(age)
   fr.SetBField(fp.GetBField())
-  fp.CalculateParticleSpectrum("electrons")
+  fp.CalculateElectronSpectrum(ebins)
   fr.SetElectrons(fp.GetParticleSpectrum())
-  fr.AddSSCTargetPhotons(fp.GetRadius())
+  fr.AddSSCTargetPhotons(fp.GetRadius(),1000)
+  print "hello nachi!"
   fr.CalculateDifferentialPhotonSpectrum()
   ElectronSED = np.array(fr.GetElectronSED())
   TotalSED = np.array(fr.GetTotalSED())

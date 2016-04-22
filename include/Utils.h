@@ -120,7 +120,7 @@ class Utils {
                                     double x_max, int n);
   vector<double>  CustomFunctionRandom(vector< vector<double> > f,
                                        double xmin, double xmax, int n);
-  double Integrate(vector< vector<double> > f, double xmin, double xmax);
+  double Integrate(vector< vector<double> > f, double xmin=0., double xmax=0.);
   vector< vector< double> > IntegratedProfile(vector< vector<double> > f);
   gsl_spline *GSLsplineFromTwoDVector(vector< vector<double> > v);
   vector< vector<double> > SortTwoDVector(vector< vector<double> > v,

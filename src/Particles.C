@@ -61,7 +61,7 @@ Particles::Particles() {
   eBreak2mSInd2 = emin2mSInd2 = emineBreak2mSInd2 = fS = fS2 = bremsl_epf =
       bremsl_eef = 0.;
   LumConstant = BConstant = NConstant = VConstant = RConstant = EmaxConstant = 
-      escapeTimeConstant = CustomInjectionNorm = NAN;
+      escapeTimeConstant = CustomInjectionNorm = Age = NAN;
   MinELookup = MaxELookup = 0.;
   accIC = gsl_interp_accel_alloc();
   accLum = gsl_interp_accel_alloc();
@@ -139,12 +139,11 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
     if (Type == 1) cout << "   (-> protons)     " << endl;
   }
 
-  if(!Age) {
+  if(std::isnan(Age)) {
     cout << "Particles::CalculateParticleSpectrum: No age set! Exiting"
          << endl; 
     return;
   }
-  std::cout<<".."<<LumVector.size() <<" "<<LumConstant<<std::endl;
   if(!LumVector.size() && std::isnan(LumConstant)) {
     cout << "Particles::CalculateParticleSpectrum: Particle vector empty! Exiting"
          << endl;
@@ -188,6 +187,7 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
       METHOD = 1;
     else METHOD = 2;
   }
+
   if(escapeTimeConstant > 0. || escapeTimeLookup != NULL || 
      EscapeTimeEnergyTimeEvolution != NULL) METHOD = 0;
   /* determine time from where to start the iteration. Particles that would have
@@ -211,12 +211,14 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   else
     eMax = DetermineEmax(Tmin);
 
+
   /* apply a safe margin to the upper energy boundary
    * in order to prevent numerical effects at the upper end of the spectrum.
    */
   energyMargin = pow(-log(energyMarginFactor), 1. / CutOffFactor);
   eMax *= energyMargin;
 
+  std::cout<< METHOD << "," << eMax << " "<<Emin<<std::endl;
   /* if emax falls below emin, return dummy vector with zeroes */
   if (eMax <= Emin) {
     cout << "Particles::FillParticleSpectrumLookup Whaat? eMax lower than "
@@ -1493,7 +1495,7 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
 
 Radiation *Particles::GetSSCEquilibrium(Radiation *fr, double t, double tolerance) {
   Age = t;
-  METHOD = 1;
+//  METHOD = 1;
   SetMembers(Age);
   fr->CreateICLossLookup();
   SetLookup(fr->GetICLossLookup(), "ICLoss");
