@@ -187,7 +187,7 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
       METHOD = 1;
     else METHOD = 2;
   }
-
+  std::cout<<" METHOD = "<<METHOD <<endl;
   if(escapeTimeConstant > 0. || escapeTimeLookup != NULL || 
      EscapeTimeEnergyTimeEvolution != NULL) METHOD = 0;
   /* determine time from where to start the iteration. Particles that would have
@@ -1012,6 +1012,8 @@ double Particles::MinMod(double a, double b) {
  */
 void Particles::ComputeGridInTimeInterval(double T1, double T2, string type, 
                                           int bins) {
+  
+  if (TminConstant) Tmin = TminConstant;
   if (T1 <= Tmin) {
     cout << "Particles::ComputeGridInTimeInterval T1<=internal min time (" << T1
          << "<=" << Tmin << "). set it artificially to " << Tmin << "yrs."

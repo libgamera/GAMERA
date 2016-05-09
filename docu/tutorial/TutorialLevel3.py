@@ -30,7 +30,7 @@ if __name__ == "__main__":
   dens = float(configParser.get('Parameters','AmbientDensity'))
   bfield = float(configParser.get('Parameters','BField'))
   t = float(configParser.get('Parameters','tRAD'))
-  e = gp.TeV_to_erg*1.e-12*float(configParser.get('Parameters','edensRAD'))
+  e = gp.eV_to_erg*float(configParser.get('Parameters','edensRAD'))
   ebins = float(configParser.get('Parameters','Ebins'))
   emax = gp.TeV_to_erg*float(configParser.get('Parameters','Emax'))
   emin = gp.TeV_to_erg*float(configParser.get('Parameters','Emin'))

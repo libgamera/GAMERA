@@ -49,12 +49,12 @@ if __name__ == "__main__":
   lum = float(configParser.get('Parameters','Luminosity'))
   age = float(configParser.get('Parameters','Age'))
   tc = float(configParser.get('Parameters','CharAge'))
-  dist = gp.pc_to_cm*float(configParser.get('Parameters','Distance'))
+  dist = float(configParser.get('Parameters','Distance'))
   dens = float(configParser.get('Parameters','AmbientDensity'))
   bfield = float(configParser.get('Parameters','BField'))
   t = float(configParser.get('Parameters','tRAD'))
-  e = gp.TeV_to_erg*1.e-12*float(configParser.get('Parameters','edensRAD'))
-  ebins = float(configParser.get('Parameters','Ebins'))
+  e = gp.eV_to_erg*float(configParser.get('Parameters','edensRAD'))
+  ebins = int(configParser.get('Parameters','Ebins'))
   emax = gp.TeV_to_erg*float(configParser.get('Parameters','Emax'))
   emin = gp.TeV_to_erg*float(configParser.get('Parameters','Emin'))
   ebreak = gp.TeV_to_erg*float(configParser.get('Parameters','Ebreak'))
@@ -81,7 +81,6 @@ if __name__ == "__main__":
   fp.SetBreakEnergy(ebreak)
   fp.SetLowSpectralIndex(spindlow)
   fp.SetSpectralIndex(spindhigh)
-  fp.SetEnergyBinsForNumericalSolver(ebins)
   fp.SetAge(age)
 
   # set radiation stuff
@@ -108,7 +107,7 @@ if __name__ == "__main__":
     fp.SetAge(i)
     fr.SetAmbientDensity(fp.GetAmbientDensity())
     fr.SetBField(fp.GetBField())
-    fp.CalculateParticleSpectrum("electrons")
+    fp.CalculateElectronSpectrum(ebins)
     fr.SetElectrons(fp.GetParticleSpectrum())
     fr.CalculateDifferentialPhotonSpectrum()
 
