@@ -12,21 +12,6 @@ using namespace std;
 
 typedef double (*fGSLPointer)(double, void *);
 
-template <typename F>
-class GSLfuncRad : public gsl_function {
- public:
-  GSLfuncRad(const F &func) : _func(func) {
-    function = &GSLfuncRad::Call;
-    params = this;
-  }
-
- private:
-  const F &_func;
-  static double Call(double x, void *params) {
-    return static_cast<GSLfuncRad *>(params)->_func(x);
-  }
-};
-
 /**  @file Radiation.C
  *   @author Joachim Hahn
  *   @short Class that calculates broad band emission from particle spectra.

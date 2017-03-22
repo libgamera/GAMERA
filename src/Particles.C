@@ -488,11 +488,12 @@ void Particles::ExtendLookup(vector<vector<double> > v, string LookupType) {
     cout << "Particles::ExtendLookup: Input vector empty. Exiting." << endl;
     return;
   }
-  string st[] = {"Luminosity", "AmbientDensity", "BField", "Emax",
+  string stArr[] = {"Luminosity", "AmbientDensity", "BField", "Emax",
                        "Radius",         "Speed"};
-  unsigned int st_size = 6;
-  vector<vector<double> > vs[] = {LumVector,  NVector,          BVector,
+  vector<string> st( stArr, stArr + ( sizeof ( stArr ) /  sizeof ( stArr[0] ) ) );
+  vector<vector<double> > vsArr[] = {LumVector,  NVector,          BVector,
                                          eMaxVector, RVector,  VVector};
+  vector<vector<vector<double> > > vs( vsArr, vsArr + ( sizeof ( vsArr ) /  sizeof ( vsArr[0] ) ) );
   vector< vector< double > > lookup;
   if (!LookupType.compare("Luminosity") || !LookupType.compare("Emax")) {
     lookup = fUtils->VectorAxisLogarithm(v,1);
@@ -500,7 +501,7 @@ void Particles::ExtendLookup(vector<vector<double> > v, string LookupType) {
   else {
     lookup = v;
   }
-  for (unsigned int i = 0; i < st_size; i++) {
+  for (unsigned int i = 0; i < st.size(); i++) {
     if (!LookupType.compare(st[i])) {
       if (vs[i][vs[i].size() - 1][0] > lookup[0][0]) {
         cout << "Particles::ExtendCRLumLookup - WTF, the vector which to add ("
