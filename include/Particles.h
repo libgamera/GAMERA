@@ -30,13 +30,13 @@ using namespace std;
 template <typename F>
 class GSLfuncPart : public gsl_function {
  public:
-  GSLfuncPart(const F &func) : _func(func) {
+  GSLfuncPart(const F func) : _func(func) {
     function = &GSLfuncPart::Call;
     params = this;
   }
  ~GSLfuncPart() {}
  private:
-  const F &_func;
+  const F _func;
   static double Call(double x, void *params) {
     return static_cast<GSLfuncPart *>(params)->_func(x);
   }
@@ -44,6 +44,16 @@ class GSLfuncPart : public gsl_function {
 
 class Particles {
   typedef double (Particles::*fPointer)(double, void *);
+
+  static void initialise(fPointer funcPtr, Particles *partPtr) {
+    _funcPtr = funcPtr;
+    _partPtr = partPtr;
+  }
+  static double evaluate(double x, void* params) {
+    return (_partPtr->*_funcPtr)(x, params);
+  }
+  static fPointer _funcPtr;
+  static Particles *_partPtr;
 
 struct timespec time0, time1, time2, time3;
  private:

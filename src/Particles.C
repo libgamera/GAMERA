@@ -1359,15 +1359,29 @@ void Particles::SetIntegratorMemory(string mode) {
  * Integration function using the GSL QAG functionality
  *
  */
+Particles::fPointer Particles::_funcPtr;
+Particles *Particles::_partPtr;
+
 double Particles::Integrate(fPointer f, double *x, double emin, double emax,
                             double tolerance, int kronrodrule) {
   double integral, error;
   /* no comment */
-  auto ptr = [=](double xx)->double {
-    return (this->*f)(xx, (void *)x);
-  };
-  GSLfuncPart<decltype(ptr)> Fp(ptr);
-  gsl_function F = *static_cast<gsl_function *>(&Fp);
+  // auto ptr = [=](double xx)->double {
+  //   return (this->*f)(xx, (void *)x);
+  // };
+
+  // GSLfuncPart<decltype(ptr)> Fp(ptr);
+  // gsl_function F = *static_cast<gsl_function *>(&Fp);
+
+  gsl_function F;
+  initialise(f, this);
+  F.function = &evaluate;
+  F.params = x;
+
+
+
+  // gsl_function F = *static_cast<gsl_function *>(&Fp);
+  
   gsl_integration_workspace *w = gsl_integration_workspace_alloc(gslmemory);
   if (gsl_integration_qag(&F, emin, emax, 0, tolerance, gslmemory, kronrodrule,
                           w, &integral,&error)) {
