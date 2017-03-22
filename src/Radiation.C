@@ -1593,15 +1593,19 @@ vector<vector<double> > Radiation::GetParticleSED(string type) {
  * Integration function using the GSL QAG functionality
  *
  */
+Radiation::fPointer Radiation::_funcPtr;
+Radiation *Radiation::_radPtr;
+
 double Radiation::Integrate(fPointer f, double *x, double emin, double emax,
                             double tolerance, int kronrodrule) {
   double integral, error;
-  auto ptr = [=](double xx)->double {
-    return (this->*f)(xx, (void *)x);
-  };
+  
+  gsl_function F;
+  initialise(f, this);
+  F.function = &evaluate;
+  F.params = x;
+
   gsl_integration_workspace *w = gsl_integration_workspace_alloc(10000);
-  GSLfuncRad<decltype(ptr)> Fp(ptr);
-  gsl_function F = *static_cast<gsl_function *>(&Fp);
   if (gsl_integration_qag(&F, emin, emax, 0, tolerance, 10000, kronrodrule, w,
                           &integral, &error))
     return 0.;

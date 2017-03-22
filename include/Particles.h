@@ -27,21 +27,6 @@ using namespace std;
  */
 
 
-template <typename F>
-class GSLfuncPart : public gsl_function {
- public:
-  GSLfuncPart(const F func) : _func(func) {
-    function = &GSLfuncPart::Call;
-    params = this;
-  }
- ~GSLfuncPart() {}
- private:
-  const F _func;
-  static double Call(double x, void *params) {
-    return static_cast<GSLfuncPart *>(params)->_func(x);
-  }
-};
-
 class Particles {
   typedef double (Particles::*fPointer)(double, void *);
 

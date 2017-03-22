@@ -2010,20 +2010,20 @@ void Astro::CalculateTrueLoveMcKeeParams(vector<double> pars) {
   double charvelocitytruelovemckee=charradiustruelovemckee/chartimetruelovemckee;
 
   /* format: {l_ED,w_core,phi_ED,phi_EDeff,t*_ST,R*_ST,R*_r_ST,v~*_r_ST,a~*_r_ST,t*_ref,t*_core,r*_r_core,v~*_r_core,a~*_r_core,f_n,alpha,eta} */
-  if(!index)          truelovemckeeparams = {  1.1,  0., 0.343, 0.0961, 0.495, 0.727, 0.545, 0.585, 0.106,  0.,    0.,    0.,    0.,    0.};
-  else if(index== 2.) truelovemckeeparams = {  1.1,  0., 0.343, 0.0947, 0.387, 0.679, 0.503, 0.686,-0.151, 1.6,    0.,    0.,    0.,    0.};
-  else if(index== 4.) truelovemckeeparams = {  1.1, 0.1, 0.343, 0.0791, 0.232, 0.587,    0.,    0.,    0.,  0.,   1.7,    0.,    0.,    0.};
-  else if(index== 6.) truelovemckeeparams = { 1.39,  0.,  0.39,     0.,  1.04,  1.07,    0.,    0.,    0.,  0., 0.513, 0.541, 0.527, 0.112};
-  else if(index== 7.) truelovemckeeparams = { 1.26,  0.,  0.47,     0., 0.732, 0.881,    0.,    0.,    0.,  0., 0.363, 0.469, 0.553, 0.116};
-  else if(index== 8.) truelovemckeeparams = { 1.21,  0.,  0.52,     0., 0.605, 0.788,    0.,    0.,    0.,  0., 0.292, 0.413, 0.530, 0.139};
-  else if(index== 9.) truelovemckeeparams = { 1.19,  0.,  0.55,     0., 0.523, 0.725,    0.,    0.,    0.,  0., 0.249, 0.371, 0.497, 0.162};
-  else if(index==10.) truelovemckeeparams = { 1.17,  0.,  0.57,     0., 0.481, 0.687,    0.,    0.,    0.,  0., 0.220, 0.340, 0.463, 0.192};
-  else if(index==12.) truelovemckeeparams = { 1.15,  0.,  0.60,     0., 0.424, 0.636,    0.,    0.,    0.,  0., 0.182, 0.293, 0.403, 0.251};
-  else if(index==14.) truelovemckeeparams = { 1.14,  0.,  0.62,     0., 0.389, 0.603,    0.,    0.,    0.,  0., 0.157, 0.259, 0.354, 0.277};
+  if(!index)          { static const double itl[] = {  1.1,  0., 0.343, 0.0961, 0.495, 0.727, 0.545, 0.585, 0.106,  0.,    0.,    0.,    0.,    0.}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index== 2.) { static const double itl[] = {  1.1,  0., 0.343, 0.0947, 0.387, 0.679, 0.503, 0.686,-0.151, 1.6,    0.,    0.,    0.,    0.}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index== 4.) { static const double itl[] = {  1.1, 0.1, 0.343, 0.0791, 0.232, 0.587,    0.,    0.,    0.,  0.,   1.7,    0.,    0.,    0.}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index== 6.) { static const double itl[] = { 1.39,  0.,  0.39,     0.,  1.04,  1.07,    0.,    0.,    0.,  0., 0.513, 0.541, 0.527, 0.112}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index== 7.) { static const double itl[] = { 1.26,  0.,  0.47,     0., 0.732, 0.881,    0.,    0.,    0.,  0., 0.363, 0.469, 0.553, 0.116}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index== 8.) { static const double itl[] = { 1.21,  0.,  0.52,     0., 0.605, 0.788,    0.,    0.,    0.,  0., 0.292, 0.413, 0.530, 0.139}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index== 9.) { static const double itl[] = { 1.19,  0.,  0.55,     0., 0.523, 0.725,    0.,    0.,    0.,  0., 0.249, 0.371, 0.497, 0.162}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index==10.) { static const double itl[] = { 1.17,  0.,  0.57,     0., 0.481, 0.687,    0.,    0.,    0.,  0., 0.220, 0.340, 0.463, 0.192}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index==12.) { static const double itl[] = { 1.15,  0.,  0.60,     0., 0.424, 0.636,    0.,    0.,    0.,  0., 0.182, 0.293, 0.403, 0.251}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index==14.) { static const double itl[] = { 1.14,  0.,  0.62,     0., 0.389, 0.603,    0.,    0.,    0.,  0., 0.157, 0.259, 0.354, 0.277}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
   else {
     cout << "Astro::CalculateTrueLoveMcKeeParams: Density Index (index="
          << index << ") not supported! Returning nothing." << endl;
-    truelovemckeeparams={};
+    truelovemckeeparams= vector<double>();
     return;
   }
 
@@ -2054,13 +2054,14 @@ void Astro::CalculateTrueLoveMcKeeParams(vector<double> pars) {
     return;
   }
   if(!QUIETMODE) {
-    vector<string> ParNames = {"l_ED","w_core","phi_ED","phi_EDeff","t*_ST",
+    string ParNamesArr[] = {"l_ED","w_core","phi_ED","phi_EDeff","t*_ST",
                                "R*_ST","R*_r_ST","v~*_r_ST","a~*_r_ST","t*_ref",
                                "t*_core","r*_r_core","v~*_r_core","a~*_r_core",
                                "f_n","alpha","eta","charradiustruelovemckee",
                                "chartimetruelovemckee",
                                "charvelocitytruelovemckee","sedovtaylortime",
                                "coreexittime","index"};
+    vector<string> ParNames( ParNamesArr, ParNamesArr + ( sizeof ( ParNamesArr ) /  sizeof ( std::string ) ) );
     cout << ">> Paramaters for Truelove & McKee's solution (density index = "
          << index << "):" <<std::endl;
     for(unsigned int i=0;i<truelovemckeeparams.size();i++) {

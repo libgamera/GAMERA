@@ -443,14 +443,20 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
 //    std::cout<< " ... ... ... "<<std::endl;
 //  }
   gsl_spline *ImportLookup = fUtils->GSLsplineFromTwoDVector(lookup);
-  vector<string> st{"ICLoss", "Luminosity", "AmbientDensity", "BField",
+  std::string stArr[] = {"ICLoss", "Luminosity", "AmbientDensity", "BField",
                     "Emax", "Radius",         "Speed"};
-  vector<gsl_spline **> spl{&ICLossLookup, &LumLookup,  &NLookup,
+  // unsigned int st_size = 7;
+  vector<string> st( stArr, stArr + ( sizeof ( stArr ) /  sizeof ( stArr[0] ) ) );
+  gsl_spline **splArr[] = {&ICLossLookup, &LumLookup,  &NLookup,
                             &BFieldLookup, &eMaxLookup,
                             &RLookup,      &VLookup};
-  vector<vector<vector<double> > *> vs{
+  vector<gsl_spline **> spl( splArr, splArr + ( sizeof ( splArr ) /  sizeof ( splArr[0] ) ) );
+  // vector<gsl_spline **> spl(gsl_spliner, gsl_spliner + (sizeof (gsl_spliner) / sizeof(gsl_spline **)));
+
+  vector<vector<double> > * vsArr[] = {
       &ICLossVector, &LumVector,        &NVector, &BVector,
       &eMaxVector, &RVector, &VVector};
+  vector<vector<vector<double> > *> vs( vsArr, vsArr + ( sizeof ( vsArr ) /  sizeof ( vsArr[0] ) ) );
   
   for (unsigned int i = 0; i < st.size(); i++) {
     if (!LookupType.compare(st[i])) {
@@ -482,9 +488,10 @@ void Particles::ExtendLookup(vector<vector<double> > v, string LookupType) {
     cout << "Particles::ExtendLookup: Input vector empty. Exiting." << endl;
     return;
   }
-  vector<string> st = {"Luminosity", "AmbientDensity", "BField", "Emax",
+  string st[] = {"Luminosity", "AmbientDensity", "BField", "Emax",
                        "Radius",         "Speed"};
-  vector<vector<vector<double> > > vs = {LumVector,  NVector,          BVector,
+  unsigned int st_size = 6;
+  vector<vector<double> > vs[] = {LumVector,  NVector,          BVector,
                                          eMaxVector, RVector,  VVector};
   vector< vector< double > > lookup;
   if (!LookupType.compare("Luminosity") || !LookupType.compare("Emax")) {
@@ -493,7 +500,7 @@ void Particles::ExtendLookup(vector<vector<double> > v, string LookupType) {
   else {
     lookup = v;
   }
-  for (unsigned int i = 0; i < st.size(); i++) {
+  for (unsigned int i = 0; i < st_size; i++) {
     if (!LookupType.compare(st[i])) {
       if (vs[i][vs[i].size() - 1][0] > lookup[0][0]) {
         cout << "Particles::ExtendCRLumLookup - WTF, the vector which to add ("
@@ -1366,21 +1373,10 @@ double Particles::Integrate(fPointer f, double *x, double emin, double emax,
                             double tolerance, int kronrodrule) {
   double integral, error;
   /* no comment */
-  // auto ptr = [=](double xx)->double {
-  //   return (this->*f)(xx, (void *)x);
-  // };
-
-  // GSLfuncPart<decltype(ptr)> Fp(ptr);
-  // gsl_function F = *static_cast<gsl_function *>(&Fp);
-
   gsl_function F;
   initialise(f, this);
   F.function = &evaluate;
   F.params = x;
-
-
-
-  // gsl_function F = *static_cast<gsl_function *>(&Fp);
   
   gsl_integration_workspace *w = gsl_integration_workspace_alloc(gslmemory);
   if (gsl_integration_qag(&F, emin, emax, 0, tolerance, gslmemory, kronrodrule,
