@@ -445,13 +445,11 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
   gsl_spline *ImportLookup = fUtils->GSLsplineFromTwoDVector(lookup);
   std::string stArr[] = {"ICLoss", "Luminosity", "AmbientDensity", "BField",
                     "Emax", "Radius",         "Speed"};
-  // unsigned int st_size = 7;
   vector<string> st( stArr, stArr + ( sizeof ( stArr ) /  sizeof ( stArr[0] ) ) );
   gsl_spline **splArr[] = {&ICLossLookup, &LumLookup,  &NLookup,
                             &BFieldLookup, &eMaxLookup,
                             &RLookup,      &VLookup};
   vector<gsl_spline **> spl( splArr, splArr + ( sizeof ( splArr ) /  sizeof ( splArr[0] ) ) );
-  // vector<gsl_spline **> spl(gsl_spliner, gsl_spliner + (sizeof (gsl_spliner) / sizeof(gsl_spline **)));
 
   vector<vector<double> > * vsArr[] = {
       &ICLossVector, &LumVector,        &NVector, &BVector,
