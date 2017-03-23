@@ -271,7 +271,7 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
   double gammas = Integrate(IntFunc, &egamma, e, emax, integratorTolerance,
                             integratorKronrodRule);
   if (std::isnan(gammas)) return 0.;
-
+  if (gammas < 0.) return 0.;
   return gammas;
 }
 
@@ -468,7 +468,7 @@ void Radiation::CreateICLossLookup(int bins) {
   double EGammaMax = 1.e8 * TeV_to_erg;
   /* lower integration boundary for the IC loss lookup (i.e. here simply the
    * electron rest mass) */
-  double logemin = log10(0.1 * m_e);
+  double logemin = log10(1.e-5 * m_e);
   /* upper integration boundary for the IC loss lookup */
   double logemax = log10(EGammaMax);
   double logestep = (double)(logemax - logemin) / bins;
@@ -974,11 +974,11 @@ void Radiation::SetParticles(vector<vector<double> > PARTICLES, int type) {
       cout << "Radiation::SetParticles: proton vector empty. Exiting." << endl;
     return;
   }
-  if(!type && ElectronLookup) {
+  if(!type && ElectronLookup && !QUIETMODE) {
       cout << "Radiation::SetParticles: Overriding existing electron lookup."
            << endl;
   }
-  if(type && ProtonLookup) {
+  if(type && ProtonLookup && !QUIETMODE) {
       cout << "Radiation::SetParticles: Overriding existing proton lookup."
            << endl;
   }
@@ -1422,6 +1422,7 @@ void Radiation::CalculateDifferentialPhotonSpectrum(vector<double> points) {
     cout << "_________________________________________" << endl;
     cout << ">> CALCULATING SED FROM PARENT PARTICLES " << endl;
   }
+
   double ICVal, SynchVal, BremsVal, ppVal, E, Emin, Emax;
   if (!ProtonVector.size()) {
     Emax = ElectronVector[ElectronVector.size() - 1][0];
@@ -1593,15 +1594,19 @@ vector<vector<double> > Radiation::GetParticleSED(string type) {
  * Integration function using the GSL QAG functionality
  *
  */
+Radiation::fPointer Radiation::_funcPtr;
+Radiation *Radiation::_radPtr;
+
 double Radiation::Integrate(fPointer f, double *x, double emin, double emax,
                             double tolerance, int kronrodrule) {
   double integral, error;
-  auto ptr = [=](double xx)->double {
-    return (this->*f)(xx, (void *)x);
-  };
+  
+  gsl_function F;
+  initialise(f, this);
+  F.function = &evaluate;
+  F.params = x;
+
   gsl_integration_workspace *w = gsl_integration_workspace_alloc(10000);
-  GSLfuncRad<decltype(ptr)> Fp(ptr);
-  gsl_function F = *static_cast<gsl_function *>(&Fp);
   if (gsl_integration_qag(&F, emin, emax, 0, tolerance, 10000, kronrodrule, w,
                           &integral, &error))
     return 0.;

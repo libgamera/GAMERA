@@ -581,9 +581,12 @@ vector< vector<double> > Utils::VectorAxisLogarithm(vector< vector<double> > v,
             "Doing nothing." << endl;
     return v;
   }
-  for(unsigned int i = 0; i < v.size() ; i++) 
-      v[i][column] = log10(v[i][column]);
-    
+  for(unsigned int i = 0; i < v.size() ; i++) {
+      if (v[i][column])
+          v[i][column] = log10(v[i][column]);
+      else
+          v[i][column] = -100.;
+  }
   return v;
 }
 

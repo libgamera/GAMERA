@@ -468,6 +468,14 @@ void Astro::CalculateBField(double x, double y, double z, double &B_tot, double 
   return;
 }
 
+double Astro::TotalBField(double x, double y, double z) {
+  double B_tot,B_coh,B_ord,B_iso;
+  vector<double> regFieldDirection, isoFieldDirection;
+  CalculateBField(x, y, z, B_tot, B_coh, B_ord, B_iso, regFieldDirection, isoFieldDirection);
+  std::cout<<x<<" "<<y<<" "<<z<<" "<<B_tot<<" "<<B_coh<<" "<<B_ord<<" "<<B_iso<<std::endl;
+  return B_tot;
+}
+
 /*  -----     AMBIENT DENSITY STUFF     ----- */
 
 /**
@@ -843,18 +851,20 @@ double Astro::ModulateGasDensityWithSpirals(double n, double x, double y, double
  *
  */
 double Astro::nRadial(double *x, double *pars) {
-  double r = x[0];
-  double l = pars[0];
-  double b = pars[1];
   vector<double> xyzref;
   xyzref.resize(3);
+  vector<double> lbr;
+  lbr.resize(3);
   xyzref[0] = pars[2];
   xyzref[1] = pars[3];
   xyzref[2] = pars[4];
+  lbr[0] = pars[0];
+  lbr[1] = pars[1];
+  lbr[2] = x[0];
   int gasspecies = pars[5];
   int modulatewitharms = (int)pars[6];
 
-  vector<double> xyzactual = GetCartesian(r,l,b,xyzref);
+  vector<double> xyzactual = GetCartesian(lbr,xyzref);
   double xActual = xyzactual[0];
   double yActual = xyzactual[1];
   double zActual = xyzactual[2];
@@ -875,7 +885,11 @@ double Astro::nRadial(double *x, double *pars) {
 /**
  * Galactic coordinates (R,GL,GB) ->Cartesian
  */
-vector<double> Astro::GetCartesian(double r, double l, double b, vector<double> xyzref) {
+vector<double> Astro::GetCartesian(vector<double> lbr, vector<double> xyzref) {
+
+  double l = lbr[0];
+  double b = lbr[1];
+  double r = lbr[2];
 
   double dl, db;
   vector<double> xyz;
@@ -897,21 +911,37 @@ vector<double> Astro::GetCartesian(double r, double l, double b, vector<double> 
 }
 
 /**
- * Cartesian coordinates -> Galactic Coordinates(R,GL,GB)
+ * Cartesian coordinates -> Galactic Coordinates(GL,GB,R)
  */
-void Astro::GetGalactic(double x, double y, double z, double xref, double yref, double zref, double &l, double &b) {
+vector<double> Astro::GetGalactic(vector<double> xyz, vector<double> xyzref) {
+
+  double x = xyz[0];
+  double y = xyz[1];
+  double z = xyz[2];
+
+  double l,b,r;
+  vector<double> lbr;
+  double xref = xyzref[0];
+  double yref = xyzref[1];
+  double zref = xyzref[2];
+  lbr.resize(3);
+
   double dx  = x-xref;
   double dy  = y-yref;
   double dz =  z-zref;
 
-  double dr = sqrt(dx*dx+dy*dy+dz*dz);
+  r = sqrt(dx*dx+dy*dy+dz*dz);
   double rrref = sqrt(xref*xref+yref*yref);
-  double drr = sqrt(dx*dx+dy*dy);
+  double dr = sqrt(dx*dx+dy*dy);
   double prod = -dx*xref - dy*yref;
-  l = 180.*acos(prod/(drr*rrref))/pi;
+  l = 180.*acos(prod/(dr*rrref))/pi;
   if(dx<=0.) l*=-1.;
-  b = 180.*asin(dz/dr)/pi;
-  return;
+  b = 180.*asin(dz/r)/pi;
+  lbr[0] = l;
+  lbr[1] = b;
+  lbr[2] = r;
+
+  return lbr;
 }
 
 /**
@@ -1621,6 +1651,7 @@ void Astro::CalculateThinShellApproximation(vector< vector<double> > dProfile,
     for(double logt = logtmin ; logt < logtmax ; logt += dlogt) {
       t = pow(10.,logt);
       x = ThinShellRadiusAndSpeed(t);
+      if(!x[0] || !x[1]) continue;
       fUtils->TwoDVectorPushBack(t,x[0]/pc_to_cm,forwardshockradiusprofile);
       fUtils->TwoDVectorPushBack(t,x[1],forwardshockvelocityprofile);
     }
@@ -1835,7 +1866,7 @@ void Astro::CalculateTrueloveMcKeeSolution(vector<double> pars, double tmin,
   // make the r and v time profiles
   if(steps && tmin && tmax) {
     if(tmin>=tmax) {
-      cout << "Astro::CalculateThinShellApproximation: Can't create profiles"
+      cout << "Astro::CalculateTrueloveMcKeeSolution: Can't create profiles"
               "because tmin >= tmax (" << tmin <<" >= "<< tmax <<
               ") Exiting!" << endl;
       return;
@@ -2010,20 +2041,20 @@ void Astro::CalculateTrueLoveMcKeeParams(vector<double> pars) {
   double charvelocitytruelovemckee=charradiustruelovemckee/chartimetruelovemckee;
 
   /* format: {l_ED,w_core,phi_ED,phi_EDeff,t*_ST,R*_ST,R*_r_ST,v~*_r_ST,a~*_r_ST,t*_ref,t*_core,r*_r_core,v~*_r_core,a~*_r_core,f_n,alpha,eta} */
-  if(!index)          truelovemckeeparams = {  1.1,  0., 0.343, 0.0961, 0.495, 0.727, 0.545, 0.585, 0.106,  0.,    0.,    0.,    0.,    0.};
-  else if(index== 2.) truelovemckeeparams = {  1.1,  0., 0.343, 0.0947, 0.387, 0.679, 0.503, 0.686,-0.151, 1.6,    0.,    0.,    0.,    0.};
-  else if(index== 4.) truelovemckeeparams = {  1.1, 0.1, 0.343, 0.0791, 0.232, 0.587,    0.,    0.,    0.,  0.,   1.7,    0.,    0.,    0.};
-  else if(index== 6.) truelovemckeeparams = { 1.39,  0.,  0.39,     0.,  1.04,  1.07,    0.,    0.,    0.,  0., 0.513, 0.541, 0.527, 0.112};
-  else if(index== 7.) truelovemckeeparams = { 1.26,  0.,  0.47,     0., 0.732, 0.881,    0.,    0.,    0.,  0., 0.363, 0.469, 0.553, 0.116};
-  else if(index== 8.) truelovemckeeparams = { 1.21,  0.,  0.52,     0., 0.605, 0.788,    0.,    0.,    0.,  0., 0.292, 0.413, 0.530, 0.139};
-  else if(index== 9.) truelovemckeeparams = { 1.19,  0.,  0.55,     0., 0.523, 0.725,    0.,    0.,    0.,  0., 0.249, 0.371, 0.497, 0.162};
-  else if(index==10.) truelovemckeeparams = { 1.17,  0.,  0.57,     0., 0.481, 0.687,    0.,    0.,    0.,  0., 0.220, 0.340, 0.463, 0.192};
-  else if(index==12.) truelovemckeeparams = { 1.15,  0.,  0.60,     0., 0.424, 0.636,    0.,    0.,    0.,  0., 0.182, 0.293, 0.403, 0.251};
-  else if(index==14.) truelovemckeeparams = { 1.14,  0.,  0.62,     0., 0.389, 0.603,    0.,    0.,    0.,  0., 0.157, 0.259, 0.354, 0.277};
+  if(!index)          { static const double itl[] = {  1.1,  0., 0.343, 0.0961, 0.495, 0.727, 0.545, 0.585, 0.106,  0.,    0.,    0.,    0.,    0.}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index== 2.) { static const double itl[] = {  1.1,  0., 0.343, 0.0947, 0.387, 0.679, 0.503, 0.686,-0.151, 1.6,    0.,    0.,    0.,    0.}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index== 4.) { static const double itl[] = {  1.1, 0.1, 0.343, 0.0791, 0.232, 0.587,    0.,    0.,    0.,  0.,   1.7,    0.,    0.,    0.}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index== 6.) { static const double itl[] = { 1.39,  0.,  0.39,     0.,  1.04,  1.07,    0.,    0.,    0.,  0., 0.513, 0.541, 0.527, 0.112}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index== 7.) { static const double itl[] = { 1.26,  0.,  0.47,     0., 0.732, 0.881,    0.,    0.,    0.,  0., 0.363, 0.469, 0.553, 0.116}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index== 8.) { static const double itl[] = { 1.21,  0.,  0.52,     0., 0.605, 0.788,    0.,    0.,    0.,  0., 0.292, 0.413, 0.530, 0.139}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index== 9.) { static const double itl[] = { 1.19,  0.,  0.55,     0., 0.523, 0.725,    0.,    0.,    0.,  0., 0.249, 0.371, 0.497, 0.162}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index==10.) { static const double itl[] = { 1.17,  0.,  0.57,     0., 0.481, 0.687,    0.,    0.,    0.,  0., 0.220, 0.340, 0.463, 0.192}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index==12.) { static const double itl[] = { 1.15,  0.,  0.60,     0., 0.424, 0.636,    0.,    0.,    0.,  0., 0.182, 0.293, 0.403, 0.251}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
+  else if(index==14.) { static const double itl[] = { 1.14,  0.,  0.62,     0., 0.389, 0.603,    0.,    0.,    0.,  0., 0.157, 0.259, 0.354, 0.277}; truelovemckeeparams = vector<double>(itl, itl + sizeof(itl)/sizeof(double)); }
   else {
     cout << "Astro::CalculateTrueLoveMcKeeParams: Density Index (index="
          << index << ") not supported! Returning nothing." << endl;
-    truelovemckeeparams={};
+    truelovemckeeparams= vector<double>();
     return;
   }
 
@@ -2054,13 +2085,14 @@ void Astro::CalculateTrueLoveMcKeeParams(vector<double> pars) {
     return;
   }
   if(!QUIETMODE) {
-    vector<string> ParNames = {"l_ED","w_core","phi_ED","phi_EDeff","t*_ST",
+    string ParNamesArr[] = {"l_ED","w_core","phi_ED","phi_EDeff","t*_ST",
                                "R*_ST","R*_r_ST","v~*_r_ST","a~*_r_ST","t*_ref",
                                "t*_core","r*_r_core","v~*_r_core","a~*_r_core",
                                "f_n","alpha","eta","charradiustruelovemckee",
                                "chartimetruelovemckee",
                                "charvelocitytruelovemckee","sedovtaylortime",
                                "coreexittime","index"};
+    vector<string> ParNames( ParNamesArr, ParNamesArr + ( sizeof ( ParNamesArr ) /  sizeof ( std::string ) ) );
     cout << ">> Paramaters for Truelove & McKee's solution (density index = "
          << index << "):" <<std::endl;
     for(unsigned int i=0;i<truelovemckeeparams.size();i++) {
@@ -2134,7 +2166,7 @@ void Astro::CalculateForwardShockInRGWind(vector<double> pars, double tmin,
   // make the r and v time profiles
   if(steps && tmin && tmax) {
     if(tmin>=tmax) {
-      cout << "Astro::CalculateThinShellApproximation: Can't create profiles"
+      cout << "Astro::CalculateForwardShockInRGWind: Can't create profiles"
               "because tmin >= tmax (" << tmin <<" >= "<< tmax <<
               ") Exiting!" << endl;
       return;

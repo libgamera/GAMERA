@@ -160,6 +160,7 @@ class Astro  {
     double CalculateRGWRadius(double pBubble, double mDotRGW, double vRGWind);///< Radius of the red giant wind zone
     void CalculateBField(double x, double y, double z, double &B_tot, double &B_coh, double &B_ord, double &B_iso, vector<double> &regFieldDirection, vector<double> &isoFieldDirection);///< 2D-Model of the large-scale galactic magnetic field structure
     double HTotalDensity(double x, double y, double z);
+    double TotalBField(double x, double y, double z);
     double HIDensity(double x, double y, double z, bool MODULATE = true);///< TODO:COMMENT
     double H2Density(double x, double y, double z, bool MODULATE = true);///< TODO:COMMENT
     double HIIDensity(double x, double y, double z, bool MODULATE = true);///< TODO:COMMENT
@@ -184,8 +185,8 @@ class Astro  {
     double ModulateGasDensityWithSpirals(double n, double x, double y, double z);
     //double CalculateGasColumnDensity(vector<double> xyzReference,vector<double> GLGB,string gascomponent,double modulate,double range,double steps);///< calculate gas column densities
     double nRadial(double *x, double *pars);///< TODO:COMMENT
-    vector<double> GetCartesian(double r, double l, double b, vector<double> xyzref);///< Galactic coordinates (GL,GB,R) ->Cartesian
-    void GetGalactic(double x, double y, double z, double xref, double yref, double zref, double &l, double &b);///< Cartesian coordinates -> Galactic Coordinates(GL,GB,R)
+    vector<double> GetCartesian(vector<double> lbr, vector<double> xyzref);///< Galactic coordinates (GL,GB,R) ->Cartesian
+    vector<double> GetGalactic(vector<double> xyz, vector<double> xyzref);///< Cartesian coordinates -> Galactic Coordinates(GL,GB,R)
     void RotateCoordinates(double &x, double &y, double &z, double phi, double theta, double psi);///< rotate coordinate around (0,0,0) by (phi,theta,psi)
     void RandomTangentialShift(double r, double width, double &x, double &y);///< gaussian shift along concentric circle (retains r-distribution)
     void RandomGaussianShift(double r, double width, double &x, double &y);

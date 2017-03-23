@@ -162,7 +162,7 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   /* if lower energy bound is externally set
    * use this value for the normalisation of the spectrum
    */
-  if (EminConstant>m_e) {
+  if (EminConstant) {
     Emin = EminConstant;
   }
   if (EminConstant>EminInternal) {
@@ -187,7 +187,6 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
       METHOD = 1;
     else METHOD = 2;
   }
-  std::cout<<" METHOD = "<<METHOD <<endl;
   if(escapeTimeConstant > 0. || escapeTimeLookup != NULL || 
      EscapeTimeEnergyTimeEvolution != NULL) METHOD = 0;
   /* determine time from where to start the iteration. Particles that would have
@@ -218,7 +217,6 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   energyMargin = pow(-log(energyMarginFactor), 1. / CutOffFactor);
   eMax *= energyMargin;
 
-  std::cout<< METHOD << "," << eMax << " "<<Emin<<std::endl;
   /* if emax falls below emin, return dummy vector with zeroes */
   if (eMax <= Emin) {
     cout << "Particles::FillParticleSpectrumLookup Whaat? eMax lower than "
@@ -227,8 +225,11 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   }
 
 
-  if (!METHOD)
+  if (!METHOD) {
+  
     PrepareAndRunNumericalSolver(ParticleSpectrum, onlyprepare, dontinitialise);
+    
+  }
   else if (METHOD==1) {
     CalculateEnergyTrajectory();
     CalcSpecSemiAnalyticConstELoss();
@@ -239,6 +240,7 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
     cout << ">> PARTICLE EVOLUTION DONE. EXITING." << endl;
     cout << endl;
   }
+  
   return;
 }
 
@@ -258,7 +260,7 @@ double Particles::SourceSpectrum(double e) {
               CustomInjectionSpectrumTimeEvolution,TActual,log10(e),taccsp,eaccsp));
   }
   else if(CustomInjectionSpectrum != NULL) {
-    if(e < MinELookup || e > MaxELookup) return 0.;
+    if(e < MinELookup || e > MaxELookup || !Lum ) return 0.;
     return Lum * 
       pow(10.,gsl_spline_eval(CustomInjectionSpectrum, log10(e), accCustInj)) 
       / CustomInjectionNorm;
@@ -418,7 +420,6 @@ void Particles::SetMembers(double t) {
   if(VVector.size() && t > VVector[0][0] &&
           t < VVector[VVector.size() - 1][0])
     V = gsl_spline_eval(VLookup, t, accV);
-
   if (R && V) adLossCoeff = V / R;
 
   return;
@@ -443,14 +444,18 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
 //    std::cout<< " ... ... ... "<<std::endl;
 //  }
   gsl_spline *ImportLookup = fUtils->GSLsplineFromTwoDVector(lookup);
-  vector<string> st{"ICLoss", "Luminosity", "AmbientDensity", "BField",
+  std::string stArr[] = {"ICLoss", "Luminosity", "AmbientDensity", "BField",
                     "Emax", "Radius",         "Speed"};
-  vector<gsl_spline **> spl{&ICLossLookup, &LumLookup,  &NLookup,
+  vector<string> st( stArr, stArr + ( sizeof ( stArr ) /  sizeof ( stArr[0] ) ) );
+  gsl_spline **splArr[] = {&ICLossLookup, &LumLookup,  &NLookup,
                             &BFieldLookup, &eMaxLookup,
                             &RLookup,      &VLookup};
-  vector<vector<vector<double> > *> vs{
+  vector<gsl_spline **> spl( splArr, splArr + ( sizeof ( splArr ) /  sizeof ( splArr[0] ) ) );
+
+  vector<vector<double> > * vsArr[] = {
       &ICLossVector, &LumVector,        &NVector, &BVector,
       &eMaxVector, &RVector, &VVector};
+  vector<vector<vector<double> > *> vs( vsArr, vsArr + ( sizeof ( vsArr ) /  sizeof ( vsArr[0] ) ) );
   
   for (unsigned int i = 0; i < st.size(); i++) {
     if (!LookupType.compare(st[i])) {
@@ -482,10 +487,12 @@ void Particles::ExtendLookup(vector<vector<double> > v, string LookupType) {
     cout << "Particles::ExtendLookup: Input vector empty. Exiting." << endl;
     return;
   }
-  vector<string> st = {"Luminosity", "AmbientDensity", "BField", "Emax",
+  string stArr[] = {"Luminosity", "AmbientDensity", "BField", "Emax",
                        "Radius",         "Speed"};
-  vector<vector<vector<double> > > vs = {LumVector,  NVector,          BVector,
+  vector<string> st( stArr, stArr + ( sizeof ( stArr ) /  sizeof ( stArr[0] ) ) );
+  vector<vector<double> > vsArr[] = {LumVector,  NVector,          BVector,
                                          eMaxVector, RVector,  VVector};
+  vector<vector<vector<double> > > vs( vsArr, vsArr + ( sizeof ( vsArr ) /  sizeof ( vsArr[0] ) ) );
   vector< vector< double > > lookup;
   if (!LookupType.compare("Luminosity") || !LookupType.compare("Emax")) {
     lookup = fUtils->VectorAxisLogarithm(v,1);
@@ -730,7 +737,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
   int tt = 1;
   int largestFilledBin = Esize;
   long int count = 0;
-  minTimeBin = (Age - startTime) * yr_to_sec / 200;
+  if(minTimeBin > Age) minTimeBin = Age*yr_to_sec/100.;
   /* append a new energy vector that will always hold the energy spectrum at the
    *  next time step and initialise it with zeroes.
    */
@@ -817,7 +824,6 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
       }
       tt++;
     }
-
     /* if eMax drops below the lower energy bound of the grid, exit. */
     if (largestFilledBin <= 0) break;
 
@@ -826,6 +832,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
     
     /* if t is larger than age, exit! */
     if(t>Age) break;
+    
     /* update the Members at the new time. */
     Lum = 0.;
     SetMembers(t);
@@ -870,7 +877,6 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
        * source */
       value = tbin * SourceSpectrum(e1);
       value *= Ecuts[i];
-
 
       /* Donor-cell advection */
       value += Grid[0][i] - quot * Grid[0][i] * ElossRate_e1 +
@@ -940,7 +946,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
   for (unsigned int j = 1; j < EnergyAxis.size() - 1; j++) {
     e1 = pow(10., EnergyAxis[j]);
     double val = Grid[0][j];
-    if(std::isnan(val) || std::isinf(val) || !val)
+    if(std::isnan(val) || std::isinf(val) || !val || val < 1.e-100)
       continue;
     fUtils->TwoDVectorPushBack(e1,val,ParticleSpectrum);
   }
@@ -1026,7 +1032,7 @@ void Particles::ComputeGridInTimeInterval(double T1, double T2, string type,
     Age = T1;
     CalculateParticleSpectrum(type, bins);
   }
-  ComputeGrid(grid, energyAxis, T1, T2, timeAxis, yr_to_sec * (T2 - T1) / 100.);
+  ComputeGrid(grid, energyAxis, T1, T2, timeAxis, yr_to_sec*(T2 - T1) / 100.);
   return;
 }
 
@@ -1312,37 +1318,26 @@ vector<vector<double> > Particles::GetParticleSED() {
 
 double Particles::GetParticleEnergyContent(double E1, double E2) {
 
-  if(E2 <= E1) {
+  if(E2 <= E1 && E1 && E2) {
     cout << "Particles::GetParticleEnergyContent: upper energy bound "
             "equal/lower than lower energy bound: " << E2 << " <= " << E1 <<
             " Returning 0 value." << endl;
     return 0.;
   }
   
-//  E1 *= TeV_to_erg;
-//  E2 *= TeV_to_erg;
-//  vector<vector<double> > v;
-//  for (unsigned int i = 0; i < ParticleSpectrum.size(); i++) {
-//    double E = ParticleSpectrum[i][0];
-//    double N = ParticleSpectrum[i][1];
-//    if (!N) continue;
-//    std::cout << E << " " << E * N << endl;
-//    fUtils->TwoDVectorPushBack(E,E * N,v);
-//  }
-
-//  if(Type && E1 < m_p ) E1 = m_p;
-//  if(!Type && E1 < m_e ) E1 = m_e;
-//  if(E2 > ParticleSpectrum[ParticleSpectrum.size()-1][1])
-//    E2 = ParticleSpectrum[ParticleSpectrum.size()-1][1];
-//  return fUtils->Integrate(v,E1,E2);
-  double econt = 0.;
-  for (unsigned int i = 1; i < ParticleSpectrum.size(); i++) {
-    double E = 0.5 * (ParticleSpectrum[i][0] + ParticleSpectrum[i-1][0]);
-    double N = 0.5 * (ParticleSpectrum[i][1] + ParticleSpectrum[i-1][1]);
-    double dE = ParticleSpectrum[i][0] - ParticleSpectrum[i-1][0];
-    econt += E*N*dE;
+  vector<vector<double> > v;
+  for (unsigned int i = 0; i < ParticleSpectrum.size(); i++) {
+    double E = ParticleSpectrum[i][0];
+    double N = ParticleSpectrum[i][1];
+    if (!N) continue;
+    fUtils->TwoDVectorPushBack(E,E * N,v);
   }
-  return econt;
+  
+  if(E1 < ParticleSpectrum[0][0] || !E1)
+    E1 = ParticleSpectrum[0][0];
+  if(E2 > ParticleSpectrum[ParticleSpectrum.size()-1][0] || !E2)
+    E2 = ParticleSpectrum[ParticleSpectrum.size()-1][0];
+  return fUtils->Integrate(v,E1,E2);
 }
 
 void Particles::SetIntegratorMemory(string mode) {
@@ -1359,15 +1354,18 @@ void Particles::SetIntegratorMemory(string mode) {
  * Integration function using the GSL QAG functionality
  *
  */
+Particles::fPointer Particles::_funcPtr;
+Particles *Particles::_partPtr;
+
 double Particles::Integrate(fPointer f, double *x, double emin, double emax,
                             double tolerance, int kronrodrule) {
   double integral, error;
   /* no comment */
-  auto ptr = [=](double xx)->double {
-    return (this->*f)(xx, (void *)x);
-  };
-  GSLfuncPart<decltype(ptr)> Fp(ptr);
-  gsl_function F = *static_cast<gsl_function *>(&Fp);
+  gsl_function F;
+  initialise(f, this);
+  F.function = &evaluate;
+  F.params = x;
+  
   gsl_integration_workspace *w = gsl_integration_workspace_alloc(gslmemory);
   if (gsl_integration_qag(&F, emin, emax, 0, tolerance, gslmemory, kronrodrule,
                           w, &integral,&error)) {
@@ -1391,6 +1389,10 @@ double Particles::Integrate(fPointer f, double *x, double emin, double emax,
  */
 void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
                                       int mode){
+  for(unsigned int i=0;i<vCustom.size();i++) {
+    std::cout<<vCustom[i][0]<<" "<<vCustom[i][1]<<" "<<std::endl;
+  }
+  std::cout<<"mode  = " <<mode<<std::endl;
   if(!vCustom.size()) {
     cout << "Particles::SetCustomInjectionSpectrum: Input vector empty."
             "Exiting." << endl;
@@ -1403,7 +1405,7 @@ void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
             vCustom[0].size() << " columns. Exiting." << endl;
     return;
   }
-  if(!MaxELookup) MinELookup = vCustom[0][0];
+  if(!MinELookup) MinELookup = vCustom[0][0];
   if(!MaxELookup) MaxELookup = vCustom[vCustom.size()-1][0];
   if(std::isnan(EmaxConstant)) {
     EmaxConstant = MaxELookup;
@@ -1495,6 +1497,9 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
   return;    
 }
 
+/*
+    Funtion under construction! Use at own peril!
+ */
 Radiation *Particles::GetSSCEquilibrium(Radiation *fr, double t, double tolerance) {
   Age = t;
 //  METHOD = 1;

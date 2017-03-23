@@ -26,24 +26,18 @@ using namespace std;
  *   particles is made whatsoever.
  */
 
-
-template <typename F>
-class GSLfuncPart : public gsl_function {
- public:
-  GSLfuncPart(const F &func) : _func(func) {
-    function = &GSLfuncPart::Call;
-    params = this;
-  }
- ~GSLfuncPart() {}
- private:
-  const F &_func;
-  static double Call(double x, void *params) {
-    return static_cast<GSLfuncPart *>(params)->_func(x);
-  }
-};
-
 class Particles {
   typedef double (Particles::*fPointer)(double, void *);
+  static void initialise(fPointer funcPtr, Particles *partPtr) {
+    _funcPtr = funcPtr;
+    _partPtr = partPtr;
+  }
+  static double evaluate(double x, void* params) {
+    return (_partPtr->*_funcPtr)(x, params);
+  }
+  static fPointer _funcPtr;
+  static Particles *_partPtr;
+
 
 struct timespec time0, time1, time2, time3;
  private:
@@ -52,12 +46,12 @@ struct timespec time0, time1, time2, time3;
              ///1-protons
   int METHOD; /// calculation method. This is determined automatically, but can
               /// be force set via SetSolverMethod(). However, if an inappropriate
-              /// method is chosen manually, the result might be wrong or 
+              /// method is chosen manually, the result might be wrong or
               /// the program might crash.
               /// 0: grid solver,
               /// 1: semi-analytical method in the presence of constant losses
               /// 2: no losses (simply adds up according to luminosity)
-                
+
   double theta;           ///< CR acceleration efficiency
   double SpectralIndex;   ///< spectral index of injected particles
   double SpectralIndex2;  ///< low-energy spectral index for broken power law
@@ -83,14 +77,14 @@ struct timespec time0, time1, time2, time3;
                         /// is then determined in a way that all particles that
                         /// are injected before that time are cooled to an
                         /// energy of maximal EminInternal after a time t=age.
-  double MinELookup;    ///< Lower energy bound of custom injection lookup.  
+  double MinELookup;    ///< Lower energy bound of custom injection lookup.
                         ///  If time evolution of custom spectrum is given, this
                         ///  is reset at every T = Age step.
-  double MaxELookup;    ///< Upper energy bound of custom injection lookup.  
+  double MaxELookup;    ///< Upper energy bound of custom injection lookup.
                         ///  If time evolution of custom spectrum is given, this
                         ///  is reset at every T = Age step.
-  double TminLookup;    ///< Lower time bound of custom injection lookup. 
-  double TmaxLookup;    ///< Higher time bound of custom injection lookup.  
+  double TminLookup;    ///< Lower time bound of custom injection lookup.
+  double TmaxLookup;    ///< Higher time bound of custom injection lookup.
   double BField;        ///< amplified B-field immediately dowmstream
   double N;             ///< ambient density
   double R;             ///< source extension (cm)
@@ -314,8 +308,7 @@ struct timespec time0, time1, time2, time3;
   vector<vector<vector<double> > > vs;
   void CalculateEnergyTrajectory(double TExt = 0.);
   void DetermineLookupTimeBoundaries();
-  void SetSolverMethod(int method);
-  void ComputeGridInTimeInterval(double T1, double T2, string type, int bins);  
+  void ComputeGridInTimeInterval(double T1, double T2, string type, int bins);
                                               ///< wrapper function to calculate
                                               ///the grid only in a specified
                                               ///time interval dT = T2-T2 (yrs)
@@ -327,15 +320,15 @@ struct timespec time0, time1, time2, time3;
                               ///BField,eElectronMax and Ecr at a given time t
   void CalculateParticleSpectrum(string type = "electrons", int bins = 100,
                                  bool onlyprepare = false,
-                                 bool dontinitialise = false); ///< fill the 
+                                 bool dontinitialise = false); ///< fill the
                                                         ///lookup that holds
                                                     ///the particle spectrum.
   void CalculateProtonSpectrum(int bins = 100) {CalculateParticleSpectrum("protons",bins);}
   void CalculateElectronSpectrum(int bins = 100) {CalculateParticleSpectrum("electrons",bins);}
-  void CalculateProtonSpectrumInTimeInterval(double T1, double T2, 
+  void CalculateProtonSpectrumInTimeInterval(double T1, double T2,
                                              int bins = 100) {
     ComputeGridInTimeInterval(T1,T2,"protons",bins);}
-  void CalculateElectronSpectrumInTimeInterval(double T1, double T2, 
+  void CalculateElectronSpectrumInTimeInterval(double T1, double T2,
                                                int bins = 100) {
     ComputeGridInTimeInterval(T1,T2,"electrons",bins);}
   void CalculateElectronSpectrumInTimeInterval(int bins = 100) {CalculateParticleSpectrum("electrons",bins);}
@@ -435,18 +428,20 @@ struct timespec time0, time1, time2, time3;
   }  ///<
   void ExtendVelocityLookup(vector<vector<double> > VLOOKUP) {
     ExtendLookup(VLOOKUP, "Speed");
-  }  ///< 
+  }  ///<
   vector<vector<double> > GetICLossLookup() { return ICLossVector; }
-  vector<vector<double> > GetLuminosityLookup() { 
-    return fUtils->VectorAxisPow10(LumVector,1); 
+  vector<vector<double> > GetLuminosityLookup() {
+    return fUtils->VectorAxisPow10(LumVector,1);
   }
-  vector<vector<double> > GetEmaxLookup() { 
-    return fUtils->VectorAxisPow10(eMaxVector,1); 
+  vector<vector<double> > GetEmaxLookup() {
+    return fUtils->VectorAxisPow10(eMaxVector,1);
   }
   vector<vector<double> > GetBFieldLookup() {return BVector; }
   vector<vector<double> > GetRadiusLookup() {return RVector; }
   vector<vector<double> > GetVelocityLookup() {return VVector; }
-  double GetEnergyLossRate(double E) { return EnergyLossRate(E); }
+  double GetEnergyLossRate(double E) {
+				CalculateConstants();
+			      	return EnergyLossRate(E); }
   void SetEnergyBins(double EBINS) {
     ebins = EBINS;
   }  ///< set energy binning of the numerical solution
@@ -526,7 +521,8 @@ struct timespec time0, time1, time2, time3;
   }  ///< set minimal time from where to start the iteration (default: 1yr).
   vector<vector<double> > GetEnergyTrajectoryVector() { return vETrajectory; }
   vector<vector<double> > GetParticleSED();
-  double GetParticleEnergyContent(double E1, double E2);
+  vector<vector<double> > GetGrid(){return grid;}
+  double GetParticleEnergyContent(double E1=0., double E2=0.);
   void SetCriticalMinEnergyForGridSolver(double eminint) {EminInternal=eminint;}
   void SetIntegratorMemory(string mode);
   void SetInterpolationMethod(string intermeth)
@@ -542,5 +538,7 @@ struct timespec time0, time1, time2, time3;
   void SetEnergyDependentEscapeTime(vector< vector<double> > vEsc) {
     SetCustomEnergylookup(vEsc,1);}
   Radiation *GetSSCEquilibrium(Radiation *fr,double t, double tolerance=1e-2);
+  void SetSolverMethod(int method);
+
 };
 #endif
