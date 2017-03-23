@@ -20,13 +20,7 @@ typedef double (*fGSLPointer)(double, void *);
 class Radiation {
   typedef double (Radiation::*fPointer)(double, void *);
 
-  static void initialise(fPointer funcPtr, Radiation *radPtr) {
-    _funcPtr = funcPtr;
-    _radPtr = radPtr;
-  }
-  static double evaluate(double x, void* params) {
-    return (_radPtr->*_funcPtr)(x, params);
-  }
+  static double evaluate(double x, void* params);
   static fPointer _funcPtr;
   static Radiation *_radPtr;
 

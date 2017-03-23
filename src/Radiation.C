@@ -25,6 +25,7 @@ Radiation::Radiation() {
   SynchModel = 0;
   integratorTolerance = 1.e-1;
   integratorKronrodRule = 2;
+  n = 0.;
   acc = gsl_interp_accel_alloc();
 }
 
@@ -270,6 +271,7 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
   gsl_interp_accel_reset(acc);
   double gammas = Integrate(IntFunc, &egamma, e, emax, integratorTolerance,
                             integratorKronrodRule);
+    if (!radiationMechanism.compare("InverseCompton"))
   if (std::isnan(gammas)) return 0.;
   if (gammas < 0.) return 0.;
   return gammas;
@@ -404,6 +406,7 @@ double Radiation::ICEmissivityRadFieldIntegrated(double x, void *par) {
                                   : boundmax = edash;
   if (k > 0.1 || boundmin >= boundmax) return 0.;
   icgammas = Integrate(IntFunc, xpars, boundmin, boundmax, integratorTolerance,6);
+  
   if (std::isnan(icgammas) || std::isinf(icgammas)) return 0.;
   if (INTEGRATEOVERGAMMAS == true)
     return icgammas * egamma;
@@ -547,6 +550,7 @@ double Radiation::K_53(double x, void *par) {
  * adapted from galprop!ghisellini svensson 1988 'the synchrotron boiler'
  */
 double Radiation::SynchEmissivity(double x, void *par) {
+  std::cout<<"Radiation::SynchEmissivity"<<std::endl;
   /* frequency of emmited synchr. radiation */
   double nu = *(double *)par / hp;
   /* electron energy */
@@ -1597,21 +1601,29 @@ vector<vector<double> > Radiation::GetParticleSED(string type) {
 Radiation::fPointer Radiation::_funcPtr;
 Radiation *Radiation::_radPtr;
 
+double Radiation::evaluate(double x, void* params) {
+  return (_radPtr->*_funcPtr)(x, params);
+}
+
+
 double Radiation::Integrate(fPointer f, double *x, double emin, double emax,
                             double tolerance, int kronrodrule) {
   double integral, error;
-  
+
+  fPointer ftemp = _funcPtr;
   gsl_function F;
-  initialise(f, this);
-  F.function = &evaluate;
+  _funcPtr = f;
+  _radPtr = this;
+  F.function = &Radiation::evaluate;
   F.params = x;
 
   gsl_integration_workspace *w = gsl_integration_workspace_alloc(10000);
-  if (gsl_integration_qag(&F, emin, emax, 0, tolerance, 10000, kronrodrule, w,
-                          &integral, &error))
-    return 0.;
+  int val = gsl_integration_qag(&F, emin, emax, 0, tolerance, 10000, kronrodrule, w,
+                          &integral, &error);
   gsl_integration_workspace_free(w);
-  return integral;
+  _funcPtr = ftemp;
+  if (val)  return 0.;
+  else return integral;
 }
 
 vector<vector<double> > Radiation::GetTargetPhotons() {

@@ -28,13 +28,8 @@ using namespace std;
 
 class Particles {
   typedef double (Particles::*fPointer)(double, void *);
-  static void initialise(fPointer funcPtr, Particles *partPtr) {
-    _funcPtr = funcPtr;
-    _partPtr = partPtr;
-  }
-  static double evaluate(double x, void* params) {
-    return (_partPtr->*_funcPtr)(x, params);
-  }
+
+  static double evaluate(double x, void* params);
   static fPointer _funcPtr;
   static Particles *_partPtr;
 

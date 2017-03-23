@@ -1357,23 +1357,27 @@ void Particles::SetIntegratorMemory(string mode) {
 Particles::fPointer Particles::_funcPtr;
 Particles *Particles::_partPtr;
 
+double Particles::evaluate(double x, void* params) {
+  return (_partPtr->*_funcPtr)(x, params);
+}
 double Particles::Integrate(fPointer f, double *x, double emin, double emax,
                             double tolerance, int kronrodrule) {
   double integral, error;
   /* no comment */
+  fPointer ftemp = _funcPtr;
   gsl_function F;
-  initialise(f, this);
-  F.function = &evaluate;
+  _funcPtr = f;
+  _partPtr = this;
+  F.function = &Particles::evaluate;
   F.params = x;
-  
+
   gsl_integration_workspace *w = gsl_integration_workspace_alloc(gslmemory);
-  if (gsl_integration_qag(&F, emin, emax, 0, tolerance, gslmemory, kronrodrule,
-                          w, &integral,&error)) {
-    gsl_integration_workspace_free(w);
-    return 0.;
-  }
+  int val = gsl_integration_qag(&F, emin, emax, 0, tolerance, gslmemory, kronrodrule,
+                          w, &integral,&error);
   gsl_integration_workspace_free(w);
-  return integral;
+  _funcPtr = ftemp;
+  if (val)  return 0.;
+  else return integral;
 }
 
 /**
