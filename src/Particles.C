@@ -1501,8 +1501,8 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
   return;    
 }
 
-/*
-    Funtion under construction! Use at own peril!
+/**
+ * Funtion under construction! Use at own peril!
  */
 Radiation *Particles::GetSSCEquilibrium(Radiation *fr, double t, double tolerance) {
   Age = t;

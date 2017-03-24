@@ -550,7 +550,6 @@ double Radiation::K_53(double x, void *par) {
  * adapted from galprop!ghisellini svensson 1988 'the synchrotron boiler'
  */
 double Radiation::SynchEmissivity(double x, void *par) {
-  std::cout<<"Radiation::SynchEmissivity"<<std::endl;
   /* frequency of emmited synchr. radiation */
   double nu = *(double *)par / hp;
   /* electron energy */
