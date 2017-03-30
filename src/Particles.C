@@ -144,7 +144,9 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
          << endl; 
     return;
   }
-  if(!LumVector.size() && std::isnan(LumConstant)) {
+  if(!LumVector.size() && std::isnan(LumConstant) 
+     && CustomInjectionSpectrum == NULL 
+     && CustomInjectionSpectrumTimeEvolution == NULL) {
     cout << "Particles::CalculateParticleSpectrum: Particle vector empty! Exiting"
          << endl;
     return;
@@ -256,6 +258,8 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
 double Particles::SourceSpectrum(double e) {
   if(CustomInjectionSpectrumTimeEvolution != NULL) {
     if(e < MinELookup || e > MaxELookup) return 0.;
+    std::cout<<e<<" "<<pow(10.,interp2d_spline_eval(
+              CustomInjectionSpectrumTimeEvolution,TActual,log10(e),taccsp,eaccsp))<<std::endl; 
     return pow(10.,interp2d_spline_eval(
               CustomInjectionSpectrumTimeEvolution,TActual,log10(e),taccsp,eaccsp));
   }
@@ -1450,7 +1454,7 @@ void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
 void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int mode){
 
   if(!vCustom.size()) {
-    cout << "Particles::SetCustomInjectionSpectrumTimeEvolution: Input vector empty."
+    cout << "Particles::SetCustomTimeEnergyLookup: Input vector empty."
             "Exiting." << endl;
     return;
   }

@@ -172,18 +172,6 @@ class Radiation {
                    ///B-Field, with perpendicularly spiraling electron around
                    ///it. DEFAULT = 0
   double PPEmissivity(double x, void *par);
-  double InelasticPPXSectionKaf(double Tp);
-  double InclusivePPXSection(double Tp);
-  double DiffPPXSection(double Tp, double Eg);
-  double MeanMultiplicity(double Tp);
-  double Amax(double Tp);
-  double F(double Tp, double Eg);
-  double SigmaOnePi(double Tp);
-  double SigmaTwoPi(double Tp);
-  double GetMaximumGammaEnergy(double Tp);
-  double GetMinimumGammaEnergy(double Tp);
-  double Epilabmax(double Tp);
-  double NuclearEnhancementFactor(double Tp);
   void GetABGParams(double Tp, double &alpha, double &beta, double &gamma,
                     double &lambda);
   void GetAParams(double Tp, double &a1, double &a2, double &a3, double &a4,
@@ -362,6 +350,18 @@ class Radiation {
   Utils *fUtils;
   void SetInterpolationMethod(string intermeth)
     {fUtils->SetInterpolationMethod(intermeth);}
+  double DiffPPXSection(double Tp, double Eg);
+  double MeanMultiplicity(double Tp);
+  double Amax(double Tp);
+  double F(double Tp, double Eg);
+  double SigmaOnePi(double Tp);
+  double SigmaTwoPi(double Tp);
+  double GetMaximumGammaEnergy(double Tp);
+  double GetMinimumGammaEnergy(double Tp);
+  double Epilabmax(double Tp);
+  double NuclearEnhancementFactor(double Tp);
+  double InelasticPPXSectionKaf(double Tp);
+  double InclusivePPXSection(double Tp);
 
 };
 #endif
