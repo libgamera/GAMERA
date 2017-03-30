@@ -258,8 +258,6 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
 double Particles::SourceSpectrum(double e) {
   if(CustomInjectionSpectrumTimeEvolution != NULL) {
     if(e < MinELookup || e > MaxELookup) return 0.;
-    std::cout<<e<<" "<<pow(10.,interp2d_spline_eval(
-              CustomInjectionSpectrumTimeEvolution,TActual,log10(e),taccsp,eaccsp))<<std::endl; 
     return pow(10.,interp2d_spline_eval(
               CustomInjectionSpectrumTimeEvolution,TActual,log10(e),taccsp,eaccsp));
   }
@@ -1397,10 +1395,6 @@ double Particles::Integrate(fPointer f, double *x, double emin, double emax,
  */
 void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
                                       int mode){
-  for(unsigned int i=0;i<vCustom.size();i++) {
-    std::cout<<vCustom[i][0]<<" "<<vCustom[i][1]<<" "<<std::endl;
-  }
-  std::cout<<"mode  = " <<mode<<std::endl;
   if(!vCustom.size()) {
     cout << "Particles::SetCustomInjectionSpectrum: Input vector empty."
             "Exiting." << endl;

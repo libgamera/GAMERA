@@ -434,9 +434,12 @@ struct timespec time0, time1, time2, time3;
   vector<vector<double> > GetBFieldLookup() {return BVector; }
   vector<vector<double> > GetRadiusLookup() {return RVector; }
   vector<vector<double> > GetVelocityLookup() {return VVector; }
-  double GetEnergyLossRate(double E) {
-				CalculateConstants();
-			      	return EnergyLossRate(E); }
+  double GetEnergyLossRate(double E, double age=0.) {
+            if(age) SetMembers(age);
+            CalculateConstants();
+            return EnergyLossRate(E); }
+  double GetCoolingTimeScale(double E, double age=0.) {//< this gives the cooling time scale at E and time age in [years]
+            return  E / GetEnergyLossRate(E,age) / yr_to_sec; }
   void SetEnergyBins(double EBINS) {
     ebins = EBINS;
   }  ///< set energy binning of the numerical solution
