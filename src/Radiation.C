@@ -989,8 +989,8 @@ void Radiation::SetParticles(vector<vector<double> > PARTICLES, int type) {
   double x[PARTICLES.size()];
   double y[PARTICLES.size()];
   for (unsigned int i = 0; i < PARTICLES.size(); i++) {
-    x[i] = log10(PARTICLES[i][0]);
-    y[i] = log10(PARTICLES[i][1]);
+    (PARTICLES[i][0]) ? x[i] = log10(PARTICLES[i][0]) : x[i] = -100.;
+    (PARTICLES[i][1]) ? y[i] = log10(PARTICLES[i][1]) : y[i] = -100.;
   }
   if (!type) {
     ElectronLookup = gsl_spline_alloc(gsl_interp_linear, size);
