@@ -361,8 +361,7 @@ void Particles::SetMembers(double t) {
   if (t == TminInternal) t *= 1. + 1.e-10;
   if (t == TmaxInternal) t /= 1. + 1.e-10;
   TActual = t;
-//  Constants = {LumConstant,  NConstant,         BConstant,
-//               EmaxConstant, escapeTimeConstant};
+
   Constants[0] = LumConstant;
   Constants[1] = NConstant;
   Constants[2] = BConstant;
@@ -372,7 +371,7 @@ void Particles::SetMembers(double t) {
   splines[1] = NLookup;
   splines[2] = BFieldLookup;
   splines[3] = eMaxLookup;
-//  splines = {LumLookup, NLookup, BFieldLookup, eMaxLookup, escapeTimeLookup};
+
   accs[0] = accLum;
   accs[1] = accN;
   accs[2] = accBField;
