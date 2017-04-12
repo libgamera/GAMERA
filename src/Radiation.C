@@ -15,6 +15,7 @@ Radiation::Radiation() {
   distance = BField = 0.;
   ElectronLookup = NULL;
   ProtonLookup = NULL;
+  TargetPhotonLookup = NULL;
   TargetPhotonEdens = 0.;
   TargetPhotonVector.clear();
   TargetPhotonVectorOld.clear();
@@ -34,6 +35,7 @@ Radiation::Radiation() {
  */
 Radiation::~Radiation() {}
 
+//FIXME make me a nice function!
 void Radiation::Reset() {
   ParticleVector.clear();
   ElectronVector.clear();
@@ -49,6 +51,16 @@ void Radiation::Reset() {
   lintpp = 0.;
   fintic = 0.;
   lintic = 0.;
+  return;
+}
+
+/*
+ * remove all previously set IC target photons
+ */
+void Radiation::ClearTargetPhotons() {
+  TargetPhotonLookup = NULL;
+  TargetPhotonVector.clear();
+  TargetPhotonVectorOld.clear();
   return;
 }
 
@@ -989,8 +1001,8 @@ void Radiation::SetParticles(vector<vector<double> > PARTICLES, int type) {
   double x[PARTICLES.size()];
   double y[PARTICLES.size()];
   for (unsigned int i = 0; i < PARTICLES.size(); i++) {
-    x[i] = PARTICLES[i][0] > 0. ? log10(PARTICLES[i][0]) : -100.;
-    x[i] = PARTICLES[i][1] > 0. ? log10(PARTICLES[i][1]) : -100.;
+    x[i] = PARTICLES[i][0] > 0. ? log10(PARTICLES[i][0]) : -1.;
+    y[i] = PARTICLES[i][1] > 0. ? log10(PARTICLES[i][1]) : -1.;
   }
   if (!type) {
     ElectronLookup = gsl_spline_alloc(gsl_interp_linear, size);
@@ -1627,6 +1639,12 @@ double Radiation::Integrate(fPointer f, double *x, double emin, double emax,
 
 vector<vector<double> > Radiation::GetTargetPhotons() {
   vector< vector<double> >  vint;
+  if(TargetPhotonLookup == NULL) {
+    cout << "Radiation::GetTargetPhotons: no target photons set. "
+            "Returning empty vector."
+         << endl;
+    return vint;
+  }
   for(double i = targetphotonenergymin ; i < targetphotonenergymax ; i*=1.01) {
     double targetphotons = pow(10.,fUtils->EvalSpline(log10(i),TargetPhotonLookup,
                            acc,__func__,__LINE__));

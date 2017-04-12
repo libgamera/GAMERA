@@ -284,6 +284,7 @@ class Radiation {
                                                   ///electron spectrum and
                                                   ///B-Field. R (source extension) in pc
   vector<vector<double> > GetTargetPhotons();///< return TotalTargetPhotonVector
+  void ClearTargetPhotons(); ///< remove all previously set IC target photons
   void Reset();  ///< reset ParticleLookup, Electrons, Protons, fintbrems,
                  ///lintbrems, fintpp, lintpp, fintic, lintic
   void ToggleQuietMode() {
