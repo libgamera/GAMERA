@@ -27,6 +27,7 @@ Radiation::Radiation() {
   integratorTolerance = 1.e-1;
   integratorKronrodRule = 2;
   n = 0.;
+  SynchAngle = 90.;
   acc = gsl_interp_accel_alloc();
 }
 
@@ -58,6 +59,7 @@ void Radiation::Reset() {
  * remove all previously set IC target photons
  */
 void Radiation::ClearTargetPhotons() {
+  SSCSET = false;
   TargetPhotonLookup = NULL;
   TargetPhotonVector.clear();
   TargetPhotonVectorOld.clear();
@@ -590,26 +592,26 @@ double Radiation::SynchEmissivity(double x, void *par) {
 
 /**
  * emissivity of synchrotron radiation
- * adapted from galprop!ghisellini svensson 1988 'the synchrotron boiler'
+ * following Blumenthal&Gould, Eqs 4.44 and 4.48 !!!CHECK THAT!!!
  */
 double Radiation::SynchEmissivityExplicit(double e, void *par) {
 
   double eElectron = e;
   double gamma = (eElectron + m_e) / m_e;
   double nu = *(double *)par / hp;
-
-  double norm = sqrt(3.) * el_charge * el_charge * el_charge * BField / m_e;
+  double geometry = sin(pi * SynchAngle / 180.);
+  double norm = sqrt(3.) * geometry * el_charge * el_charge * el_charge * BField / m_e;
   double nu_c =
-      3. * el_charge * BField * gamma * gamma * c_speed / (4. * pi * m_e);
+      3. * geometry * el_charge * BField * gamma * gamma * c_speed / (4. * pi * m_e);
   double x = nu / nu_c;
 
   fPointer IntFunc = &Radiation::K_53;
   double *v = NULL;
-  double F = x * Integrate(IntFunc, v, x, 1.e2 * x, integratorTolerance,
+  double F = x * Integrate(IntFunc, v, x, 1.e3 * x, integratorTolerance,
                            integratorKronrodRule);
   double electrons = fUtils->EvalSpline(log10(eElectron),ElectronLookup,
                                         acc,__func__,__LINE__);
-  double val = norm * F * pow(10., electrons) / (hp * hp * nu);
+  double val = norm * F * pow(10., electrons) / (hp * hp * nu) / geometry / geometry;
 
   return val;
 }
@@ -882,7 +884,7 @@ double Radiation::Epilabmax(double Tp) {
 }
 
 /** correction factor that accounts for the abundance of heavier nuclei in
- *  the medium.
+ *  the medium.(Eq. 24)
  */
 double Radiation::NuclearEnhancementFactor(double Tp) {
   double Tp0 = 1.e3 * GeV_to_erg;
@@ -1001,8 +1003,8 @@ void Radiation::SetParticles(vector<vector<double> > PARTICLES, int type) {
   double x[PARTICLES.size()];
   double y[PARTICLES.size()];
   for (unsigned int i = 0; i < PARTICLES.size(); i++) {
-    x[i] = PARTICLES[i][0] > 0. ? log10(PARTICLES[i][0]) : -1.;
-    y[i] = PARTICLES[i][1] > 0. ? log10(PARTICLES[i][1]) : -1.;
+    x[i] = PARTICLES[i][0] > 0. ? log10(PARTICLES[i][0]) : -100.;
+    y[i] = PARTICLES[i][1] > 0. ? log10(PARTICLES[i][1]) : -100.;
   }
   if (!type) {
     ElectronLookup = gsl_spline_alloc(gsl_interp_linear, size);

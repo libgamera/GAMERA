@@ -48,6 +48,8 @@ class Radiation {
                                               ///number of electrons with energy
                                               ///eElectron at frequency nu,
                                               ///following Blumenthal&Gould
+  double SynchAngle;///< inclination angle between electrons spiraling along the B-Field and
+                    /// observer as used in SynchEmissivityExplicit(). Default: 90degrees.
   double BremsEmissivity(double x, void *par);  ///< Bremsstrahlung emissivity,
                                                 ///e-p and e-e, follwing From
                                                 ///Baring 1999, ApJ, 513,
@@ -169,8 +171,9 @@ class Radiation {
                 ///DEFAULT = 1
   int SynchModel;  ///< indicates which synchrotron emissivity model should be
                    ///used. 0 - random B-field (Gisellini 1988) 1 - regular
-                   ///B-Field, with perpendicularly spiraling electron around
-                   ///it. DEFAULT = 0
+                   ///B-Field, with electrons spiraling around it at inclination
+                   ///angle to observer 'SynchAngle' (default angle 90degrees.). 
+                   ///DEFAULT = 0
   double PPEmissivity(double x, void *par);
   void GetABGParams(double Tp, double &alpha, double &beta, double &gamma,
                     double &lambda);
@@ -349,6 +352,7 @@ class Radiation {
   vector< vector<double> > GetProtonSED() {return GetParticleSED("protons");}
   vector< vector<double> > GetElectronSED() {return GetParticleSED("electrons");}
   Utils *fUtils;
+  void SetSynchrotronPitchAngle(double synchangle) {SynchAngle = synchangle;}
   void SetInterpolationMethod(string intermeth)
     {fUtils->SetInterpolationMethod(intermeth);}
   double DiffPPXSection(double Tp, double Eg);

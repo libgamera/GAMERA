@@ -261,7 +261,7 @@ vector<double> Utils::LinearRandom(double slope, double x_min,
 }
 
 /**
-* get power-law distributed variates
+* get power-law distributed variates TODO: Index == 1
 */
 vector<double> Utils::PowerLawRandom(double index, double x_min,
                                      double x_max, int n) {
@@ -321,8 +321,8 @@ vector<double> Utils::ExponentialRandom(double ind_norm, double x_min,
 /**
  * Sample Variate that follows the input 2D-Vector
  */
-vector<double> Utils::CustomFunctionRandom(vector< vector<double> > f,
-                                           double xmin, double xmax, int n) {
+vector<double> Utils::CustomFunctionRandom(vector< vector<double> > f, int n,
+                                           double xmin, double xmax ) {
 
                                              cout<<"1.0"<<std::endl;
   vector<double> v;
@@ -414,6 +414,11 @@ double Utils::Integrate(vector< vector<double> > f, double xmin, double xmax) {
   if(!f.size()) {
     cout << "Utils::Integrate: function vector empty! "
     "Exiting & returning 0." << endl;
+    return 0.;
+  }
+  if(f.size() < 3) {
+    cout << "Utils::Integrate: function vector has less than 3 bins, "
+            "Interpolation not possible! Exiting & returning 0." << endl;
     return 0.;
   }
   if(f[0].size() != 2) {

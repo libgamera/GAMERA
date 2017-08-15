@@ -187,9 +187,12 @@ class Astro  {
     double nRadial(double *x, double *pars);///< TODO:COMMENT
     vector<double> GetCartesian(vector<double> lbr, vector<double> xyzref);///< Galactic coordinates (GL,GB,R) ->Cartesian
     vector<double> GetGalactic(vector<double> xyz, vector<double> xyzref);///< Cartesian coordinates -> Galactic Coordinates(GL,GB,R)
+    vector< vector<double> > GetGalacticPositions(vector< vector<double> > xyz, vector<double> xyzref);
     void RotateCoordinates(double &x, double &y, double &z, double phi, double theta, double psi);///< rotate coordinate around (0,0,0) by (phi,theta,psi)
     void RandomTangentialShift(double r, double width, double &x, double &y);///< gaussian shift along concentric circle (retains r-distribution)
     void RandomGaussianShift(double r, double width, double &x, double &y);
+    double ApparentSize(double size, vector<double> lbr);
+    vector<double> GetApparentSizes(vector<double> sizes, vector< vector<double> > lbr);
     unsigned int GetRandomArm(double r);///< return a random spiral arm (identifier, i.e. an unsigned integer)
     void Bar(double r, double &x, double &y);///< Get xy Coordinates on a central bar inclined with an angle 'angle' clockwise
     void Disk(double r, double &x, double &y);///< Get random xy Coordinates  on a disk

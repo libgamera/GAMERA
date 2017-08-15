@@ -118,8 +118,8 @@ class Utils {
   vector<double>  SignRandom(int n);
   vector<double>  ExponentialRandom(double ind_norm, double x_min,
                                     double x_max, int n);
-  vector<double>  CustomFunctionRandom(vector< vector<double> > f,
-                                       double xmin, double xmax, int n);
+  vector<double>  CustomFunctionRandom(vector< vector<double> > f, int n,
+                                       double xmin = 0., double xmax = 0.);
   double Integrate(vector< vector<double> > f, double xmin=0., double xmax=0.);
   vector< vector< double> > IntegratedProfile(vector< vector<double> > f);
   gsl_spline *GSLsplineFromTwoDVector(vector< vector<double> > v);

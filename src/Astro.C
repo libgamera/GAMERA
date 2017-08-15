@@ -945,8 +945,30 @@ vector<double> Astro::GetGalactic(vector<double> xyz, vector<double> xyzref) {
 }
 
 /**
+ * Cartesian coordinates -> Galactic Coordinates(GL,GB,R) for vector of points
+ */
+/**
  * rotate coordinate around (0,0,0) by (phi,theta,psi)
  */
+vector< vector<double> > Astro::GetGalacticPositions(
+                        vector< vector<double> > xyz, vector<double> xyzref) {
+    vector< vector<double> > lb;
+    if (!xyz.size()) {
+        cout << "Astro::GetGalacticPositions: Input vector of positions is "
+                "empty. Returning empty vector." << endl;
+        return lb;
+    }
+
+    for(unsigned int i=0; i<xyz.size(); i++) {
+        vector<double> lbr = GetGalactic(xyz[i], xyzref);
+        lb.push_back(vector<double>());
+        lb[lb.size()-1].push_back(lbr[0]);
+        lb[lb.size()-1].push_back(lbr[1]);
+        lb[lb.size()-1].push_back(lbr[2]);
+    }
+    return lb;
+}
+
 void Astro::RotateCoordinates(double &x, double &y, double &z, double phi, double theta, double psi) {
 
   double xyz[3];
@@ -1213,9 +1235,9 @@ double Astro::EvalTaylorCordesArmGalactocentricRadius(double theta, int arm) {
 void Astro::SetSurfaceDensityModel(string surfacedensitymodel) {
   if(!surfacedensitymodel.compare("CaseBhattacharya")) SURFACEDENSITYMODEL = 0;
   else if(!surfacedensitymodel.compare("IusifovKucuk")) SURFACEDENSITYMODEL = 1;
-  else if(!surfacedensitymodel.compare("Linear")) SURFACEDENSITYMODEL = 2;
+  else if(!surfacedensitymodel.compare("Flat")) SURFACEDENSITYMODEL = 2;
   else {
-    std::cout<<"Astro::SetSurfaceDensityModel: Specify supported surface density model (currently 'CaseBhattacharya', 'IusifovKucuk' and 'Linear')! returning 0 value."<<std::endl;
+    std::cout<<"Astro::SetSurfaceDensityModel: Specify supported surface density model (currently 'CaseBhattacharya', 'IusifovKucuk' and 'Flat')! returning 0 value."<<std::endl;
   }
   return;
 }
@@ -1244,6 +1266,30 @@ void Astro::SetMainSequenceBubbleModel(string msbubblemodel) {
   else {
     std::cout<<"Astro::SetMainSequenceBubbleModel: Specify supported main sequence wind bubble model (currently 'Weaver' and 'Chen')! Defaulting to Weaver's model."<<std::endl;
   }
+}
+
+
+double Astro::ApparentSize(double size, vector<double> lbr) {
+    if(lbr.size() != 3) {
+        cout << "Astro::ApparentSize: Something's wrong with "
+                "position vector. Returning 0." << endl;
+        return 0.;
+    }
+    return 180.*atan(size * 1e-3 / lbr[2]) / pi;
+}
+
+vector<double> Astro::GetApparentSizes(vector<double> sizes, vector< vector<double> > lbr) {
+    vector<double> angles;
+    if(sizes.size() != lbr.size()) {
+        cout << "Astro::GetApparentSizes: Size and position vectors are of different "
+                "length. Returning empty vector." << endl;
+        return angles;
+    }
+
+    for(unsigned int i=0;i<sizes.size();i++)
+        angles.push_back(ApparentSize(sizes[i],lbr[i]));
+
+    return angles;
 }
 
 vector< vector<double> > Astro::DiceGalacticPositions(int n) {
@@ -1336,7 +1382,7 @@ void Astro::PositionOnSpiralArmAngular(double theta, int arm, double &x, double 
 vector<double> Astro::GetRandomGalactocentricRadii(int n) {
   double rmin = 0.;
   double rmax = 20.;
-  if(SURFACEDENSITYMODEL==2) return fUtils->LinearRandom(0.,rmin,rmax,n);
+  if(SURFACEDENSITYMODEL==2) return fUtils->LinearRandom(1,rmin,rmax,n);
   vector< vector<double> > v;
   int steps = 200;
   double dr = (rmax-rmin)/steps;

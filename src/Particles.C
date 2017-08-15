@@ -36,6 +36,8 @@ Particles::Particles() {
   EscapeTimeEnergyTimeEvolution = NULL;
   CustomInjectionSpectrum = NULL;
   CustomInjectionSpectrumTimeEvolution = NULL;
+  energyTrajectory = NULL;
+  energyTrajectoryInverse = NULL;
   integratorTolerance = 5.e-2;
   ParticleSpectrum.clear();
   ParticleSpectrum.resize(0);
@@ -651,6 +653,7 @@ void Particles::DetermineTMin(double emin, double &tmin) {
   for (logt = logtmin; logt < logtmax; logt += logdt) {
     CalculateEnergyTrajectory(pow(10., logt));
     gsl_interp_accel_reset(accTrInv);
+    if (energyTrajectoryInverse == NULL) continue;
     if (gsl_spline_eval_e(energyTrajectoryInverse, log10(emin), accTrInv,
                           &TMIN))
       continue;
@@ -1136,6 +1139,11 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
 
 
 double Particles::SemiAnalyticConstELossIntegrand(double T, void *par) {
+  if (energyTrajectoryInverse == NULL || energyTrajectory == NULL) {
+    cout << "Particles::SemiAnalyticConstELossIntegrand: Couldn't calculate "
+            "particle energy trajectory lookup. Exiting program." << endl;
+    exit(1);
+  }
   double tdash, E, Enow;
   Enow = *(double *)par;
   int err = gsl_spline_eval_e(energyTrajectoryInverse, log10(Enow), accTrInv, &tdash);
