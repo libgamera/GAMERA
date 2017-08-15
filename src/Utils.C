@@ -324,7 +324,6 @@ vector<double> Utils::ExponentialRandom(double ind_norm, double x_min,
 vector<double> Utils::CustomFunctionRandom(vector< vector<double> > f, int n,
                                            double xmin, double xmax ) {
 
-                                             cout<<"1.0"<<std::endl;
   vector<double> v;
   if(!f.size()) {
     cout << "Utils::CustomFunctionRandom: function vector empty! "
@@ -342,7 +341,6 @@ vector<double> Utils::CustomFunctionRandom(vector< vector<double> > f, int n,
             "Returning emptyvector." << endl;
     return v;
   }
-  cout<<"1.1"<<std::endl;
   int size = (int)f.size();
   double x[size];
   double y[size];
@@ -356,7 +354,6 @@ vector<double> Utils::CustomFunctionRandom(vector< vector<double> > f, int n,
   gsl_spline_init(lookup, x, y, size);
   gsl_interp_accel *a = gsl_interp_accel_alloc();
 
-  cout<<"1.2"<<std::endl;
   for(int i=0;i<n;i++) {
     double x;
     while(1) {
