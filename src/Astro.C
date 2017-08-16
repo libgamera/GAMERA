@@ -885,6 +885,17 @@ double Astro::nRadial(double *x, double *pars) {
 /**
  * Galactic coordinates (R,GL,GB) ->Cartesian
  */
+
+/**
+ * In there for backwards compability
+ */
+vector<double> Astro::GetCartesian(double r, double l, double b, vector<double> xyzref) {
+    vector<double> lbr;
+    lbr.push_back(l);
+    lbr.push_back(b);
+    lbr.push_back(r);
+    return GetCartesian(lbr, xyzref);
+}
 vector<double> Astro::GetCartesian(vector<double> lbr, vector<double> xyzref) {
 
   double l = lbr[0];
@@ -909,6 +920,47 @@ vector<double> Astro::GetCartesian(vector<double> lbr, vector<double> xyzref) {
 
   return xyz;
 }
+
+/**
+ * Galactic Coordinates(GL,GB,R) coordinates ->  Cartesian for vector of points
+ */
+vector< vector<double> > Astro::GetCartesianPositions(
+                        vector< vector<double> > lbr, vector<double> xyzref) {
+    vector< vector<double> > temp;
+    if (!lbr.size()) {
+        cout << "Astro::GetGalacticPositions: Input vector of positions is "
+                "empty. Returning empty vector." << endl;
+        return temp;
+    }
+
+    for(unsigned int i=0; i<lbr.size(); i++) {
+        vector<double> xyz = GetCartesian(lbr[i], xyzref);
+        temp.push_back(vector<double>());
+        temp[temp.size()-1].push_back(xyz[0]);
+        temp[temp.size()-1].push_back(xyz[1]);
+        temp[temp.size()-1].push_back(xyz[2]);
+    }
+    return temp;
+}
+/**
+ * In there for backwards compatibility
+ */
+void Astro::GetGalactic(double x, double y, double z, double xref, double yref, double zref, double &l, double &b) {
+    vector<double> xyz;
+    xyz.push_back(x);
+    xyz.push_back(y);
+    xyz.push_back(z);
+    vector<double> xyzref;
+    xyzref.push_back(xref);
+    xyzref.push_back(yref);
+    xyzref.push_back(zref);
+    vector<double> gal = GetGalactic(xyz, xyzref);
+    l = gal[0]; b = gal[1];
+    return;
+
+}
+
+
 
 /**
  * Cartesian coordinates -> Galactic Coordinates(GL,GB,R)
@@ -947,27 +999,28 @@ vector<double> Astro::GetGalactic(vector<double> xyz, vector<double> xyzref) {
 /**
  * Cartesian coordinates -> Galactic Coordinates(GL,GB,R) for vector of points
  */
-/**
- * rotate coordinate around (0,0,0) by (phi,theta,psi)
- */
 vector< vector<double> > Astro::GetGalacticPositions(
                         vector< vector<double> > xyz, vector<double> xyzref) {
-    vector< vector<double> > lb;
+    vector< vector<double> > temp;
     if (!xyz.size()) {
         cout << "Astro::GetGalacticPositions: Input vector of positions is "
                 "empty. Returning empty vector." << endl;
-        return lb;
+        return temp;
     }
 
     for(unsigned int i=0; i<xyz.size(); i++) {
         vector<double> lbr = GetGalactic(xyz[i], xyzref);
-        lb.push_back(vector<double>());
-        lb[lb.size()-1].push_back(lbr[0]);
-        lb[lb.size()-1].push_back(lbr[1]);
-        lb[lb.size()-1].push_back(lbr[2]);
+        temp.push_back(vector<double>());
+        temp[temp.size()-1].push_back(lbr[0]);
+        temp[temp.size()-1].push_back(lbr[1]);
+        temp[temp.size()-1].push_back(lbr[2]);
     }
-    return lb;
+    return temp;
 }
+
+/**
+ * rotate coordinate around (0,0,0) by (phi,theta,psi)
+ */
 
 void Astro::RotateCoordinates(double &x, double &y, double &z, double phi, double theta, double psi) {
 
@@ -1395,7 +1448,7 @@ vector<double> Astro::GetRandomGalactocentricRadii(int n) {
     else break;
     fUtils->TwoDVectorPushBack(r,val,v);
   }
-  return fUtils->CustomFunctionRandom(v,v[0][0],v[v.size()-1][0],n);
+  return fUtils->CustomFunctionRandom(v,n);
 }
 
 double Astro::CaseBhattacharyaProfile(double r) {

@@ -186,7 +186,10 @@ class Astro  {
     //double CalculateGasColumnDensity(vector<double> xyzReference,vector<double> GLGB,string gascomponent,double modulate,double range,double steps);///< calculate gas column densities
     double nRadial(double *x, double *pars);///< TODO:COMMENT
     vector<double> GetCartesian(vector<double> lbr, vector<double> xyzref);///< Galactic coordinates (GL,GB,R) ->Cartesian
+    vector<double> GetCartesian(double r, double l, double b, vector<double> xyzref);
+    vector< vector<double> > GetCartesianPositions(vector< vector<double> > lbr, vector<double> xyzref);
     vector<double> GetGalactic(vector<double> xyz, vector<double> xyzref);///< Cartesian coordinates -> Galactic Coordinates(GL,GB,R)
+    void GetGalactic(double x, double y, double z, double xref, double yref, double zref, double &l, double &b);
     vector< vector<double> > GetGalacticPositions(vector< vector<double> > xyz, vector<double> xyzref);
     void RotateCoordinates(double &x, double &y, double &z, double phi, double theta, double psi);///< rotate coordinate around (0,0,0) by (phi,theta,psi)
     void RandomTangentialShift(double r, double width, double &x, double &y);///< gaussian shift along concentric circle (retains r-distribution)
