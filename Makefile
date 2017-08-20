@@ -31,7 +31,7 @@ help:
 	@echo '  clean            remove temporary files'
 
 
-all: gamera TutorialLevel1 gappa
+all: gamera gappa
 
 gamera: Radiation Particles Utils Astro bicubic bilinear interp2d interp2d_spline libgamera
 
