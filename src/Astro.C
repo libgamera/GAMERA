@@ -928,7 +928,7 @@ vector< vector<double> > Astro::GetCartesianPositions(
                         vector< vector<double> > lbr, vector<double> xyzref) {
     vector< vector<double> > temp;
     if (!lbr.size()) {
-        cout << "Astro::GetGalacticPositions: Input vector of positions is "
+        cout << "Astro::GetCartesianPositions: Input vector of positions is "
                 "empty. Returning empty vector." << endl;
         return temp;
     }
@@ -986,9 +986,11 @@ vector<double> Astro::GetGalactic(vector<double> xyz, vector<double> xyzref) {
   double rrref = sqrt(xref*xref+yref*yref);
   double dr = sqrt(dx*dx+dy*dy);
   double prod = -dx*xref - dy*yref;
+
+  double vec_prod = dx*yref - dy*xref;
   l = 180.*acos(prod/(dr*rrref))/pi;
-  if(dx<=0.) l*=-1.;
-  b = 180.*asin(dz/r)/pi;
+  if(vec_prod<=0.) l*=-1.;
+  b = 180.*asin(dz/r)/pi - 180.*asin(zref/rrref)/pi;
   lbr[0] = l;
   lbr[1] = b;
   lbr[2] = r;
