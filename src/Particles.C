@@ -1109,7 +1109,7 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
     SetMembers(Age);
     for (e = Emin, tt = 0; e < eMax; e = pow(10., log10(e) + logstep), tt++) {
       if (QUIETMODE == false)
-        cout << "    " << (int)(100. * tt / ebins) << "\% done\r" << std::flush;
+        cout << "    " << (int)(100. * tt / ebins) -1 << "\% done\r" << std::flush;
       lossrate = EnergyLossRate(e);
       if(lossrate <= 0.) break;
       val = Integrate(IntFunc, &dummy, e, eMax, 0.1*integratorTolerance,
@@ -1124,7 +1124,7 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
     IntFunc = &Particles::SemiAnalyticConstELossIntegrand;
     for (e = Emin, tt = 0; e < eMax; e = pow(10., log10(e) + logstep), tt++) {
       if (QUIETMODE == false)
-        cout << "    " << (int)(100. * tt / ebins) << "\% done\r" << std::flush;
+        cout << "    " << (int)(100. * tt / ebins) - 1 << "\% done\r" << std::flush;
       val = Integrate(IntFunc, &e, log10(Tmin), 10.*log10(Age),
                              0.1*integratorTolerance,kronrodrule);
       SetMembers(Age);
@@ -1403,12 +1403,12 @@ double Particles::Integrate(fPointer f, double *x, double emin, double emax,
 void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
                                       int mode){
   if(!vCustom.size()) {
-    cout << "Particles::SetCustomInjectionSpectrum: Input vector empty."
+    cout << "Particles::SetCustomEnergylookup: Input vector empty."
             "Exiting." << endl;
     return;
   }
   if(vCustom[0].size() != 2) {
-    cout << "Particles::SetCustomInjectionSpectrum:This function supports "
+    cout << "Particles::SetCustomEnergylookup:This function supports "
             "only input vectors with 2 columns, energy vs. differential "
             "injection rate / escape time. The vector you specified has " << 
             vCustom[0].size() << " columns. Exiting." << endl;
@@ -1422,7 +1422,12 @@ void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
   if(!EminConstant) {
     EminConstant = MinELookup;
   }
-  if(!mode) CustomInjectionNorm = fUtils->EnergyContent(vCustom);
+  if(!mode) {
+    CustomInjectionNorm = fUtils->EnergyContent(vCustom);
+    if(std::isnan(LumConstant) && !LumVector.size()) {
+       LumConstant = CustomInjectionNorm;
+    }
+  }
   vCustom = fUtils->VectorAxisLogarithm(vCustom,0);
   vCustom = fUtils->VectorAxisLogarithm(vCustom,1);
   if(!mode) {  

@@ -167,12 +167,12 @@ class Radiation {
                                      ///differential spectra in erg -
                                      ///erg^-1s^-1cm^-2
   int PiModel;  ///< indicates which parameterisation to use in the Kafexhiu pi0
-                ///model. 0 - Geant4, 1 - Pythia8, 2 - SIBYLL2.1, 3 - QGSJET-I.
+                ///model. 0 - Geant4.10, 1 - Pythia8.1, 2 - SIBYLL2.1, 3 - QGSJET-I.
                 ///DEFAULT = 1
-  int SynchModel;  ///< indicates which synchrotron emissivity model should be
-                   ///used. 0 - random B-field (Gisellini 1988) 1 - regular
-                   ///B-Field, with electrons spiraling around it at inclination
-                   ///angle to observer 'SynchAngle' (default angle 90degrees.). 
+  int SynchModel;  ///< indicates which synchrotron emissivity model should be used.
+                   /// 0 - isotropic pitch angle distribution, following Ghisellini et al. 1988 
+                   /// 1 - fixed pitch angle, default 90 degrees, following Blumenthal&Gould 1970
+                   /// if set to 1, angle to observer is controled by'SynchAngle' (default angle 90 degrees.). 
                    ///DEFAULT = 0
   double PPEmissivity(double x, void *par);
   void GetABGParams(double Tp, double &alpha, double &beta, double &gamma,

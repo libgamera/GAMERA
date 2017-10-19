@@ -380,24 +380,31 @@ struct timespec time0, time1, time2, time3;
     SetLookup(ICLOSSLOOKUP, "ICLoss");
   }  ///< set the lookup holding energy-dependent IC cooling rate {E-ICLossRate}
   void SetLuminosityLookup(vector<vector<double> > LUMLOOKUP) {
+    LumConstant = NAN;
     SetLookup(LUMLOOKUP, "Luminosity");
   }  ///< Set BField evolution
   void SetAmbientDensityLookup(vector<vector<double> > NLOOKUP) {
+    NConstant = NAN;
     SetLookup(NLOOKUP, "AmbientDensity");
   }  ///< Set ambient density evolution
   void SetBFieldLookup(vector<vector<double> > BFIELDLOOKUP) {
+    BConstant = NAN;
     SetLookup(BFIELDLOOKUP, "BField");
   }  ///< Set BField evolution
   void SetEmaxLookup(vector<vector<double> > EMAXLOOKUP) {
+    EmaxConstant = NAN;
     SetLookup(EMAXLOOKUP, "Emax");
   }  ///< Set max. particle evolution
   void SetEscapeTimeLookup(vector<vector<double> > ESCTIMELOOKUP) {
+    escapeTimeConstant = NAN;
     SetLookup(ESCTIMELOOKUP, "EscapeTime");
   }  ///< Set escape time evolution
   void SetRadiusLookup(vector<vector<double> > RADIUSLOOKUP) {
+    RConstant = NAN;
     SetLookup(RADIUSLOOKUP, "Radius");
   }  ///< Set radius evolution
   void SetVelocityLookup(vector<vector<double> > VELOCITYLOOKUP) {
+    VConstant = NAN;
     SetLookup(VELOCITYLOOKUP, "Speed");
   }  ///< Set expansion velocity evolution
   void ExtendICLossLookup(vector<vector<double> > ICLOSSLOOKUP) {

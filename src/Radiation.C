@@ -122,9 +122,11 @@ void Radiation::CalculateDifferentialGammaEmission(double e, int particletype) {
       ldiffbrems = DifferentialEmissionComponent(e, p);
       fdiffbrems = lumtoflux * ldiffbrems;
     }
-    radiationMechanism = "InverseCompton";
-    ldiffic = DifferentialEmissionComponent(e, p);
-    fdiffic = lumtoflux * ldiffic;
+    if(TargetPhotonVector.size()) {
+        radiationMechanism = "InverseCompton";
+        ldiffic = DifferentialEmissionComponent(e, p);
+        fdiffic = lumtoflux * ldiffic;
+    }
     if(BField) {
       radiationMechanism = "Synchrotron";
       ldiffsynch = DifferentialEmissionComponent(e, p);
@@ -504,7 +506,7 @@ void Radiation::CreateICLossLookup(int bins) {
 
     if ((double)ii / bins > 0.0001 * tt && QUIETMODE == false) {
       cout << "\r";
-      cout << "    " << (int)(100. * ii / bins) << "\% done" << std::flush;
+      cout << "    " << (int)(100. * ii / bins) - 1 << "\% done" << std::flush;
       tt++;
     }
     ii++;
