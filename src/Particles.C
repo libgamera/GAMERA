@@ -16,7 +16,6 @@ Particles::Particles() {
   ebins = 100;
   BField = 0.;
   N = 0.;
-  SACELI_Told = 0.;
   R = -1.;
   V = -1.;
   TActual  = 0.;
@@ -115,8 +114,10 @@ void Particles::CalculateConstants() {
 void Particles::SetSolverMethod(int method) {
   if(method != 0 && method != 1 && method != 2) {
       cout << "Particles::SetSolverMethod: Unsupported solver method ("
-           << method << "). Ignoring this foolishness." << endl;
-      return;
+           << method << "). Options: 0-grid solver, 1-semianalytic with "
+           << "const. losses, 2-semianalytic with no losses. Ignoring this "
+           << "foolishness." << endl;
+      exit(1);
   }
   METHOD = method;
   return;
@@ -131,7 +132,7 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   } else if (!type.compare("protons")) {
     Type = 1;
   } else {
-    cout << "Particles::FillParticleSpectrumLookup: What the fuck! Specify "
+    cout << "Particles::CalculateParticleSpectrum: What the fuck! Specify "
             "supported particle species! " << endl;
   }
   if (!QUIETMODE) {
@@ -146,6 +147,18 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
          << endl; 
     return;
   }
+    
+
+  if (VVector.size() && !RVector.size()) {
+    cout << "Particles::CalculateParticleSpectrum: You set a velocity time "
+         << "lookup but no radius time lookup. Both need to be set via "
+         << "Particles::SetRadiusLookup() and Particles::SetVelocityLookup(), "  
+         << "otherwise I exit! Exiting. "<<endl;
+    exit(1);
+
+  }
+
+
   if(!LumVector.size() && std::isnan(LumConstant) 
      && CustomInjectionSpectrum == NULL 
      && CustomInjectionSpectrumTimeEvolution == NULL) {
@@ -180,7 +193,7 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
 
   if(METHOD == -1) {
     if(Type==0 && (BVector.size() || NVector.size() ||
-                (RVector.size() && VVector.size())))
+                (RVector.size() && VVector.size()) || !std::isnan(VConstant)))
       METHOD = 0;
     else if(Type==1 && RVector.size() && VVector.size())
       METHOD = 0;
@@ -201,9 +214,9 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   if(Type && (escapeTimeConstant > 0. || escapeTimeLookup != NULL || 
      EscapeTimeEnergyTimeEvolution != NULL)) Tmin = 1.e-3;
   else if (TminConstant) Tmin = TminConstant;
-  else if(!METHOD) DetermineTMin(EminInternal, Tmin);
+//  else if(!METHOD) DetermineTMin(EminInternal, Tmin); // That doesnt work well
   else if(METHOD == 1) Tmin = TminInternal;
-  else Tmin = 1.e-3;
+  else Tmin = 1.;
   if(Tmin<TminInternal) Tmin=TminInternal;
   /* get the upper energy boundary of the spectrum. This can either be
    * externally
@@ -223,7 +236,7 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
 
   /* if emax falls below emin, return dummy vector with zeroes */
   if (eMax <= Emin) {
-    cout << "Particles::FillParticleSpectrumLookup Whaat? eMax lower than "
+    cout << "Particles::CalculateParticleSpectrum Whaat? eMax lower than "
             "Emin: eMax = " << eMax << " Emin = " << Emin << endl;
     return;
   }
@@ -402,29 +415,24 @@ void Particles::SetMembers(double t) {
   }
 
   R = V = adLossCoeff = 0.;
-  if(RConstant > 0. && !std::isnan(VConstant)) {
-    R = VConstant*yr_to_sec*t + RConstant;
-    V = VConstant;
-  }
 
-  else if(RConstant > 0. && std::isnan(VConstant)) {
-    R = RConstant;
-    V = 0.;
+  if (!std::isnan(VConstant)) V = VConstant;
+  if (!std::isnan(RConstant)) R = RConstant;
+  if (R < 0.) {
+    cout << "Particles::SetMembers: Radius (" << R << " cm) "
+         << " is negative! Setting it to 0."  << endl;
+    R = 0.;
   }
-  else {
-    R = yr_to_sec*t*V;
-    V = VConstant;
-  }
+  R += yr_to_sec*t*V;
 
   if(RVector.size() && t > RVector[0][0] &&
           t < RVector[RVector.size() - 1][0])
-    R = gsl_spline_eval(RLookup, t, accR);
+    R = gsl_spline_eval(RLookup, t, accR) * pc_to_cm;
 
   if(VVector.size() && t > VVector[0][0] &&
           t < VVector[VVector.size() - 1][0])
     V = gsl_spline_eval(VLookup, t, accV);
   if (R && V) adLossCoeff = V / R;
-
   return;
 }
 
@@ -441,11 +449,6 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
   else {
     lookup = v;
   }
-//  if(!LookupType.compare("ICLoss") && lookup.size()) {
-//    for(unsigned int i=0;i<lookup.size();i++)
-//      std::cout<<lookup[i][0]<<" "<<lookup[i][1]<<std::endl;
-//    std::cout<< " ... ... ... "<<std::endl;
-//  }
   gsl_spline *ImportLookup = fUtils->GSLsplineFromTwoDVector(lookup);
   std::string stArr[] = {"ICLoss", "Luminosity", "AmbientDensity", "BField",
                     "Emax", "Radius",         "Speed"};
@@ -469,9 +472,6 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
       *vs[i] = lookup;   
       DetermineLookupTimeBoundaries();
       
-//  if(!LookupType.compare("ICLoss") && lookup.size()) 
-//    for(unsigned int i=0;i<lookup.size();i++)
-//      std::cout<<lookup[i][0]<<" "<<lookup[i][1]<<std::endl;
       return;
     }
   }
@@ -698,7 +698,7 @@ void Particles::SetInitialCondition(vector<vector<double> > &Grid,
   double t0 = startTime;
   SetMembers(t0);
   for (unsigned int i = 0; i < EnergyAxis.size(); i++) {
-    double e = 0.5 * (pow(10, EnergyAxis[i]) + pow(10., EnergyAxis[i + 1]));
+    double e = 0.5 * (pow(10., EnergyAxis[i]) + pow(10., EnergyAxis[i + 1]));
     Grid[0][i] = t0 * yr_to_sec * SourceSpectrum(e);
   }
 
@@ -1088,51 +1088,22 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
 
   double logstep = (log10(eMax) - log10(Emin)) / ebins;
 
-  // determine longest cooling time scale 'maxCoolingTime'
-  // (typically of particles with lowest energy). 
-  // If source Age > 'maxCoolingTime', calculate steady state solution.
-  double maxCoolingTime = -100.;
-  for (double E = Emin; E < eMax; E *= 1.01) {
-    double CoolingTime = E / EnergyLossRate(E);
-    if (CoolingTime > maxCoolingTime) maxCoolingTime = CoolingTime;
-  }
-  maxCoolingTime /= yr_to_sec;
+  double e, lossrate, val = 0.;
+  e = lossrate = val = 0.;
+  int tt;
 
-  double e = 0.;
-  double lossrate = 0.;
-  double val = 0.;
-  double dummy = 0.;
-  int tt = 0;
-  // steady state solution
-  if (Age > maxCoolingTime) {
-    IntFunc = &Particles::SourceSpectrumWrapper;
+  // semi analytical solution, see e.g. Atoyan & Aharonian 1999, MNRAS, Volume 302, Issue 2, pp. 253-276
+  Tmin = pow(10.,vETrajectory[0][0]);
+  for (e = Emin, tt = 0; e < eMax; e = pow(10., log10(e) + logstep), tt++) {
+    if (QUIETMODE == false)
+      cout << "    " << (int)(100. * tt / ebins) -1 << "\% done\r" << std::flush;
     SetMembers(Age);
-    for (e = Emin, tt = 0; e < eMax; e = pow(10., log10(e) + logstep), tt++) {
-      if (QUIETMODE == false)
-        cout << "    " << (int)(100. * tt / ebins) -1 << "\% done\r" << std::flush;
-      lossrate = EnergyLossRate(e);
-      if(lossrate <= 0.) break;
-      val = Integrate(IntFunc, &dummy, e, eMax, 0.1*integratorTolerance,
-                             kronrodrule) / lossrate;
-      fUtils->TwoDVectorPushBack(e,val,ParticleSpectrum);
-    }
-
-  }
-  // time integration (constant energy losses)
-  else {
-    Tmin = pow(10.,vETrajectory[0][0]);
+    lossrate = EnergyLossRate(e);
+    if(lossrate <= 0.) continue;
     IntFunc = &Particles::SemiAnalyticConstELossIntegrand;
-    for (e = Emin, tt = 0; e < eMax; e = pow(10., log10(e) + logstep), tt++) {
-      if (QUIETMODE == false)
-        cout << "    " << (int)(100. * tt / ebins) - 1 << "\% done\r" << std::flush;
-      val = Integrate(IntFunc, &e, log10(Tmin), 10.*log10(Age),
-                             0.1*integratorTolerance,kronrodrule);
-      SetMembers(Age);
-      lossrate = EnergyLossRate(e);
-      if(lossrate <= 0.) break;
-      val /= lossrate;
-      if(val) fUtils->TwoDVectorPushBack(e,val,ParticleSpectrum);
-    }
+    val = Integrate(IntFunc, &e, log10(Tmin), log10(Age),
+                    0.1*integratorTolerance,kronrodrule) / lossrate;
+    if(val) fUtils->TwoDVectorPushBack(e,val,ParticleSpectrum);
   }
   return;
 }
@@ -1146,27 +1117,20 @@ double Particles::SemiAnalyticConstELossIntegrand(double T, void *par) {
   }
   double tdash, E, Enow;
   Enow = *(double *)par;
-  int err = gsl_spline_eval_e(energyTrajectoryInverse, log10(Enow), accTrInv, &tdash);
-  if(err) return 0.;
-  if (T > tdash) return 0.;
-  T = pow(10., T);
-  if(Age - T < Tmin) return 0.;
-  tdash = pow(10., tdash);
+  if(gsl_spline_eval_e(energyTrajectoryInverse, log10(Enow), accTrInv, &tdash)) 
+    return 0.;
+  T = pow(10.,T);
+  tdash = pow(10.,tdash);
+
+  if (tdash - T < Tmin || Age - T < Tmin) return 0.;
   if (gsl_spline_eval_e(energyTrajectory, log10(tdash - T), accTr, &E))
     return 0.;
   E = pow(10., E);
   if (E > eMax || E <= 0.) return 0.;
   SetMembers(Age - T);
-  if (!SACELI_Told) {
-    SACELI_Told = T;
-    return 0.;
-  }
-  double dT = (T - SACELI_Told) * yr_to_sec;
-  double dlogT = log10(T) - log10(SACELI_Told);
-  SACELI_Told = T;
   double dE = EnergyLossRate(E);
-  double Sp =   SourceSpectrum(E);
-  return dE * Sp * dT / dlogT;
+  double Sp = SourceSpectrum(E);
+  return dE * Sp * T * yr_to_sec * 2.302585093; // the number at the end is ln(10)
 }
 
 void Particles::SetType(string type) {
@@ -1196,7 +1160,7 @@ void Particles::DetermineLookupTimeBoundaries() {
   double lumtmin, emaxtmin, ntmin, btmin, rtmin, vtmin, esctmin, lumtmax,
       emaxtmax, ntmax, btmax, rtmax, vtmax, esctmax,custspinjtmin,custspinjtmax;
   lumtmin = emaxtmin = ntmin = btmin = rtmin = vtmin = esctmin = custspinjtmin 
-    = 1.e-10;
+    = TminInternal; //std::cout ACHTUNG; hier stand 1e-10
   lumtmax = emaxtmax = ntmax = btmax = rtmax = vtmax = esctmax = custspinjtmax
     = 1.e100;
 
@@ -1270,7 +1234,7 @@ void Particles::CalculateEnergyTrajectory(double TExt) {
   fUtils->Clear2DVector(vETrajectory);
 
   double E, Edot, dt, T;
-  (TExt > TminInternal) ? T = TExt : T = TminInternal;
+  T = (TExt > TminInternal) ? TExt : TminInternal;
   T *= 1.1;
   SetMembers(T);
   E = eMax;

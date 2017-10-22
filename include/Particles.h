@@ -153,8 +153,6 @@ struct timespec time0, time1, time2, time3;
                        ///optimisation
   double bremsl_eef;   ///< constant used in 'EnergyLossRate'. Used for speed
                        ///optimisation
-  double SACELI_Told;  ///< Helper quantity that saves the last time step in the
-                       ///integration in CalcSpecSemiAnalyticConstELoss
 
   bool logarithmicCRLumLookupTimeBins;  ///< boolean indicating that time steps
                                         ///in CRLumLookup are logarithmic. In
@@ -524,7 +522,11 @@ struct timespec time0, time1, time2, time3;
   double GetTminInternal() {
     return TminInternal;
   }  ///< set minimal time from where to start the iteration (default: 1yr).
-  vector<vector<double> > GetEnergyTrajectoryVector() { return vETrajectory; }
+  vector<vector<double> > GetEnergyTrajectoryVector() { 
+    vector< vector<double> > v;
+    v = fUtils-> VectorAxisPow10(vETrajectory,0);
+    v = fUtils-> VectorAxisPow10(v,1);
+    return v; }
   vector<vector<double> > GetParticleSED();
   vector<vector<double> > GetGrid(){return grid;}
   double GetParticleEnergyContent(double E1=0., double E2=0.);
