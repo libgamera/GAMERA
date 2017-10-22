@@ -1,8 +1,0 @@
-Distance 1.e3
-AmbientDensity .3
-BField 1.e-5
-TRAD 1000.
-edensRAD 1.
-inputspectrumElectrons docu/tutorial/TutorialLevel1Electrons.dat
-inputspectrumProtons docu/tutorial/TutorialLevel1Protons.dat
-outfile docu/tutorial/TutorialLevel1
