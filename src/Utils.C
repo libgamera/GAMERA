@@ -1,9 +1,9 @@
 #include "Utils.h"
 
 Utils::Utils(bool DRAWLOGO) {
-  if (DRAWLOGO == true) DrawGamera();
   QUIETMODE = false;
   GAMERADESTROYEDTHECONSOLE = false;
+  if (DRAWLOGO == true) DrawGamera();
   INTERMETH = (gsl_interp_type*)gsl_interp_cspline;
   r = gsl_rng_alloc (gsl_rng_mt19937);
   gsl_rng_set(r,time(0));
@@ -384,7 +384,6 @@ double Utils::EnergyContent(vector< vector<double> > f, double emin, double emax
     return 0.;
   }
   for(unsigned int i=0;i<f.size();i++) f[i][1] = f[i][0] * f[i][1];
-  std::cout<<Integrate(f,emin,emax)<<std::endl;
   return Integrate(f,emin,emax);
 }
 
@@ -434,11 +433,9 @@ double Utils::Integrate(vector< vector<double> > f, double xmin, double xmax) {
   int size = (int)f.size();
   double x[size];
   double y[size];
-  double ymax = -1.e-100;
   for (unsigned int i=0;i<f.size();i++) {
     x[i] = f[i][0];
     y[i] = f[i][1];
-    if(x[i] > xmin && x[i] < xmax && y[i] > ymax) ymax = y[i];
   }
   gsl_spline *lookup = gsl_spline_alloc(gsl_interp_linear, size);
   gsl_spline_init(lookup, x, y, size);
@@ -446,8 +443,9 @@ double Utils::Integrate(vector< vector<double> > f, double xmin, double xmax) {
   double integral = 0.;
   int errcode = gsl_spline_eval_integ_e(lookup, xmin, xmax, a, &integral);
   if(errcode) {
-    cout << "Utils::Integrate: Someting went wrong in the integration!"
-            "Errorcode " << errcode << ". Returning 0. value. " << endl;
+    if (QUIETMODE == false) {
+        cout << "Utils::Integrate: Someting went wrong in the integration!"
+            "Errorcode " << errcode << ". Returning 0. value. " << endl;}
     integral = 0.;
   }
   return integral;
@@ -639,9 +637,9 @@ void Utils::SetInterpolationMethod(string intermeth) {
   else if(!intermeth.compare("AKIMA")) INTERMETH = (gsl_interp_type*)gsl_interp_akima;
   else if(!intermeth.compare("POLYNOMIAL")) INTERMETH = (gsl_interp_type*)gsl_interp_polynomial;
   else {
-    std::cout<<"Utils::SetInterpolationMethod: " << intermeth
+    cout<<"Utils::SetInterpolationMethod: " << intermeth
              <<" is not a valid interpolation type. Options: " << endl;
-    std::cout<<"  'LINEAR','CUBICSPLINE','AKIMA','POLYNOMIAL'" << endl;
+    cout<<"  'LINEAR','CUBICSPLINE','AKIMA','POLYNOMIAL'" << endl;
   }
   return;
 }

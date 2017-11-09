@@ -68,6 +68,7 @@ class Radiation {
                                       ///emission. This is basically reading in
                                       ///a 2D vector(i.e. 'ParticleLookup')
                                       ///holding E-N(particles).
+  double GetIntegratedFlux(int i, double emin, double emax, bool ENERGYFLUX=false); /// integrate spectrum i between emin and emax. if ENERGYFLUX == true, the integrated energy flux instead of the integrated flux will be calculated.
   vector<vector<double> > ParticleVector;  ///< 2D vector holding the particle
                                            ///spectrum that emits the radiation.
                                            ///Format: E(erg)-N(number). This can
@@ -100,22 +101,6 @@ class Radiation {
                                              ///E(erg) - Edens(erg cm^-3) }
   double n;  ///< ambient density for Bremsstrahlung and inelastic p-p emission
              ///mechanisms (cm^-3)
-  double fintbrems;   ///< integrated flux above specified energy E (in
-                      ///CalculateIntegratedGammaEmission) due to Bremsstrahlung
-  double lintbrems;   ///< integrated luminosity above specified energy E (in
-                      ///CalculateIntegratedGammaEmission) due to Bremsstrahlung
-  double fintpp;      ///< integrated flux above specified energy E (in
-                      ///CalculateIntegratedGammaEmission) due to inelastic p-p
-                      ///collision
-  double lintpp;      ///< integrated luminosity above specified energy E (in
-                      ///CalculateIntegratedGammaEmission) due to inelastic p-p
-                      ///collision
-  double fintic;      ///< integrated flux above specified energy E (in
-                      ///CalculateIntegratedGammaEmission) due to inelastic IC
-                      ///radiation
-  double lintic;      ///< integrated luminosity above specified energy E (in
-                      ///CalculateIntegratedGammaEmission) due to inelastic IC
-                      ///radiation
   double fdiffbrems;  ///< differential flux at specified energy E (in
                       ///CalculateDifferentialGammaEmission) due to
                       ///Bremsstrahlung
@@ -226,7 +211,6 @@ class Radiation {
   double GetAmbientDensity() {
     return n;
   }  ///< get ambient number density (cm^-3)
-  void CalculateIntegralGammaEmission(double e, int particletype);
   void CalculateDifferentialGammaEmission(double e, int particletype);
   void CalculateDifferentialPhotonSpectrum(int steps = 100, double emin = 0.,
                                            double emax = 0.);
@@ -249,12 +233,62 @@ class Radiation {
   double GetDifferentialSynchFlux() { return fdiffsynch; }  ///< get fdiffsynch
   double GetDifferentialBremsFlux() { return fdiffbrems; }  ///< get fdiffbrems
   double GetDifferentialPPFlux() { return fdiffpp; }        ///< get fdiffpp
-  double GetIntegralICFlux() { return fintic; }             ///< get fintic
-  double GetIntegralBremsFlux() { return fintbrems; }       ///< get fintbrems
-  double GetIntegralPPFlux() { return fintpp; }             ///< get fintpp
-  double GetICLuminosity() { return lintic; }               ///< get lintic
-  double GetBremsLuminosity() { return lintbrems; }         ///< get lintbrems
-  double GetPPLuminosity() { return lintpp; }               ///< get lintpp
+  double GetIntegralTotalFlux(double emin, double emax) {  ///< get integrated
+    return GetIntegratedFlux(1,emin,emax); }             /// gamma-ray flux between
+                                                         /// emin and emax (TeV) 
+                                                         /// summed over all 
+                                                         /// radiation processes
+                                                         
+  double GetIntegralPPFlux(double emin, double emax) { ///< get integrated 
+    return GetIntegratedFlux(2,emin,emax); }             /// gamma-ray flux between
+                                                         /// emin and emax (TeV) 
+                                                         /// from proton-proton
+                                                         /// interaction
+                                                         
+  double GetIntegralICFlux(double emin, double emax) { ///< get integrated 
+    return GetIntegratedFlux(3,emin,emax); }             /// gamma-ray flux between
+                                                         /// emin and emax (TeV) 
+                                                         /// from IC-mechanism
+                                                         
+  double GetIntegralBremsstrahlungFlux(double emin, double emax) { ///< get integrated 
+    return GetIntegratedFlux(4,emin,emax); }             /// gamma-ray flux between
+                                                         /// emin and emax (TeV) 
+                                                         /// from Bremsstrahlung
+                                                         
+  double GetIntegralSynchrotronFlux(double emin, double emax) { ///< get integrated 
+    return GetIntegratedFlux(5,emin,emax); }             /// flux between
+                                                         /// emin and emax (TeV) 
+                                                         /// from synchrotron
+                                                         /// process
+                                                         
+  double GetIntegralTotalEnergyFlux(double emin, double emax) { ///< get integrated 
+    return GetIntegratedFlux(1,emin,emax,true); }        /// energy flux between
+                                                         /// emin and emax (TeV) 
+                                                         /// summed over all 
+                                                         /// radiation processes
+                                                         
+  double GetIntegralPPEnergyFlux(double emin, double emax) { ///< get integrated 
+    return GetIntegratedFlux(2,emin,emax,true); }        /// energy flux between
+                                                         /// emin and emax (TeV) 
+                                                         /// from proton-proton
+                                                         /// interaction
+                                                         
+  double GetIntegralICEnergyFlux(double emin, double emax) { ///< get integrated
+    return GetIntegratedFlux(3,emin,emax,true); }        /// energy flux between
+                                                         /// emin and emax (TeV) 
+                                                         /// from IC-mechanism
+                                                         
+  double GetIntegralBremsstrahlungEnergyFlux(double emin, double emax) { ///< get integrated 
+    return GetIntegratedFlux(4,emin,emax,true); }        /// energy flux between
+                                                         /// emin and emax (TeV) 
+                                                         /// from Bremsstrahlung
+                                                         
+  double GetIntegralSynchrotronEnergyFlux(double emin, double emax) { ///< get integrated 
+    return GetIntegratedFlux(5,emin,emax,true); }        /// energy flux between
+                                                         /// emin and emax (TeV) 
+                                                         /// from synchrotron
+                                                         /// process
+                                                         
   void CreateICLossLookup(int bins = 100);  ///< creates a 2D vector holding the
                                             ///energy-dependent energy loss rate
                                             ///due to IC cooling. Useful to
@@ -290,9 +324,6 @@ class Radiation {
   void ClearTargetPhotons(); ///< remove all previously set IC target photons
   void Reset();  ///< reset ParticleLookup, Electrons, Protons, fintbrems,
                  ///lintbrems, fintpp, lintpp, fintic, lintic
-  void ToggleQuietMode() {
-    QUIETMODE = true;
-  }  ///< enable quiet mode (very little cout output)
   vector<vector<double> > GetICLossLookup() {
     return ICLossLookup;
   }  ///< return TotalTargetPhotonVector
@@ -367,6 +398,7 @@ class Radiation {
   double NuclearEnhancementFactor(double Tp);
   double InelasticPPXSectionKaf(double Tp);
   double InclusivePPXSection(double Tp);
-
+  void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }  ///< enable quiet mode (very little cout output)
+  bool GetQuietMode() {return QUIETMODE;}
 };
 #endif

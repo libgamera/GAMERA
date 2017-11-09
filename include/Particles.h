@@ -507,9 +507,6 @@ struct timespec time0, time1, time2, time3;
     sharpEnergyCut = false;
   }  ///< untoggle a sharp energy cut in the particle spectrum (position given
      ///by Emax)
-  void ToggleQuietMode() {
-    QUIETMODE = true;
-  }  ///< untoggle quiet mode (no progress printout on the console)
   void SetEnergyAxisLowerBoundary(double BOUND) {
     EnergyAxisLowerBoundary = BOUND;
   }  ///< might be superflous
@@ -546,6 +543,8 @@ struct timespec time0, time1, time2, time3;
     SetCustomEnergylookup(vEsc,1);}
   Radiation *GetSSCEquilibrium(Radiation *fr,double t, double tolerance=1e-2);
   void SetSolverMethod(int method);
+  void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }  ///< toggle quiet mode on or off ( if on, no progress printout on the console)
+  bool GetQuietMode() {return QUIETMODE;}
 
 };
 #endif

@@ -24,10 +24,6 @@ help:
 	@echo ''
 	@echo '  gamera           Create the GAMERA shared object (lib/libgamera.so)'
 	@echo '  gappa            Wrap the python module (lib/gappa.py and lib/_gappa.so)'
-	@echo '  tutorial1        Compile a simple tutorial program'
-	@echo '                   (-> bin/TutorialLevel1, see http://joachimhahn.github.io/GAMERA/)'
-	@echo '  documentation    Generate documentation'
-	@echo '                   (-> docu/doxygen/html/ and docu/sphinx/build/html/)'
 	@echo '  clean            remove temporary files'
 
 
@@ -35,7 +31,6 @@ all: gamera gappa
 
 gamera: Radiation Particles Utils Astro bicubic bilinear interp2d interp2d_spline libgamera
 
-tutorial1: gamera TutorialLevel1
 
 
 
@@ -68,10 +63,6 @@ libgamera : $(objectsSO)
 	$(CXX) -shared -o $(LIBDIR)/libgamera.so $(objectsSO) $(CXXFLAGS) $(LDFLAGS)
 	@echo "-> done!"
 
-# This is an example on how to use the shared library libgamera.so
-TutorialLevel1 : docu/tutorial/TutorialLevel1.C
-	$(CXX) -g -O2 -Wall -c docu/tutorial/TutorialLevel1.C -o $(OUTDIR)/TutorialLevel1.o $(CXXFLAGS) $(INCLUDES)
-	$(CXX) -g -Wall -o bin/TutorialLevel1 $(OUTDIR)/TutorialLevel1.o -lgamera -L$(LIBDIR)
 
 interp2D : testscripts/interp2Dtest.C
 	$(CXX) -g -O2 -Wall -c testscripts/interp2Dtest.C -o $(OUTDIR)/interp2Dtest.o $(CXXFLAGS) $(INCLUDES) $(LDFLAGS)
@@ -85,13 +76,6 @@ gappa:
 	python setup.py build_ext --build-lib ../lib;\
 	cd ..;\
 
-# make documentation
-documentation:
-	echo pwd;\
-	cd docu/doxygen;\
-	doxygen doxygenconfig.cfg;\
-	cd ../sphinx/;\
-	make html;\
 
 clean-out:
 	-rm -f out/*
@@ -102,7 +86,5 @@ clean-lib:
 clean-python:
 	-rm -f python/_gappa.cc python/_gappa.so python/gappa.py
 	-rm -rf python/build/
-clean-docu:
-	-rm -rf docu/doxygen/xml/* docu/doxygen/html/* docu/sphinx/build/*
 
-clean: clean-out clean-bin clean-lib clean-python clean-docu
+clean: clean-out clean-bin clean-lib clean-python

@@ -9,7 +9,6 @@ Radiation::Radiation() {
   DEBUG = false;
   SSCSET = false;
   lumtoflux = 0.;
-  fintbrems = lintbrems = fintpp = lintpp = fintic = lintic = 0.;
   ldiffbrems = fdiffbrems = ldiffsynch = fdiffsynch = 0.;
   ldiffic = fdiffic = ldiffpp = fdiffpp = 0.;
   distance = BField = 0.;
@@ -46,12 +45,6 @@ void Radiation::Reset() {
   gsl_spline_free(TargetPhotonLookup);
   BField = 0.;
   n = 0.;
-  fintbrems = 0.;
-  lintbrems = 0.;
-  fintpp = 0.;
-  lintpp = 0.;
-  fintic = 0.;
-  lintic = 0.;
   return;
 }
 
@@ -145,64 +138,6 @@ void Radiation::CalculateDifferentialGammaEmission(double e, int particletype) {
 }
 
 /**
- * Calculates the integral photon Emission above energy 'e' [erg]. This gives
- * - integral fluxes, fint* [(no. of photons)/(s*cm^2)]
- * - photon rate, lint* [(no. of photons)/s]
- *
- * The * stands for Brems(-strahlung), IC and pp (i.e. pi^0 decay) components.
- * These quantities are private members.
- *
- * It calls the 'DifferentialEmissionComponent'
- * function for the relevant radiation mechanisms:
- * - protons
- *   + inelastic p-p scattering
- * - electrons
- *   + IC emission
- *   + Bremsstrahlung
- *   + Synchrotron radiation
- *
- * This function calculates the appropriate (depending on the particle species)
- * radiation mechanism and their gamma-ray flux by calling
- * the method 'CalculateLuminosityAndFlux' which integrates
- * 'DifferentialEmissionComponent'.
- */
-void Radiation::CalculateIntegralGammaEmission(double e, int particletype) {
-
-  lintbrems = fintbrems = lintic = fintic = lintpp = fintpp = 0.;
-
-  if (particletype != 0. && particletype != 1) {
-    cout << "### Radiation::CalculateIntegratedGammaEmission: Please provide "
-            "proper particle spectrum and particle type! ###" << endl;
-    return;
-  }
-
-  if ((!particletype && !ElectronVector.size()) ||
-      (particletype == 1 && !ProtonVector.size())) {
-    cout << "### Radiation::CalculateIntegratedGammaEmission: No accelerated "
-            "particles! Exiting... ###" << endl;
-    return;
-  } else if (!particletype) {
-    ParticleVector = ElectronVector;
-    if (!n) {
-      cout << "Radiation::CalculateIntegratedGammaEmission: No ambient density "
-              "value set for Bremsstrahlung. Returning zero value." << endl;
-      lintbrems = 0.;
-      fintbrems = 0.;
-    } else {
-      CalculateLuminosityAndFlux("Bremsstrahlung", e, lintbrems, fintbrems);
-    }
-    CalculateLuminosityAndFlux("InverseCompton", e, lintic, fintic);
-  } else if (particletype == 1) {
-    ParticleVector = ProtonVector;
-    CalculateLuminosityAndFlux("ppEmission", e, lintpp, fintpp);
-  } else {
-    cout << "### Radiation::CalculateIntegratedGammaEmission: WTF?! That is "
-            "not possible!!" << endl;
-  }
-
-  return;
-}
-/**
  * Calculates the differential photon rate [(no. of photons)/(erg*s)]
  * at energy 'e' [erg] resulting from radiation mechanism
  * 'radiationMechanism' that has been specified before in
@@ -293,63 +228,6 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
   return gammas;
 }
 
-/**
- * Calculates
- * - f: integrated flux [(no. of photons)/(s*cm^2)] and
- * - l: photon rate [(no. of photons)/s]
- *
- * above energy 'e' [erg].
- *
- * This method integrates the 'DifferentialEmissionComponent' method
- * for the relevant radiation mechanisms:
- * - protons
- *   + inelastic p-p scattering
- * - electrons
- *   + IC emission
- *   + Bremsstrahlung
- *   + Synchrotron radiation
- *
- * The integration boundaries are {e,maximum particle energy}, where the
- * maximum particle energy is automatically determined from the
- * 'ParticleVector' vector.
- */
-void Radiation::CalculateLuminosityAndFlux(string mechanism, double e,
-                                           double &l, double &f) {
-
-  double lumtoflux = 0.;
-  double emingamma = e;
-  /* if no distance is provided, Luminosity and Flux are treated as
-   * being the same */
-  if (!distance) {
-    cout << "### Radiation::CalculateLuminosityAndFlux: Distance to particles "
-            "not specified -> Flux equals now the luminosity! ###" << endl;
-    lumtoflux = 1.;
-  } else
-    lumtoflux = 1. / (4. * pi * distance * distance);
-
-  if (!ParticleVector.size()) {
-    cout << "### Radiation::CalculateLuminosityAndFlux: No accelerated "
-            "particles! Exiting... ###" << endl;
-    l = 0.;
-    f = 0.;
-    return;
-  }
-
-  double emax = ParticleVector[ParticleVector.size() - 1][0];
-  if (e >= 0.99999 * emax) {
-    l = 0.;
-    f = 0.;
-    return;
-  }
-  radiationMechanism = mechanism;
-  fPointer IntFunc = &Radiation::DifferentialEmissionComponent;
-
-  l = Integrate(IntFunc, &emingamma, e, emax, integratorTolerance,
-                integratorKronrodRule);
-  f = lumtoflux * l;
-
-  return;
-}
 
 /********* RADIATION MECHANISMS ***********************************/
 
@@ -1529,12 +1407,11 @@ vector<vector<double> > Radiation::ReturnDifferentialPhotonSpectrum(
   }
   double e, dNdE;
   for (unsigned int j = 0; j < diffSpec.size(); j++) {
-    e = diffSpec[j][0];
     dNdE = diffSpec[j][i];
+    if (dNdE <= 0. ) continue;
+    e = diffSpec[j][0];
     if (e < emin && emin) continue;
     if (e > emax && emax) continue;
-    if (dNdE < 0.) dNdE = 0.;
-    if (!dNdE) continue;
     fUtils->TwoDVectorPushBack(e,dNdE,tempVec);
   }
   return tempVec;
@@ -1557,13 +1434,12 @@ vector<vector<double> > Radiation::ReturnSED(int i, double emin, double emax) {
   }
   double e, eTeV, dNdE;
   for (unsigned int j = 0; j < diffSpec.size(); j++) {
+    dNdE = diffSpec[j][i];
+    if (dNdE <= 0. ) continue;
     e = diffSpec[j][0];
     eTeV = e / TeV_to_erg;
-    dNdE = diffSpec[j][i];
     if (eTeV < emin && emin) continue;
     if (eTeV > emax && emax) continue;
-    if (dNdE < 0.) dNdE = 0.;
-    if (!dNdE) continue;
     fUtils->TwoDVectorPushBack(eTeV,e * e * dNdE,tempVec);
   }
   return tempVec;
@@ -1609,6 +1485,37 @@ vector<vector<double> > Radiation::GetParticleSED(string type) {
 
   return v;
 }
+
+double Radiation::GetIntegratedFlux(int i, double emin, double emax, bool ENERGYFLUX) {
+
+  if (!diffSpec.size()) {
+    cout << "Radiation::GetIntegratedFlux: Differential spectrum "
+            "vector empty. Fill it via "
+            "Radiation::CalculateDifferentialSpectrum() first! Returning zero."
+            << endl;
+    return 0.;
+  }
+  emin *= TeV_to_erg;
+  emax *= TeV_to_erg;
+  if (!emin) emin = diffSpec[0][0];
+  if (!emax) emax = diffSpec[diffSpec.size()-1][0];
+  vector <vector <double> > tempVec;
+  double e, dNdE, val;
+  for (unsigned int j = 0; j < diffSpec.size(); j++) {
+    dNdE = diffSpec[j][i];
+    if (dNdE <= 0. ) continue;
+    e = diffSpec[j][0];
+    if (ENERGYFLUX == false) fUtils->TwoDVectorPushBack(e,dNdE,tempVec);
+    else fUtils->TwoDVectorPushBack(e,e*dNdE,tempVec);
+  }
+  if (tempVec.size() < 3) return 0.;
+  fUtils->ToggleQuietMode();
+  val = fUtils->Integrate(tempVec,emin,emax);
+  fUtils->ToggleQuietMode();
+  return val;
+}
+
+
 /**
  * Integration function using the GSL QAG functionality
  *

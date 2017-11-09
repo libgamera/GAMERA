@@ -210,7 +210,6 @@ class Astro  {
     void PositionOnSpiralArmAngular(double theta, int arm, double &x, double &y); ///< get position on arm in x-y plane given a certain polar angle in the galaxy.
     void GetDistanceToNearestSpiralArm(double x, double y, double &DistanceToClosestArm, int &ClosestArm);
     double GetDistanceToGivenSpiralArm(double x, double y, int arm);
-    void ToggleQuietMode() {QUIETMODE=true;}
     vector< vector<double> > DiceGalacticPositions(int i);
     double GetRMax() {return rMax;}
     void SetSpiralArmModel(string centralstructuremodel);
@@ -259,6 +258,8 @@ class Astro  {
 
     void SetInterpolationMethod(string intermeth)
        {fUtils->SetInterpolationMethod(intermeth);}
+    void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }
+    bool GetQuietMode() {return QUIETMODE;}
 
 };
 #endif

@@ -101,7 +101,6 @@ class Utils {
  public:
   Utils(bool DRAWLOGO = true);
   ~Utils();
-  void ToggleQuietMode() { QUIETMODE = true; }
   int ReadParameterFile(string inputname, vector<string> parameter_names,
                         vector<string> files_names,
                         vector<double> &parameter_values,
@@ -166,5 +165,7 @@ class Utils {
     return interp2d_spline_eval(INTERNAL2DSPLINE,x,y,xacc,yacc);}
   double EnergyContent(vector< vector<double> > f, double emin=0., double emax=0.);
   double EnergyContentFast(vector< vector<double> > f);
+  void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }
+  bool GetQuietMode() {return QUIETMODE;}
 };
 #endif
