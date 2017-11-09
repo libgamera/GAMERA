@@ -37,6 +37,7 @@ class Particles {
 struct timespec time0, time1, time2, time3;
  private:
   Utils *fUtils;
+  Radiation *fRadiation;
   int Type;  ///< integer indicating particle type. supported: 0-electrons and
              ///1-protons
   int METHOD; /// calculation method. This is determined automatically, but can
@@ -102,6 +103,7 @@ struct timespec time0, time1, time2, time3;
                         ///particle iteration is started
   double BConstant;     ///< Constantly set constant B-Field
   double NConstant;     ///< Constantly set constant ambient density
+  int iclosslookupbins; ///< bins of the IC-Loss lookup
   double LumConstant;   ///< Constantly set source luminosity
   double RConstant;     ///< Constantly set source extension
   double VConstant;     ///< Constantly set source expansion speed
@@ -545,6 +547,11 @@ struct timespec time0, time1, time2, time3;
   void SetSolverMethod(int method);
   void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }  ///< toggle quiet mode on or off ( if on, no progress printout on the console)
   bool GetQuietMode() {return QUIETMODE;}
-
+  void AddThermalTargetPhotons(double T, double edens, int steps=200);// wrapped from Radiation class. See Docu there.
+  void AddArbitraryTargetPhotons(vector<vector<double> > PhotonArray);// wrapped from Radiation class. See Docu there.
+  void ImportTargetPhotonsFromFile(const char *phFile); // wrapped from Radiation class. See Docu there.
+  void AddSSCTargetPhotons(double R, int steps=100); // wrapped from Radiation class. See Docu there. Radius in pc
+  void RemoveLastICTargetPhotonComponent(); // wrapped from Radiation class. See Docu there.
+  void CheckSanityOfTargetPhotonLookup(); // wrapped from Radiation class. See Docu there.
 };
 #endif

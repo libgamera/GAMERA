@@ -25,6 +25,7 @@ Particles::Particles() {
   EminConstantForNormalisationOnly = false; 
   DEBUG = false;
   ICLossLookup = NULL;
+  iclosslookupbins = 200;
   LumLookup = NULL;
   NLookup = NULL;
   eMaxLookup = NULL;
@@ -81,6 +82,7 @@ Particles::Particles() {
   eaccesc = gsl_interp_accel_alloc();
 
   fUtils = new Utils();
+  fRadiation = new Radiation();
 }
 Particles::~Particles() {
   for (unsigned int i = 0; i < grid.size(); i++) grid[i].clear();
@@ -1473,6 +1475,67 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
   }
 
   return;    
+}
+
+/** Add a greybody distribution of target photons to TotalTargetPhotonGraph,
+ * which is used in the
+ * IC cooling process in this class.
+ */
+void Particles::AddThermalTargetPhotons(double T, double edens, int steps) {
+  fRadiation->AddThermalTargetPhotons(T, edens, steps);
+  fRadiation->CreateICLossLookup(iclosslookupbins);
+  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+}
+
+/** Add an arbitray distribution of target photons to TotalTargetPhotonGraph,
+ * which is used in the
+ * IC coolin process in this class
+ * This requires as input a 2D vector of format:
+ *              ~~~    energy[erg] number_density   ~~~
+ * The photons will be added to TotalTargetPhotonGraph
+ */
+void Particles::AddArbitraryTargetPhotons(vector<vector<double> > PhotonArray) {
+  fRadiation->AddArbitraryTargetPhotons(PhotonArray);
+  fRadiation->CreateICLossLookup(iclosslookupbins);
+  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+}
+
+/** Import target photons from file. File has to be in ASCII format, namely:
+ *              ~~~    energy[eV] number_density   ~~~
+ * The photons will be added to TotalTargetPhotonGraph
+ */
+void Particles::ImportTargetPhotonsFromFile(const char *phFile) {
+  fRadiation->ImportTargetPhotonsFromFile(phFile);
+  fRadiation->CreateICLossLookup(iclosslookupbins);
+  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+}
+
+/** Add SSC target photons.
+ * This function calls the Synchrotron code in this class.
+ * The photons will be added to TotalTargetPhotonGraph
+ * If 'UPDATE' is 'true'
+ * then recalculate the synchroton target field and
+ * replace the previous one by this updated field.
+ * DANGER: for the 'UPDATE' option to work, the SSC field
+ * must be the last entry in the 'TargetPhotonGraphs' vector!
+ * It uses Atoyan&Aharonian1996: MNRAS, Volume 278, Issue 2, pp. 525-541
+ */
+void Particles::AddSSCTargetPhotons(double R, int steps) {
+  fRadiation->AddSSCTargetPhotons(R,steps);
+  fRadiation->CreateICLossLookup(iclosslookupbins);
+  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+}
+
+/** remove the latest component in
+ * TotalTargetPhotonVector and recompute
+ * the total target photon spectrum
+ */
+void Particles::RemoveLastICTargetPhotonComponent() {
+  fRadiation->RemoveLastICTargetPhotonComponent();
+}
+
+void Particles::CheckSanityOfTargetPhotonLookup() {
+  fRadiation->CheckSanityOfTargetPhotonLookup();
 }
 
 /**

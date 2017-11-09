@@ -99,7 +99,7 @@ class Utils {
   gsl_interp_accel *yacc;
 
  public:
-  Utils(bool DRAWLOGO = true);
+  Utils(bool DRAWLOGO = false);
   ~Utils();
   int ReadParameterFile(string inputname, vector<string> parameter_names,
                         vector<string> files_names,
