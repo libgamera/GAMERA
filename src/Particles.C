@@ -197,13 +197,11 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
     if(Type==0 && (BVector.size() || NVector.size() ||
                 (RVector.size() && VVector.size()) || !std::isnan(VConstant)))
       METHOD = 0;
-    else if(Type==1 && RVector.size() && VVector.size())
-      METHOD = 0;
     else if (Type==0 && (!std::isnan(BConstant) || !std::isnan(NConstant) ||
-           !std::isnan(VConstant) || ICLossVector.size()))
+             ICLossVector.size()))
       METHOD = 1;
-    else if(Type==1 && !std::isnan(VConstant))
-      METHOD = 1;
+    else if(Type==1 && ( (RVector.size() && VVector.size()) || !std::isnan(VConstant) ) )
+      METHOD = 0;
     else METHOD = 2;
   }
   if(escapeTimeConstant > 0. || escapeTimeLookup != NULL || 
