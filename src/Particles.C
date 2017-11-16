@@ -1538,6 +1538,28 @@ void Particles::CheckSanityOfTargetPhotonLookup() {
   fRadiation->CheckSanityOfTargetPhotonLookup();
 }
 
+vector<vector<double> > Particles::GetTargetPhotons() {
+  return fRadiation->GetTargetPhotons();
+}
+
+vector< vector<double> > Particles::GetEnergyLossRateVector(vector<double> epoints,
+                                                      double age, bool TIMESCALE) {
+    if(!epoints.size()) {
+        cout << "Particles::GetEnergyLossRate: you input a vector of size 0. "
+                "Exiting." << endl;
+        exit(0);
+    }
+    vector< vector<double> > v;
+    for(unsigned int i=0; i < epoints.size(); i++) {
+        double energy = epoints[i];
+        double val = GetEnergyLossRate(energy,age);
+        if(TIMESCALE == true) val = energy / val / yr_to_sec;
+        fUtils->TwoDVectorPushBack(energy,val,v);
+    }
+    return v;
+}
+
+
 /**
  * Funtion under construction! Use at own peril!
  */

@@ -307,6 +307,8 @@ struct timespec time0, time1, time2, time3;
                                               ///< wrapper function to calculate
                                               ///the grid only in a specified
                                               ///time interval dT = T2-T2 (yrs)
+  vector< vector<double> > GetEnergyLossRateVector(vector<double> epoints,
+                                                      double age, bool TIMESCALE);
 
  public:
   Particles();
@@ -348,7 +350,7 @@ struct timespec time0, time1, time2, time3;
   double GetRadius() {
     return R;
   }  ///< get the extension of the astrophysical particle accelerator (cm).
-  double GetSpeed() {
+  double GetExpansionVelocity() {
     return V;
   }  ///< get the extension speed of the astrophysical particle accelerator
      ///(cm/s).
@@ -359,54 +361,37 @@ struct timespec time0, time1, time2, time3;
   void SetConstantEscapeTime(double EscapeTime) {
     escapeTimeConstant = EscapeTime;
   }  ///< set the time scale of particle escape
-  void SetSpectralIndex(double spectralindex) {
-    SpectralIndex = spectralindex;
-    if (SpectralIndex == 2.) SpectralIndex += 0.0000001;
-  }  ///< set spectral index of the particle injection spectrum
-  void SetLowSpectralIndex(double spectralindex2) {
-    SpectralIndex2 = spectralindex2;
-    if (SpectralIndex2 == 2.) SpectralIndex2 += 0.0000001;
-  }  ///< set low-energy spectral index of the broken power-law particle
-     ///injection spectrum. If this is not set, a single power-law injection
-     ///spectrum will be assumed.
-  void SetBreakEnergy(double ebreak) {
-    eBreak = ebreak;
-  }  ///< set break energy of broken powerlaw. If this is not set, a single
-     ///power-law injection spectrum will be assumed.
   void ToggleDebugging() {
     DEBUG = true;
   }  ///< switch on Debugging/Testing mode
   void SetICLossLookup(vector<vector<double> > ICLOSSLOOKUP) {
     SetLookup(ICLOSSLOOKUP, "ICLoss");
   }  ///< set the lookup holding energy-dependent IC cooling rate {E-ICLossRate}
-  void SetLuminosityLookup(vector<vector<double> > LUMLOOKUP) {
-    LumConstant = NAN;
-    SetLookup(LUMLOOKUP, "Luminosity");
-  }  ///< Set BField evolution
-  void SetAmbientDensityLookup(vector<vector<double> > NLOOKUP) {
+
+  void SetAmbientDensity(vector<vector<double> > NLOOKUP) {
     NConstant = NAN;
     SetLookup(NLOOKUP, "AmbientDensity");
   }  ///< Set ambient density evolution
-  void SetBFieldLookup(vector<vector<double> > BFIELDLOOKUP) {
+  void SetBField(vector<vector<double> > BFIELDLOOKUP) {
     BConstant = NAN;
     SetLookup(BFIELDLOOKUP, "BField");
   }  ///< Set BField evolution
-  void SetEmaxLookup(vector<vector<double> > EMAXLOOKUP) {
-    EmaxConstant = NAN;
-    SetLookup(EMAXLOOKUP, "Emax");
-  }  ///< Set max. particle evolution
-  void SetEscapeTimeLookup(vector<vector<double> > ESCTIMELOOKUP) {
+  void SetEscapeTime(vector<vector<double> > ESCTIMELOOKUP) {
     escapeTimeConstant = NAN;
     SetLookup(ESCTIMELOOKUP, "EscapeTime");
   }  ///< Set escape time evolution
-  void SetRadiusLookup(vector<vector<double> > RADIUSLOOKUP) {
+
+  void SetRadius(vector<vector<double> > RADIUSLOOKUP) {
     RConstant = NAN;
     SetLookup(RADIUSLOOKUP, "Radius");
   }  ///< Set radius evolution
-  void SetVelocityLookup(vector<vector<double> > VELOCITYLOOKUP) {
+
+  void SetExpansionVelocity(vector<vector<double> > VELOCITYLOOKUP) {
     VConstant = NAN;
     SetLookup(VELOCITYLOOKUP, "Speed");
   }  ///< Set expansion velocity evolution
+
+
   void ExtendICLossLookup(vector<vector<double> > ICLOSSLOOKUP) {
     ExtendLookup(ICLOSSLOOKUP, "ICLoss");
   }  ///< set the lookup holding energy-dependent IC cooling rate {E-ICLossRate}
@@ -447,9 +432,13 @@ struct timespec time0, time1, time2, time3;
             return EnergyLossRate(E); }
   double GetCoolingTimeScale(double E, double age=0.) {//< this gives the cooling time scale at E and time age in [years]
             return  E / GetEnergyLossRate(E,age) / yr_to_sec; }
-  void SetEnergyBins(double EBINS) {
-    ebins = EBINS;
-  }  ///< set energy binning of the numerical solution
+
+  vector< vector<double> > GetEnergyLossRate(vector<double> epoints, double age=0.) {
+            return GetEnergyLossRateVector(epoints,age,false);
+  }
+  vector< vector<double> > GetCoolingTimeScale(vector<double> epoints, double age=0.) {
+            return GetEnergyLossRateVector(epoints,age,true);
+  }
   double GetEnergyBins() {
     return ebins;
   }  ///< get energy binning of the numerical solution
@@ -459,19 +448,9 @@ struct timespec time0, time1, time2, time3;
   vector<vector<double> > GetEscapeVector() {
     return EscapeVector;
   }  ///< get vector that holds the escape particles.
-  void SetEmin(double EMIN, bool ONLYFORNORMALISATION =
-                                false) {  ///< Constanty set minimal energy of
-                                          ///particle spectrum
-    EminConstant = EMIN;
-    if (ONLYFORNORMALISATION) EminConstantForNormalisationOnly = true;
-  }
   void SetTmin(double TMIN) {
     TminConstant = TMIN;
   }  ///< Constanty set minimal time of injected particles
-  void SetEmax(double EMAX) {
-    eMaxVector.clear();
-    EmaxConstant = EMAX;
-  }  ///< Constanty set maximal energy of particle spectrum
   void SetBField(double BEXT) {
     BVector.clear();
     BConstant = BEXT;
@@ -480,15 +459,11 @@ struct timespec time0, time1, time2, time3;
     NVector.clear();
     NConstant = NCONSTANT;
   }  ///< Constanty set value of ambient density
-  void SetLuminosity(double LUMConstant) {
-    LumVector.clear();
-    LumConstant = LUMConstant;
-  }  ///< Constantly set value of source luminosity
   void SetRadius(double r) {
     RVector.clear();
     RConstant = pc_to_cm*r;
   }  ///< Constanty set value of source extension (pc)
-  void SetSourceExpansionSpeed(double v) {
+  void SetExpansionVelocity(double v) {
     VVector.clear();
     VConstant = v;
   }  ///< Constanty set value of source expansion speed (cm/s)
@@ -553,5 +528,97 @@ struct timespec time0, time1, time2, time3;
   void AddSSCTargetPhotons(double R, int steps=100); // wrapped from Radiation class. See Docu there. Radius in pc
   void RemoveLastICTargetPhotonComponent(); // wrapped from Radiation class. See Docu there.
   void CheckSanityOfTargetPhotonLookup(); // wrapped from Radiation class. See Docu there.
+  vector<vector<double> > GetTargetPhotons(); // wrapped from Radiation class. See Docu there.
+
+  /*********************************************************/
+  /* DEPRECATED FUNCTIONS KEPT FOR BACKWARDS COMPATIBILITY */
+  void SetEmin(double EMIN, bool ONLYFORNORMALISATION =
+                                false) {  ///< Constanty set minimal energy of
+                                          ///particle spectrum
+    cout<< "SetEmin: This way of specifying the minimum energy of the source spectrum is DEPRECATED. "
+           "This is done now by specifying a 2D-spectrum as input. See the documentation "
+           "website on how to do it now!"<<endl;
+    EminConstant = EMIN;
+    if (ONLYFORNORMALISATION) EminConstantForNormalisationOnly = true;
+  } ///< DEPRECATED
+  void SetEmax(double EMAX) {
+    cout<< "SetEmax: This way of specifying the maximum energy of the source spectrum is DEPRECATED. "
+           "This is done now by specifying a 2D-spectrum as input. See the documentation "
+           "website on how to do it now!"<<endl;
+    eMaxVector.clear();
+    EmaxConstant = EMAX;
+  }  ///< DEPRECATED
+  void SetLuminosity(double LUMConstant) {
+    cout<< "SetLuminosity: This way of specifying the luminosity of the source spectrum is DEPRECATED. "
+           "This is done now by specifying a 2D-spectrum as input. See the documentation "
+           "website on how to do it now!"<<endl;
+    LumVector.clear();
+    LumConstant = LUMConstant;
+  } ///< DEPRECATED
+  void SetSpectralIndex(double spectralindex) {
+    cout<< "SetSpectralIndex: This way of specifying the index of the source spectrum is DEPRECATED. "
+           "This is done now by specifying a 2D-spectrum as input. See the documentation "
+           "website on how to do it now!"<<endl;
+    SpectralIndex = spectralindex;
+    if (SpectralIndex == 2.) SpectralIndex += 0.0000001;
+  }  ///< DEPRECATED
+  void SetLowSpectralIndex(double spectralindex2) {
+    cout<< "SetLowSpectralIndex: This way of specifying the lower index of the source spectrum is DEPRECATED. "
+           "This is done now by specifying a 2D-spectrum as input. See the documentation "
+           "website on how to do it now!"<<endl;
+    SpectralIndex2 = spectralindex2;
+    if (SpectralIndex2 == 2.) SpectralIndex2 += 0.0000001;
+  }  ///< DEPRECATED
+  void SetBreakEnergy(double ebreak) {
+    cout<< "SetBreakEnergy: This way of specifying the break energy of the source spectrum is DEPRECATED. "
+           "This is done now by specifying a 2D-spectrum as input. See the documentation "
+           "website on how to do it now!"<<endl;
+    eBreak = ebreak;
+  }  ///< DEPRECATED
+  void SetSourceExpansionSpeed(double v) {
+    cout << "SetSourceExpansionSpeed: DEPRECATED! USE Particles::SetExpansionVelocity(double v) instead!"<<endl;
+    SetExpansionVelocity(v);
+  }  ///< DEPRECATED
+  double GetSpeed() {
+    cout<<"GetSpeed: DEPRECATED! Use Particles::GetExpansionVelocity() instead! " <<endl; 
+    return V;
+  }  ///< DEPRECATED
+  void SetEmaxLookup(vector<vector<double> > EMAXLOOKUP) {
+    cout<< "SetEmaxLookup: This way of specifying the maximum energy is DEPRECATED. "
+           "this is done now by a 3D-spectrum lookup. See the documentation "
+           "website on how to do it now!"<<endl;
+    EmaxConstant = NAN;
+    SetLookup(EMAXLOOKUP, "Emax");
+  }  ///< DEPRECATED
+  void SetAmbientDensityLookup(vector<vector<double> > NLOOKUP) {
+    cout<< "SetAmbientDensityLookup: DEPRECATED! USE Particles::SetAmbientDensity(<vector<vector<double>>v) instead!"<<endl;
+    SetAmbientDensity(NLOOKUP);
+  }  ///< DEPRECATED
+  void SetLuminosityLookup(vector<vector<double> > LUMLOOKUP) {
+    cout<< "SetLuminosityLookup: This way of specifying the maximum energy is DEPRECATED. "
+           "this is done now by a 3D-spectrum lookup. See the documentation "
+           "website on how to do it now!"<<endl;
+    SetLookup(LUMLOOKUP, "Luminosity");
+  }  ///< DEPRECATED
+  void SetBFieldLookup(vector<vector<double> > BFIELDLOOKUP) {
+    cout<< "SetBFieldLookup: DEPRECATED! USE Particles::SetBField(<vector<vector<double>>v) instead!"<<endl;
+    SetBField(BFIELDLOOKUP);
+  }  ///< DEPRECATED!
+  void SetEscapeTimeLookup(vector<vector<double> > ESCTIMELOOKUP) {
+    cout<< "SetEscapeTimeLookup: DEPRECATED! USE Particles::SetEscapeTime(<vector<vector<double>>v) instead!"<<endl;
+    SetEscapeTime(ESCTIMELOOKUP);
+  }  ///< DEPRECATED
+  void SetRadiusLookup(vector<vector<double> > RADIUSLOOKUP) {
+    cout<< "SetRadiusLookup: DEPRECATED! USE Particles::SetRadius(<vector<vector<double>>v) instead!"<<endl;
+    SetRadius(RADIUSLOOKUP);
+  }  ///< DEPRECATED
+  void SetVelocityLookup(vector<vector<double> > VELOCITYLOOKUP) {
+    cout<< "SetVelocityLookup: DEPRECATED! USE Particles::SetExpansionVelocity(<vector<vector<double>>v) instead!"<<endl;
+    SetExpansionVelocity(VELOCITYLOOKUP);
+  }  ///< DEPRECATED
+  void SetEnergyBins(double EBINS) {
+    ebins = EBINS;
+  }   ///< DEPRECATED
+
 };
 #endif
