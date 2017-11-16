@@ -1547,10 +1547,12 @@ vector< vector<double> > Particles::GetEnergyLossRateVector(vector<double> epoin
                 "Exiting." << endl;
         exit(0);
     }
+    if(age) SetMembers(age);
+    CalculateConstants();
     vector< vector<double> > v;
     for(unsigned int i=0; i < epoints.size(); i++) {
         double energy = epoints[i];
-        double val = GetEnergyLossRate(energy,age);
+        double val = EnergyLossRate(energy);
         if(TIMESCALE == true) val = energy / val / yr_to_sec;
         fUtils->TwoDVectorPushBack(energy,val,v);
     }
