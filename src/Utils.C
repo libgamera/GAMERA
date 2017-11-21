@@ -377,6 +377,81 @@ vector<double> Utils::CustomFunctionRandom(vector< vector<double> > f, int n,
   return v;
 }
 
+/**
+ * Sample Variate that follows the input 2D-Vector of a 2D dimensional function
+ */
+vector< vector<double> > Utils::CustomFunctionRandom2D(vector< vector<double> > f, int n,
+                                           double xmin, double xmax,
+                                           double ymin, double ymax ) {
+
+  vector< vector<double> > v;
+  if(!f.size()) {
+    cout << "Utils::CustomFunctionRandom: function vector empty! "
+            "Exiting!" << endl;
+    return v;
+  }
+  if(!xmin && !xmax) {
+    xmin = f[0][0];
+    xmax = f[f.size()-1][0];
+  }
+  if(!ymin && !ymax) {
+    ymin = f[0][1];
+    ymax = f[f.size()-1][1];
+  }
+  if(  xmin < f[0][0] || xmax > f[f.size()-1][0] ||  
+       ymin < f[0][1] || ymax > f[f.size()-1][1] ) {
+    cout << "Utils::CustomFunctionRandom2D: requested sampling range outside "
+            "of boundaries req.: x-(" << xmin << "," << xmax << ") vs. "
+            "avail.:(" << f[0][0] << "," << f[f.size()-1][0] << "),"
+            "y-(" << ymin << "," << ymax << ") vs. "
+            "avail.:(" << f[0][1] << "," << f[f.size()-1][1] << "). "
+            "Returning emptyvector." << endl;
+    return v;
+  }
+  int size = (int)f.size();
+  double x[size];
+  double y[size];
+  double z[size];
+  double zmax = -1.e-100;
+  for (unsigned int i=0;i<f.size();i++) {
+    x[i] = f[i][0];
+    y[i] = f[i][1];
+    z[i] = f[i][2];
+//    std::cout<<x[i]<<" "<<y[i]<<" "<<z[i]<<" "<<zmax<<" xm: "<<xmin<<", "<<xmax<<" ym: "<<ymin<<","<<ymax<<std::endl;
+    if(x[i] > xmin && x[i] < xmax &&
+       y[i] > ymin && y[i] < ymax && z[i] > zmax) zmax = z[i];
+  }
+  double x0,x1,y0,y1;
+  interp2d_spline *spline2d = TwoDsplineFromTwoDVector(f,x0,x1,y0,y1);
+//  std::cout<<x0<<" "<<x1<<" "<<y0<<" "<<y1<<std::endl;
+  gsl_interp_accel *xaccsp = gsl_interp_accel_alloc();
+  gsl_interp_accel *yaccsp = gsl_interp_accel_alloc();
+
+  for(int i=0;i<n;i++) {
+    double x,y;
+    while(1) {
+      x = (xmax-xmin)*gsl_rng_uniform(r)+xmin;
+      y = (ymax-ymin)*gsl_rng_uniform(r)+ymin;
+      double u = gsl_rng_uniform(r);
+      double val = 0.;
+      val = interp2d_spline_eval(spline2d,x,y,xaccsp,yaccsp);
+//      if (gsl_spline_eval_e(lookup, x, a, &val)) {
+//        cout << "Utils::CustomFunctionRandom: Function interpolation "
+//        "failed. Exiting!" << endl;
+//        return v;
+//      }
+      if (std::isnan(val) || std::isinf(val)) {
+        cout << "Utils::CustomFunctionRandom: Function interpolation returned "
+             << val << "! Exiting! " << endl;
+        return v;
+      }
+      if(u < val/zmax) break;
+    }
+    TwoDVectorPushBack(x,y,v);
+  }
+  return v;
+}
+
 double Utils::EnergyContent(vector< vector<double> > f, double emin, double emax) {
   if(!f.size()) {
     cout << "Utils::EnergyContent: spectrum vector empty! "
@@ -496,23 +571,24 @@ interp2d_spline *Utils::TwoDsplineFromTwoDVector(vector< vector<double> > v,
 //  std::cout<<xdim<<" "<<ydim<<std::endl;
 
   double az[(int)v.size()];
+  std::cout<<" -----------------  "<<std::endl;
   for(unsigned int i=0;i<v.size();i++) {
       double x = v[i][0];
       double y = v[i][1];
       double z = v[i][2];
-
+      std::cout<<x<<" "<<y<<" "<<z<<std::endl;
       if(!vy.size()) vy.push_back(y);
       else if (y != vy[vy.size()-1]) vy.push_back(y);
 
       if(vy.size()==1) vx.push_back(x);
       az[i] = z;
   }
-  xmin = vx[0];
-  xmax = vx[vx.size()-1];
-  ymin = vy[0];
-  ymax = vy[vy.size()-1];
+  std::cout<<" -----------------  "<<std::endl;
+  xmin = vx[0];  xmax = vx[vx.size()-1];
+  ymin = vy[0];  ymax = vy[vy.size()-1];
   unsigned long xs = (unsigned long)vx.size();
   unsigned long ys = (unsigned long)vy.size();
+  std::cout<<xs<<" "<<ys<<std::endl;
   double ax[(int)xs];
   double ay[(int)ys];
   for(unsigned int i=0;i<vx.size();i++) ax[i] = vx[i];

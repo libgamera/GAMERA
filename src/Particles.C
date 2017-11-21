@@ -1524,12 +1524,20 @@ void Particles::AddSSCTargetPhotons(double R, int steps) {
   SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
 }
 
+void Particles::ClearTargetPhotons() {
+  fUtils->Clear2DVector(ICLossVector);
+  fRadiation->ClearTargetPhotons();
+}
+
+
 /** remove the latest component in
  * TotalTargetPhotonVector and recompute
  * the total target photon spectrum
  */
 void Particles::RemoveLastICTargetPhotonComponent() {
   fRadiation->RemoveLastICTargetPhotonComponent();
+  fRadiation->CreateICLossLookup(iclosslookupbins);
+  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
 }
 
 void Particles::CheckSanityOfTargetPhotonLookup() {

@@ -529,6 +529,7 @@ struct timespec time0, time1, time2, time3;
   void RemoveLastICTargetPhotonComponent(); // wrapped from Radiation class. See Docu there.
   void CheckSanityOfTargetPhotonLookup(); // wrapped from Radiation class. See Docu there.
   vector<vector<double> > GetTargetPhotons(); // wrapped from Radiation class. See Docu there.
+  void ClearTargetPhotons(); // wrapped from Radiation class. See Docu there.
 
   /*********************************************************/
   /* DEPRECATED FUNCTIONS KEPT FOR BACKWARDS COMPATIBILITY */
@@ -595,7 +596,7 @@ struct timespec time0, time1, time2, time3;
     SetAmbientDensity(NLOOKUP);
   }  ///< DEPRECATED
   void SetLuminosityLookup(vector<vector<double> > LUMLOOKUP) {
-    cout<< "SetLuminosityLookup: This way of specifying the maximum energy is DEPRECATED. "
+    cout<< "SetLuminosityLookup: This way of specifying the luminosity is DEPRECATED. "
            "this is done now by a 3D-spectrum lookup. See the documentation "
            "website on how to do it now!"<<endl;
     SetLookup(LUMLOOKUP, "Luminosity");

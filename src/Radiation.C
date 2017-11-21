@@ -53,6 +53,7 @@ void Radiation::Reset() {
  */
 void Radiation::ClearTargetPhotons() {
   SSCSET = false;
+  fUtils->Clear2DVector(ICLossLookup);
   TargetPhotonLookup = NULL;
   TargetPhotonVector.clear();
   TargetPhotonVectorOld.clear();
@@ -355,6 +356,7 @@ void Radiation::CreateICLossLookup(int bins) {
 
   if(!TargetPhotonVector.size()) {
     cout << "Radiation::CreateICLossLookup: No target photons! Exiting." <<endl;
+    if(ICLossLookup.size()) fUtils->Clear2DVector(ICLossLookup);
     return;
   }
   INTEGRATEOVERGAMMAS = true;

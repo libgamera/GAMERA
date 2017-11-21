@@ -119,6 +119,10 @@ class Utils {
                                     double x_max, int n);
   vector<double>  CustomFunctionRandom(vector< vector<double> > f, int n,
                                        double xmin = 0., double xmax = 0.);
+  vector< vector<double> > CustomFunctionRandom2D(vector< vector<double> > f, 
+                                           int n,
+                                           double xmin=0., double xmax=0.,
+                                           double ymin=0., double ymax=0.);
   double Integrate(vector< vector<double> > f, double xmin=0., double xmax=0.);
   vector< vector< double> > IntegratedProfile(vector< vector<double> > f);
   gsl_spline *GSLsplineFromTwoDVector(vector< vector<double> > v);
