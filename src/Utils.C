@@ -417,13 +417,11 @@ vector< vector<double> > Utils::CustomFunctionRandom2D(vector< vector<double> > 
     x[i] = f[i][0];
     y[i] = f[i][1];
     z[i] = f[i][2];
-//    std::cout<<x[i]<<" "<<y[i]<<" "<<z[i]<<" "<<zmax<<" xm: "<<xmin<<", "<<xmax<<" ym: "<<ymin<<","<<ymax<<std::endl;
     if(x[i] > xmin && x[i] < xmax &&
        y[i] > ymin && y[i] < ymax && z[i] > zmax) zmax = z[i];
   }
   double x0,x1,y0,y1;
   interp2d_spline *spline2d = TwoDsplineFromTwoDVector(f,x0,x1,y0,y1);
-//  std::cout<<x0<<" "<<x1<<" "<<y0<<" "<<y1<<std::endl;
   gsl_interp_accel *xaccsp = gsl_interp_accel_alloc();
   gsl_interp_accel *yaccsp = gsl_interp_accel_alloc();
 
@@ -571,35 +569,25 @@ interp2d_spline *Utils::TwoDsplineFromTwoDVector(vector< vector<double> > v,
 //  std::cout<<xdim<<" "<<ydim<<std::endl;
 
   double az[(int)v.size()];
-  std::cout<<" -----------------  "<<std::endl;
   for(unsigned int i=0;i<v.size();i++) {
       double x = v[i][0];
       double y = v[i][1];
       double z = v[i][2];
-      std::cout<<x<<" "<<y<<" "<<z<<std::endl;
       if(!vy.size()) vy.push_back(y);
       else if (y != vy[vy.size()-1]) vy.push_back(y);
 
       if(vy.size()==1) vx.push_back(x);
       az[i] = z;
   }
-  std::cout<<" -----------------  "<<std::endl;
   xmin = vx[0];  xmax = vx[vx.size()-1];
   ymin = vy[0];  ymax = vy[vy.size()-1];
   unsigned long xs = (unsigned long)vx.size();
   unsigned long ys = (unsigned long)vy.size();
-  std::cout<<xs<<" "<<ys<<std::endl;
   double ax[(int)xs];
   double ay[(int)ys];
   for(unsigned int i=0;i<vx.size();i++) ax[i] = vx[i];
   for(unsigned int i=0;i<vy.size();i++) ay[i] = vy[i];
 
-//  for(unsigned int i=0;i<vx.size();i++) cout << ax[i] <<endl;
-////  cout << " - - - - - - " << endl;
-//  for(unsigned int i=0;i<vy.size();i++) cout << ay[i] <<endl;
-////  cout << " - - - - - - " << endl;
-//  for(unsigned int i=0;i<v.size();i++) cout << az[i] <<endl;
-////  cout << " - - - - - - " << endl;
   interp2d_spline *s = interp2d_spline_alloc(interp2d_bilinear, xs, ys);
   interp2d_spline_init (s, ax, ay, az, xs, ys);
   return s;

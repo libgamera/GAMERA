@@ -391,6 +391,10 @@ struct timespec time0, time1, time2, time3;
     SetLookup(VELOCITYLOOKUP, "Speed");
   }  ///< Set expansion velocity evolution
 
+  void SetLuminosity(vector<vector<double> > LUMLOOKUP) {
+    LumConstant = NAN;
+    SetLookup(LUMLOOKUP, "Luminosity");
+  }  ///< DEPRECATED
 
   void ExtendICLossLookup(vector<vector<double> > ICLOSSLOOKUP) {
     ExtendLookup(ICLOSSLOOKUP, "ICLoss");
@@ -596,9 +600,7 @@ struct timespec time0, time1, time2, time3;
     SetAmbientDensity(NLOOKUP);
   }  ///< DEPRECATED
   void SetLuminosityLookup(vector<vector<double> > LUMLOOKUP) {
-    cout<< "SetLuminosityLookup: This way of specifying the luminosity is DEPRECATED. "
-           "this is done now by a 3D-spectrum lookup. See the documentation "
-           "website on how to do it now!"<<endl;
+    LumConstant = NAN;
     SetLookup(LUMLOOKUP, "Luminosity");
   }  ///< DEPRECATED
   void SetBFieldLookup(vector<vector<double> > BFIELDLOOKUP) {

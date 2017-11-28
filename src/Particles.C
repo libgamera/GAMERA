@@ -403,10 +403,8 @@ void Particles::SetMembers(double t) {
   vs[3] =  eMaxVector;
   for (unsigned int i = 0; i < Constants.size(); i++) {
     *vals[i] = 0.;
-    if (!std::isnan(Constants[i]))
-      *vals[i] = Constants[i];
-    else if (splines[i] == NULL)
-      continue;
+    if (!std::isnan(Constants[i])) *vals[i] = Constants[i];
+    else if (splines[i] == NULL) continue;
     else {
        double value = gsl_spline_eval(splines[i], t, accs[i]);
       if(i == 0 || i == 3) value = pow(10.,value);
@@ -459,7 +457,7 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
   vector<gsl_spline **> spl( splArr, splArr + ( sizeof ( splArr ) /  sizeof ( splArr[0] ) ) );
 
   vector<vector<double> > * vsArr[] = {
-      &ICLossVector, &LumVector,        &NVector, &BVector,
+      &ICLossVector, &LumVector, &NVector, &BVector,
       &eMaxVector, &RVector, &VVector};
   vector<vector<vector<double> > *> vs( vsArr, vsArr + ( sizeof ( vsArr ) /  sizeof ( vsArr[0] ) ) );
   
@@ -478,7 +476,7 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
   return;
 }
 
-/** Append CRLUMLOOKUP to CRLumLookup. Time order has to be right, so the
+/** Append lookup to existing lookup. Time order has to be right, so the
  * youngest
  * appended entry has to be older than the oldest already existing one.
  * This function is useful when iteratively determining B-Field, CR Lum, source
