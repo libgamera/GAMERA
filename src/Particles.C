@@ -54,7 +54,8 @@ Particles::Particles() {
   vals.resize(4);
   accs.resize(4);
   vs.resize(4);
-
+  CustomInjectionSpectrumTimeEvolutionVector.resize(0);
+  EscapeTimeEnergyTimeEvolutionVector.resize(0);
   SpectralIndex2 = eBreak = TminConstant = adLossCoeff = EminConstant = 0.;
   
   escapeTime = EnergyAxisLowerBoundary = EnergyAxisUpperBoundary = 0.;
@@ -193,24 +194,33 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
 
   /* determine algorithm to calculate the particle spectrum */
 
-  if(METHOD == -1) {
-    if(Type==0 && (BVector.size() || NVector.size() ||
-                (RVector.size() && VVector.size()) || !std::isnan(VConstant)))
-      METHOD = 0;
-    else if (Type==0 && (!std::isnan(BConstant) || !std::isnan(NConstant) ||
-             ICLossVector.size()))
-      METHOD = 1;
-    else if(Type==1 && ( (RVector.size() && VVector.size()) || !std::isnan(VConstant) ) )
-      METHOD = 0;
-    else METHOD = 2;
-  }
+//  if(METHOD == -1) {
+//    if(Type==0 && (BVector.size() || NVector.size() ||
+//                (RVector.size() && VVector.size()) || !std::isnan(VConstant)
+//                || EscapeTimeEnergyTimeEvolutionVector.size()
+//                || CustomInjectionSpectrumTimeEvolutionVector.size())
+//      METHOD = 0;
+//    else if (Type==0 && (!std::isnan(BConstant) || !std::isnan(NConstant) ||
+//             ICLossVector.size()))
+//      METHOD = 1;
+//    else if(Type==1 && ( (RVector.size() && VVector.size()) || !std::isnan(VConstant)
+//                || EscapeTimeEnergyTimeEvolutionVector.size()
+//                || CustomInjectionSpectrumTimeEvolutionVector.size()) )
+//      METHOD = 0;
+//    else METHOD = 2;
+//  }
+
+  // grid solver seems to be the best solution in all but the highest energy-loss
+  // cases. Setting it as default. User can manually specify another method.
+  METHOD = 0;
+
+
   if(escapeTimeConstant > 0. || escapeTimeLookup != NULL || 
      EscapeTimeEnergyTimeEvolution != NULL) METHOD = 0;
   /* determine time from where to start the iteration. Particles that would have
    * been injected before that time are injected as a blob at Tmin. This can
    * lead to bumps at low energies, depending on cooling.
    */
-
   if(Type && (escapeTimeConstant > 0. || escapeTimeLookup != NULL || 
      EscapeTimeEnergyTimeEvolution != NULL)) Tmin = 1.e-3;
   else if (TminConstant) Tmin = TminConstant;
@@ -739,7 +749,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
   int tt = 1;
   int largestFilledBin = Esize;
   long int count = 0;
-  if(minTimeBin > Age) minTimeBin = Age*yr_to_sec/100.;
+  if(minTimeBin > Age) minTimeBin = TminInternal * 10. *yr_to_sec;//Age*yr_to_sec/1000.;
   /* append a new energy vector that will always hold the energy spectrum at the
    *  next time step and initialise it with zeroes.
    */
@@ -1160,7 +1170,7 @@ void Particles::DetermineLookupTimeBoundaries() {
   lumtmin = emaxtmin = ntmin = btmin = rtmin = vtmin = esctmin = custspinjtmin 
     = TminInternal; //std::cout ACHTUNG; hier stand 1e-10
   lumtmax = emaxtmax = ntmax = btmax = rtmax = vtmax = esctmax = custspinjtmax
-    = 1.e100;
+    = TmaxInternal;//std::cout ACHTUNG; hier stand 1e100
 
   if (LumVector.size()) lumtmin = LumVector[0][0];
   if (eMaxVector.size()) emaxtmin = eMaxVector[0][0];
@@ -1460,6 +1470,8 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
             " time. Exiting." << endl;
     return;
   }
+  TminInternal = TminLookup;
+  TmaxInternal = TmaxInternal;
   DetermineLookupTimeBoundaries();
   MinELookup = pow(10.,MinELookup);
   MaxELookup = pow(10.,MaxELookup);

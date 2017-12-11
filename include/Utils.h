@@ -110,6 +110,7 @@ class Utils {
   void WriteOut(vector<vector<double> > sp, string outname);
   void ReadIn(string inname, vector< vector<double> > &sp);
   double Random();
+  vector<double>  UniformRandom(double x_min, double x_max,int n);
   vector<double>  LinearRandom(double slope, double x_min, double x_max, int n);
   vector<double>  PowerLawRandom(double index, double x_min, double x_max,
                                  int n);
@@ -169,7 +170,9 @@ class Utils {
     return interp2d_spline_eval(INTERNAL2DSPLINE,x,y,xacc,yacc);}
   double EnergyContent(vector< vector<double> > f, double emin=0., double emax=0.);
   double EnergyContentFast(vector< vector<double> > f);
+  vector<double> GetVectorMinMax(vector< vector<double> > v, unsigned int axis);
   void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }
   bool GetQuietMode() {return QUIETMODE;}
+  vector< vector<double> > RemoveZeroEntries(vector< vector<double> > v);
 };
 #endif

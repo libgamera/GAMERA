@@ -243,6 +243,15 @@ double Utils::Random() {
 }
 
 /**
+* get n uniform random numbers in [x_min,x_max)
+*/
+vector<double> Utils::UniformRandom(double x_min, double x_max,int n) {
+  vector<double> v;
+  for(int i=0;i<n;i++) v.push_back(x_min + (x_max-x_min)*gsl_rng_uniform(r));
+  return v;
+}
+
+/**
 * get linearly distributed variates
 */
 vector<double> Utils::LinearRandom(double slope, double x_min,
@@ -669,6 +678,48 @@ vector< vector<double> > Utils::VectorAxisPow10(vector< vector<double> > v,
 
   return v;
 }
+
+vector<double> Utils::GetVectorMinMax(vector< vector<double> > v, unsigned int axis) {
+                
+  vector<double> extrema;       
+  if(!v.size()) {
+    cout<<"Utils::GetVectorMinMax: " 
+        <<" vector empty. returning." << endl;
+    return extrema;
+    
+  }                         
+  if(axis > v[0].size()-1) {
+    cout<<"Utils::GetVectorMinMax: "
+             <<" too few columns: Vector has " << 
+             v[0].size() << "columns, but you asked for the extrema of the " 
+             <<axis;
+             if (axis == 1) cout<<"st";
+             else if (axis == 2) cout<<"nd";
+             else cout<<"th";
+             cout<<" column. returning." << endl;
+    return extrema;
+  }
+  double max = -1e100;
+  double min = 1e100;
+  
+  for(unsigned int i=0;i<v.size();i++) {
+    if(v[i][axis] < min) min = v[i][axis];
+    if(v[i][axis] > max) max = v[i][axis];
+  }
+  extrema.push_back(min);
+  extrema.push_back(max);
+  return extrema;
+}
+
+
+vector< vector<double> > Utils::RemoveZeroEntries(vector< vector<double> > v) {
+  vector< vector<double> > v_out;
+  for(unsigned int i = 0; i < v.size() ; i++) {
+    if(v[i][1]) TwoDVectorPushBack(v[i][0],v[i][1],v_out);  
+  }
+  return v_out;
+}
+
 
 void Utils::TwoDVectorPushBack(double x, double y,
                                vector< vector<double> > &v) {
