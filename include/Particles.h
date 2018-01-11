@@ -309,6 +309,8 @@ struct timespec time0, time1, time2, time3;
                                               ///time interval dT = T2-T2 (yrs)
   vector< vector<double> > GetEnergyLossRateVector(vector<double> epoints,
                                                       double age, bool TIMESCALE);
+  vector< vector<double> > GetInjectionSpectrumVector(vector<double> epoints,
+                                                      double age, bool SED);
 
  public:
   Particles();
@@ -442,6 +444,12 @@ struct timespec time0, time1, time2, time3;
   }
   vector< vector<double> > GetCoolingTimeScale(vector<double> epoints, double age=0.) {
             return GetEnergyLossRateVector(epoints,age,true);
+  }
+  vector< vector<double> > GetInjectionSpectrum(vector<double> epoints, double age=0.) {
+            return GetInjectionSpectrumVector(epoints,age,false);
+  }
+  vector< vector<double> > GetInjectionSED(vector<double> epoints, double age=0.) {
+            return GetInjectionSpectrumVector(epoints,age,true);
   }
   double GetEnergyBins() {
     return ebins;

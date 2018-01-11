@@ -1561,7 +1561,7 @@ vector<vector<double> > Particles::GetTargetPhotons() {
 vector< vector<double> > Particles::GetEnergyLossRateVector(vector<double> epoints,
                                                       double age, bool TIMESCALE) {
     if(!epoints.size()) {
-        cout << "Particles::GetEnergyLossRate: you input a vector of size 0. "
+        cout << "Particles::GetEnergyLossRateVector: you input a vector of size 0. "
                 "Exiting." << endl;
         exit(0);
     }
@@ -1576,6 +1576,30 @@ vector< vector<double> > Particles::GetEnergyLossRateVector(vector<double> epoin
     }
     return v;
 }
+
+vector< vector<double> > Particles::GetInjectionSpectrumVector(
+                                                      vector<double> epoints,
+                                                      double age, bool SED) {
+    if(!epoints.size()) {
+        cout << "Particles::GetInjectionSpectrumVector: you input a vector of "
+                "size 0. Exiting." << endl;
+        exit(0);
+    }
+    if(age) SetMembers(age);
+    CalculateConstants();
+    vector< vector<double> > v;
+    for(unsigned int i=0; i < epoints.size(); i++) {
+        double energy = epoints[i];
+        double val = SourceSpectrum(energy);
+        if(SED == true) {
+            val *= energy * energy;
+            energy /= TeV_to_erg;
+        }
+        fUtils->TwoDVectorPushBack(energy,val,v);
+    }
+    return v;
+}
+
 
 
 /**
