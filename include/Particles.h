@@ -550,7 +550,7 @@ struct timespec time0, time1, time2, time3;
     CustomInjectionSpectrum = NULL;
     vector< vector<double> > vCustomSpectrum = fUtils->MeshgridToTwoDVector(t,e,mesh);
     SetCustomTimeEnergyLookup(vCustomSpectrum,0);}///< custom injection spectrum, changing over time, input numpy-style meshgrid
-
+ 
   /* methods to set particle escape */
   void SetConstantEscapeTime(double EscapeTime) {
     escapeTimeLookupTdep = NULL;

@@ -217,7 +217,7 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   // cases. Setting it as default. User can manually specify another method.
   METHOD = 0;
 
-
+ 
   if(escapeTimeConstant > 0. || escapeTimeLookupEdep != NULL || 
      EscapeTimeEnergyTimeEvolution != NULL) METHOD = 0;
   /* determine time from where to start the iteration. Particles that would have
