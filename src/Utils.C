@@ -729,6 +729,15 @@ void Utils::TwoDVectorPushBack(double x, double y,
   return;
 }
 
+void Utils::TwoDVectorPushBack(double x, double y, double z,
+                               vector< vector<double> > &v) {
+  v.push_back(vector<double>());
+  v[v.size()-1].push_back(x);
+  v[v.size()-1].push_back(y);
+  v[v.size()-1].push_back(z);
+  return;
+}
+
 /**
  * Private method that is used in the sorting of 2D vectors.
  */
@@ -744,6 +753,19 @@ bool sortcriterionsecondcolumn (vector<double> i,
 void Utils::Clear2DVector(vector< vector<double> > &v) {
   for (unsigned int i = 0; i < v.size(); i++) v[i].clear();
   v.clear();
+}
+
+vector< vector<double> > Utils::MeshgridToTwoDVector(vector<double> x, vector<double> y, 
+                                                     vector< vector<double> > mesh
+                                                     ) {
+    vector< vector<double > > v;
+    std::cout<<"y_len = "<<mesh.size()<<" x_len = "<<mesh[0].size()<<std::endl;
+    for(unsigned int i=0; i < mesh.size(); i++) {
+         for(unsigned int j=0; j < mesh[i].size(); j++) {
+             TwoDVectorPushBack(x[j],y[i],mesh[i][j],v);  
+         }
+    }
+    return v;
 }
 
 void Utils::SetInterpolationMethod(string intermeth) {

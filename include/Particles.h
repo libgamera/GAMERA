@@ -189,19 +189,19 @@ struct timespec time0, time1, time2, time3;
                                         ///electrons (erg) - escape time
 
   vector<vector<double> > ICLossVector, LumVector, NVector, BVector, eMaxVector,
-      escapeTimeVector, RVector, VVector,tempspec,
+      escapeTimeVectorEdep, escapeTimeVectorTdep, RVector, VVector,tempspec,
       CustomInjectionSpectrumTimeEvolutionVector,
       EscapeTimeEnergyTimeEvolutionVector;
   gsl_spline *ICLossLookup, *LumLookup, *NLookup, *BFieldLookup, *eMaxLookup,
-      *escapeTimeLookup, *RLookup, *VLookup, *energyTrajectory,
+      *escapeTimeLookupEdep, *escapeTimeLookupTdep, *RLookup, *VLookup, *energyTrajectory,
       *energyTrajectoryInverse,*CustomInjectionSpectrum;
   interp2d_spline *CustomInjectionSpectrumTimeEvolution,
       *EscapeTimeEnergyTimeEvolution;
-  gsl_interp_accel *accIC, *accLum, *accN, *accBField, *acceMax, *accescapeTime,
-      *accR, *accV, *accTr, *accTrInv,*accCustInj,
+  gsl_interp_accel *accIC, *accLum, *accN, *accBField, *acceMax, *accescapeTimeEdep,
+      *accescapeTimeTdep,*accR, *accV, *accTr, *accTrInv,*accCustInj,
       *taccsp,*eaccsp,*taccesc,*eaccesc;
   double SourceSpectrum(double e);  ///< particle injection spectrum
-  double EscapeTime(double e);  ///< particle escape time spectrum
+  double EscapeTime(double e, double t);  ///< particle escape time spectrum
   vector<double> timeAxis;          ///< time axis for numerical integrator
   vector<double> energyAxis;        ///< energy axis for numerical integrator
   vector<vector<double> > grid;     ///< 2D grid on which solving takes place
@@ -339,30 +339,45 @@ struct timespec time0, time1, time2, time3;
     SetMembers(Age);
   }                                      ///< set source age
   double GetAge() const { return Age; }  ///< get source age
-  double GetLuminosity() {
+  double GetLuminosity(double age=0.) {
+    if(age) SetMembers(age);
+    CalculateConstants();
     return Lum;
   }  ///< get particle luminosity of the source
-  double GetBField() {
+  double GetBField(double age=0.) {
+    if(age) SetMembers(age);
+    CalculateConstants();
     return BField;
   }  ///< get the BField at the acceleration site of the astrophysical particle
      ///accelerator.
-  double GetAmbientDensity() {
+  double GetAmbientDensity(double age=0.) {
+    if(age) SetMembers(age);
+    CalculateConstants();
     return N;
   }  ///< get the ambient density at the astrophysical particle accelerator.
-  double GetRadius() {
+  double GetRadius(double age=0.) {
+    if(age) SetMembers(age);
+    CalculateConstants();
     return R;
   }  ///< get the extension of the astrophysical particle accelerator (cm).
-  double GetExpansionVelocity() {
+  double GetExpansionVelocity(double age=0.) {
+    if(age) SetMembers(age);
+    CalculateConstants();
     return V;
   }  ///< get the extension speed of the astrophysical particle accelerator
      ///(cm/s).
-  double GetEmax() { return eMax; }  ///< get the max. particle energy (erg)
-  double GetEscapeTime() {
-    return escapeTime;
+  double GetEmax(double age=0.) {
+    if(age) SetMembers(age);
+    CalculateConstants();
+    return eMax; }  ///< get the max. particle energy (erg)
+  double GetEscapeTime(double e, double age=0.) {
+    if(age) SetMembers(age);
+    CalculateConstants();
+    return EscapeTime(e,age) / yr_to_sec;
   }  ///< the particle escape time scale (s)
-  void SetConstantEscapeTime(double EscapeTime) {
-    escapeTimeConstant = EscapeTime;
-  }  ///< set the time scale of particle escape
+  vector < vector<double> > GetEscapeTime(vector<double> epoints, double age=0.) {
+      return GetQuantityVector(epoints,age,"escape_time");
+  } ///< the particle escape time scale (s), returns spectral shape
   void ToggleDebugging() {
     DEBUG = true;
   }  ///< switch on Debugging/Testing mode
@@ -378,10 +393,6 @@ struct timespec time0, time1, time2, time3;
     BConstant = NAN;
     SetLookup(BFIELDLOOKUP, "BField");
   }  ///< Set BField evolution
-  void SetEscapeTime(vector<vector<double> > ESCTIMELOOKUP) {
-    escapeTimeConstant = NAN;
-    SetLookup(ESCTIMELOOKUP, "EscapeTime");
-  }  ///< Set escape time evolution
 
   void SetRadius(vector<vector<double> > RADIUSLOOKUP) {
     RConstant = NAN;
@@ -433,24 +444,26 @@ struct timespec time0, time1, time2, time3;
   vector<vector<double> > GetRadiusLookup() {return RVector; }
   vector<vector<double> > GetVelocityLookup() {return VVector; }
   double GetEnergyLossRate(double E, double age=0.) {
-            if(age) SetMembers(age);
-            CalculateConstants();
-            return EnergyLossRate(E); }
+      if(age) SetMembers(age);
+      CalculateConstants();
+      return EnergyLossRate(E); }
   double GetCoolingTimeScale(double E, double age=0.) {//< this gives the cooling time scale at E and time age in [years]
-            return  E / GetEnergyLossRate(E,age) / yr_to_sec; }
+      return  E / GetEnergyLossRate(E,age) / yr_to_sec; }
 
   vector< vector<double> > GetEnergyLossRate(vector<double> epoints, double age=0.) {
-            return GetEnergyLossRateVector(epoints,age,false);
+      return GetEnergyLossRateVector(epoints,age,false);
   }
   vector< vector<double> > GetCoolingTimeScale(vector<double> epoints, double age=0.) {
-            return GetEnergyLossRateVector(epoints,age,true);
+      return GetEnergyLossRateVector(epoints,age,true);
   }
   vector< vector<double> > GetInjectionSpectrum(vector<double> epoints, double age=0.) {
-            return GetInjectionSpectrumVector(epoints,age,false);
+      return GetInjectionSpectrumVector(epoints,age,false);
   }
   vector< vector<double> > GetInjectionSED(vector<double> epoints, double age=0.) {
-            return GetInjectionSpectrumVector(epoints,age,true);
+      return GetInjectionSpectrumVector(epoints,age,true);
   }
+  vector< vector<double> > GetQuantityVector(vector<double> epoints,
+                                                      double age, string mode);
   double GetEnergyBins() {
     return ebins;
   }  ///< get energy binning of the numerical solution
@@ -522,14 +535,57 @@ struct timespec time0, time1, time2, time3;
     {fUtils->SetInterpolationMethod(intermeth);}
   void SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int mode);
   void SetCustomEnergylookup(vector< vector<double> > vCustom,int mode);
-  void SetCustomInjectionSpectrumTimeEvolution(vector< vector<double> > vCustomSpectrum) {
-    SetCustomTimeEnergyLookup(vCustomSpectrum,0);}
+
+  /* methods to set custom source injection spectra */
   void SetCustomInjectionSpectrum(vector< vector<double> > vSpectrum) {
-    SetCustomEnergylookup(vSpectrum,0);}
+    CustomInjectionSpectrumTimeEvolution = NULL;
+    SetCustomEnergylookup(vSpectrum,0);} ///< custom injection spectrum
+
+  void SetCustomInjectionSpectrumTimeEvolution(vector< vector<double> > vCustomSpectrum) {
+    CustomInjectionSpectrum = NULL;
+    SetCustomTimeEnergyLookup(vCustomSpectrum,0);}///< custom injection spectrum, changing over time
+
+  void SetCustomInjectionSpectrumTimeEvolution(vector<double> t, vector<double> e, 
+                                                vector< vector<double> > mesh) {
+    CustomInjectionSpectrum = NULL;
+    vector< vector<double> > vCustomSpectrum = fUtils->MeshgridToTwoDVector(t,e,mesh);
+    SetCustomTimeEnergyLookup(vCustomSpectrum,0);}///< custom injection spectrum, changing over time, input numpy-style meshgrid
+
+  /* methods to set particle escape */
+  void SetConstantEscapeTime(double EscapeTime) {
+    escapeTimeLookupTdep = NULL;
+    escapeTimeLookupEdep = NULL;
+    EscapeTimeEnergyTimeEvolution = NULL;
+    escapeTimeConstant = EscapeTime;
+  }  ///< set the time scale of particle escape
+
+  void SetTimeDependentEscapeTime(vector< vector<double> > vEsc) {
+    escapeTimeConstant = NAN;
+    escapeTimeLookupEdep = NULL;
+    EscapeTimeEnergyTimeEvolution = NULL;
+    SetLookup(vEsc, "EscapeTimeTdep");} ///< Set escape time evolution
+
+  void SetEnergyDependentEscapeTime(vector<vector<double> > ESCTIMELOOKUP) {
+    escapeTimeConstant = NAN;
+    escapeTimeLookupTdep = NULL;
+    EscapeTimeEnergyTimeEvolution = NULL;
+    SetCustomEnergylookup(ESCTIMELOOKUP, 1);
+  } ///< set energy-dependent escape time, constant 
+
   void SetTimeAndEnergyDependentEscapeTime(vector< vector<double> > vEsc) {
-    SetCustomTimeEnergyLookup(vEsc,1);}
-  void SetEnergyDependentEscapeTime(vector< vector<double> > vEsc) {
-    SetCustomEnergylookup(vEsc,1);}
+    escapeTimeConstant = NAN;
+    escapeTimeLookupEdep = NULL;
+    escapeTimeLookupTdep = NULL;
+    SetCustomTimeEnergyLookup(vEsc,1);}///< set energy-dependent escape time, dynamic
+
+  void SetTimeAndEnergyDependentEscapeTime(vector<double> t, vector<double> e, 
+                                                vector< vector<double> > mesh) {
+    escapeTimeConstant = NAN;
+    escapeTimeLookupEdep = NULL;
+    escapeTimeLookupTdep = NULL;
+    vector< vector<double> > vEsc = fUtils->MeshgridToTwoDVector(t,e,mesh);
+    SetCustomTimeEnergyLookup(vEsc,1);}///< set energy-dependent escape time, dynamic. input numpy-style meshgrid.
+
   Radiation *GetSSCEquilibrium(Radiation *fr,double t, double tolerance=1e-2);
   void SetSolverMethod(int method);
   void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }  ///< toggle quiet mode on or off ( if on, no progress printout on the console)
@@ -617,7 +673,7 @@ struct timespec time0, time1, time2, time3;
   }  ///< DEPRECATED!
   void SetEscapeTimeLookup(vector<vector<double> > ESCTIMELOOKUP) {
     cout<< "SetEscapeTimeLookup: DEPRECATED! USE Particles::SetEscapeTime(<vector<vector<double>>v) instead!"<<endl;
-    SetEscapeTime(ESCTIMELOOKUP);
+    SetTimeDependentEscapeTime(ESCTIMELOOKUP);
   }  ///< DEPRECATED
   void SetRadiusLookup(vector<vector<double> > RADIUSLOOKUP) {
     cout<< "SetRadiusLookup: DEPRECATED! USE Particles::SetRadius(<vector<vector<double>>v) instead!"<<endl;

@@ -130,6 +130,7 @@ class Utils {
   vector< vector<double> > SortTwoDVector(vector< vector<double> > v,
                                                  int column);
   void TwoDVectorPushBack(double x, double y, vector< vector<double> > &v);
+  void TwoDVectorPushBack(double x, double y, double z, vector< vector<double> > &v);
 
   double EvalSpline(double x, gsl_spline *s, gsl_interp_accel *a,
                     const char* t, int l);
@@ -170,6 +171,8 @@ class Utils {
     return interp2d_spline_eval(INTERNAL2DSPLINE,x,y,xacc,yacc);}
   double EnergyContent(vector< vector<double> > f, double emin=0., double emax=0.);
   double EnergyContentFast(vector< vector<double> > f);
+  vector< vector<double> > MeshgridToTwoDVector(vector<double> x, vector<double> y, 
+                                                     vector< vector<double> > mesh);
   vector<double> GetVectorMinMax(vector< vector<double> > v, unsigned int axis);
   void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }
   bool GetQuietMode() {return QUIETMODE;}
