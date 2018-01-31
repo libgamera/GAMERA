@@ -147,7 +147,7 @@ class Utils {
   void SetInternal1DSpline(vector< vector<double> > v) {
     gsl_interp_accel_reset(acc);
     if(INTERNAL1DSPLINE!=NULL) gsl_spline_free(INTERNAL1DSPLINE);
-    INTERNAL1DSPLINE = GSLsplineFromTwoDVector(v);}
+    INTERNAL1DSPLINE = GSLsplineFromTwoDVector(v);} 
   void SetInternal2DSpline(vector< vector<double> > v) {
 //    std::cout<<" -- - --- --- " <<std::endl;
 //    for(unsigned int i=0;i<v.size();i++) {
