@@ -756,10 +756,29 @@ void Utils::Clear2DVector(vector< vector<double> > &v) {
 }
 
 vector< vector<double> > Utils::MeshgridToTwoDVector(vector<double> x, vector<double> y, 
-                                                     vector< vector<double> > mesh
-                                                     ) {
-    vector< vector<double > > v;
-    std::cout<<"y_len = "<<mesh.size()<<" x_len = "<<mesh[0].size()<<std::endl;
+                                                     vector< vector<double> > mesh) {
+                             
+    vector< vector<double > > v;                        
+    if(!mesh.size()){
+        cout<<"Utils::MeshgridToTwoDVector: mesh has size 0. Returning empty vector. " 
+            << endl;
+        return v;}
+    if(!x.size() || !y.size()) {
+        cout<<"Utils::MeshgridToTwoDVector: At least one of the axis vectors has size 0. "
+              "Returning empty vector."<< endl;
+        return v;}
+    if(x.size() != mesh[0].size() && y.size() != mesh.size()) {
+        cout<<"Utils::MeshgridToTwoDVector: x and y-axis vector sizes don't match "
+              "dimensions of mesh grid. Returning empty vector."<< endl;
+        return v;}
+    if(x.size() != mesh[0].size()) {
+        cout<<"Utils::MeshgridToTwoDVector: x-axis vector size doesn't match x-dimension "
+              "of mesh grid. Returning empty vector."<< endl;
+        return v;}
+    if(y.size() != mesh.size()) {
+        cout<<"Utils::MeshgridToTwoDVector: y-axis vector size doesn't match y-dimension "
+              "of mesh grid. Returning empty vector."<< endl;
+        return v;}
     for(unsigned int i=0; i < mesh.size(); i++) {
          for(unsigned int j=0; j < mesh[i].size(); j++) {
              TwoDVectorPushBack(x[j],y[i],mesh[i][j],v);  

@@ -111,6 +111,9 @@ class Astro  {
     vector< vector<double> > forwardshockvelocityprofile;
     vector< vector<double> > reverseshockradiusprofile;
     vector< vector<double> > reverseshockvelocityprofile;
+    vector< vector<double> > cdradiusprofile;
+    vector< vector<double> > cdvelocityprofile;
+
 
     vector< vector<double> > thinshellradius;
     vector< vector<double> > thinshellvelocity;
@@ -235,7 +238,8 @@ class Astro  {
                                         double tmin = 1.e-2,
                                         double tmax = 1.e4,
                                         int steps = 200);
-
+    void CalculateTangChevalierSolution(vector<double> pars, double tmin=1.e-2,
+                                           double tmax=1.e4, int steps=200);
     vector<double> ThinShellRadiusAndSpeed(double t);
     vector<double> TrueloveMcKeeRadiusAndSpeedForward(double t) {
                                   return TrueloveMcKeeRadiusAndSpeed(t,false);}
@@ -249,6 +253,10 @@ class Astro  {
                                   return reverseshockradiusprofile;}
     vector< vector<double> > GetReverseShockVelocityEvolution() {
                                   return reverseshockvelocityprofile;}
+    vector< vector<double> > GetContactDiscontinuityRadiusEvolution() {
+                                  return cdradiusprofile;}
+    vector< vector<double> > GetContactDiscontinuityVelocityEvolution() {
+                                  return cdvelocityprofile;}
     void CalculateForwardShockInRGWind(vector<double> pars,
                                        double tmin = 1.e-2,
                                        double tmax = 1.e4,

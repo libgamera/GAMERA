@@ -2321,3 +2321,180 @@ void Astro::CalculateForwardShockInRGWind(vector<double> pars, double tmin,
   v.push_back(V);
   return v;
 }
+
+void Astro::CalculateTangChevalierSolution(vector<double> pars, double tmin,
+                                           double tmax, int steps) {
+    
+  fUtils->Clear2DVector(forwardshockradiusprofile);
+  fUtils->Clear2DVector(forwardshockvelocityprofile);
+  fUtils->Clear2DVector(cdradiusprofile);
+  fUtils->Clear2DVector(cdvelocityprofile);
+
+  if(pars.size()!=5) {
+    cout << "Astro::CalculateTangChevalierSolution: wrong number of parameters ("
+         << pars.size() << "). Parameter list takes exactly 4 "
+            "parameters: " << endl;
+    cout << " - [0] eta parameter (cm^-3) " << endl;
+    cout << " - [1] SN blast energy (erg) " << endl;
+    cout << " - [2] SN ejecta mass (mSol) " << endl;
+    cout << " - [3] ejecta density index " << endl;
+    cout << " - [4] ambient density index " << endl;
+//    cout << " - [5] w_core "<< endl;
+    cout << "Exiting!" <<endl;
+    return;
+  }
+
+  if (pars[3] < 0 || pars[3] == 3 || pars[3] == 5 || pars[3] == 11 || pars[3] ==13 || pars[3]>14){
+    cout << "Astro::CalculateTangChevalierSolution: ejecta density index of n = "
+         << pars[3] << " not supported. Exiting." <<endl;
+    return;
+  }
+
+  if (!(pars[4] == 0 || pars[4] == 2)){
+    cout << "Astro::CalculateTangChevalierSolution: ambient density index of s = "
+         << pars[4] << " not supported. Exiting." <<endl;
+    return;
+  }
+
+  /* intercept invalid values here */
+
+  double alphas_i0[] = {1.25,1.19,1.10,0.,0.80,0.,36.1,20.3,14.7,10.4,8.91,0.,7.11,0.,6.23};
+  double alphas_i2[] = {0.95,0.91,0.85,0.,0.63,0.,11.3,8.00,6.22,5.16,4.56,0.,3.81,0.,3.40};
+  double alphas_cd_i0[] = {0.89,0.94,1.08,0.,1.38,0.,5.54,4.28,3.09,3.01,2.92,0.,2.35,0.,2.20};
+  double alphas_cd_i2[] = {1.23,1.16,1.06,0.,0.58,0.,6.04,4.61,3.81,3.35,2.94,0.,2.47,0.,2.21};
+  double zetas_b_i0[] = {0.,0.,0.,0.,0.,0.,1.06,1.06,1.08,1.12,1.15,0.,1.21,0.,1.26};
+  double zetas_b_i2[] = {0.,0.,0.,0.,0.,0.,0.77,0.83,0.90,0.97,1.03,0.,1.14,0.,1.23};
+  double zetas_c_i0[] = {0.,0.,0.,0.,0.,0.,0.84,0.89,0.94,0.98,1.01,0.,1.08,0.,1.13};
+  double zetas_c_i2[] = {0.,0.,0.,0.,0.,0.,0.56,0.64,0.71,0.77,0.83,0.,0.93,0.,1.01};
+  double w_core_i0[] = {0.,0.,0.,0.,0.05,0.,0.05,0.05,0.05,0.05,0.05,0.,0.05,0.,0.05};
+  double w_core_i2[] = {0.,0.,0.,0.,0.1,0.,0.1,0.1,0.1,0.1,0.1,0.,0.1,0.,0.1};
+  double b_i0[] = {-0.37,-0.25,-0.06,0.,0.27,0.,-0.1,-0.11,-0.16,-0.13,-0.12,0.,-0.16,0.,-0.16};
+  double b_i2[] = {0.50,0.50,0.51,0.,0.47,0.,0.53,0.53,0.53,0.53,0.53,0.,0.52,0.,0.52};
+  double c_i0[] = {1.66,1.42,1.05,0.,0.72,0.,1.11,1.09,1.16,1.09,1.07,0.,1.11,0.,1.10};
+  double c_i2[] = {0.53,0.54,0.52,0.,0.71,0.,0.47,0.47,0.47,0.47,0.47,0.,0.48,0.,0.48};
+
+  double Esn = pars[1];
+  double Mej = pars[2]*mSol;
+  double index_e = pars[3];
+  double index_a = pars[4];
+  double eta = pars[0] * m_p_g;
+//  double w_core = pars[5];
+  std::cout<<eta<<" "<<index_a<<" "<<Mej<<std::endl;
+  double rChar = pow(Mej,1./(3.-index_a)) * pow(eta,-1./(3.-index_a));
+  std::cout<<rChar<<" "<<Mej/eta<<std::endl;
+  double tChar = pow(Esn,-0.5) * pow(Mej,(5.-index_a)/(2.*(3.-index_a))) 
+                   * pow(eta,-1./(3.-index_a));
+  double fac = 1.05;
+  double w_core = !index_a ? w_core_i0[int(index_e)] : w_core_i2[int(index_e)];
+  double t_star=0.;double r_star = 0.;double r = 0.;double v = 0.;
+  double r_c_star=0.; double v_c_star=0.;double r0=0.;double t0=0.;
+  double r_c=0.;double v_c=0.; double r_c0 = 0.;
+  double alpha = !index_a ? alphas_i0[int(index_e)] : alphas_i2[int(index_e)];
+  double alpha_cd = !index_a ? alphas_cd_i0[int(index_e)] : alphas_cd_i2[int(index_e)];
+  double xi = !index_a ? 2.026 : 3./(2.*pi);
+  double q_b = !index_a ? 1.1 : 1.19;
+  double lambda_c = 0.;
+  if (index_e > 3) {
+      lambda_c = 2.*pow(w_core,-2.)*((5.-index_e)/(3.-index_e));
+      lambda_c *= (pow(w_core,index_e-3.)-index_e/3.) / (pow(w_core,index_e-5.)-index_e/5.);
+      lambda_c = sqrt(lambda_c);
+  }
+  else lambda_c = sqrt(2.*(5.-index_e)/(3.-index_e));
+  double lambda_b = index_e<5. ? q_b*lambda_c : 0.;
+  double zeta_b = !index_a ? zetas_b_i0[int(index_e)] : zetas_b_i2[int(index_e)];
+  double zeta_c = !index_a ? zetas_c_i0[int(index_e)] : zetas_c_i2[int(index_e)];
+  double b = !index_a ? b_i0[int(index_e)] : b_i2[int(index_e)];
+  double c = !index_a ? c_i0[int(index_e)] : c_i2[int(index_e)];
+
+  cout<<">>Parameters for Tang & Chevalier's solution:"<<endl;
+  cout<<">>>Input parameters:"<<endl;
+  cout<<"   s = "<<index_a<<endl;
+  cout<<"   n = "<<index_e<<endl;
+  cout<<"   E_sn = "<<Esn<<" erg"<<endl;
+  cout<<"   eta = "<<eta/m_p_g<<"/cm^3"<<endl;
+  cout<<"   Mej = "<<Mej/mSol<<" mSol"<<endl;
+  cout<<"   w_core = "<<w_core<<endl;
+  cout<<">>>Internal model parameters - forward shock:"<<endl;
+  cout<<"   alpha = "<<alpha<< endl;
+  if (lambda_b) cout<< "   lambda_b = "<<lambda_b<< endl;
+  else cout<< "   lambda_b = -"<< endl;
+  cout<< "   xi = "<<xi<< endl;
+  if (zeta_b) cout<< "   zeta_b = "<<zeta_b<< endl;
+  else cout<< "   zeta_b = -"<< endl;
+  cout<<">>>Internal model parameters - contact discontinuity:"<<endl;
+  cout<<"   alpha = "<<alpha_cd<< endl;
+  cout<<"   b = "<<b<<endl;
+  cout<<"   c = "<<c<<endl;
+  if (zeta_c) cout<< "   zeta_c = "<<zeta_c<< endl;
+  else cout<<"   zeta_c = -"<< endl;
+  cout<<"   lambda_c = "<<lambda_c<< endl;
+  cout<<">>>Characteristic scales:"<<endl;
+  cout<<"   t_char = "<<tChar/yr_to_sec<<" yrs"<<endl;
+  cout<<"   r_char = "<<rChar/pc_to_cm<<" pc"<<endl;  
+  cout<<"Please note that this solution does not include the reverse shock dynamics."<<endl;    
+  cout<<"For that, please use the Truelove & McKee model." << endl;
+
+  if (index_e < 5.) {
+    for (double t=tmin/fac;t<tmax;t*=fac) {
+      t_star = t * yr_to_sec/ tChar;
+
+      r_star = pow(lambda_b*t_star,-2.*alpha);
+      r_star += pow(xi*t_star*t_star,-2.*alpha/(5.-index_a));
+      r_star = pow(r_star,-1./(2.*alpha));
+          
+      r_c_star = pow(lambda_c*t_star,-alpha_cd);
+      r_c_star += pow(c*pow(t_star,b),-alpha_cd);
+      r_c_star = pow(r_c_star,-1./alpha_cd);
+
+      r = r_star*rChar/pc_to_cm;
+      r_c = r_c_star*rChar/pc_to_cm;
+
+      if (t0 && r0) v = pc_to_cm * (r-r0) / (t-t0) / yr_to_sec;
+      if (t0 && r_c0) v_c = pc_to_cm * (r_c-r_c0) / (t-t0) / yr_to_sec;
+      t0 = t;
+      r0 = r;
+      r_c0 = r_c;
+      if(t>=tmin){
+        fUtils->TwoDVectorPushBack(t_star,r_star,forwardshockradiusprofile);
+        fUtils->TwoDVectorPushBack(t,v,forwardshockvelocityprofile);
+        fUtils->TwoDVectorPushBack(t_star,r_c_star,cdradiusprofile);
+        fUtils->TwoDVectorPushBack(t,v_c,cdvelocityprofile);
+      }
+    }
+  }
+  else if (index_e > 5.){
+    for (double t=tmin/fac;t<tmax;t*=fac) {
+      t_star = t * yr_to_sec / tChar;
+
+      r_star = pow(zeta_b*pow(t_star,(index_e-3.)/(index_e-index_a)),-alpha);
+      r_star += pow(xi*t_star*t_star,-alpha/(5.-index_a));
+      r_star = pow(r_star,-1./alpha);
+
+      r_c_star = pow(zeta_c*pow(t_star,(index_e-3.)/(index_e-index_a)),-alpha_cd);
+      r_c_star += pow(c*pow(t_star,b),-alpha_cd);
+      r_c_star = pow(r_c_star,-1./alpha_cd);
+
+      r = r_star*rChar/pc_to_cm;
+      r_c = r_c_star*rChar/pc_to_cm;
+
+      if (t0 && r0) v = pc_to_cm * (r-r0) / (t-t0) / yr_to_sec;
+      if (t0 && r_c0) v_c = pc_to_cm * (r_c-r_c0) / (t-t0) / yr_to_sec;
+      t0 = t;
+      r0 = r;
+      r_c0 = r_c;
+      if(t>=tmin){
+        fUtils->TwoDVectorPushBack(t_star,r_star,forwardshockradiusprofile);
+        fUtils->TwoDVectorPushBack(t,v,forwardshockvelocityprofile);
+        fUtils->TwoDVectorPushBack(t_star,r_c_star,cdradiusprofile);
+        fUtils->TwoDVectorPushBack(t,v_c,cdvelocityprofile);
+      }
+    }
+  }  
+
+  return;
+}
+
+
+
+
+
