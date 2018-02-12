@@ -2339,7 +2339,6 @@ void Astro::CalculateTangChevalierSolution(vector<double> pars, double tmin,
     cout << " - [2] SN ejecta mass (mSol) " << endl;
     cout << " - [3] ejecta density index " << endl;
     cout << " - [4] ambient density index " << endl;
-//    cout << " - [5] w_core "<< endl;
     cout << "Exiting!" <<endl;
     return;
   }
@@ -2354,6 +2353,12 @@ void Astro::CalculateTangChevalierSolution(vector<double> pars, double tmin,
     cout << "Astro::CalculateTangChevalierSolution: ambient density index of s = "
          << pars[4] << " not supported. Exiting." <<endl;
     return;
+  }
+
+  if (!tmin) { 
+    cout << "Astro::CalculateTangChevalierSolution: tmin has to be larger than 0."
+            " Exiting." <<endl;
+        return;
   }
 
   /* intercept invalid values here */
@@ -2378,16 +2383,14 @@ void Astro::CalculateTangChevalierSolution(vector<double> pars, double tmin,
   double index_e = pars[3];
   double index_a = pars[4];
   double eta = pars[0] * m_p_g;
-//  double w_core = pars[5];
-  std::cout<<eta<<" "<<index_a<<" "<<Mej<<std::endl;
+
   double rChar = pow(Mej,1./(3.-index_a)) * pow(eta,-1./(3.-index_a));
-  std::cout<<rChar<<" "<<Mej/eta<<std::endl;
   double tChar = pow(Esn,-0.5) * pow(Mej,(5.-index_a)/(2.*(3.-index_a))) 
                    * pow(eta,-1./(3.-index_a));
   double fac = 1.05;
   double w_core = !index_a ? w_core_i0[int(index_e)] : w_core_i2[int(index_e)];
   double t_star=0.;double r_star = 0.;double r = 0.;double v = 0.;
-  double r_c_star=0.; double v_c_star=0.;double r0=0.;double t0=0.;
+  double r_c_star=0.; double r0=0.;double t0=0.;
   double r_c=0.;double v_c=0.; double r_c0 = 0.;
   double alpha = !index_a ? alphas_i0[int(index_e)] : alphas_i2[int(index_e)];
   double alpha_cd = !index_a ? alphas_cd_i0[int(index_e)] : alphas_cd_i2[int(index_e)];
@@ -2455,9 +2458,9 @@ void Astro::CalculateTangChevalierSolution(vector<double> pars, double tmin,
       r0 = r;
       r_c0 = r_c;
       if(t>=tmin){
-        fUtils->TwoDVectorPushBack(t_star,r_star,forwardshockradiusprofile);
+        fUtils->TwoDVectorPushBack(t,r,forwardshockradiusprofile);
         fUtils->TwoDVectorPushBack(t,v,forwardshockvelocityprofile);
-        fUtils->TwoDVectorPushBack(t_star,r_c_star,cdradiusprofile);
+        fUtils->TwoDVectorPushBack(t,r_c,cdradiusprofile);
         fUtils->TwoDVectorPushBack(t,v_c,cdvelocityprofile);
       }
     }
@@ -2483,9 +2486,9 @@ void Astro::CalculateTangChevalierSolution(vector<double> pars, double tmin,
       r0 = r;
       r_c0 = r_c;
       if(t>=tmin){
-        fUtils->TwoDVectorPushBack(t_star,r_star,forwardshockradiusprofile);
+        fUtils->TwoDVectorPushBack(t,r,forwardshockradiusprofile);
         fUtils->TwoDVectorPushBack(t,v,forwardshockvelocityprofile);
-        fUtils->TwoDVectorPushBack(t_star,r_c_star,cdradiusprofile);
+        fUtils->TwoDVectorPushBack(t,r_c,cdradiusprofile);
         fUtils->TwoDVectorPushBack(t,v_c,cdvelocityprofile);
       }
     }
