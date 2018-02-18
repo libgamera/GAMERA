@@ -666,5 +666,10 @@ class Radiation {
   /// Get integrated absorbed energy flux between emin and emax (erg) summed over all radiation processes
   double GetIntegralTotalAbsFlux(double emin, double emax, vector <int> fields) {
     return ReturnAbsorbedIntergratedFlux(emin,emax,false,fields,sizephfield); }
+
+  /*
+   * Functions for the calculation of the optical depth
+   */
+
 };
 #endif
