@@ -400,5 +400,10 @@ class Radiation {
   double InclusivePPXSection(double Tp);
   void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }  ///< enable quiet mode (very little cout output)
   bool GetQuietMode() {return QUIETMODE;}
+
+  /*
+   * Functions for the calculation of the optical depth
+   */
+   */
 };
 #endif

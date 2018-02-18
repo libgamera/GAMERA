@@ -177,5 +177,9 @@ class Utils {
   void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }
   bool GetQuietMode() {return QUIETMODE;}
   vector< vector<double> > RemoveZeroEntries(vector< vector<double> > v);
+  
+  //addition for the gamma-gamma absorption
+  // !!!UNDER CONSTRUCTION!!!
+  double AverageSigmaGammaGamma(double Eph1, double Eph2);
 };
 #endif
