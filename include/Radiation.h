@@ -506,5 +506,11 @@ class Radiation {
   void SumTargetFieldsIsotropic(int bins=1000);
   unsigned int GetTargetFieldCount(){return RADFIELD_COUNTER;}
   void SetICFastMode() {FASTMODE_IC = true;}
+
+  /*
+   * Functions for the calculation of the optical depth
+   */
+   */
+
 };
 #endif
