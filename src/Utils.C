@@ -1042,6 +1042,7 @@ double Utils::Norm(vector<double> v) {
     double norm = 0.0;
     for (unsigned int i=0; i < v.size(); i++) norm += v[i]*v[i];
     return sqrt(norm);
+
 /**
  * Function for the gamma gamma absorption cross section
  * Analytical average over solid angle
