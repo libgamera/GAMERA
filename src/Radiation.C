@@ -2245,3 +2245,32 @@ vector<vector<double> > Radiation::GetTargetPhotons(int i) {
     }
     return fUtils->VectorAxisPow10(vint,-1);
 }
+
+/*
+ * Functions for the calculation of the optical depth
+ * Fill use in the definition the functions GetTotalSpectrum() and GetTargetPhotons()
+ * Need to define a method to speed up the calculation and compute the contribution
+ * only for the relevant part of the cross section
+ * !!! CAREFUL UNDER CONSTRUCTION !!!
+ * !!! FOR THE MOMENT TEST ONLY WITH ISOTROPIC AND HOMOGENEOUS FIELDS!!!
+ */
+
+vector<double> Radiation::ComputeOptDepth(double Egammamin,double Egammamax, double emin,double emax, double distance){
+	cout<<"This function is under construction, it works only with homogeneous and isotropic fields"<<endl;
+	vector<double> tauval;
+    vector< vector<double> > gammas = Radiation::ReturnDifferentialPhotonSpectrum(1,Egammamin,Egammamax);
+    vector< vector<double> > targets = Radiation::GetTargetPhotons();
+    vector< vector<double> > TempVect;
+    double product=0;
+    double integral=0;
+    for (unsigned int i=0; i<gammas[0].size();i++){
+        for (unsigned int j=0;j<targets[0].size();j++){
+        	product = fUtils->AverageSigmaGammaGamma(gammas[0][i],targets[0][j])*targets[1][j];
+        	fUtils->TwoDVectorPushBack(targets[0][j],product,TempVect);
+        }
+        integral = fUtils->Integrate(TempVect,emin,emax);  //Make this process smarter
+    	tauval.push_back(integral*distance); //where I need to arrive, a vector with a tau for each gamma
+    }
+
+	return tauval;
+}
