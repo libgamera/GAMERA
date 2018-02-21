@@ -791,8 +791,9 @@ void Utils::SetInterpolationMethod(string intermeth) {
 double Utils::AverageSigmaGammaGamma(double Eph1, double Eph2) {
   double CMene = Eph1*Eph2/(m_e*m_e*c_speed*c_speed*c_speed*c_speed);
   if (CMene < 1.){
-	  std::cout<<"ERROR, you'll get a negative number in the square root!\n";
+	  std::cout<<"ERROR, you'll get a negative number in the square root!\n"
+			  "You are below threshold for pair production\n";
       return 0;}
-  return 3./(2.*CMene*CMene)*Sigma_T*((CMene+0.5*log(CMene)-1./6.+1./(2.*CMene))
+  return 3./(2.*CMene*CMene)*sigma_T*((CMene+0.5*log(CMene)-1./6.+1./(2.*CMene))
 		  *log(sqrt(CMene)+sqrt(CMene-1))-(CMene+4./9.-1./(9.*CMene))*sqrt(1.-(1./CMene)));
 }

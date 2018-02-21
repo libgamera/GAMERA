@@ -403,7 +403,13 @@ class Radiation {
 
   /*
    * Functions for the calculation of the optical depth
+   * Fill use in the definition the functions GetTotalSpectrum() and GetTargetPhotons()
+   * Need to define a method to speed up the calculation and compute the contribution
+   * only for the relevant part of the cross section
+   * !!! CAREFUL UNDER CONSTRUCTION !!!
    */
-   */
+  vector<double> ComputeOptDepth(double Egammamin,double Egammamax, double emin,double emax, double distance);
+
+
 };
 #endif
