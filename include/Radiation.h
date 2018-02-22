@@ -515,7 +515,10 @@ class Radiation {
    * !!! CAREFUL UNDER CONSTRUCTION !!!
    */
 
+
   vector<double> ComputeOptDepth(double Egammamin,double Egammamax, double emin,double emax, double distance);
+  double ComputeOptDepth(double Egamma);
+
 
 
 

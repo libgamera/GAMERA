@@ -2255,22 +2255,27 @@ vector<vector<double> > Radiation::GetTargetPhotons(int i) {
  * !!! FOR THE MOMENT TEST ONLY WITH ISOTROPIC AND HOMOGENEOUS FIELDS!!!
  */
 
-vector<double> Radiation::ComputeOptDepth(double Egammamin,double Egammamax, double emin,double emax, double distance){
+double Radiation::ComputeOptDepth(double Egamma){
 	cout<<"This function is under construction, it works only with homogeneous and isotropic fields"<<endl;
-	vector<double> tauval;
-    vector< vector<double> > gammas = Radiation::ReturnDifferentialPhotonSpectrum(1,Egammamin,Egammamax);
+	double tauval=0;
     vector< vector<double> > targets = Radiation::GetTargetPhotons();
     vector< vector<double> > TempVect;
     double product=0;
     double integral=0;
-    for (unsigned int i=0; i<gammas[0].size();i++){
-        for (unsigned int j=0;j<targets[0].size();j++){
-        	product = fUtils->AverageSigmaGammaGamma(gammas[0][i],targets[0][j])*targets[1][j];
-        	fUtils->TwoDVectorPushBack(targets[0][j],product,TempVect);
+    //double integral2=0;
+    for (unsigned int j=0;j<targets.size();j++){
+        product = fUtils->AverageSigmaGammaGamma(Egamma,targets[j][0])*targets[j][1];
+        //integral2+=product*(targets[j+1][0]-targets[j][0]);
+        if (product != 0.0){
+           fUtils->TwoDVectorPushBack(targets[j][0],product,TempVect);
         }
-        integral = fUtils->Integrate(TempVect,emin,emax);  //Make this process smarter
-    	tauval.push_back(integral*distance); //where I need to arrive, a vector with a tau for each gamma
     }
-
+    integral = fUtils->Integrate(TempVect,targets[0][0],targets[targets.size()-1][0]);  //Make this process smarter
+    if (!distance){
+        cout << "Missing distance, assign a distance to the source"<<endl;
+    }
+    else {
+    	tauval= (integral*distance); //where I need to arrive, a vector with a tau for each gamma
+    }
 	return tauval;
 }
