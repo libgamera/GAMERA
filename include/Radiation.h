@@ -408,7 +408,7 @@ class Radiation {
    * only for the relevant part of the cross section
    * !!! CAREFUL UNDER CONSTRUCTION !!!
    */
-  vector<double> ComputeOptDepth(double Egammamin,double Egammamax, double emin,double emax, double distance);
+  double ComputeOptDepth(double Egamma);
 
 
 };
