@@ -1073,4 +1073,3 @@ double Utils::SigmaGammaGamma(double Eph1,double Eph2, double theta) {
 	double beta = sqrt(1.-1./CMene);  //ausiliary variable
 	return sigma_T*3./16.*(1.-beta*beta)*(2.*beta*(beta*beta-2.)+(3.-beta*beta*beta*beta)*log((1+beta)/(1-beta)));
 }
-

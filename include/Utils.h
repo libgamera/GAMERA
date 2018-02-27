@@ -211,6 +211,5 @@ class Utils {
   // !!!UNDER CONSTRUCTION!!!
   double AverageSigmaGammaGamma(double Eph1, double Eph2);
   double SigmaGammaGamma(double Eph1, double Eph2, double theta);
-
 };
 #endif
