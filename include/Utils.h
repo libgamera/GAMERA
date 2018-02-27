@@ -191,6 +191,7 @@ class Utils {
   //addition for the gamma-gamma absorption
   // !!!UNDER CONSTRUCTION!!!
   double AverageSigmaGammaGamma(double Eph1, double Eph2);
+  double SigmaGammaGamma(double Eph1, double Eph2, double theta);
 
 };
 #endif

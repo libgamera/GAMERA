@@ -2256,7 +2256,7 @@ vector<vector<double> > Radiation::GetTargetPhotons(int i) {
  */
 
 double Radiation::ComputeOptDepth(double Egamma){
-	cout<<"This function is under construction, it works only with homogeneous and isotropic fields"<<endl;
+	//cout<<"This function is under construction, it works only with homogeneous and isotropic fields"<<endl;
 	double tauval=0;
     vector< vector<double> > targets = Radiation::GetTargetPhotons();
     vector< vector<double> > TempVect;
