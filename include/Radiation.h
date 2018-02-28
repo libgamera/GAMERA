@@ -518,6 +518,14 @@ class Radiation {
 
   vector<double> ComputeOptDepth(double Egammamin,double Egammamax, double emin,double emax, double distance);
   double ComputeOptDepth(double Egamma);
+  vector <vector <double> > RetAbsDiffSpectrum(double emin, double emax);
+  vector <vector <double> > RetAbsSED(double emin, double emax);
+  vector<vector<double> > GetAbsSED(double emin = 0., double emax = 0.) {
+      return RetAbsSED(emin, emax);
+    }  ///< return total SED
+  vector<vector<double> > GetAbsSpectrum(double emin = 0., double emax = 0.) {
+        return RetAbsDiffSpectrum(emin, emax);
+      }  ///< return total Diff Spectrum
 
 
 
