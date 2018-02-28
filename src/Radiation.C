@@ -3505,3 +3505,29 @@ double Radiation::ReturnAbsorbedIntergratedFlux(double emin, double emax, bool E
     fUtils->ToggleQuietMode();
     return val;
 }
+
+/*
+ * Functions to directly retrieve the absorbed gamma ray spectrum and
+ * the absorbed gammaray SED
+ * using the above calculated optical depth
+ * It makes things easier when scripting
+ */
+vector <vector <double> > Radiation::RetAbsDiffSpectrum(double emin, double emax){
+	vector <vector<double> > gammaspec = Radiation::ReturnDifferentialPhotonSpectrum(1,emin,emax);
+    vector <vector<double> > TempVect;
+    for (unsigned int i=0;i<gammaspec.size();i++){
+    	double tau = Radiation::ComputeOptDepth(gammaspec[i][0]);
+    	fUtils->TwoDVectorPushBack(gammaspec[i][0],gammaspec[i][1]*exp(-tau),TempVect);
+    }
+    return TempVect;
+}
+
+vector <vector <double> > Radiation::RetAbsSED(double emin, double emax){
+	vector <vector<double> > gammaspec = Radiation::ReturnSED(1,emin,emax);
+    vector <vector<double> > TempVect;
+    for (unsigned int i=0;i<gammaspec.size();i++){
+    	double tau = Radiation::ComputeOptDepth(gammaspec[i][0]);
+    	fUtils->TwoDVectorPushBack(gammaspec[i][0],gammaspec[i][1]*exp(-tau),TempVect);
+    }
+    return TempVect;
+}
