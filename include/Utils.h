@@ -68,6 +68,8 @@
 #define h_to_sec 3.6e3
 /* pc to lyr */
 #define pc_to_lyr 3.26156
+/* natural logarithm of 10 */
+#define ln10 2.302585
 
 using namespace std;
 
@@ -173,6 +175,8 @@ class Utils {
   double EnergyContentFast(vector< vector<double> > f);
   vector< vector<double> > MeshgridToTwoDVector(vector<double> x, vector<double> y, 
                                                      vector< vector<double> > mesh);
+/*  void TwoDVectorToMeshgrid(vector< vector<double> > vec, vector<double> &x,*/
+/*                                vector<double> &y, vector< vector<double> > &mesh);*/
   vector<double> GetVectorMinMax(vector< vector<double> > v, unsigned int axis);
   void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }
   bool GetQuietMode() {return QUIETMODE;}

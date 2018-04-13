@@ -99,7 +99,7 @@ struct timespec time0, time1, time2, time3;
                         ///the particle spectrum is calculated (optional)
   double EmaxConstant;  ///< Constantly set upper energy boundary within which
                         ///the particle spectrum is calculated (optional)
-  double TminConstant;  ///< Constantly set lower time boundary at which the
+  double TminExternal;  ///< Constantly set lower time boundary at which the
                         ///particle iteration is started
   double BConstant;     ///< Constantly set constant B-Field
   double NConstant;     ///< Constantly set constant ambient density
@@ -155,6 +155,9 @@ struct timespec time0, time1, time2, time3;
                        ///optimisation
   double bremsl_eef;   ///< constant used in 'EnergyLossRate'. Used for speed
                        ///optimisation
+
+  double synchl,icl,adl,bremsl; ///< loss rates for synchrotron, IC, adiabatic exp.
+                                /// and bremsstrahlug.
 
   bool logarithmicCRLumLookupTimeBins;  ///< boolean indicating that time steps
                                         ///in CRLumLookup are logarithmic. In
@@ -308,7 +311,8 @@ struct timespec time0, time1, time2, time3;
                                               ///the grid only in a specified
                                               ///time interval dT = T2-T2 (yrs)
   vector< vector<double> > GetEnergyLossRateVector(vector<double> epoints,
-                                                      double age, bool TIMESCALE);
+                                                   string type, double age, 
+                                                        bool TIMESCALE);
   vector< vector<double> > GetInjectionSpectrumVector(vector<double> epoints,
                                                       double age, bool SED);
 
@@ -443,18 +447,17 @@ struct timespec time0, time1, time2, time3;
   vector<vector<double> > GetBFieldLookup() {return BVector; }
   vector<vector<double> > GetRadiusLookup() {return RVector; }
   vector<vector<double> > GetVelocityLookup() {return VVector; }
-  double GetEnergyLossRate(double E, double age=0.) {
-      if(age) SetMembers(age);
-      CalculateConstants();
-      return EnergyLossRate(E); }
-  double GetCoolingTimeScale(double E, double age=0.) {//< this gives the cooling time scale at E and time age in [years]
-      return  E / GetEnergyLossRate(E,age) / yr_to_sec; }
+  double GetEnergyLossRate(double E, string type,double age=0.);
+  double GetCoolingTimeScale(double E, string type="sum", double age=0.) {//< this gives the cooling time scale at E and time age in [years]
+      return  E / GetEnergyLossRate(E,type) / yr_to_sec; }
 
-  vector< vector<double> > GetEnergyLossRate(vector<double> epoints, double age=0.) {
-      return GetEnergyLossRateVector(epoints,age,false);
+  vector< vector<double> > GetEnergyLossRate(vector<double> epoints, string type="sum",
+                                                            double age=0.) {
+      return GetEnergyLossRateVector(epoints,type,age,false);
   }
-  vector< vector<double> > GetCoolingTimeScale(vector<double> epoints, double age=0.) {
-      return GetEnergyLossRateVector(epoints,age,true);
+  vector< vector<double> > GetCoolingTimeScale(vector<double> epoints, string type="sum",
+                                               double age=0.) {
+      return GetEnergyLossRateVector(epoints,type,age,true);
   }
   vector< vector<double> > GetInjectionSpectrum(vector<double> epoints, double age=0.) {
       return GetInjectionSpectrumVector(epoints,age,false);
@@ -474,7 +477,7 @@ struct timespec time0, time1, time2, time3;
     return EscapeVector;
   }  ///< get vector that holds the escape particles.
   void SetTmin(double TMIN) {
-    TminConstant = TMIN;
+    TminExternal = TMIN;
   }  ///< Constanty set minimal time of injected particles
   void SetBField(double BEXT) {
     BVector.clear();
@@ -588,15 +591,18 @@ struct timespec time0, time1, time2, time3;
 
   Radiation *GetSSCEquilibrium(Radiation *fr,double t, double tolerance=1e-2);
   void SetSolverMethod(int method);
-  void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }  ///< toggle quiet mode on or off ( if on, no progress printout on the console)
+  void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; fRadiation->ToggleQuietMode();}  ///< toggle quiet mode on or off ( if on, no progress printout on the console)
   bool GetQuietMode() {return QUIETMODE;}
   void AddThermalTargetPhotons(double T, double edens, int steps=200);// wrapped from Radiation class. See Docu there.
+  void ResetWithThermalTargetPhotons(int i, double T, double edens, int steps=200);// wrapped from Radiation class. See Docu there.
   void AddArbitraryTargetPhotons(vector<vector<double> > PhotonArray);// wrapped from Radiation class. See Docu there.
+  void ResetWithArbitraryTargetPhotons(int i,vector<vector<double> > PhotonArray);
   void ImportTargetPhotonsFromFile(const char *phFile); // wrapped from Radiation class. See Docu there.
-  void AddSSCTargetPhotons(double R, int steps=100); // wrapped from Radiation class. See Docu there. Radius in pc
-  void RemoveLastICTargetPhotonComponent(); // wrapped from Radiation class. See Docu there.
+  void ResetWithTargetPhotonsFromFile(int i,const char *phFile);
+  void AddSSCTargetPhotons(int steps=100); // wrapped from Radiation class. See Docu there. Radius in pc
+  void ResetWithSSCTargetPhotons(int i, int steps=100);
   void CheckSanityOfTargetPhotonLookup(); // wrapped from Radiation class. See Docu there.
-  vector<vector<double> > GetTargetPhotons(); // wrapped from Radiation class. See Docu there.
+  vector<vector<double> > GetTargetPhotons(int i=-1); // wrapped from Radiation class. See Docu there.
   void ClearTargetPhotons(); // wrapped from Radiation class. See Docu there.
 
   /*********************************************************/

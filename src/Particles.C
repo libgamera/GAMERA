@@ -7,7 +7,7 @@ Particles::Particles() {
   Tmin = 1.;
   Type = 0;
   CutOffFactor = 1000.;
-  TminInternal = 1.e-4;
+  TminInternal = 1/yr_to_sec; // 1 sec
   TmaxInternal = 1.e100;
   TminLookup = 0.;
   EminInternal = 1.e-3;
@@ -58,7 +58,7 @@ Particles::Particles() {
   vs.resize(4);
   CustomInjectionSpectrumTimeEvolutionVector.resize(0);
   EscapeTimeEnergyTimeEvolutionVector.resize(0);
-  SpectralIndex2 = eBreak = TminConstant = adLossCoeff = EminConstant = 0.;
+  SpectralIndex2 = eBreak = TminExternal = adLossCoeff = EminConstant = 0.;
   
   escapeTime = EnergyAxisLowerBoundary = EnergyAxisUpperBoundary = 0.;
   eBreakS2 = eBreak2mS2 = eBreakS = eBreak2mS = emin2mS2 = emin2mS =
@@ -85,6 +85,11 @@ Particles::Particles() {
   taccesc = gsl_interp_accel_alloc();
   eaccesc = gsl_interp_accel_alloc();
 
+
+  // grid solver seems to be the best solution in all but the highest energy-loss
+  // cases. Setting it as default. User can manually specify semi-analytical method.
+  METHOD = 0;
+
   fUtils = new Utils();
   fRadiation = new Radiation();
 }
@@ -93,7 +98,7 @@ Particles::~Particles() {
   grid.clear();
 }
 
-/*   ----    END OF BINARY SEARCHES     ----   */
+
 
 /** Speed Hack: calculate some constant that are repeatedly needed in nested
  * loops
@@ -114,6 +119,8 @@ void Particles::CalculateConstants() {
 
   bremsl_epf = 3. * fineStructConst * sigma_T * c_speed * m_e / pi;
   bremsl_eef = (3. * fineStructConst * sigma_T * c_speed * m_e / (2. * pi));
+  if(!Type && (fRadiation->GetICLossLookup()).size()) 
+        SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
   return;
 }
 
@@ -192,47 +199,16 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
     EminInternal = 1.1*EminConstant;
   }
   CalculateConstants();
-
   DetermineLookupTimeBoundaries();
 
-  /* determine algorithm to calculate the particle spectrum */
-
-//  if(METHOD == -1) {
-//    if(Type==0 && (BVector.size() || NVector.size() ||
-//                (RVector.size() && VVector.size()) || !std::isnan(VConstant)
-//                || EscapeTimeEnergyTimeEvolutionVector.size()
-//                || CustomInjectionSpectrumTimeEvolutionVector.size())
-//      METHOD = 0;
-//    else if (Type==0 && (!std::isnan(BConstant) || !std::isnan(NConstant) ||
-//             ICLossVector.size()))
-//      METHOD = 1;
-//    else if(Type==1 && ( (RVector.size() && VVector.size()) || !std::isnan(VConstant)
-//                || EscapeTimeEnergyTimeEvolutionVector.size()
-//                || CustomInjectionSpectrumTimeEvolutionVector.size()) )
-//      METHOD = 0;
-//    else METHOD = 2;
-//  }
-
-  // grid solver seems to be the best solution in all but the highest energy-loss
-  // cases. Setting it as default. User can manually specify another method.
-  METHOD = 0;
-
- 
-  if(escapeTimeConstant > 0. || escapeTimeLookupEdep != NULL || 
-     EscapeTimeEnergyTimeEvolution != NULL) METHOD = 0;
   /* determine time from where to start the iteration. Particles that would have
    * been injected before that time are injected as a blob at Tmin. This can
    * lead to bumps at low energies, depending on cooling.
    */
-  if(Type && (escapeTimeConstant > 0. || escapeTimeLookupEdep != NULL || 
-     EscapeTimeEnergyTimeEvolution != NULL)) Tmin = 1.e-3;
-  else if (TminConstant) Tmin = TminConstant;
-//  else if(!METHOD) DetermineTMin(EminInternal, Tmin); // That doesnt work well
-  else if(METHOD == 1) Tmin = TminInternal;
-  else Tmin = 1.;
-  if(Tmin<TminInternal) Tmin=TminInternal;
-  METHOD = 0; Tmin = 1;
-  if (TminConstant) Tmin = TminConstant;
+  Tmin = 1; // standard start of iteration time , 1 year.
+  if (TminExternal) Tmin = TminExternal; // replace with externally set TminExternal
+  if (Tmin<TminInternal) Tmin=TminInternal; // if external time is smaller than internal minimum time (standard 1s), set to latter
+
   /* get the upper energy boundary of the spectrum. This can either be
    * externally
    * set (if) or dynamically determined by the code (else).
@@ -256,7 +232,7 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
     return;
   }
 
-
+//  METHOD = 1;
   if (!METHOD) {
   
     PrepareAndRunNumericalSolver(ParticleSpectrum, onlyprepare, dontinitialise);
@@ -544,10 +520,7 @@ void Particles::ExtendLookup(vector<vector<double> > v, string LookupType) {
  * ambient photon and B-fields.
  */
 double Particles::EnergyLossRate(double E) {
-  double synchl = 0.;
-  double icl = 0.;
-  double adl = 0.;
-  double bremsl = 0.;
+  synchl = icl = adl = bremsl = 0.;
   double bremsl_ep = 0.;
   double bremsl_ee = 0.;
   double gamma = E / m_e;
@@ -1040,7 +1013,7 @@ double Particles::MinMod(double a, double b) {
 void Particles::ComputeGridInTimeInterval(double T1, double T2, string type, 
                                           int bins) {
   
-  if (TminConstant) Tmin = TminConstant;
+  if (TminExternal) Tmin = TminExternal;
   if (T1 <= Tmin) {
     cout << "Particles::ComputeGridInTimeInterval T1<=internal min time (" << T1
          << "<=" << Tmin << "). set it artificially to " << Tmin << "yrs."
@@ -1498,17 +1471,27 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
   return;    
 }
 
-/** Add a greybody distribution of target photons to TotalTargetPhotonGraph,
+/** Add a greybody distribution of target photons,
  * which is used in the
  * IC cooling process in this class.
  */
 void Particles::AddThermalTargetPhotons(double T, double edens, int steps) {
   fRadiation->AddThermalTargetPhotons(T, edens, steps);
-  fRadiation->CreateICLossLookup(iclosslookupbins);
-  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+//  fRadiation->CreateICLossLookup(iclosslookupbins);
+//  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
 }
 
-/** Add an arbitray distribution of target photons to TotalTargetPhotonGraph,
+/** Reset photon target field i with a greybody distribution,
+ * which is used in the
+ * IC cooling process in this class.
+ */
+void Particles::ResetWithThermalTargetPhotons(int i, double T, double edens, int steps) {
+  fRadiation->ResetWithThermalTargetPhotons(i, T, edens, steps);
+//  fRadiation->CreateICLossLookup(iclosslookupbins);
+//  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+}
+
+/** Add an arbitray distribution of target photons,
  * which is used in the
  * IC coolin process in this class
  * This requires as input a 2D vector of format:
@@ -1517,8 +1500,18 @@ void Particles::AddThermalTargetPhotons(double T, double edens, int steps) {
  */
 void Particles::AddArbitraryTargetPhotons(vector<vector<double> > PhotonArray) {
   fRadiation->AddArbitraryTargetPhotons(PhotonArray);
-  fRadiation->CreateICLossLookup(iclosslookupbins);
-  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+//  fRadiation->CreateICLossLookup(iclosslookupbins);
+//  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+}
+
+/** Reset photon target field i by a an arbitray distribution of target photons,
+ * which is used in the
+ * IC cooling process in this class.
+ */
+void Particles::ResetWithArbitraryTargetPhotons(int i,vector<vector<double> > PhotonArray) {
+  fRadiation->ResetWithArbitraryTargetPhotons(i, PhotonArray);
+//  fRadiation->CreateICLossLookup(iclosslookupbins);
+//  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
 }
 
 /** Import target photons from file. File has to be in ASCII format, namely:
@@ -1527,9 +1520,20 @@ void Particles::AddArbitraryTargetPhotons(vector<vector<double> > PhotonArray) {
  */
 void Particles::ImportTargetPhotonsFromFile(const char *phFile) {
   fRadiation->ImportTargetPhotonsFromFile(phFile);
-  fRadiation->CreateICLossLookup(iclosslookupbins);
-  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+//  fRadiation->CreateICLossLookup(iclosslookupbins);
+//  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
 }
+
+/** Reset photon target field i by target photons from file,
+ * which is used in the
+ * IC cooling process in this class.
+ */
+void Particles::ResetWithTargetPhotonsFromFile(int i,const char *phFile) {
+  fRadiation->ResetWithTargetPhotonsFromFile(i,phFile);
+//  fRadiation->CreateICLossLookup(iclosslookupbins);
+//  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+}
+
 
 /** Add SSC target photons.
  * This function calls the Synchrotron code in this class.
@@ -1541,10 +1545,23 @@ void Particles::ImportTargetPhotonsFromFile(const char *phFile) {
  * must be the last entry in the 'TargetPhotonGraphs' vector!
  * It uses Atoyan&Aharonian1996: MNRAS, Volume 278, Issue 2, pp. 525-541
  */
-void Particles::AddSSCTargetPhotons(double R, int steps) {
-  fRadiation->AddSSCTargetPhotons(R,steps);
-  fRadiation->CreateICLossLookup(iclosslookupbins);
-  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+void Particles::AddSSCTargetPhotons(int steps) {
+  fRadiation->SetElectrons(ParticleSpectrum);
+  fRadiation->SetBField(BField);
+  fRadiation->AddSSCTargetPhotons(R/pc_to_cm,steps);
+//  fRadiation->CreateICLossLookup(iclosslookupbins);
+//  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+}
+
+/** Reset photon target field i with SSC target photons.
+ *
+ */
+void Particles::ResetWithSSCTargetPhotons(int i,int steps) {
+  fRadiation->SetElectrons(ParticleSpectrum);
+  fRadiation->SetBField(BField);
+  fRadiation->ResetWithSSCTargetPhotons(i, R/pc_to_cm, steps);
+//  fRadiation->CreateICLossLookup(iclosslookupbins);
+//  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
 }
 
 void Particles::ClearTargetPhotons() {
@@ -1557,33 +1574,54 @@ void Particles::ClearTargetPhotons() {
  * TotalTargetPhotonVector and recompute
  * the total target photon spectrum
  */
-void Particles::RemoveLastICTargetPhotonComponent() {
-  fRadiation->RemoveLastICTargetPhotonComponent();
-  fRadiation->CreateICLossLookup(iclosslookupbins);
-  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
-}
+//void Particles::RemoveLastICTargetPhotonComponent() {
+//  fRadiation->RemoveLastICTargetPhotonComponent();
+//  fRadiation->CreateICLossLookup(iclosslookupbins);
+//  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+//}
 
 void Particles::CheckSanityOfTargetPhotonLookup() {
   fRadiation->CheckSanityOfTargetPhotonLookup();
 }
 
-vector<vector<double> > Particles::GetTargetPhotons() {
-  return fRadiation->GetTargetPhotons();
+vector<vector<double> > Particles::GetTargetPhotons(int i) {
+  return fRadiation->GetTargetPhotons(i);
+}
+double Particles::GetEnergyLossRate(double E, string type, double age) {
+    
+    if(age) {
+        SetMembers(age);
+    }
+    CalculateConstants();
+    double sum = EnergyLossRate(E);
+    if (!type.compare("sum")) return sum;     
+    if (!type.compare("synchrotron") ) return synchl;
+    else if (!type.compare("inverse_compton") ) return icl;
+    else if (!type.compare("adiabatic_losses") ) return adl;
+    else if (!type.compare("bremsstrahlung") ) return bremsl;
+    else {
+        cout<<"Particles::GetEnergyLossRate: Loss mechanism "<<type<<" not known."
+              " returning zero."<<endl;
+        return 0.;
+    }
 }
 
 vector< vector<double> > Particles::GetEnergyLossRateVector(vector<double> epoints,
-                                                      double age, bool TIMESCALE) {
+                                                        string type, double age, 
+                                                               bool TIMESCALE) {
     if(!epoints.size()) {
         cout << "Particles::GetEnergyLossRateVector: you input a vector of size 0. "
                 "Exiting." << endl;
         exit(0);
     }
-    if(age) SetMembers(age);
+    if(age || !ICLossVector.size()) {
+        SetMembers(age);
+    }
     CalculateConstants();
     vector< vector<double> > v;
     for(unsigned int i=0; i < epoints.size(); i++) {
         double energy = epoints[i];
-        double val = EnergyLossRate(energy);
+        double val = GetEnergyLossRate(energy,type);
         if(TIMESCALE == true) val = energy / val / yr_to_sec;
         fUtils->TwoDVectorPushBack(energy,val,v);
     }
@@ -1659,29 +1697,29 @@ Radiation *Particles::GetSSCEquilibrium(Radiation *fr, double t, double toleranc
 //  METHOD = 1;
   SetMembers(Age);
   fr->CreateICLossLookup();
-  SetLookup(fr->GetICLossLookup(), "ICLoss");
-  CalculateElectronSpectrum();
-  fr->SetBField(BField);
-  for(unsigned int i=0;i<ParticleSpectrum.size();i++)
-    std::cout<<ParticleSpectrum[i][0]<<" "<<ParticleSpectrum[i][1]<<std::endl;
-  fr->SetElectrons(ParticleSpectrum);
- 
-  double new_sum,old_sum;
-  new_sum = old_sum = -1.;
-  while (1) {
-    fr->AddSSCTargetPhotons(R/pc_to_cm,100);
-    vector< vector <double> > tph = fr->GetTargetPhotons();
-    new_sum = fUtils->EnergyContent(tph);
-    std::cout<<new_sum<< " " << old_sum<<std::endl;
-    if( fabs(1. - new_sum/old_sum) < tolerance ) break;
-    fr->CreateICLossLookup();
-    SetLookup(fr->GetICLossLookup(), "ICLoss");
-    CalculateElectronSpectrum();
-    for(unsigned int i=0;i<ParticleSpectrum.size();i++)
-      std::cout<<ParticleSpectrum[i][0]<<" "<<ParticleSpectrum[i][1]<<std::endl;
-    fr->SetElectrons(ParticleSpectrum);
-    old_sum = new_sum;
-  }
+//  SetLookup(fr->GetICLossLookup(), "ICLoss");
+//  CalculateElectronSpectrum();
+//  fr->SetBField(BField);
+//  for(unsigned int i=0;i<ParticleSpectrum.size();i++)
+//    std::cout<<ParticleSpectrum[i][0]<<" "<<ParticleSpectrum[i][1]<<std::endl;
+//  fr->SetElectrons(ParticleSpectrum);
+// 
+//  double new_sum,old_sum;
+//  new_sum = old_sum = -1.;
+//  while (1) {
+//    fr->AddSSCTargetPhotons(R/pc_to_cm,100);
+//    vector< vector <double> > tph = fr->GetTargetPhotons();
+//    new_sum = fUtils->EnergyContent(tph);
+//    std::cout<<new_sum<< " " << old_sum<<std::endl;
+//    if( fabs(1. - new_sum/old_sum) < tolerance ) break;
+//    fr->CreateICLossLookup();
+//    SetLookup(fr->GetICLossLookup(), "ICLoss");
+//    CalculateElectronSpectrum();
+//    for(unsigned int i=0;i<ParticleSpectrum.size();i++)
+//      std::cout<<ParticleSpectrum[i][0]<<" "<<ParticleSpectrum[i][1]<<std::endl;
+//    fr->SetElectrons(ParticleSpectrum);
+//    old_sum = new_sum;
+//  }
   
 //  BConstant = LConstant = NConstant = NAN;
   return fr;

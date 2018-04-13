@@ -673,7 +673,10 @@ vector< vector<double> > Utils::VectorAxisPow10(vector< vector<double> > v,
       v[i][0] = pow(10.,xval);
     if(column == 1) 
       v[i][1] = pow(10.,yval);
-    
+    if(column == -1) {
+      v[i][0] = pow(10.,xval);
+      v[i][1] = pow(10.,yval);
+    }
   }
 
   return v;
@@ -755,6 +758,7 @@ void Utils::Clear2DVector(vector< vector<double> > &v) {
   v.clear();
 }
 
+
 vector< vector<double> > Utils::MeshgridToTwoDVector(vector<double> x, vector<double> y, 
                                                      vector< vector<double> > mesh) {
                              
@@ -786,6 +790,32 @@ vector< vector<double> > Utils::MeshgridToTwoDVector(vector<double> x, vector<do
     }
     return v;
 }
+
+//void Utils::TwoDVectorToMeshgrid(vector< vector<double> > vec)//, vector<double> &x,
+////                                vector<double> &y, vector< vector<double> > &mesh) {
+//    {
+//    vector<double> x;
+//    vector<double> y;
+//    vector< vector<double> > mesh;
+
+//    double yval = vec[0][1];
+//    mesh.push_back(vector<double>());
+//    y.push_back(vec[0][1]);
+
+//    for(unsigned int i=0;i<vec.size();i++) {
+//        if(i==0) x.push_back(vec[i][0]);
+//        if(vec[i][1] != yval) {
+//            mesh.push_back(vector<double>());
+//            yval = vec[i][1];
+//            y.push_back(yval);      
+//        }
+//        mesh[mesh.size()-1].push_back(vec[i][2]);
+//    }
+//    vector<double> a;
+//    a.push_bac
+//    return;
+//}
+
 
 void Utils::SetInterpolationMethod(string intermeth) {
   if(!intermeth.compare("CUBICSPLINE")) INTERMETH = (gsl_interp_type*)gsl_interp_cspline;
