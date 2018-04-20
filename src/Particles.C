@@ -7,7 +7,7 @@ Particles::Particles() {
   Tmin = 1.;
   Type = 0;
   CutOffFactor = 1000.;
-  TminInternal = 1/yr_to_sec; // 1 sec
+  TminInternal = 1./yr_to_sec; // 1 sec
   TmaxInternal = 1.e100;
   TminLookup = 0.;
   EminInternal = 1.e-3;
@@ -592,7 +592,7 @@ void Particles::PrepareAndRunNumericalSolver(
    * until t=age. This is useful in conjunction with
    * ComputeGridInTimeInterval().
    */
-  if (onlyprepare == false) ComputeGrid(grid, energyAxis, Tmin, Age, timeAxis);
+  if (onlyprepare == false) ComputeGrid(grid, energyAxis, Tmin, Age, timeAxis, Age*yr_to_sec/1e3);
   return;
 }
 
@@ -751,7 +751,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
   else if (Type == 1 && QUIETMODE == false)
     cout << "** Evolving Proton Spectrum:" << endl;
   /* main loop over time  */
-  for (double T = startTime; T < Age; T += tbin / yr_to_sec) {
+  for (double T = startTime; T <= Age; T += tbin / yr_to_sec) {
     /* Set Members (CR luminosity, B-field etc.) at time T */
     SetMembers(T);
     Ecuts.clear();
@@ -949,7 +949,6 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
    * this function.
    */
   Grid.pop_back();
-
   /* for the format of the info writeout */
   if (QUIETMODE == false) {
     cout << endl;
@@ -1025,8 +1024,9 @@ void Particles::ComputeGridInTimeInterval(double T1, double T2, string type,
   if(!grid.size()) {
     Age = T1;
     CalculateParticleSpectrum(type, bins);
+    fUtils->Clear2DVector(ParticleSpectrum);
   }
-  ComputeGrid(grid, energyAxis, T1, T2, timeAxis, yr_to_sec*(T2 - T1) / 100.);
+  ComputeGrid(grid, energyAxis, T1, T2, timeAxis, yr_to_sec*(T2 - T1)/1e3);
   return;
 }
 
@@ -1084,10 +1084,10 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
 
   // semi analytical solution, see e.g. Atoyan & Aharonian 1999, MNRAS, Volume 302, Issue 2, pp. 253-276
   Tmin = pow(10.,vETrajectory[0][0]);
+  SetMembers(Age);
   for (e = Emin, tt = 0; e < eMax; e = pow(10., log10(e) + logstep), tt++) {
     if (QUIETMODE == false)
       cout << "    " << (int)(100. * tt / ebins) -1 << "\% done\r" << std::flush;
-    SetMembers(Age);
     lossrate = EnergyLossRate(e);
     if(lossrate <= 0.) continue;
     IntFunc = &Particles::SemiAnalyticConstELossIntegrand;
@@ -1143,6 +1143,7 @@ double Particles::SourceSpectrumWrapper(double E, void *par) {
  * evolution of parameters (Source Luminosity,B-Field, Ambient density etc.).
  * If everything is set to constant values, i.e. in a stationary scenario,
  * these boundaries will be set to {TminInternal,TmaxInternal} = {1.e-4,1.e100}yrs.
+ * TODO: Shorten this!!
  */
 void Particles::DetermineLookupTimeBoundaries() {
 
@@ -1243,6 +1244,7 @@ void Particles::CalculateEnergyTrajectory(double TExt) {
     dt = 1.e-3 * E / Edot;
     E -= dt * Edot;
     T += dt / yr_to_sec;
+    std::cout<<E<<" "<<T<<" "<<TmaxInternal<<std::endl;
     if(T>TmaxInternal || Edot < 0.) break;
     SetMembers(T);
   }
