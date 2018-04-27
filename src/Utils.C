@@ -714,6 +714,53 @@ vector<double> Utils::GetVectorMinMax(vector< vector<double> > v, unsigned int a
   return extrema;
 }
 
+vector<unsigned int> Utils::GetVectorMinMaxIndices(vector< vector<double> > v, unsigned int axis) {
+                
+  vector<unsigned int> extrema_indices;       
+  if(!v.size()) {
+    cout<<"Utils::GetVectorMinMax: " 
+        <<" vector empty. returning." << endl;
+    return extrema_indices;
+    
+  }                         
+  if(axis > v[0].size()-1) {
+    cout<<"Utils::GetVectorMinMax: "
+             <<" too few columns: Vector has " << 
+             v[0].size() << "columns, but you asked for the extrema of the " 
+             <<axis;
+             if (axis == 1) cout<<"st";
+             else if (axis == 2) cout<<"nd";
+             else cout<<"th";
+             cout<<" column. returning." << endl;
+    return extrema_indices;
+  }
+  double max = -1e100;
+  double min = 1e100;
+  unsigned i_min = 0;
+  unsigned i_max = 0;
+  for(unsigned int i=0;i<v.size();i++) {
+    if(v[i][axis] < min)  {
+        min = v[i][axis];
+        i_min = i;
+    }
+    if(v[i][axis] > max) {
+        max = v[i][axis];
+        i_max = i;
+    }
+  }
+  extrema_indices.push_back(i_min);
+  extrema_indices.push_back(i_max);
+  return extrema_indices;
+}
+
+
+vector< vector<double> > Utils::TwoDVectorFabs(vector< vector<double> > v) {
+  vector< vector<double> > v_out;
+  for(unsigned int i = 0; i < v.size() ; i++) {
+    TwoDVectorPushBack(v[i][0],fabs(v[i][1]),v_out);  
+  }
+  return v_out;
+}
 
 vector< vector<double> > Utils::RemoveZeroEntries(vector< vector<double> > v) {
   vector< vector<double> > v_out;

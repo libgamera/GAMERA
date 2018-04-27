@@ -5,6 +5,7 @@ Particles::Particles() {
   SpectralIndex = 2.000;
   METHOD = -1;
   Tmin = 1.;
+  TIterationStart = Tmin;
   Type = 0;
   CutOffFactor = 1000.;
   TminInternal = 1./yr_to_sec; // 1 sec
@@ -408,7 +409,7 @@ void Particles::SetMembers(double t) {
   }
 
   R = V = adLossCoeff = 0.;
-
+//  std::cout<<"RConstant,R: "<<RConstant<<","<<R<<std::endl;
   if (!std::isnan(VConstant)) V = VConstant;
   if (!std::isnan(RConstant)) R = RConstant;
   if (R < 0.) {
@@ -416,7 +417,9 @@ void Particles::SetMembers(double t) {
          << " is negative! Setting it to 0."  << endl;
     R = 0.;
   }
-  R += yr_to_sec*t*V;
+//  std::cout<<"->"<<R<<","<<TIterationStart<<std::endl;
+  R += yr_to_sec*(t-TIterationStart)*V;
+//  std::cout<<"->"<<R<<std::endl;
 
   if(RVector.size() && t > RVector[0][0] &&
           t < RVector[RVector.size() - 1][0])
@@ -739,6 +742,10 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
   vector<double> E;
   vector<double> Ecuts;
   vector<double> EscTime;
+  TIterationStart = startTime;
+  vector< vector<double> > lossrates;
+  unsigned int max_loss_ind;
+  double max_loss_rate;
   Grid.push_back(vector<double>());
   for (unsigned int i = 0; i < EnergyAxis.size(); i++) {
     Grid[Grid.size() - 1].push_back(0.);
@@ -774,15 +781,35 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
      * If an external emax is specified, always choose the highest energy bin
      * value.
      */
+//    if (adLossCoeff<0.) std::cout<<"ADL:"<<adLossCoeff<<std::endl;
+//    if (adLossCoeff<0.) std::cout<<V<<" "<<R<<std::endl;
     if (!std::isnan(EmaxConstant)) largestFilledBin = Esize - 1;
-    e1 = pow(10., EnergyAxis[largestFilledBin - 1]);
-    e2 = pow(10., EnergyAxis[largestFilledBin]);
-    ebin = e2 - e1;
+//    e1 = pow(10., EnergyAxis[largestFilledBin - 1]);
+//    e2 = pow(10., EnergyAxis[largestFilledBin]);
+//    ebin = e2 - e1;
+
+//    vector< vector<double> > v;
+    fUtils->Clear2DVector(lossrates);
+    for(unsigned int i=0; i < E.size(); i++) {
+        fUtils->TwoDVectorPushBack(E[i],EnergyLossRate(E[i]),lossrates);
+    }
+//    lossrates = GetEnergyLossRate(E);
+    lossrates = fUtils->TwoDVectorFabs(lossrates);
+////    lossrates = fUtils->RemoveZeroEntries(lossrates);
+//    for(unsigned int gg=0;gg<lossrates.size();gg++)
+//        std::cout<<lossrates[gg][0]<<" "<<lossrates[gg][1]<<std::endl;
+    max_loss_ind = fUtils->GetVectorMinMaxIndices(lossrates,1)[1];
+//    std::cout<<"->MAX = "<<lossrates[max_loss_ind][1]<<" at "<<lossrates[max_loss_ind][0]<<std::endl;
+
+    max_loss_rate = lossrates[max_loss_ind][1];
+    ebin = max_loss_ind ? 
+           lossrates[max_loss_ind][0]-lossrates[max_loss_ind-1][0]:
+           lossrates[max_loss_ind+1][0]-lossrates[max_loss_ind][0];
 
     /* the tbin size is then simply defined as deltaE/Edot_max */
-    double elr = fabs(EnergyLossRate(e2));
-    tbin = elr ? ebin / elr : minTimeBin;
+    tbin = max_loss_rate ? ebin / max_loss_rate : minTimeBin;
     
+//    std::cout<< "->"<<tbin<<" "<<minTimeBin<<std::endl;
     /* compare minimum timescale to that of particle escape 
      * and choose the smaller one
      */
@@ -795,13 +822,15 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
      * tbin>minTimeBin.
      */
     if (tbin > minTimeBin) tbin = minTimeBin;
+
+//    std::cout<< "-->"<<tbin<<" "<<minTimeBin<<std::endl;
     /* negative time steps are not what we want! In this case shout out some
      * debug. */
-    if (tbin < 0.) {
-      cout << "Particles::ComputeGrid: ebin = " << ebin << " (e2,e1) = " << e2
-           << "," << e1 << ") elossrate(" << e2 << ") = " << EnergyLossRate(e2)
-           << " lastbin = " << largestFilledBin << endl;
-    }
+//    if (tbin < 0.) {
+//      cout << "Particles::ComputeGrid: ebin = " << ebin << " (e2,e1) = " << e2
+//           << "," << e1 << ") elossrate(" << e2 << ") = " << EnergyLossRate(e2)
+//           << " lastbin = " << largestFilledBin << endl;
+//    }
 
     /* info writeout */
     if (T > 0.01 * tt * (Age - startTime) && QUIETMODE == false) {
@@ -842,6 +871,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
     /* just for the first step (for speed) */
     e0 = 0.;
     ElossRate_e2 = EnergyLossRate(pow(10., EnergyAxis[0]));
+    double ElossRate_e0 = 0.;
     double particleCount = 0.;
     for (unsigned int i = 0; i < Esize; i++) {
       count++;
@@ -862,6 +892,8 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
 
       ElossRate_e1 = ElossRate_e2;
       ElossRate_e2 = EnergyLossRate(e2);
+      ElossRate_e0 = i ? EnergyLossRate(e0): 0.;
+        
 
       deltaE1 = tbin * ElossRate_e1;
       deltaE2 = tbin * ElossRate_e2;
@@ -871,28 +903,44 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
        * source */
       value = tbin * SourceSpectrum(e1);
       value *= Ecuts[i];
+      value += Grid[0][i];
 
       /* Donor-cell advection */
-      value += Grid[0][i] - quot * Grid[0][i] * ElossRate_e1 +
-              quot * Grid[0][i + 1] * ElossRate_e2;
-      if (!i) value += quot * Grid[0][i] * ElossRate_e1;
-
+      if(ElossRate_e1>=0. && i)   value -= quot * Grid[0][i] * ElossRate_e1;
+      if(ElossRate_e2 >= 0.) value += quot * Grid[0][i+1] * ElossRate_e2;
       value -= 0.5 * quot * (GetMinModSlope(i, ebin, &Grid) * ElossRate_e1 *
                                  (ebin - deltaE1) -
                              GetMinModSlope(i + 1, ebin, &Grid) * ElossRate_e2 *
                                  (ebin - deltaE2));
 
 
-      if(ElossRate_e1<0.) {
-        if(i){
-          ebin = e1 - e0;
-          quot = tbin / ebin;
-          value = Grid[0][i] + quot * Grid[0][i] * ElossRate_e1 -
-                  quot * Grid[0][i-1] * EnergyLossRate(e0) ;
-        }
-        else
-          value  = Grid[0][i] + quot * Grid[0][i] * ElossRate_e1;
+      if(ElossRate_e1<0. && i) {
+//                             quot = tbin / (e1 - e0);
+                             value += quot * Grid[0][i] * ElossRate_e1;
       }
+      if(ElossRate_e0 < 0. && i) {
+//                             quot = tbin / (e1 - e0);
+                             value -= quot * Grid[0][i-1] * ElossRate_e0;
+      }
+      if(ElossRate_e1<0. && !i) {
+                             value += quot * Grid[0][i] * ElossRate_e1;
+      }
+
+//        else value += Grid[0][i] + quot * Grid[0][i] * ElossRate_e1;
+
+
+
+//      }
+//      else {
+//        if(i){
+//          ebin = e1 - e0;
+//          quot = tbin / ebin;
+//          value += Grid[0][i] - quot * Grid[0][i] * fabs(ElossRate_e1) +
+//                  quot * Grid[0][i-1] * fabs(EnergyLossRate(e0)) ;
+//        }
+//        else
+//          value  += Grid[0][i] - quot * Grid[0][i] * fabs(ElossRate_e1);
+//      }
       /* these additional operations result in the superbee algorithm */
       //      value -=
       // 0.5*quot*(GetSuperBeeSlope(i,ebin,&Grid)*ElossRate_e1*(ebin-deltaE1)-GetSuperBeeSlope(i+1,ebin,&Grid)*ElossRate_e2*(ebin-deltaE2));
@@ -921,10 +969,10 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
       Grid[1][i] = value;
       particleCount += value * ebin;
     }
-    /* put a "0" as the last element of this row in order to avoid edge effects.
-     */
-    Grid[1][Esize] = 0.;
-    Grid[1][0] = 0.;
+//    /* put a "0" as the last element of this row in order to avoid edge effects.
+//     */
+//    Grid[1][Esize] = 0.;
+//    Grid[1][0] = 0.;
     /* set the just now calculated spectrum as base spectrum for the next step
      * This way, only 2 vectors are needed for the calculation of the spectrum
      */
@@ -937,9 +985,10 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
    * Also, forego edge bins in order to avoid artefacts.
    */
   fUtils->Clear2DVector(ParticleSpectrum);
-  for (unsigned int j = 1; j < EnergyAxis.size() - 1; j++) {
+  for (unsigned int j = 1; j < EnergyAxis.size() ; j++) {
     e1 = pow(10., EnergyAxis[j]);
     double val = Grid[0][j];
+//    std::cout<<e1<<" "<<val<<std::endl;
     if(std::isnan(val) || std::isinf(val) || !val || val < 1.e-100)
       continue;
     fUtils->TwoDVectorPushBack(e1,val,ParticleSpectrum);
@@ -948,6 +997,8 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
    * vector (Grid[1]) so that Grid has the same shape as in the beginning of
    * this function.
    */
+  
+//  std::cout<<ParticleSpectrum.size()<<std::endl;
   Grid.pop_back();
   /* for the format of the info writeout */
   if (QUIETMODE == false) {
@@ -1010,14 +1061,20 @@ double Particles::MinMod(double a, double b) {
  * time step before) due to memory storage reasons.
  */
 void Particles::ComputeGridInTimeInterval(double T1, double T2, string type, 
-                                          int bins) {
+                                          int bins, bool ICRESET) {
   
   if (TminExternal) Tmin = TminExternal;
   if (T1 <= Tmin) {
-    cout << "Particles::ComputeGridInTimeInterval T1<=internal min time (" << T1
+    cout << "Particles::ComputeGridInTimeInterval: T1<=internal min time (" << T1
          << "<=" << Tmin << "). set it artificially to " << Tmin << "yrs."
          << endl;
     T1 = Tmin * 1.001;
+  }
+  if (T1 >= T2) {
+    cout << "Particles::ComputeGridInTimeInterval: T1>=T2 (" << T1
+         << ">=" << T2 << "). Exiting."
+         << endl;
+    exit(1);
   }
   fUtils->Clear2DVector(ParticleSpectrum);
   SetSolverMethod(0);
@@ -1025,6 +1082,11 @@ void Particles::ComputeGridInTimeInterval(double T1, double T2, string type,
     Age = T1;
     CalculateParticleSpectrum(type, bins);
     fUtils->Clear2DVector(ParticleSpectrum);
+  }
+  std::cout<<"ICR:"<<ICRESET<<std::endl;
+  if(ICRESET==true) {
+    std::cout<<"hier!"<<std::endl;
+    CalculateConstants();
   }
   ComputeGrid(grid, energyAxis, T1, T2, timeAxis, yr_to_sec*(T2 - T1)/1e3);
   return;
@@ -1244,7 +1306,6 @@ void Particles::CalculateEnergyTrajectory(double TExt) {
     dt = 1.e-3 * E / Edot;
     E -= dt * Edot;
     T += dt / yr_to_sec;
-    std::cout<<E<<" "<<T<<" "<<TmaxInternal<<std::endl;
     if(T>TmaxInternal || Edot < 0.) break;
     SetMembers(T);
   }

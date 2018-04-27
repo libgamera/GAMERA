@@ -1554,12 +1554,12 @@ void Radiation::AddSSCTargetPhotons(double R, int steps) {
 
 void Radiation::ResetWithSSCTargetPhotons(int i,double R, int steps) {
     if (i<0 || i>=(int)RADFIELDS_MAX) {
-      cout<<"Radiation::ResetWithTargetPhotonsFromFile: Invalid index "<<i<<
+      cout<<"Radiation::ResetWithSSCTargetPhotons: Invalid index "<<i<<
             ". Exiting."<<endl;
       return;
     }
     if (!TargetPhotonVectors[i].size()) {
-      cout<<"Radiation::ResetWithTargetPhotonsFromFile: Vector "<<i<<
+      cout<<"Radiation::ResetWithSSCTargetPhotons: Vector "<<i<<
             " not set before. Set it up first before resetting. Exiting."<<endl;
       return;
     }

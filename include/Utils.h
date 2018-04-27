@@ -178,8 +178,11 @@ class Utils {
 /*  void TwoDVectorToMeshgrid(vector< vector<double> > vec, vector<double> &x,*/
 /*                                vector<double> &y, vector< vector<double> > &mesh);*/
   vector<double> GetVectorMinMax(vector< vector<double> > v, unsigned int axis);
+  vector<unsigned int> GetVectorMinMaxIndices(vector< vector<double> > v, unsigned int axis);
   void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }
   bool GetQuietMode() {return QUIETMODE;}
   vector< vector<double> > RemoveZeroEntries(vector< vector<double> > v);
+  vector< vector<double> > TwoDVectorFabs(vector< vector<double> > v);
+
 };
 #endif

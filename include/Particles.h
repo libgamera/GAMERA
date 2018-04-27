@@ -67,6 +67,7 @@ struct timespec time0, time1, time2, time3;
   double TmaxInternal;  ///< Same as TminInternal but here it is the maximal
                         ///time
   double TActual;  ///< Actual time of iteration time step
+  double TIterationStart; ///< start time when using grid solver
   double EminInternal;  ///< internal parameter that is relevant to the grid-
                         /// solver. Essentially, it is used to determine the
                         /// starting time of the iteration. The starting time
@@ -306,7 +307,8 @@ struct timespec time0, time1, time2, time3;
   vector<vector<vector<double> > > vs;
   void CalculateEnergyTrajectory(double TExt = 0.);
   void DetermineLookupTimeBoundaries();
-  void ComputeGridInTimeInterval(double T1, double T2, string type, int bins);
+  void ComputeGridInTimeInterval(double T1, double T2, string type, int bins,
+                                 bool ICRESET);
                                               ///< wrapper function to calculate
                                               ///the grid only in a specified
                                               ///time interval dT = T2-T2 (yrs)
@@ -330,10 +332,10 @@ struct timespec time0, time1, time2, time3;
   void CalculateElectronSpectrum(int bins = 100) {CalculateParticleSpectrum("electrons",bins);}
   void CalculateProtonSpectrumInTimeInterval(double T1, double T2,
                                              int bins = 100) {
-    ComputeGridInTimeInterval(T1,T2,"protons",bins);}
+    ComputeGridInTimeInterval(T1,T2,"protons",bins,false);}
   void CalculateElectronSpectrumInTimeInterval(double T1, double T2,
-                                               int bins = 100) {
-    ComputeGridInTimeInterval(T1,T2,"electrons",bins);}
+                                               int bins = 100, bool ICRESET=false) {
+    ComputeGridInTimeInterval(T1,T2,"electrons",bins,ICRESET);}
   void CalculateElectronSpectrumInTimeInterval(int bins = 100) {CalculateParticleSpectrum("electrons",bins);}
   void SetType(string type);
   double EnergyLossRate(double E);  ///< total energy loss rate of particles
@@ -362,7 +364,7 @@ struct timespec time0, time1, time2, time3;
   double GetRadius(double age=0.) {
     if(age) SetMembers(age);
     CalculateConstants();
-    return R;
+    return R/pc_to_cm;
   }  ///< get the extension of the astrophysical particle accelerator (cm).
   double GetExpansionVelocity(double age=0.) {
     if(age) SetMembers(age);
@@ -542,6 +544,8 @@ struct timespec time0, time1, time2, time3;
   /* methods to set custom source injection spectra */
   void SetCustomInjectionSpectrum(vector< vector<double> > vSpectrum) {
     CustomInjectionSpectrumTimeEvolution = NULL;
+    LumConstant = NAN;
+    fUtils->Clear2DVector(LumVector);
     SetCustomEnergylookup(vSpectrum,0);} ///< custom injection spectrum
 
   void SetCustomInjectionSpectrumTimeEvolution(vector< vector<double> > vCustomSpectrum) {
