@@ -514,10 +514,13 @@ class Radiation {
    * only for the relevant part of the cross section
    * !!! CAREFUL UNDER CONSTRUCTION !!!
    */
+  double AverageSigmaGammaGamma(double Eph1, double Eph2);
+  double SigmaGammaGamma(double Eph1, double Eph2, double theta);
+  
+  //vector<double> ComputeOptDepth(double Egammamin,double Egammamax, double emin,double emax, double distance);
+  double ComputeOptDepth(double Egamma, int target, double distance);
 
-
-  vector<double> ComputeOptDepth(double Egammamin,double Egammamax, double emin,double emax, double distance);
-  double ComputeOptDepth(double Egamma);
+/* //to be fixed
   vector <vector <double> > RetAbsDiffSpectrum(double emin, double emax);
   vector <vector <double> > RetAbsSED(double emin, double emax);
   vector<vector<double> > GetAbsSED(double emin = 0., double emax = 0.) {
@@ -526,7 +529,7 @@ class Radiation {
   vector<vector<double> > GetAbsSpectrum(double emin = 0., double emax = 0.) {
         return RetAbsDiffSpectrum(emin, emax);
       }  ///< return total Diff Spectrum
-
+*/
 
 
 

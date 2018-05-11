@@ -2246,6 +2246,43 @@ vector<vector<double> > Radiation::GetTargetPhotons(int i) {
     return fUtils->VectorAxisPow10(vint,-1);
 }
 
+
+
+/**
+ * Function for the gamma gamma absorption cross section
+ * Analytical average over solid angle
+ * Eq. 5 from (Eungwanichayapant & Aharonian, 2009) https://arxiv.org/pdf/0907.2971.pdf
+ * This is approximated and good within 3%
+ * !!!UNDER CONSTRUCTION!!!
+ * 
+ * To be consistent, the energy of the photons must be given in ergs
+ * 
+ */
+double Radiation::AverageSigmaGammaGamma(double Eph1, double Eph2) {
+  double CMene = Eph1*Eph2/(m_e*m_e);
+  if (CMene < 1.){
+	  //std::cout<<"ERROR, you'll get a negative number in the square root!\n"
+	  //	  "You are below threshold for pair production\n";
+      return 0;}
+  return 3./(2.*CMene*CMene)*sigma_T*((CMene+0.5*log(CMene)-1./6.+1./(2.*CMene))
+		  *log(sqrt(CMene)+sqrt(CMene-1))-(CMene+4./9.-1./(9.*CMene))*sqrt(1.-(1./CMene)));
+}
+
+
+/*
+ * Function for the full gamma gamma absorption cross section
+ * Eq. 1 from Vernetto&Lipari 2016 (https://arxiv.org/pdf/1608.01587v2.pdf)
+ */
+double Radiation::SigmaGammaGamma(double Eph1,double Eph2, double theta) {
+	double CMene = 2.*Eph1*Eph2*(1-cos(theta))/(4.*m_e*m_e);  //Centr Mass energy
+	if (CMene <= 0) {
+		//below threshold for pair production return a cross section = 0
+		return 0;
+	}
+	double beta = sqrt(1.-1./CMene);  //ausiliary variable
+	return sigma_T*3./16.*(1.-beta*beta)*(2.*beta*(beta*beta-2.)+(3.-beta*beta*beta*beta)*log((1+beta)/(1-beta)));
+}
+
 /*
  * Functions for the calculation of the optical depth
  * Takes as argument just the energy f the gamma ray photon and computes the optical
@@ -2254,29 +2291,30 @@ vector<vector<double> > Radiation::GetTargetPhotons(int i) {
  * !!! CAREFUL UNDER CONSTRUCTION !!!
  * !!! FOR THE MOMENT TEST ONLY WITH ISOTROPIC AND HOMOGENEOUS FIELDS!!!
  */
-
-double Radiation::ComputeOptDepth(double Egamma){
+double Radiation::ComputeOptDepth(double Egamma, int target, double distance){
 	//cout<<"This function is under construction, it works only with homogeneous and isotropic fields"<<endl;
 	double tauval=0;
-    vector< vector<double> > targets = Radiation::GetTargetPhotons();
+    vector< vector<double> > targets = Radiation::GetTargetPhotons(target);
     vector< vector<double> > TempVect;
     double product=0;
     double integral=0;
     //double integral2=0;
     for (unsigned int j=0;j<targets.size();j++){
-        product = fUtils->AverageSigmaGammaGamma(Egamma,targets[j][0])*targets[j][1];
+        product = Radiation::AverageSigmaGammaGamma(Egamma,targets[j][0])*targets[j][1];
         //integral2+=product*(targets[j+1][0]-targets[j][0]);
         //if (product != 0.0){
            fUtils->TwoDVectorPushBack(targets[j][0],product,TempVect);
         //}
     }
     integral = fUtils->Integrate(TempVect,targets[0][0],targets[targets.size()-1][0]);  //Make this process smarter
-    if (!distance){
-        cout << "Missing distance, assign a distance to the source"<<endl;
-    }
-    else {
+    //if (!distance){
+    //    //cout << "Missing distance, assign a distance to the source"<<endl;
+    //    distance=1e5*pc_to_cm; //in pc
+    //    tauval= (integral*distance);
+    //}
+    //else {
     	tauval= (integral*distance); //where I need to arrive, a vector with a tau for each gamma
-    }
+    //}
 	return tauval;
 }
 
@@ -2285,23 +2323,24 @@ double Radiation::ComputeOptDepth(double Egamma){
  * the absorbed gammaray SED
  * using the above calculated optical depth
  * It makes things easier when scripting
- */
+ 
 vector <vector <double> > Radiation::RetAbsDiffSpectrum(double emin, double emax){
-	vector <vector<double> > gammaspec = Radiation::ReturnDifferentialPhotonSpectrum(1,emin,emax);
+	vector <vector<double> > gammaspec = Radiation::ReturnDifferentialPhotonSpectrum(1,emin,emax,diffSpecICComponents);
     vector <vector<double> > TempVect;
     for (unsigned int i=0;i<gammaspec.size();i++){
-    	double tau = Radiation::ComputeOptDepth(gammaspec[i][0]);
+        double tau = Radiation::ComputeOptDepth(gammaspec[i][0]);
     	fUtils->TwoDVectorPushBack(gammaspec[i][0],gammaspec[i][1]*exp(-tau),TempVect);
     }
     return TempVect;
 }
 
 vector <vector <double> > Radiation::RetAbsSED(double emin, double emax){
-	vector <vector<double> > gammaspec = Radiation::ReturnSED(1,emin,emax);
+	vector <vector<double> > gammaspec = Radiation::ReturnSED(1,emin,emax,diffSpecICComponents);
     vector <vector<double> > TempVect;
     for (unsigned int i=0;i<gammaspec.size();i++){
-    	double tau = Radiation::ComputeOptDepth(gammaspec[i][0]);
+        double tau = Radiation::ComputeOptDepth(gammaspec[i][0]);
     	fUtils->TwoDVectorPushBack(gammaspec[i][0],gammaspec[i][1]*exp(-tau),TempVect);
     }
     return TempVect;
 }
+*/
