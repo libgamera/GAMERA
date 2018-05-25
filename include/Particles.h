@@ -363,7 +363,7 @@ struct timespec time0, time1, time2, time3;
   }  ///< get the ambient density at the astrophysical particle accelerator.
   double GetRadius(double age=0.) {
     if(age) SetMembers(age);
-    CalculateConstants();
+/*    CalculateConstants();*/
     return R/pc_to_cm;
   }  ///< get the extension of the astrophysical particle accelerator (cm).
   double GetExpansionVelocity(double age=0.) {
@@ -439,7 +439,7 @@ struct timespec time0, time1, time2, time3;
   void ExtendVelocityLookup(vector<vector<double> > VLOOKUP) {
     ExtendLookup(VLOOKUP, "Speed");
   }  ///<
-  vector<vector<double> > GetICLossLookup() { return ICLossVector; }
+/*  vector<vector<double> > GetICLossLookup() { return ICLossVector; }*/
   vector<vector<double> > GetLuminosityLookup() {
     return fUtils->VectorAxisPow10(LumVector,1);
   }
@@ -484,18 +484,23 @@ struct timespec time0, time1, time2, time3;
   void SetBField(double BEXT) {
     BVector.clear();
     BConstant = BEXT;
+    SetMembers(TminInternal);
   }  ///< Constanty set B-Field value
   void SetAmbientDensity(double NCONSTANT) {
     NVector.clear();
     NConstant = NCONSTANT;
+    SetMembers(TminInternal);
   }  ///< Constanty set value of ambient density
   void SetRadius(double r) {
     RVector.clear();
     RConstant = pc_to_cm*r;
+    std::cout<<"Rconst = "<<RConstant<<std::endl;
+    SetMembers(TminInternal);
   }  ///< Constanty set value of source extension (pc)
   void SetExpansionVelocity(double v) {
     VVector.clear();
     VConstant = v;
+    SetMembers(TminInternal);
   }  ///< Constanty set value of source expansion speed (cm/s)
   void SetCutOffFactor(double CUTOFFFACTOR) {
     CutOffFactor = CUTOFFFACTOR;
@@ -534,6 +539,15 @@ struct timespec time0, time1, time2, time3;
   vector<vector<double> > GetParticleSED();
   vector<vector<double> > GetGrid(){return grid;}
   double GetParticleEnergyContent(double E1=0., double E2=0.);
+
+  void SetLuminosity(double LUMConstant) {
+    LumVector.clear();
+    LumConstant = LUMConstant;
+  }
+  void SetEmax(vector<vector<double> > EMAXLOOKUP) {
+    EmaxConstant = NAN;
+    SetLookup(EMAXLOOKUP, "Emax");
+  } 
   void SetCriticalMinEnergyForGridSolver(double eminint) {EminInternal=eminint;}
   void SetIntegratorMemory(string mode);
   void SetInterpolationMethod(string intermeth)
@@ -593,7 +607,7 @@ struct timespec time0, time1, time2, time3;
     vector< vector<double> > vEsc = fUtils->MeshgridToTwoDVector(t,e,mesh);
     SetCustomTimeEnergyLookup(vEsc,1);}///< set energy-dependent escape time, dynamic. input numpy-style meshgrid.
 
-  Radiation *GetSSCEquilibrium(Radiation *fr,double t, double tolerance=1e-2);
+/*  Radiation *GetSSCEquilibrium(Radiation *fr,double t, double tolerance=1e-2);*/
   void SetSolverMethod(int method);
   void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; fRadiation->ToggleQuietMode();}  ///< toggle quiet mode on or off ( if on, no progress printout on the console)
   bool GetQuietMode() {return QUIETMODE;}
@@ -605,9 +619,22 @@ struct timespec time0, time1, time2, time3;
   void ResetWithTargetPhotonsFromFile(int i,const char *phFile);
   void AddSSCTargetPhotons(int steps=100); // wrapped from Radiation class. See Docu there. Radius in pc
   void ResetWithSSCTargetPhotons(int i, int steps=100);
+  vector<vector<double> > GetICLossLookup(int i=-1) {
+    return fRadiation->GetICLossLookup(i);
+  };///< return TotalTargetPhotonVector
+  double GetTargetPhotonFieldEnergyDensity(unsigned int i) {
+    return fRadiation->GetTargetPhotonFieldEnergyDensity(i);
+  }
   void CheckSanityOfTargetPhotonLookup(); // wrapped from Radiation class. See Docu there.
   vector<vector<double> > GetTargetPhotons(int i=-1); // wrapped from Radiation class. See Docu there.
   void ClearTargetPhotons(); // wrapped from Radiation class. See Docu there.
+
+  void SetSynchrotronEmissionModel(int SYNCHMODEL) {
+    fRadiation->SetSynchrotronEmissionModel(SYNCHMODEL);
+  }  ///< externally switch the parameterisation of the synchrotron emission
+     ///model. See SynchModel docu for options.
+  vector<double> CalculateSSCEquilibrium(double tolerance = 5e-2, int bins = 100);
+
 
   /*********************************************************/
   /* DEPRECATED FUNCTIONS KEPT FOR BACKWARDS COMPATIBILITY */
@@ -627,13 +654,6 @@ struct timespec time0, time1, time2, time3;
     eMaxVector.clear();
     EmaxConstant = EMAX;
   }  ///< DEPRECATED
-  void SetLuminosity(double LUMConstant) {
-    cout<< "SetLuminosity: This way of specifying the luminosity of the source spectrum is DEPRECATED. "
-           "This is done now by specifying a 2D-spectrum as input. See the documentation "
-           "website on how to do it now!"<<endl;
-    LumVector.clear();
-    LumConstant = LUMConstant;
-  } ///< DEPRECATED
   void SetSpectralIndex(double spectralindex) {
     cout<< "SetSpectralIndex: This way of specifying the index of the source spectrum is DEPRECATED. "
            "This is done now by specifying a 2D-spectrum as input. See the documentation "

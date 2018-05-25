@@ -415,7 +415,6 @@ class Radiation {
     return ReturnSED(2, emin, emax, diffSpec);
   }  ///< return pi0 decay SED
   vector<vector<double> > GetICSED(double emin = 0., double emax = 0.) {
-    std::cout<<"1"<<std::endl;
     return ReturnSED(3, emin, emax, diffSpec);
   }  ///< return pi0 decay SED
   vector<vector<double> > GetBremsstrahlungSED(double emin = 0.,

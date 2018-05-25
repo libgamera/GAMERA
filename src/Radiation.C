@@ -1583,7 +1583,7 @@ void Radiation::SetSSCTargetPhotons(double R, int steps, int i) {
   }
   void *p = NULL;
   double logemin = log10(1.e-8 * eV_to_erg);
-  double logemax = log10(1e-3*ParticleVector[ParticleVector.size()-1][0]);
+  double logemax = log10(1e-4*ParticleVector[ParticleVector.size()-1][0]);
 //  if(logemax>-2.) logemax = -2.;
   double estep = (logemax - logemin) / steps;
   double E = 0.;
@@ -2012,7 +2012,7 @@ vector<vector<double> > Radiation::ReturnDifferentialPhotonSpectrum(
   if (!vec.size()) {
     cout << "Radiation::ReturnDifferentialSpectrum: Differential spectrum "
             "vector empty. Fill it via "
-            "Radiation::CalculateDifferentialSpectrum() first! Returning empty "
+            "Radiation::CalculateDifferentialPhotonSpectrum() first! Returning empty "
             "vector." << endl;
     return tempVec;
   }
@@ -2040,7 +2040,7 @@ vector<vector<double> > Radiation::ReturnSED(int i, double emin, double emax,
   vector<vector<double> > tempVec;
   if (!vec.size()) {
     cout << "Radiation::ReturnSED: Differential spectrum vector empty. Fill it "
-            "via Radiation::CalculateDifferentialSpectrum() first! Returning "
+            "via Radiation::CalculateDifferentialPhotonSpectrum() first! Returning "
             "empty vector." << endl;
     return tempVec;
   }

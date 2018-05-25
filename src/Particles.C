@@ -120,8 +120,8 @@ void Particles::CalculateConstants() {
 
   bremsl_epf = 3. * fineStructConst * sigma_T * c_speed * m_e / pi;
   bremsl_eef = (3. * fineStructConst * sigma_T * c_speed * m_e / (2. * pi));
-  if(!Type && (fRadiation->GetICLossLookup()).size()) 
-        SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+  if(!Type && (fRadiation->GetICLossLookup()).size()) {
+        SetLookup(fRadiation->GetICLossLookup(), "ICLoss");}
   return;
 }
 
@@ -263,20 +263,22 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
  * - exponential cut-offs can be mitigated by very high values of "CutOffFactor"
  */
 double Particles::SourceSpectrum(double e) {
+  double val = 0.;
   if(CustomInjectionSpectrumTimeEvolution != NULL) {
     if(e < MinELookup || e > MaxELookup) return 0.;
-    return pow(10.,interp2d_spline_eval(
+    val = pow(10.,interp2d_spline_eval(
               CustomInjectionSpectrumTimeEvolution,TActual,log10(e),taccsp,eaccsp));
   }
   else if(CustomInjectionSpectrum != NULL) {
     if(e < MinELookup || e > MaxELookup || !Lum ) return 0.;
-    return Lum * 
+    val = Lum * 
       pow(10.,gsl_spline_eval(CustomInjectionSpectrum, log10(e), accCustInj)) 
       / CustomInjectionNorm;
   }
-  else {
-    return PowerLawInjectionSpectrum(e, eMax, 10. * eMax);
-  }
+  else val = PowerLawInjectionSpectrum(e, eMax, 10. * eMax);
+
+  if (val <1.e-99)  return 0.;
+  else return val;
 }
 
 double Particles::EscapeTime(double e, double t) {
@@ -852,7 +854,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
 
     /* This is the new time! */
     t = T + 0.5 * tbin / yr_to_sec;
-    
+//    std::cout<< "Tbin/mintimebin"<<tbin<<"/"<<minTimeBin<<std::endl;
     /* if t is larger than age, exit! */
     if(t>Age) break;
     
@@ -901,6 +903,7 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
 
       /* Increase in particles in bin 'i' due to particle injection from the
        * source */
+//      std::cout<<"e="<<e1<<" "<<SourceSpectrum(e1)<<" "<<EnergyLossRate(e1)<<std::endl;
       value = tbin * SourceSpectrum(e1);
       value *= Ecuts[i];
       value += Grid[0][i];
@@ -908,12 +911,18 @@ void Particles::ComputeGrid(vector<vector<double> > &Grid,
       /* Donor-cell advection */
       if(ElossRate_e1>=0. && i)   value -= quot * Grid[0][i] * ElossRate_e1;
       if(ElossRate_e2 >= 0.) value += quot * Grid[0][i+1] * ElossRate_e2;
-      value -= 0.5 * quot * (GetMinModSlope(i, ebin, &Grid) * ElossRate_e1 *
+
+      double mm,sb;
+      mm = 0.5 * quot * (GetMinModSlope(i, ebin, &Grid) * ElossRate_e1 *
                                  (ebin - deltaE1) -
                              GetMinModSlope(i + 1, ebin, &Grid) * ElossRate_e2 *
                                  (ebin - deltaE2));
-
-
+      sb =
+       0.5*quot*(GetSuperBeeSlope(i,ebin,&Grid)*ElossRate_e1*(ebin-deltaE1)-GetSuperBeeSlope(i+1,ebin,&Grid)*ElossRate_e2*(ebin-deltaE2));
+//      std::cout<<"mm,sb="<<mm<<","<<sb<<","<<sqrt(fabs(mm*sb))<<std::endl;
+//      double prod = sqrt(fabs(mm*sb));
+//      if (sb) value -= sb * prod / fabs(sb);
+      value -= 0.5 * sqrt(mm*mm + sb*sb);
       if(ElossRate_e1<0. && i) {
 //                             quot = tbin / (e1 - e0);
                              value += quot * Grid[0][i] * ElossRate_e1;
@@ -1076,16 +1085,14 @@ void Particles::ComputeGridInTimeInterval(double T1, double T2, string type,
          << endl;
     exit(1);
   }
-  fUtils->Clear2DVector(ParticleSpectrum);
+//  fUtils->Clear2DVector(ParticleSpectrum);
   SetSolverMethod(0);
   if(!grid.size()) {
     Age = T1;
     CalculateParticleSpectrum(type, bins);
     fUtils->Clear2DVector(ParticleSpectrum);
   }
-  std::cout<<"ICR:"<<ICRESET<<std::endl;
   if(ICRESET==true) {
-    std::cout<<"hier!"<<std::endl;
     CalculateConstants();
   }
   ComputeGrid(grid, energyAxis, T1, T2, timeAxis, yr_to_sec*(T2 - T1)/1e3);
@@ -1435,14 +1442,13 @@ void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
             vCustom[0].size() << " columns. Exiting." << endl;
     return;
   }
+
+  if(std::isnan(EmaxConstant)) EmaxConstant = vCustom[vCustom.size()-1][0];
+  if(!EminConstant) EminConstant = vCustom[0][0];
+  
+  vCustom = fUtils->RemoveZeroEntries(vCustom);
   if(!MinELookup) MinELookup = vCustom[0][0];
   if(!MaxELookup) MaxELookup = vCustom[vCustom.size()-1][0];
-  if(std::isnan(EmaxConstant)) {
-    EmaxConstant = MaxELookup;
-  }
-  if(!EminConstant) {
-    EminConstant = MinELookup;
-  }
   if(!mode) {
     CustomInjectionNorm = fUtils->EnergyContent(vCustom);
     if(std::isnan(LumConstant) && !LumVector.size()) {
@@ -1755,37 +1761,66 @@ vector< vector<double> > Particles::GetQuantityVector(vector<double> epoints,
 /**
  * Funtion under construction! Use at own peril!
  */
-Radiation *Particles::GetSSCEquilibrium(Radiation *fr, double t, double tolerance) {
-  Age = t;
-//  METHOD = 1;
-  SetMembers(Age);
-  fr->CreateICLossLookup();
-//  SetLookup(fr->GetICLossLookup(), "ICLoss");
-//  CalculateElectronSpectrum();
-//  fr->SetBField(BField);
-//  for(unsigned int i=0;i<ParticleSpectrum.size();i++)
-//    std::cout<<ParticleSpectrum[i][0]<<" "<<ParticleSpectrum[i][1]<<std::endl;
-//  fr->SetElectrons(ParticleSpectrum);
-// 
-//  double new_sum,old_sum;
-//  new_sum = old_sum = -1.;
-//  while (1) {
-//    fr->AddSSCTargetPhotons(R/pc_to_cm,100);
-//    vector< vector <double> > tph = fr->GetTargetPhotons();
-//    new_sum = fUtils->EnergyContent(tph);
-//    std::cout<<new_sum<< " " << old_sum<<std::endl;
-//    if( fabs(1. - new_sum/old_sum) < tolerance ) break;
-//    fr->CreateICLossLookup();
-//    SetLookup(fr->GetICLossLookup(), "ICLoss");
-//    CalculateElectronSpectrum();
-//    for(unsigned int i=0;i<ParticleSpectrum.size();i++)
-//      std::cout<<ParticleSpectrum[i][0]<<" "<<ParticleSpectrum[i][1]<<std::endl;
-//    fr->SetElectrons(ParticleSpectrum);
-//    old_sum = new_sum;
-//  }
-  
-//  BConstant = LConstant = NConstant = NAN;
-  return fr;
+vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
+  if (TminExternal) Tmin = TminExternal;
+  ToggleQuietMode();
+  double r_orig = R;
+  double r_start = 10.*R < 1. ? 1. : 10.*R;
+  int steps = 10;
+  double delta_log_r = (log10(r_start) - log10(r_orig)) / steps;
+  double delta_t = (Age-Tmin) / steps;
+  double target_field_count = fRadiation->GetTargetFieldCount();
+  double e_p = 0.;
+  double e_p_0 = 0.;
+  double precision = 1e100;
+  cout << "____________________________________" << endl;
+  cout << ">> CALCULATING SSC EQUILIBRIUM STATE " << endl;
+
+  vector<double> iter;
+  CalculateElectronSpectrum(bins);
+  // this first loop calculates spectrum on ever-decreasing radii until real
+  // source radius is reached. The idea is to 'cool away' the highest energy 
+  // electrons first in a lower intensity synchrotron target field (due to the
+  // larger radii) before the actual iteration on the real radius starts. This
+  // can considerably speed up the process.
+  cout << "   -> pre-iteration for speedup     " << endl;
+  double log_r,t,t0;
+  int i;
+  t0 = Tmin;
+
+  for(log_r = log10(r_start), t=Tmin, i=0; log_r >= log10(r_orig) && t<=Age && i<steps; log_r -= delta_log_r, t+= delta_t,i++) {
+    cout<<"t0,t "<<t0<<","<<t<<std::endl;
+    cout << "    " << (int)(100. * (i+1) / steps) << "\% done\r" << std::flush;
+    R = pow(10.,log_r);
+    if (log_r == log10(r_start)) AddSSCTargetPhotons();
+    else ResetWithSSCTargetPhotons(target_field_count);
+    CalculateElectronSpectrum(bins);
+    e_p = GetParticleEnergyContent();
+    iter.push_back(e_p);
+    e_p_0 = e_p;
+    t0 = t;
+  }   
+
+  cout << endl;
+  cout << endl;
+  cout << "   -> precision reached / goal:     " << endl;  
+  R = r_orig;
+  while(1){
+    ResetWithSSCTargetPhotons(target_field_count);
+    SetMembers(Age);
+    CalculateElectronSpectrum(bins);
+    e_p = GetParticleEnergyContent();
+    iter.push_back(e_p);
+    precision = fabs(e_p/e_p_0 - 1.);
+    cout << " >> " << precision << " / " << tolerance <<"\r"<<std::flush;
+    if (precision < tolerance) break;
+    e_p_0 = e_p;
+  }
+  cout << endl;
+  cout << "   -> DONE!     " << endl;
+  ToggleQuietMode();
+  return iter;
+
 }
 
 
