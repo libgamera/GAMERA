@@ -1763,7 +1763,6 @@ vector< vector<double> > Particles::GetQuantityVector(vector<double> epoints,
  */
 vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
   if (TminExternal) Tmin = TminExternal;
-  ToggleQuietMode();
   double r_orig = R;
   double r_start = 10.*R < 1. ? 1. : 10.*R;
   int steps = 10;
@@ -1773,24 +1772,27 @@ vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
   double e_p = 0.;
   double e_p_0 = 0.;
   double precision = 1e100;
-  cout << "____________________________________" << endl;
-  cout << ">> CALCULATING SSC EQUILIBRIUM STATE " << endl;
-
-  vector<double> iter;
-  CalculateElectronSpectrum(bins);
+  if (QUIETMODE == false) {
+    cout << "\r";
+    cout << "____________________________________" << endl;
+    cout << ">> CALCULATING SSC EQUILIBRIUM STATE " << endl;
+    cout << "   -> pre-iteration for speedup     " << endl;
+  }
   // this first loop calculates spectrum on ever-decreasing radii until real
   // source radius is reached. The idea is to 'cool away' the highest energy 
   // electrons first in a lower intensity synchrotron target field (due to the
   // larger radii) before the actual iteration on the real radius starts. This
   // can considerably speed up the process.
-  cout << "   -> pre-iteration for speedup     " << endl;
-  double log_r,t,t0;
+  vector<double> iter;
+  CalculateElectronSpectrum(bins);
+  double log_r,t;
   int i;
-  t0 = Tmin;
 
   for(log_r = log10(r_start), t=Tmin, i=0; log_r >= log10(r_orig) && t<=Age && i<steps; log_r -= delta_log_r, t+= delta_t,i++) {
-    cout<<"t0,t "<<t0<<","<<t<<std::endl;
-    cout << "    " << (int)(100. * (i+1) / steps) << "\% done\r" << std::flush;
+    
+    if (QUIETMODE == false) {
+     cout << "    " << (int)(100. * (i+1) / steps) << "\% done\r" << std::flush;
+    }
     R = pow(10.,log_r);
     if (log_r == log10(r_start)) AddSSCTargetPhotons();
     else ResetWithSSCTargetPhotons(target_field_count);
@@ -1798,12 +1800,13 @@ vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
     e_p = GetParticleEnergyContent();
     iter.push_back(e_p);
     e_p_0 = e_p;
-    t0 = t;
   }   
 
-  cout << endl;
-  cout << endl;
-  cout << "   -> precision reached / goal:     " << endl;  
+  if (QUIETMODE == false) {
+    cout << endl;
+    cout << endl;
+    cout << "   -> precision reached / goal:     " << endl;  
+  }
   R = r_orig;
   while(1){
     ResetWithSSCTargetPhotons(target_field_count);
@@ -1812,13 +1815,17 @@ vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
     e_p = GetParticleEnergyContent();
     iter.push_back(e_p);
     precision = fabs(e_p/e_p_0 - 1.);
-    cout << " >> " << precision << " / " << tolerance <<"\r"<<std::flush;
+    if (QUIETMODE == false) {
+        cout << " >> " << precision << " / " << tolerance <<"\r"<<std::flush;
+    }
     if (precision < tolerance) break;
     e_p_0 = e_p;
   }
-  cout << endl;
-  cout << "   -> DONE!     " << endl;
-  ToggleQuietMode();
+
+  if (QUIETMODE == false) {
+    cout << endl;
+    cout << "   -> DONE!     " << endl;
+  }
   return iter;
 
 }
