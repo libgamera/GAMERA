@@ -8,16 +8,14 @@ A complete working script can be found [here](RadiationBasics.py).
 Step 1: Define a particle spectrum
 ----------------------------------
 
-Create a 2D vector (C++) or list / numpy array (python) representing a particle spectrum. This spectrum has to be differential in energy (`1 / erg`)
-and in the right format. For instance, a power-law can be defined 
-in python using numpy like
+Create a 2D vector (C++) or list / numpy array (python) representing a particle spectrum. This spectrum has to be differential in energy (`1 / erg`). For instance, a power-law can be defined like
 ```
 e = np.logspace(-3,3,200) * gp.TeV_to_erg # energy axis
 power_law = norm * e**-alpha # define power law
 particles = zip(e,power_law) # input needs to be 2D-array
 ```
 >Note:
->You have to make sure that the norm of the power-law is right. For example, if
+>You have to make sure that the `norm` of the power-law is right. For example, if
 you normalise to an energy content `E_tot`, it should be something like `norm = E_tot / np.sum(e[1:]*powerlaw[1:]*np.diff(e))`.
 
 
@@ -59,7 +57,7 @@ fr.SetElectrons(particles)
 Step 6: Calculate the radiation spectra and retrieve them
 ---------------------------------------------------------
 The differential spectrum is calculated at a specified set of points in energy 
-space. The unit of these points in energy is again erg. This set of points is 
+space. The unit of these points in energy is erg. This set of points is 
 defined by a 1D-vector (`C++`) or list / numpy array (`python`), for example:
 ```
 e = np.logspace(-6,15,bins) * gp.eV_to_erg # has to be in erg!
@@ -69,8 +67,8 @@ The radiation spectrum is calculated at these energies via
 fr.CalculateDifferentialPhotonSpectrum(e)
 ```
 
-Step 7: Get the spectral
-------------------------
+Step 7: Get the spectra
+-----------------------
 There are different formats you can now extract:
 - differential photon spectra (`dN/dE`, units: `1 / erg / cm^2 / s`)
 ```
@@ -96,19 +94,19 @@ fr.GetIntegral*EnergyFlux(emin,emax) # emin, emax in TeV!
 
 The so-retrieved spectra are in the format of 2D-vectors (C++) or 2D-lists (python). 
  
-Notes
------
-> Specifying a distance value is optional. If set to non-zero value, photon flux from particle population at that distance will be calculated. Otherwise, the luminosity is calculated. 
+Important Notes
+---------------
+- Specifying a distance value is optional. If set to non-zero value, photon flux from particle population at that distance will be calculated. Otherwise, the luminosity is calculated. 
 
->For integral fluxes to be precise, you should make sure that your spectrum's 
+- For integral fluxes to be precise, you should make sure that your spectrum's 
 binning is fine enough (you can change that by adjusting `bins` in the above step `[a]`). 
 You can get an idea of the required binning [here](binning.md). 
-
->You only have to set the parameters relevant to the radiation process you want to calculate. For example, if you are only interested in Bremsstrahlung, you don't have to specify the B-Field
-
->For the IC process there are several ways to set up the radiation fields, including for SSC modelling or anisotropy, [see here](inverse_compton.md)
-
->The `Particle` class in `GAMERA` creates spectra already in the right format and 
+- You only have to set the parameters relevant to the radiation process you want to calculate. For example, if you are only interested in Bremsstrahlung, you don't have to specify the B-Field
+- For the IC process there are several ways to set up the radiation fields, including for SSC modelling or anisotropy, [see here](inverse_compton.md)
+- If you have set up more than one IC target field, you can access the individual contributions to the resulting radiation spectrum via `fr.GetICSpectrum(field)`,
+where `field` is the index of the field (e.g. the for the first field you have set 
+it is `field=0`, for the second `field=1` and so on).
+- The `Particle` class in `GAMERA` creates spectra already in the right format and 
 is the natural 'counterpart' to the Radiation class. It allows, among other things, 
 for time-dependent modeling. Tutorials how to use it are available, too.
 
