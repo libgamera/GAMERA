@@ -56,11 +56,10 @@ b_field = 1e-5 # in Gauss, necessary for Synchrotron calculation
 
 ambient_density = 1 # 1/cm^3, necessary for Bremsstrahlung and hadronic emission
 
-# radiation field, necessary for Inverse-Compton radiation. 
+# radiation field parameters, necessary for Inverse-Compton radiation. 
 temp = 2.7 # Temperature in K
 edens = 0.25 * gp.eV_to_erg # energy density in erg / cm^-3
 
-# distance
 distance = 1e3 # in pc
 
 ```
@@ -73,8 +72,6 @@ fr.SetBField(b_field)
 fr.AddThermalTargetPhotons(t_cmb,edens_cmb)
 fr.SetDistance(distance)
 ```
-
->Specifying a distance value is optional. If set to non-zero value, photon flux from particle population at that distance will be calculated. Otherwise, the luminosity is calculated. 
 
 Now set up the particle spectrum. You can decide what kind of particles 
 you put there. This will determine which radiation processes will be calculated.
@@ -126,22 +123,16 @@ fr.GetIntegral*EnergyFlux(emin,emax) # emin, emax in TeV!
 
 The so-retrieved spectra are in the format of 2D-vectors (C++) or 2D-lists (python). 
  
-<aside class="warning">
-For these integral fluxes to be precise, you should make sure that your spectrum's 
+> Notes:
+> Specifying a distance value is optional. If set to non-zero value, photon flux from particle population at that distance will be calculated. Otherwise, the luminosity is calculated. 
+
+>For integral fluxes to be precise, you should make sure that your spectrum's 
 binning is fine enough (you can change that by adjusting `bins` in the above step `[a]`). 
-You can get an idea of the required binning [https://www.mpi-hd.mpg.de/personalhomes/jhahn/Various/Integration%20Over%20Power-Laws/index.html](here). 
-</aside>
+You can get an idea of the required binning [here](binning.md). 
 
+>You only have to set the parameters relevant to the radiation process you want to calculate. For example, if you are only interested in Bremsstrahlung, you don't have to specify the B-Field
 
-
-<aside class="notice">
-you only have to set the parameters relevant to the radiation process you want to calculate. For example, if you are only interested in Bremsstrahlung, you don't have to specify the B-Field
-</aside>
-
-
-<aside class="notice">
-For the IC process there are several ways to set up the radiation fields, including for SSC modelling or anisotropy, [see here](inverse_compton.md)
-</aside>
+>For the IC process there are several ways to set up the radiation fields, including for SSC modelling or anisotropy, [see here](inverse_compton.md)
 
 
 ![RadiationBasics](RadiationBasics.png) 
