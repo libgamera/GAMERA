@@ -1,8 +1,6 @@
 ![Banner](GAMERA_banner.png) 
+ 
 
- 
-#A `C++/python` modelling package for gamma-ray astronomy
- 
 Documentation under construction and will be updated continuously. 
  
 
@@ -15,6 +13,13 @@ NEWS
 - integrated flux now easier to get (basic Radiation tutorial updated)
 - no more random drawings of GAMERA on your console ;)
 - directly set up radiation fields in the Particles class now! (updated static modeling Particles tutorial) 
+
+Documentation & Tutorials
+=========================
+[Download & Installation](docs/download_installation.md)
+[Tutorials](docs/tutorials_main.md)
+
+
 
 
 
