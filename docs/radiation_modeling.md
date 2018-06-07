@@ -10,19 +10,18 @@ Step 1: Define a particle spectrum
 
 The first step is to define a 2D vector (C++) or list / numpy array (python) 
 defining a particle spectrum. This spectrum has to be differential in energy
-and needs to be in the right format. For instance, a power-law can be defined 
-in python using numpy as simply as
+and in the right format. For instance, a power-law can be defined 
+in python using numpy like
 ```
-# define the energy range of the particles, here between 1 GeV and 1 PeV
-energy_in_erg_particles = np.logspace(-3,3,200) * gp.TeV_to_erg
-
-# make the power-law, norm has to be in the right format so that it reflects
-# particles  /  energy in ergs
-particles = norm * energy_in_erg_particles**-alpha
-
-# zip together to a 2D-list
-particles = np.array(zip(energy_in_erg_particles,particles))
+e = np.logspace(-3,3,200) * gp.TeV_to_erg # energy axis
+power_law = norm * e**-alpha # define power law
+particles = zip(e,power_law) # input needs to be 2D-array
 ```
+>Note:
+>You have to make sure that the norm of the power-law is right. For example, if
+you normalise to energy content `E_tot`, the `norm` parameter in the example 
+above should be something like `norm = E_tot / np.sum(e[1:]*powerlaw[1:]*np.diff(e))`.
+
 
 The `Particle` class in `GAMERA` creates spectra already in the right format and 
 is the natural 'counterpart' to the Radiation class. It allows, among other things, 
