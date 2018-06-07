@@ -18,14 +18,14 @@ You will have to compile `GAMERA` from source. Apart from a `C++` compiler (e.g.
 - the `C/C++` python wrapper `swig`, if you want the python-wrapped version (i.e. `GAPPA`)
 - python (including the headers) for `GAPPA`
 
-*`Linux`
+`Linux`
 These packages are readily available on all major Linux platforms. On Ubuntu 16.04 LTS,  
 you can install them via 
 ```
 sudo apt install libgsl2 libgsl-dev swig python-dev
 ```
 
-*`MacOS`
+`MacOS`
 many repositories provide `gsl` and `swig`, for example [homebrew](https://brew.sh/): 
 ```
 $ brew install gsl swig
