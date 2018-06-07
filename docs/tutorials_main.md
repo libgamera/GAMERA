@@ -7,8 +7,9 @@ How to ...
 - [calculate the broad-band radiation spectrum from a parent population of hadrons or electrons](radiation_modeling.md)
 - [evolve a particle population in a time-constant environment](static_modeling.md)
 - [evolve a particle population in a changing environment](dynamic_modeling.md)
+- [set up more complicated Inverse-Compton radiation fields (SSC, anisotropy, arbitrary shape)](inverse_compton.md)
 - [take particle escape into account](particle_escape.md)
-- [access your energy loss scales](energy_loss.md)
+- [display the particle energy loss scales](energy_loss.md)
 
 
 Please note:
