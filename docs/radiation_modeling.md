@@ -1,14 +1,12 @@
-Calculating the broad-band radiation spectrum from a parent population of particles
-===================================================================================
-
-
-The following will explain the general usage of the `GAMERA Radiation` class. 
-Syntax is in python (wrapped via swig from C++), but the principle of usage
-is the same in C++. 
+Step-by-step: broad-band radiation spectrum from a parent population of particles
+=================================================================================
 
 A complete working script can be found [here](RadiationBasics.py). 
 
-- __define a particle spectrum__
+
+
+Step 1: Define a particle spectrum
+----------------------------------
 
 The first step is to define a 2D vector (C++) or list / numpy array (python) 
 defining a particle spectrum. This spectrum has to be differential in energy. 
@@ -44,7 +42,8 @@ for time-dependent modeling. Tutorials how to use it are available, too.
 
 
 
-- __create a Radiation object and set it up__
+Step 2: create a Radiation object and set it up
+-----------------------------------------------
 
 Creating a Radiation object works like
 ```
@@ -74,18 +73,13 @@ fr.SetBField(b_field)
 fr.AddThermalTargetPhotons(t_cmb,edens_cmb)
 fr.SetDistance(distance)
 ```
-_Some remarks:_ 
 
-- you only have to set the parameters relevant to the radiation process you want to calculate. For example, if you are only interested in Bremsstrahlung, you don't have to specify the B-Field
+<aside class="notice">
+Specifying a distance value is optional. If set to non-zero value, photon flux from particle population at that distance will be calculated. Otherwise, the luminosity is calculated. 
+</aside>
 
-- For the IC process there are several ways to set up the radiation fields, including for SSC modelling. There is a [https://www.mpi-hd.mpg.de/personalhomes/jhahn/Tutorials/Calculate%20Radiation%20From%20A%20Particle%20Population/Setting%20Up%20IC-Target%20Photons/index.html](dedicated tutorial for that).
-
-- Specifying a distance value is optional. If set to non-zero value, photon flux from particle population at that distance will be calculated. Otherwise, a photon emissivity / production rate is calculated. In the following, we assume that a distance has been set, but the  procedure to calculate radiation spectra is the same if you don't chose to do so.
-
-Finally, set up the particle spectrum. Now, you can decide what kind of particles 
-you want to set. In the standard way of using it, you can pick one or both of those 
-options depending on what kind of radiation processes you are interested in. Or, 
-in other words, what kind of particles you theoretical spectra constitute:
+Now set up the particle spectrum. You can decide what kind of particles 
+you put there. This will determine which radiation processes will be calculated.
 
 ```
 fr.SetProtons(particles)   # if you want to calculate hadronic emission
@@ -93,71 +87,64 @@ fr.SetElectrons(particles) # if you want to calculate leptonic emission
    # (Bremsstrahlung, Synchrotron- and IC-radiation)
 ```
 
---- calculate the radiation spectra and retrieve them
+Step 3: Calculate the radiation spectra and retrieve them
+---------------------------------------------------------
+
 The differential spectrum is calculated at a specified set of points in energy 
 space. The unit of these points in energy is again erg. This set of points is 
 defined by a 1D-vector (`C++`) or list / numpy array (`python`), for example:
 ```
 e = np.logspace(-6,15,bins) * gp.eV_to_erg #[a]
 ```
-Then, the radiation spectrum is calculated via 
+Then, the radiation spectrum is calculated at these energies via 
 ```
 fr.CalculateDifferentialPhotonSpectrum(e)
 ```
 
-The now calculated spectra can be accessed in form of either  
-differential photon spectra (dN/dE, unit: $$erg^{-1} cm^{-2} s^{-1} \text{ vs. } erg$$) or 
-SEDs (E$$^2$$dN/dE, unit: $$erg \cdot cm^{-2} s^{-1} \text{ vs. } TeV$$). 
-The commands are as follows: 
- 
-__differential photon spectra__
-
+The now calculated spectra can be accessed in form of either
+- differential photon spectra (`dN/dE`, units: `1 / erg / cm^2 / s`)
 ```
+fr.GetTotalSpectrum()  # sum of all components
 fr.GetPPSpectrum() # inelastic proton scattering
 fr.GetSynchrotronSpectrum()# synchrotron radiation
 fr.GetBremsstrahlungSpectrum() # bremsstrahlung
 fr.GetICSpectrum() # inverse-compton scattering
-fr.GetTotalSpectrum()  # sum of all components
 ```
- 
-__SEDs__
+   
+- SEDs (`E^2*dN/dE`, units: `erg / cm^2 / s`) 
+```
+fr.Get*SED() # * denotes the radiation mechanisms above!
+```
+- integrated flux (`int_e^inf dE dN/dE`, units: `1 / cm^2 / s`)
+```
+fr.GetIntegral*Flux(emin,emax) # emin, emax in TeV!
+```
+- integrated energy flux (`int_e^inf dE E*dN/dE`, units: `erg / cm^2 / s`)
+```
+fr.GetIntegral*Flux(emin,emax) # emin, emax in TeV!
+```
+fr.GetIntegral*EnergyFlux(emin,emax) # emin, emax in TeV!
+```
 
-```
-fr.GetPPSED() 
-fr.GetSynchrotronSED() 
-fr.GetBremsstrahlungSED()
-fr.GetICSED()
-fr.GetTotalSED()
-```
+
 The so-retrieved spectra are in the format of 2D-vectors (C++) or 2D-lists (python). 
  
-__integrated flux__ 
-
-also integrated number fluxes (integrated in energy over `dN/dE`) are easily calculated via
-```
-fr.GetIntegralTotalFlux(emin,emax) # emin, emax in TeV!
-fr.GetIntegralPPFlux(emin,emax) 
-fr.GetIntegralSynchrotronFlux(emin,emax)
-fr.GetIntegralBremsstrahlungFlux(emin,emax)
-fr.GetIntegralICFlux(emin,emax)
-```
-These values are floats and correspond to the integral fluxes between emin and emax in TeV. The result has then the unit of `1 / cm^2 / s`.
- 
-__integrated energy flux__
-
-same as above for energy fluxes (integrated in energy over `E*dN/dE`)
-```
-fr.GetIntegralTotalEnergyFlux(emin,emax) # emin, emax in TeV!
-fr.GetIntegralPPFlux(emin,emax) 
-fr.GetIntegralSynchrotronFlux(emin,emax)
-fr.GetIntegralBremsstrahlungFlux(emin,emax)
-fr.GetIntegralICFlux(emin,emax)
-```
-The result has then the unit of `erg / cm^2 / s`. 
+<aside class="warning">
 For these integral fluxes to be precise, you should make sure that your spectrum's 
 binning is fine enough (you can change that by adjusting `bins` in the above step `[a]`). 
 You can get an idea of the required binning [https://www.mpi-hd.mpg.de/personalhomes/jhahn/Various/Integration%20Over%20Power-Laws/index.html](here). 
+</aside>
 
+
+
+<aside class="notice">
+you only have to set the parameters relevant to the radiation process you want to calculate. For example, if you are only interested in Bremsstrahlung, you don't have to specify the B-Field
+</aside>
+
+
+<aside class="notice">
+For the IC process there are several ways to set up the radiation fields, including for SSC modelling or anisotropy, [see here](inverse_compton.md)
+</aside>
 
 
 ![RadiationBasics](RadiationBasics.png) 
