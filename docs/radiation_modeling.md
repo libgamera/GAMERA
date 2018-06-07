@@ -74,17 +74,14 @@ fr.AddThermalTargetPhotons(t_cmb,edens_cmb)
 fr.SetDistance(distance)
 ```
 
-<aside class="notice">
-Specifying a distance value is optional. If set to non-zero value, photon flux from particle population at that distance will be calculated. Otherwise, the luminosity is calculated. 
-</aside>
+>Specifying a distance value is optional. If set to non-zero value, photon flux from particle population at that distance will be calculated. Otherwise, the luminosity is calculated. 
 
 Now set up the particle spectrum. You can decide what kind of particles 
 you put there. This will determine which radiation processes will be calculated.
 
 ```
-fr.SetProtons(particles)   # if you want to calculate hadronic emission
-fr.SetElectrons(particles) # if you want to calculate leptonic emission 
-   # (Bremsstrahlung, Synchrotron- and IC-radiation)
+fr.SetProtons(particles) 
+fr.SetElectrons(particles) 
 ```
 
 Step 3: Calculate the radiation spectra and retrieve them
