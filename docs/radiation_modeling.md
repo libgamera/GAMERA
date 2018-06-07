@@ -4,7 +4,7 @@ Step-by-step: broad-band radiation spectrum from a parent population of particle
 =================================================================================
 
 Only a few steps are required to get the radiation spectra from a particle population.
-A complete working script can be found [here](radiation_basics.py) (it ouputs the plot
+A complete working script can be found [here](radiation_basics.py) (it creates the plots
 at the bottom of the page). 
 
 Step 1: Define a particle spectrum
