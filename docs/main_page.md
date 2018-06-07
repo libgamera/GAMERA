@@ -1,4 +1,4 @@
-@GAMERA_banner.png[height:15vw] 
+![Banner](GAMERA_banner.png) 
 
  
 #A `C++/python` modelling package for gamma-ray astronomy
