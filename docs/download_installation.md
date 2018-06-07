@@ -35,14 +35,16 @@ $ brew install gsl swig
 
 Building: `python`
 ------------------
-*Compilation
+__Compilation__
+
 If you are interested in the `python` package (`GAPPA`), run 
 ```
 $ make gappa
 ```
 and it will generate `lib/_gappa.so` and `lib/gappa.py`. 
 
-*Usage 
+__Usage__
+
 In your python script, You need to add the directory holding the module (default: `lib/` in the `GAMERA` directory) to the search  path for modules, e.g.:
 ```
 import sys
@@ -52,6 +54,7 @@ sys.path.append('/home/user/Documents/GAMERA/lib')
 Building: `C++`
 ---------------
 __Compilation__
+
 To build the `C++` library, go to the base GAMERA directory and run
 ```
 $ make gamera
@@ -59,6 +62,7 @@ $ make gamera
 This will create the shared object `lib/libgamera.so` which can be used in `C++` programs. 
 
 __Usage__
+
 To use the library in you program, compile like e.g.:
 ```
 $ gcc -o yourProgram yourProgramSource.C -lgamera -L$(LIBDIR)
