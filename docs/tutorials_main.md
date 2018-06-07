@@ -36,4 +36,4 @@ in either language.
 
 ![GAMERA](GAMERA.png) 
 
-[(back to main page)](main_page.md))
+[(back to main page)](main_page.md)

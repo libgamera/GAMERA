@@ -51,14 +51,14 @@ sys.path.append('/home/user/Documents/GAMERA/lib')
 
 Building: `C++`
 ---------------
-*Compilation 
+__Compilation__
 To build the `C++` library, go to the base GAMERA directory and run
 ```
 $ make gamera
 ```
 This will create the shared object `lib/libgamera.so` which can be used in `C++` programs. 
 
-*Usage
+__Usage__
 To use the library in you program, compile like e.g.:
 ```
 $ gcc -o yourProgram yourProgramSource.C -lgamera -L$(LIBDIR)
@@ -78,4 +78,4 @@ $ make clean
 ```
 and re-compile with the commands above.
 
-[(<- back to main page)](main_page.md)
+[(back to main page)](main_page.md)
