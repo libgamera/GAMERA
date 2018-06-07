@@ -1,9 +1,11 @@
+[(back to main page)](main_page.md)
+
 Step-by-step: broad-band radiation spectrum from a parent population of particles
 =================================================================================
 
-A complete working script can be found [here](RadiationBasics.py). 
-
-
+Only a few steps are required to get the radiation spectra from a particle population.
+A complete working script can be found [here](radiation_basics.py) (it ouputs the plot
+at the bottom of the page). 
 
 Step 1: Define a particle spectrum
 ----------------------------------
@@ -101,15 +103,20 @@ Important Notes
 - For integral fluxes to be precise, you should make sure that your spectrum's 
 binning is fine enough (you can change that by adjusting `bins` in the above step `[a]`). 
 You can get an idea of the required binning [here](binning.md). 
+
 - You only have to set the parameters relevant to the radiation process you want to calculate. For example, if you are only interested in Bremsstrahlung, you don't have to specify the B-Field
+
 - For the IC process there are several ways to set up the radiation fields, including for SSC modelling or anisotropy, [see here](inverse_compton.md)
+
 - If you have set up more than one IC target field, you can access the individual contributions to the resulting radiation spectrum via `fr.GetICSpectrum(field)`,
 where `field` is the index of the field (e.g. the for the first field you have set 
 it is `field=0`, for the second `field=1` and so on).
+
 - The `Particle` class in `GAMERA` creates spectra already in the right format and 
 is the natural 'counterpart' to the Radiation class. It allows, among other things, 
 for time-dependent modeling. Tutorials how to use it are available, too.
 
 
-![RadiationBasics](RadiationBasics.png) 
-
+![particles](particle_spectra.png) 
+![SEDs](radiation_SEDs.png) 
+[(back to main page)](main_page.md)
