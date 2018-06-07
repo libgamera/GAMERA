@@ -27,6 +27,7 @@ sudo apt install libgsl2 libgsl-dev swig python-dev
 ```
 
 On `MacOS`: 
+
 many repositories provide `gsl` and `swig`, for example [homebrew](https://brew.sh/): 
 ```
 $ brew install gsl swig
@@ -76,3 +77,5 @@ After any new `git pull`, you should clean up the directory via
 $ make clean
 ```
 and re-compile with the commands above.
+
+[BACK TO MAIN PAGE](main_page.md)
