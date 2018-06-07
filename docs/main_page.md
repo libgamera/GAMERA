@@ -16,8 +16,8 @@ NEWS
 
 Documentation & Tutorials
 =========================
-[Download & Installation](docs/download_installation.md) 
-[Tutorials](docs/tutorials_main.md)
+[Download & Installation](download_installation.md) 
+[Tutorials](tutorials_main.md)
 
 
 
