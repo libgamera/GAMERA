@@ -53,13 +53,10 @@ fr = gp.Radiation()
 Define relevant parameters
 ```
 b_field = 1e-5 # in Gauss, necessary for Synchrotron calculation
-
 ambient_density = 1 # 1/cm^3, necessary for Bremsstrahlung and hadronic emission
-
 # radiation field parameters, necessary for Inverse-Compton radiation. 
 temp = 2.7 # Temperature in K
 edens = 0.25 * gp.eV_to_erg # energy density in erg / cm^-3
-
 distance = 1e3 # in pc
 
 ```
@@ -115,15 +112,14 @@ fr.GetIntegral*Flux(emin,emax) # emin, emax in TeV!
 ```
 - integrated energy flux (`int_e^inf dE E*dN/dE`, units: `erg / cm^2 / s`)
 ```
-fr.GetIntegral*Flux(emin,emax) # emin, emax in TeV!
-```
 fr.GetIntegral*EnergyFlux(emin,emax) # emin, emax in TeV!
 ```
 
 
 The so-retrieved spectra are in the format of 2D-vectors (C++) or 2D-lists (python). 
  
-> Notes:
+Notes
+-----
 > Specifying a distance value is optional. If set to non-zero value, photon flux from particle population at that distance will be calculated. Otherwise, the luminosity is calculated. 
 
 >For integral fluxes to be precise, you should make sure that your spectrum's 
