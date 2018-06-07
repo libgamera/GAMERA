@@ -1802,11 +1802,7 @@ vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
     e_p_0 = e_p;
   }   
 
-  if (QUIETMODE == false) {
-    cout << endl;
-    cout << endl;
     cout << "   -> precision reached / goal:     " << endl;  
-  }
   R = r_orig;
   while(1){
     ResetWithSSCTargetPhotons(target_field_count);
@@ -1815,17 +1811,12 @@ vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
     e_p = GetParticleEnergyContent();
     iter.push_back(e_p);
     precision = fabs(e_p/e_p_0 - 1.);
-    if (QUIETMODE == false) {
         cout << " >> " << precision << " / " << tolerance <<"\r"<<std::flush;
-    }
     if (precision < tolerance) break;
     e_p_0 = e_p;
   }
 
-  if (QUIETMODE == false) {
-    cout << endl;
     cout << "   -> DONE!     " << endl;
-  }
   return iter;
 
 }
