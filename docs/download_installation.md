@@ -78,4 +78,4 @@ $ make clean
 ```
 and re-compile with the commands above.
 
-[BACK TO MAIN PAGE](main_page.md)
+[(<- back to main page)](main_page.md)
