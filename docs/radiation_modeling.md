@@ -9,13 +9,9 @@ Step 1: Define a particle spectrum
 ----------------------------------
 
 The first step is to define a 2D vector (C++) or list / numpy array (python) 
-defining a particle spectrum. This spectrum has to be differential in energy. 
-How this spectrum is computed doesn't matter as long as it is in the right 
-units and format. The spectrum has to be a vector or list of {energy, differential 
-particle number} tuples. The energy has to be in erg, and the differential particle 
-number has to be in particles / erg . 
-
-For instance, a power-law can be defined in python using numpy as simply as
+defining a particle spectrum. This spectrum has to be differential in energy
+and needs to be in the right format. For instance, a power-law can be defined 
+in python using numpy as simply as
 ```
 # define the energy range of the particles, here between 1 GeV and 1 PeV
 energy_in_erg_particles = np.logspace(-3,3,200) * gp.TeV_to_erg
@@ -27,14 +23,6 @@ particles = norm * energy_in_erg_particles**-alpha
 # zip together to a 2D-list
 particles = np.array(zip(energy_in_erg_particles,particles))
 ```
-The units of the spectrum will impact the unit of the calculated radiation spectra. 
-For instance, if the unit of the particle spectrum only differential in energy, 
-i.e. 1/erg, the output radiation spectra will have the unit of a flux if a 
-source distance is specified (see below) or differential photon count per energy and time if not. 
-
-On the other hand, if the input unit is differential also in volume, i.e. 1/erg/cm^3, 
-then also the output radiation spectrum will be. Therefore, if no distance is 
-specified in this case, a volume photon emissivity will be calculated, i.e. d³N/dEdVdt. 
 
 The `Particle` class in `GAMERA` creates spectra already in the right format and 
 is the natural 'counterpart' to the Radiation class. It allows, among other things, 
@@ -45,12 +33,11 @@ for time-dependent modeling. Tutorials how to use it are available, too.
 Step 2: create a Radiation object and set it up
 -----------------------------------------------
 
-Creating a Radiation object works like
 ```
-fr = gp.Radiation()
+fr = gp.Radiation() # create the object
 ```
 
-Define relevant parameters
+Define relevant model parameters
 ```
 b_field = 1e-5 # in Gauss, necessary for Synchrotron calculation
 ambient_density = 1 # 1/cm^3, necessary for Bremsstrahlung and hadronic emission
@@ -61,8 +48,7 @@ distance = 1e3 # in pc
 
 ```
 
-and set up the Radiation object with these parameters
-
+set up the Radiation object with these parameters
 ```
 fr.SetAmbientDensity(ambient_density)
 fr.SetBField(b_field)
@@ -70,9 +56,8 @@ fr.AddThermalTargetPhotons(t_cmb,edens_cmb)
 fr.SetDistance(distance)
 ```
 
-Now set up the particle spectrum. You can decide what kind of particles 
+set up the particle spectrum. You can decide what kind of particles 
 you put there. This will determine which radiation processes will be calculated.
-
 ```
 fr.SetProtons(particles) 
 fr.SetElectrons(particles) 

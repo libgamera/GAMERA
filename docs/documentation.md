@@ -2,7 +2,16 @@
 
 Units
 =====
+UNDER CONSTRUCTION
+------------------
+The units of the spectrum will impact the unit of the calculated radiation spectra. 
+For instance, if the unit of the particle spectrum only differential in energy, 
+i.e. 1/erg, the output radiation spectra will have the unit of a flux if a 
+source distance is specified (see below) or differential photon count per energy and time if not. 
 
+On the other hand, if the input unit is differential also in volume, i.e. 1/erg/cm^3, 
+then also the output radiation spectrum will be. Therefore, if no distance is 
+specified in this case, a volume photon emissivity will be calculated, i.e. d³N/dEdVdt. 
 
 Radiation models
 ================
