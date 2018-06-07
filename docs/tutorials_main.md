@@ -35,3 +35,5 @@ Please check out the [installation instructions](download_installation.md) to le
 in either language.
 
 ![GAMERA](GAMERA.png) 
+
+([back to main page](main_page.md))
