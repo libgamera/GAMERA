@@ -1,41 +1,6 @@
 Calculating the broad-band radiation spectrum from a parent population of particles
 ===================================================================================
 
-In GAMERA, radiation mechanisms are implemented for
-- Electrons (including Positrons)
-- Protons (actually assuming a generic hadron mix, see ...)
-- Arbitrary mix of hadronic species for both projectiles and target nuclei. 
-
-Supported gamma-ray production mechanisms:
-
-- Electrons
-
-For the radiation from electrons, GAMERA supports the following emission mechanisms:
-
-__Synchrotron Emission__
- 
-Supports both isotropised pitch angle distribution of electrons (following Ghisellini et al., ApJ, Part 2 - Letters (ISSN 0004-637X), vol. 334, Nov. 1, 1988, p. L5-L8) as well as custom fixed pitch angles (Blumenthal & Gould, RvMP, vol. 42, Issue 2, pp. 237-271, 1970)
-
-__Bremsstrahlung__
-
-Both electron-electron and electron-ion Bremsstrahlung, following Baring 1999, ApJ, 513, 311-338
-
-__Inverse-Compton Emission__
-Supports arbitrary target fields, using the full Klein-Nishina cross-section following Blumenthal & Gould 1970 also SSC emission supported
-
-- Hadrons
-
-__π⁰- and η-Decay__ 
-Following the parameterisation of Kafexhiu et al., Physical Review D, 
-Volume 90, Issue 12, id.123014, 2014. 
- 
-There are several tutorials that you can access at the top bar of this page which 
-will teach you how to use the `Radiation` class.
-
-General Usage
--------------
-
-
 
 The following will explain the general usage of the `GAMERA Radiation` class. 
 Syntax is in python (wrapped via swig from C++), but the principle of usage
