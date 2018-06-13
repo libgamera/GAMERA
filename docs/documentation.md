@@ -2,8 +2,6 @@
 
 Units
 =====
-UNDER CONSTRUCTION
-------------------
 
 Units in GAMERA are mostly in cgs, with several exceptions that are meaningful
 in the astrophysical context.
