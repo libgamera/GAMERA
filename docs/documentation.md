@@ -50,12 +50,12 @@ scenarios relavant to gamma-ray astronomy as simple as possible.
  
 The `Particles` class is designed to solve the following transport equation
  
-$$\frac{\partial{N}}{\partial{t}} = Q(E,t) - \frac{\partial}{\partial E}(bN) - \frac{N}{t_{esc}},$$
+![dgl](DGL.diff)
  
-where $$Q(E,t)$$, the source term, is the spectrum of particles injected into a system, 
-$$b=b(E,t)$$ is the energy loss rate of these particles, $$t_{esc}=t_{esc}(E,t)$$ is the time 
-scale on which particle escape the system and $$N=N(E,t)$$ is the total resulting 
-particle spectrum in the system at a time $$t$$. 
+where Q(E,t), the source term, is the spectrum of particles injected into a system, 
+$$b=b(E,t)$$ is the energy loss rate of these particles, _t_esc_=t_esc(E,t)_ is the time 
+scale on which particle escape the system and _N_=_N(E,t)_ is the total resulting 
+particle spectrum in the system at a time _t_. 
 
 An example which is described by this equation could be a pulsar wind nebula (PWN) 
 where the pulsar steadily injects a spectrum of accelerated electrons / positrons into 
