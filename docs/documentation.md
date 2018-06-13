@@ -118,7 +118,7 @@ Formats
 =======
 
 `GAMERA` uses doubles, 1D vectors of doubles and 2D vectors of doubles.
-- scalars are used as input / output when a single number is supplied / extracted,
+- doubles are used as input / output when a single number is supplied / extracted,
   e.g. when the distance to a source is set or when the total energy of particles
   is extracted.
 - 1D vectors are used for example when you want to calculate the radiation spectrum
@@ -137,9 +137,9 @@ Formats
   - probability density surfaces in random number generation
   - time-and energy dependent shapes of particle escape of injection spectra
 
-If you use `python` and `numpy`, you can conveniently either cast the `GAMERA` output
+If you use `python` and `numpy`, you can conveniently cast the `GAMERA` output
 into `numpy`-arrays for further manipulation. Also, `GAMERA` accepts `numpy`-arrays
-as input. In particular, `numpy.meshgrid` can be used for the last bullet point
+as input. In particular, `numpy.meshgrid` can be used as input for the last bullet point
 in the above list.
 
 
