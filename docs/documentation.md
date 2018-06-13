@@ -12,9 +12,10 @@ in the astrophysical context.
 - lengths are in parsecs
 - when retrieving SEDs, for convenience the units are
   - erg / s / cm^2 vs TeV for radiation flux SEDs
-  - erg / s vs TeV for luminosity SEDs (i.e. when the distance to the source is not set)
-  - erg vs TeV for particle SEDs
-  (Differential spectra are again in cgs units)
+  - erg / s vs. TeV for luminosity SEDs (i.e. when the distance to the source is not set)
+  - erg vs. TeV for particle SEDs
+
+  (differential spectra are again in cgs units)
 - gas densities are in number densities. 
 
 

@@ -1,4 +1,3 @@
-![Banner](GAMERA_banner.png) 
  
 
 Documentation under construction and will be updated continuously. 
