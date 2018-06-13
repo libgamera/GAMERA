@@ -1,5 +1,17 @@
 [(back to main page)](main_page.md)
 
+`GAMERA` is a `C++` library for modeling in high energy astrophysics. It is also
+available as a `swig`-wrapped `python` module (which is internally called `gappa`).
+
+Here is a list of what you can do with it:
+- calculate the spectral evolution of a particle population in the presence of
+  time-dependent or constant injection, energy losses and particle escape
+- calculate the radiation spectrum from a parent particle population
+- do these things in an object-oriented and modular way, allowing you to easily
+  model multiple emission zones that can interact with each other
+- access 3D Galactic gas, magnetic field and spiral arm models from 
+
+
 Particle evolution
 ==================
 
