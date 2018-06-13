@@ -33,7 +33,7 @@ Radiation models
 
 In GAMERA, radiation mechanisms are implemented for
 - Electrons (including Positrons)
-- Protons (actually assuming a generic hadron mix, see ...)
+- Protons 
 - Arbitrary mix of hadronic species for both projectiles and target nuclei. 
 
 Supported gamma-ray production mechanisms:
