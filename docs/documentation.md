@@ -117,23 +117,23 @@ __for Hadrons__
 Data Types
 ==========
 
-`GAMERA` uses __doubles__, __1D vectors of doubles__ and __2D vectors of doubles__.
+`GAMERA` uses __doubles__, __vectors of doubles__, __vectors of double-tuples__ and __2D vectors of doubles__.
 - __doubles__ are used as input / output when a single number is supplied / extracted,
   e.g. when the distance to a source is set or when the total energy of particles
   is extracted.
-- __1D vectors of doubles__ are used for example when you want to calculate the radiation spectrum
+- __vectors of doubles__ (`vector<double>`) are used for example when you want to calculate the radiation spectrum
   at a series of specific points in energy, which are supplied in this format.
   If you generate a string of random numbers with the `Utils`-class, you can specify
   the number of random numbers you want to dice and it will return you the result as
   a 1D-vector of doubles
-- __2D vectors of double tuples__ are frequently used when a function or lookup is provided / extracted,
+- __vectors of double-tuples__ (`vector< vector<double> >`) are frequently used when a function or lookup is provided / extracted,
   for example 
   - SEDs and spectra are 2D vectors holding tuples of (energy,flux)
   - the time dependency of the source size is supplied in form of a vector of tuples
     (time,size)
   - the energy dependency of the particle escape term can be provided in the format
     of (energy, escape_time)
-- __2D vectors of doubles__ consisting of longer vectors are used e.g. for
+- __2D vectors of doubles__ (`vector< vector<double> >`) consisting of longer vectors are used e.g. for
   - probability density surfaces in random number generation
   - time-and energy dependent shapes of particle escape of injection spectra
 
