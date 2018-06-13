@@ -9,8 +9,13 @@ Here is a list of what you can do with it:
 - calculate the radiation spectrum from a parent particle population
 - do these things in an object-oriented and modular way, allowing you to easily
   model multiple emission zones that can interact with each other
-- access 3D Galactic gas, magnetic field and spiral arm models from 
+- access 3D Galactic gas, magnetic field and spiral arm models, as well as hydrodynamical
+  Supernova Remnant models from accepted and peer reviewed publications
 
+And here are some things that you can't at the moment:
+- fitting
+- spatial evolution of particles. However, it is possible to approximate by using
+  different zones of particles
 
 Particle evolution
 ==================
