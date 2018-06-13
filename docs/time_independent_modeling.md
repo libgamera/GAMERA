@@ -6,7 +6,7 @@ This tutorial will cover the scenario where a injected population of electron ev
 system. By that it is meant that magnetic field and other environmental parameters 
 as well as the injection spectrum don't change over time. 
 
-Step 1: create a `Particles`-object
+Step 1: create a Particles-object
 ----------------------------------
 
 ```
@@ -41,23 +41,11 @@ fp.SetBField(b_field) # in Gauss
 fp.SetAmbientDensity(density) # in particles/cm^3
 fp.AddThermalTargetPhotons(temperature,energy_density) #in K, erg/cm^3. 
 ```
->Note: 
->There is a [dedicated tutorial](inverse_compton.md) on how to set radiation fields for the IC process 
+>Note 1: 
+>There is a [dedicated tutorial](inverse_compton.md) on how to set radiation fields for the IC process.
  
-The above commands determine the energy loss rate of the injected particles. You access this information with 
-
-```
-e_loss_rate  = fp.GetEnergyLossRate(e,age) # (erg,yrs)
-cooling_time = fp.GetCoolingTimeScale(e,age)
-```
-which will return 2D-arrays containing `[energy(erg)~energy_loss_rate(erg/s)]` and 
-`[energy(erg)~cooling time(yrs)]`. The cooling time is defined as `t_cool(E) = |E / (dE/dt)|`. 
-
-@LossRates.png[width:550px] 
- 
-Note that the energy loss rate at high energy transitions from $$\dot{E}\sim E$$ at 
-early ages, where adiabatic expansion is the dominating cooling contribution, to 
-the synchrotron and IC expectation $$\dot{E}\sim E^2$$. 
+>Note 2:
+>Environmental parameters determine the cooling rate of electrons. Check [this tutorial](energy_losses.md) on how to visualise this information.
 
 
 Step 4 (Optional): Set up the particle escape term
@@ -72,24 +60,26 @@ just assume a constant escape time value:
 fp.SetConstantEscapeTime(t_esc) # in seconds
 ```
 
-Step 5: Set starting point of iteration
+Step 5 (Optional): Set starting point of iteration
 ---------------------------------------
 
 The program needs to know at which point in time to start the iteration.
 It will then set the initial condition of the system accordingly. 
+Per default, a starting time of tmin = 1yr will be assumed, which is OK for
+sources that evolve on time scales larger than tens of years. 
+If you are interested in modeling sources that develop at a smaller time scale,
+you have to set tmin appropriately:
 
 ```
 fp.SetTmin(tmin) # yrs
 ```
-The default is set to one year. 
-The initial condition is assumed to be the result of loss-free injection of
-particles until t = tmin. The spectral shape of the injection up until this point
-is fixed to the value at t = tmin, i.e. Q(t \le tmin) =  Q(t=tmin). 
-Only at t \ge tmin will cooling, escape and the actual evolution of Q be taken
+
+>Note: 
+>The initial condition is assumed to be the result of loss-free injection of particles until t = tmin. The spectral shape of the injection up until this point is fixed to the value at t = tmin, i.e. Q(t \le tmin) =  Q(t=tmin). Only at t \ge tmin will cooling, escape and the actual evolution of Q be taken
 into account.
 
 
-Step 5: Set the source age
+Step 6: Set the source age
 --------------------------
 
 the specified system will be evolved to the point in time t = age. You can set
@@ -102,7 +92,7 @@ fp.SetAge(age) # in yrs
 
 
 
-Step 5: Compute The Time Evolution
+Step 7: Compute the time evolution
 ----------------------------------
 
 Finally, the spectrum can be calculated:
@@ -116,13 +106,9 @@ __For protons:__
 ```
 fp.CalculateProtonSpectrum()
 ```
-Please note that in case the losses are time-dependent a starting age for the particle spectrum 
-evolution has to be specified. Per default, this is set to 1 year. However, in certain cases it 
-might be necessary to change this number, which can be done by stating 
-```
-fp.SetTmin(tmin) # yrs
-```
 
+Step 8: Get the particle spectra
+--------------------------------
 
 You can access the result via two options:
 ```
@@ -131,11 +117,6 @@ sed = fp.GetParticleSED()  # returns SED: E(TeV) vs E**2*dN/dE (erg)
 ```
 
 
-
-[ParticlesBasic.py](Here) is a working script which will produce the following 
-output (assuming electrons). Note that particle escape was not set in this example.
-
-@ParticlesBasic.png[width:550px] 
 
 
 
