@@ -6,7 +6,7 @@ General info
 `GAMERA` is a `C++` library for modeling in high energy astrophysics. It is also
 available as a `swig`-wrapped `python` module (which is internally called `gappa`).
 
-Here is a list of what you can do with it:
+Here is a list of what you _can_ do with it:
 - calculate the spectral evolution of a particle population in the presence of
   time-dependent or constant injection, energy losses and particle escape
 - calculate the radiation spectrum from a parent particle population
@@ -15,7 +15,7 @@ Here is a list of what you can do with it:
 - access 3D Galactic gas, magnetic field and spiral arm models, as well as hydrodynamical
   Supernova Remnant models from accepted and peer reviewed publications
 
-And here are some things that you can't at the moment:
+And here are some things that you _can't_ do at the moment:
 - fitting
 - spatial evolution of particles. However, it is possible to approximate by using
   different zones of particles
@@ -114,12 +114,39 @@ __for Hadrons__
   - Following the parameterisation of [Kafexhiu et al. 2014](http://adsabs.harvard.edu/abs/2014PhRvD..90l3014K)
  
 
+Formats
+=======
+
+`GAMERA` uses doubles, 1D vectors of doubles and 2D vectors of doubles.
+- scalars are used as input / output when a single number is supplied / extracted,
+  e.g. when the distance to a source is set or when the total energy of particles
+  is extracted.
+- 1D vectors are used for example when you want to calculate the radiation spectrum
+  at a series of specific points in energy, which are supplied in this format.
+  If you generate a string of random numbers with the `Utils`-class, you can specify
+  the number of random numbers you want to dice and it will return you the result as
+  a 1D-vector
+- 2D vectors consisting of tuples are frequently used when a function or lookup is provided / extracted,
+  for example 
+  - SEDs and spectra are 2D vectors holding tuples of (energy,flux)
+  - the time dependency of the source size is supplied in form of a vector of tuples
+    (time,size)
+  - the energy dependency of the particle escape term can be provided in the format
+    of (energy, escape_time)
+- 2D vectors consisting of longer vectors are used e.g. for
+  - probability density surfaces in random number generation
+  - time-and energy dependent shapes of particle escape of injection spectra
+
+If you use `python` and `numpy`, you can conveniently either cast the `GAMERA` output
+into `numpy`-arrays for further manipulation. Also, `GAMERA` accepts `numpy`-arrays
+as input. In particular, `numpy.meshgrid` can be used for the last bullet point
+in the above list.
 
 
-Units
+Units 
 =====
 
-Units in GAMERA are mostly in cgs, with several exceptions that are meaningful
+Units in `GAMERA` are mostly in cgs, with several exceptions that are meaningful
 in the astrophysical context.
 
 - times are in years, except for particle escape time scales
