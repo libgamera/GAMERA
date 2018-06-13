@@ -118,7 +118,7 @@ Data Types
 ==========
 
 `GAMERA` uses __doubles__, __vectors of doubles__, __vectors of double-tuples__ and __2D vectors of doubles__.
-- __doubles__ are used as input / output when a single number is supplied / extracted,
+- __doubles__ (`double`) are used as input / output when a single number is supplied / extracted,
   e.g. when the distance to a source is set or when the total energy of particles
   is extracted.
 - __vectors of doubles__ (`vector<double>`) are used for example when you want to calculate the radiation spectrum
