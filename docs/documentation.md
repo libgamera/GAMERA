@@ -6,7 +6,7 @@ General info
 `GAMERA` is a `C++` library for modeling in high energy astrophysics. It is also
 available as a `swig`-wrapped `python` module (which is internally called `gappa`).
 
-Here is a list of what you _can_ do with it:
+Here is a list of what you can do with it:
 - calculate the spectral evolution of a particle population in the presence of
   time-dependent or constant injection, energy losses and particle escape
 - calculate the radiation spectrum from a parent particle population
@@ -15,7 +15,7 @@ Here is a list of what you _can_ do with it:
 - access 3D Galactic gas, magnetic field and spiral arm models, as well as hydrodynamical
   Supernova Remnant models from accepted and peer reviewed publications
 
-And here are some things that you _can't_ do at the moment:
+And here are some things that you can't do at the moment:
 - fitting
 - spatial evolution of particles. However, it is possible to approximate by using
   different zones of particles
@@ -106,7 +106,7 @@ __for Electrons__
   - using the full Klein-Nishina cross-section [(see e.g. Blumenthal & Gould 1970)](http://adsabs.harvard.edu/abs/1970RvMP...42..237B)
   - allowing for arbitrary target field spectra
   - supporting synchrotron-self-Compton(SSC) emission [(using Atoyan & Aharonian 1996)](http://adsabs.harvard.edu/abs/1996MNRAS.278..525A)
-  - anisotropic radiation fields [(following Moskalenko & Strong)](http://iopscience.iop.org/article/10.1086/308138/meta)
+  - anisotropic radiation fields [(following Moskalenko & Strong 2000)](http://iopscience.iop.org/article/10.1086/308138/meta)
 
 __for Hadrons__
 
