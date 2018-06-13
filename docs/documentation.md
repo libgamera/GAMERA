@@ -1,30 +1,45 @@
 [(back to main page)](main_page.md)
 
-Units
-=====
+Particle evolution
+==================
 
-Units in GAMERA are mostly in cgs, with several exceptions that are meaningful
-in the astrophysical context.
+The intention of `GAMERA` is to make the modeling of particle spectra in typical 
+scenarios relavant to gamma-ray astronomy as simple as possible.
+ 
+The `Particles` class is designed to solve the following transport equation
+ 
+$$\frac{\partial{N}}{\partial{t}} = Q(E,t) - \frac{\partial}{\partial E}(bN) - \frac{N}{t_{esc}},$$
+ 
+where $$Q(E,t)$$, the source term, is the spectrum of particles injected into a system, 
+$$b=b(E,t)$$ is the energy loss rate of these particles, $$t_{esc}=t_{esc}(E,t)$$ is the time 
+scale on which particle escape the system and $$N=N(E,t)$$ is the total resulting 
+particle spectrum in the system at a time $$t$$. 
 
-- times are in years, except for particle escape time scales
-- lengths are in parsecs
-- when retrieving SEDs, for convenience the units are
-  - erg / s / cm^2 vs TeV for radiation flux SEDs
-  - erg / s vs. TeV for luminosity SEDs (i.e. when the distance to the source is not set)
-  - erg vs. TeV for particle SEDs
+An example which is described by this equation could be a pulsar wind nebula (PWN) 
+where the pulsar steadily injects a spectrum of accelerated electrons / positrons into 
+the surrounding medium, where these particles suffer Synchrotron- and other losses 
+over time.
+ 
+If the energy loss rate and escape time scale are constant in time, $$b=b(E)$$ and  $$t_{esc}=t_{esc}(E)$$, 
+the differential equation can be solved analytically or semi-analytically. 
+An excellent discussion of this solution can be found in [Atoyan & Aharonian 1999](http://adsabs.harvard.edu/abs/1999MNRAS.302..253A).
+ 
+If the losses and escape times are time-dependent, typically the equation can only be solved 
+numerically. The approach in `GAMERA` is to interpret the transport equation as an 
+advective flow in energy space and solve it using a donor-cell advection algorithm.
+ 
+This method also allows for iterative models, because model parameters can be 
+changed while the numerical method is running. This allows for example for the interaction between 
+particles and their emitted radiation, or between multiple zones of particles.
 
-  (differential spectra are again in cgs units)
-- gas densities are in number densities. 
+Per default, the numerical method will be used. However, if the user is sure that
+energy losses are constant in time, the semi-analytical method can be applied, 
+which in certain circumstances can be much faster. However, the latter does presently
+not support the treatment of particle escape.
 
+The output of this class, namely particle spectra $$N(E,t)$$, is in the right format 
+to be directly used in the `Radiation` class, so that radiation spectra can be calculated easily. 
 
-Also, the units of the spectrum will impact the unit of the calculated radiation spectra.
-For instance, if the unit of the particle spectrum is only differential in energy, 
-i.e. 1/erg, the output radiation spectra will have the unit of a flux if a 
-source distance is specified (see below) or differential photon count per energy and time if not. 
-
-On the other hand, if the input unit is differential also in volume, i.e. 1/erg/cm^3, 
-then also the output radiation spectrum will be. Therefore, if no distance is 
-specified in this case, a volume photon emissivity will be calculated, i.e. d³N/dEdVdt. 
 
 Radiation models
 ================
@@ -57,8 +72,35 @@ __for Hadrons__
   - Following the parameterisation of [Kafexhiu et al. 2014](http://adsabs.harvard.edu/abs/2014PhRvD..90l3014K)
  
 
-Particle evolution
-==================
+
+
+Units
+=====
+
+Units in GAMERA are mostly in cgs, with several exceptions that are meaningful
+in the astrophysical context.
+
+- times are in years, except for particle escape time scales
+- lengths are in parsecs
+- when retrieving SEDs, for convenience the units are
+  - erg / s / cm^2 vs TeV for radiation flux SEDs
+  - erg / s vs. TeV for luminosity SEDs (i.e. when the distance to the source is not set)
+  - erg vs. TeV for particle SEDs
+
+  (differential spectra are again in cgs units)
+- gas densities are in number densities. 
+
+
+Also, the units of the spectrum will impact the unit of the calculated radiation spectra.
+For instance, if the unit of the particle spectrum is only differential in energy, 
+i.e. 1/erg, the output radiation spectra will have the unit of a flux if a 
+source distance is specified (see below) or differential photon count per energy and time if not. 
+
+On the other hand, if the input unit is differential also in volume, i.e. 1/erg/cm^3, 
+then also the output radiation spectrum will be. Therefore, if no distance is 
+specified in this case, a volume photon emissivity will be calculated, i.e. d³N/dEdVdt. 
+
+
 
 [(back to main page)](main_page.md)
 
