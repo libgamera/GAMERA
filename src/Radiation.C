@@ -2124,8 +2124,6 @@ double Radiation::GetIntegratedFlux(int i, double emin, double emax, bool ENERGY
             << endl;
     return 0.;
   }
-  emin *= TeV_to_erg;
-  emax *= TeV_to_erg;
   if (!emin) emin = diffSpec[0][0];
   if (!emax) emax = diffSpec[diffSpec.size()-1][0];
   vector <vector <double> > tempVec;

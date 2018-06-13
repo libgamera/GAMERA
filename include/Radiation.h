@@ -300,57 +300,57 @@ class Radiation {
   double GetDifferentialPPFlux() { return fdiffpp; }        ///< get fdiffpp
   double GetIntegralTotalFlux(double emin, double emax) {  ///< get integrated
     return GetIntegratedFlux(1,emin,emax); }             /// gamma-ray flux between
-                                                         /// emin and emax (TeV) 
+                                                         /// emin and emax (erg) 
                                                          /// summed over all 
                                                          /// radiation processes
                                                          
   double GetIntegralPPFlux(double emin, double emax) { ///< get integrated 
     return GetIntegratedFlux(2,emin,emax); }             /// gamma-ray flux between
-                                                         /// emin and emax (TeV) 
+                                                         /// emin and emax (erg) 
                                                          /// from proton-proton
                                                          /// interaction
                                                          
   double GetIntegralICFlux(double emin, double emax) { ///< get integrated 
     return GetIntegratedFlux(3,emin,emax); }             /// gamma-ray flux between
-                                                         /// emin and emax (TeV) 
+                                                         /// emin and emax (erg) 
                                                          /// from IC-mechanism
                                                          
   double GetIntegralBremsstrahlungFlux(double emin, double emax) { ///< get integrated 
     return GetIntegratedFlux(4,emin,emax); }             /// gamma-ray flux between
-                                                         /// emin and emax (TeV) 
+                                                         /// emin and emax (erg) 
                                                          /// from Bremsstrahlung
                                                          
   double GetIntegralSynchrotronFlux(double emin, double emax) { ///< get integrated 
     return GetIntegratedFlux(5,emin,emax); }             /// flux between
-                                                         /// emin and emax (TeV) 
+                                                         /// emin and emax (erg) 
                                                          /// from synchrotron
                                                          /// process
                                                          
   double GetIntegralTotalEnergyFlux(double emin, double emax) { ///< get integrated 
     return GetIntegratedFlux(1,emin,emax,true); }        /// energy flux between
-                                                         /// emin and emax (TeV) 
+                                                         /// emin and emax (erg) 
                                                          /// summed over all 
                                                          /// radiation processes
                                                          
   double GetIntegralPPEnergyFlux(double emin, double emax) { ///< get integrated 
     return GetIntegratedFlux(2,emin,emax,true); }        /// energy flux between
-                                                         /// emin and emax (TeV) 
+                                                         /// emin and emax (erg) 
                                                          /// from proton-proton
                                                          /// interaction
                                                          
   double GetIntegralICEnergyFlux(double emin, double emax) { ///< get integrated
     return GetIntegratedFlux(3,emin,emax,true); }        /// energy flux between
-                                                         /// emin and emax (TeV) 
+                                                         /// emin and emax (erg) 
                                                          /// from IC-mechanism
                                                          
   double GetIntegralBremsstrahlungEnergyFlux(double emin, double emax) { ///< get integrated 
     return GetIntegratedFlux(4,emin,emax,true); }        /// energy flux between
-                                                         /// emin and emax (TeV) 
+                                                         /// emin and emax (erg) 
                                                          /// from Bremsstrahlung
                                                          
   double GetIntegralSynchrotronEnergyFlux(double emin, double emax) { ///< get integrated 
     return GetIntegratedFlux(5,emin,emax,true); }        /// energy flux between
-                                                         /// emin and emax (TeV) 
+                                                         /// emin and emax (erg) 
                                                          /// from synchrotron
                                                          /// process
                                                          
