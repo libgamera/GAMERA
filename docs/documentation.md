@@ -106,7 +106,7 @@ __for Electrons__
   - using the full Klein-Nishina cross-section [(see e.g. Blumenthal & Gould 1970)](http://adsabs.harvard.edu/abs/1970RvMP...42..237B)
   - allowing for arbitrary target field spectra
   - supporting synchrotron-self-Compton(SSC) emission [(using Atoyan & Aharonian 1996)](http://adsabs.harvard.edu/abs/1996MNRAS.278..525A)
-  - anisotropic radiation fields
+  - anisotropic radiation fields [(following Moskalenko & Strong)](http://iopscience.iop.org/article/10.1086/308138/meta)
 
 __for Hadrons__
 
