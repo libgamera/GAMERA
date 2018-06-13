@@ -169,6 +169,13 @@ On the other hand, if the input unit is differential also in volume, i.e. 1/erg/
 then also the output radiation spectrum will be. Therefore, if no distance is 
 specified in this case, a volume photon emissivity will be calculated, i.e. d³N/dEdVdt. 
 
+Libraries
+=========
+
+`GAMERA` uses 
+- the `C++` Standard Library, mainly for output stream and vectors
+- `GSL` for interpolation, integration and random number generation
+
 
 
 [(back to main page)](main_page.md)
