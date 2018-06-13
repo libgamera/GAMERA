@@ -75,7 +75,7 @@ fp.SetTmin(tmin) # yrs
 ```
 
 >Note: 
->The initial condition is assumed to be the result of loss-free injection of particles until t = tmin. The spectral shape of the injection up until this point is fixed to the value at t = tmin, i.e. Q(t \le tmin) =  Q(t=tmin). Only at t \ge tmin will cooling, escape and the actual evolution of Q be taken
+>The initial condition is assumed to be the result of loss-free injection of particles until t = tmin. The spectral shape of the injection up until this point is fixed to the value at t = tmin, i.e. Q(t < tmin) =  Q(t=tmin). Only at t > tmin will cooling, escape and the actual evolution of Q be taken
 into account.
 
 
