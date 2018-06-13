@@ -8,19 +8,18 @@ UNDER CONSTRUCTION
 Units in GAMERA are mostly in cgs, with several exceptions that are meaningful
 in the astrophysical context.
 
-- source ages are in years
-- distances and extensions are in parsecs
+- times are in years, except for particle escape time scales
+- lengths are in parsecs
 - when retrieving SEDs, for convenience the units are
   - erg / s / cm^2 vs TeV for radiation flux SEDs
   - erg / s vs TeV for luminosity SEDs (i.e. when the distance to the source is not set)
   - erg vs TeV for particle SEDs
-
   (Differential spectra are again in cgs units)
--
+- gas densities are in number densities. 
 
 
-The units of the spectrum will impact the unit of the calculated radiation spectra.
-For instance, if the unit of the particle spectrum only differential in energy, 
+Also, the units of the spectrum will impact the unit of the calculated radiation spectra.
+For instance, if the unit of the particle spectrum is only differential in energy, 
 i.e. 1/erg, the output radiation spectra will have the unit of a flux if a 
 source distance is specified (see below) or differential photon count per energy and time if not. 
 
