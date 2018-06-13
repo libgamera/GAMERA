@@ -50,7 +50,7 @@ scenarios relavant to gamma-ray astronomy as simple as possible.
  
 The `Particles` class is designed to solve the following transport equation
  
-![dgl](DGL.gif)
+![dgl](DGL.png)
  
 where _Q(E,t)_, the source term, is the spectrum of particles injected into a system, 
 _b=b(E,t)_ is the energy loss rate of these particles, _t_esc_=_t_esc(E,t)_ is the time 
