@@ -1,5 +1,8 @@
 [(back to main page)](main_page.md)
 
+General info
+============
+
 `GAMERA` is a `C++` library for modeling in high energy astrophysics. It is also
 available as a `swig`-wrapped `python` module (which is internally called `gappa`).
 
@@ -16,6 +19,28 @@ And here are some things that you can't at the moment:
 - fitting
 - spatial evolution of particles. However, it is possible to approximate by using
   different zones of particles
+
+How to use these features is shown in the [tutorials section](tutorials_main.md).
+ 
+At the time of writing, `python` is quite popular and the tutorials on these pages 
+are provided in that language. However, you can use `GAMERA` also in your `C++` program
+by adapting the syntax, e.g. instead of the `python` code
+```
+fr = gappa.Radiation()
+fr.SetBField(b)
+[...]
+sed = fr.GetTotalSED()
+```
+you could write in `C++` syntax
+```
+Radiation *fRad = new Radiation();
+fRad->SetBField(b);
+[...]
+vector< vector<double> > SED = fRad->GetTotalSED();
+```
+Please check out the [installation instructions](download_installation.md) to learn how to make `GAMERA` work
+in either language.
+
 
 Particle evolution
 ==================
