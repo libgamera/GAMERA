@@ -16,7 +16,7 @@ in the astrophysical context.
   - erg vs TeV for particle SEDs
 
   (Differential spectra are again in cgs units)
-
+-
 
 
 The units of the spectrum will impact the unit of the calculated radiation spectra.
