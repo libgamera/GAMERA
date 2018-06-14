@@ -86,14 +86,14 @@ to be directly used in the `Radiation` class, so that radiation spectra can be c
 Radiation models
 ================
 
-In GAMERA, radiation mechanisms are implemented for
+In `GAMERA`, radiation mechanisms are implemented for
 - Electrons (including Positrons)
 - Protons 
 - Arbitrary mix of hadronic species for both projectiles and target nuclei. 
 
 Supported gamma-ray production mechanisms:
 
-__for Electrons__
+### for Electrons
 
 - Synchrotron Emission
   - isotropised pitch angle distribution of electrons [(following Ghisellini et al. 1988)](http://adsabs.harvard.edu/abs/1988ApJ...334L...5G) 
@@ -108,7 +108,7 @@ __for Electrons__
   - supporting synchrotron-self-Compton(SSC) emission [(using Atoyan & Aharonian 1996)](http://adsabs.harvard.edu/abs/1996MNRAS.278..525A)
   - anisotropic radiation fields [(following Moskalenko & Strong 2000)](http://iopscience.iop.org/article/10.1086/308138/meta)
 
-__for Hadrons__
+### for Hadrons
 
 - π⁰- and η-Decay
   - Following the parameterisation of [Kafexhiu et al. 2014](http://adsabs.harvard.edu/abs/2014PhRvD..90l3014K)
