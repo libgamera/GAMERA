@@ -6,16 +6,14 @@ This tutorial will cover the scenario where a injected population of electron ev
 system. By that it is meant that magnetic field and other environmental parameters 
 as well as the injection spectrum don't change over time. 
 
-Step 1: create a Particles-object
-----------------------------------
+## Step 1: create a Particles-object
 
 ```
 import gappa as gp
 fp = gp.Particles()
 ```
 
-Step 2: Set up the injection spectrum
--------------------------------------
+## Step 2: Set up the injection spectrum
 
 Here we will set a power law injection spectrum
 ```
@@ -32,8 +30,7 @@ power_law *= 1e37/fu.Integrate(zip(e,e*power_law))
 fp.SetCustomInjectionSpectrum(zip(e,power_law))
 ```
 
-Step 3: Set up environmental parameters
----------------------------------------
+## Step 3: Set up environmental parameters
 
 environmental parameters like B-Field and ambient density are set via `Setter`-functions: 
 ```
@@ -48,8 +45,7 @@ fp.AddThermalTargetPhotons(temperature,energy_density) #in K, erg/cm^3.
 >Environmental parameters determine the cooling rate of electrons. Check [this tutorial](energy_losses.md) on how to visualise this information.
 
 
-Step 6: Set the source age
---------------------------
+## Step 4: Set the source age
 
 the specified system will be evolved to the point in time t = age. You can set
 the age via
@@ -58,11 +54,7 @@ the age via
 fp.SetAge(age) # in yrs
 ```
 
-
-
-
-Step 7: Compute the time evolution
-----------------------------------
+## Step 5: Compute the time evolution
 
 Finally, the spectrum can be calculated:
 
@@ -76,8 +68,7 @@ __For protons:__
 fp.CalculateProtonSpectrum()
 ```
 
-Step 8: Get the particle spectra
---------------------------------
+## Step 6: Get the particle spectra
 
 You can access the result via two options:
 ```
@@ -85,10 +76,8 @@ sp  = fp.GetParticleSpectrum() # returns diff. spectrum: E(erg) vs dN/dE (1/erg)
 sed = fp.GetParticleSED()  # returns SED: E(TeV) vs E**2*dN/dE (erg)
 ```
 
-Optional Steps
---------------
-__Set up the particle escape term__ 
-
+## Optional Steps
+### Set up the particle escape term
 there are several options for this. Either a constant, an energy-dependent, a 
 time-dependent or a both energy- and time-dependent escape time can be applied.
 [Here](particle_escape.md) you can learn how to do this. In the following we
@@ -98,8 +87,7 @@ just assume a constant escape time value:
 fp.SetConstantEscapeTime(t_esc) # in seconds
 ```
 
-__Set starting point of iteration__
-
+### Set starting point of iteration
 The program needs to know at which point in time to start the iteration.
 It will then set the initial condition of the system accordingly. 
 Per default, a starting time of tmin = 1yr will be assumed, which is OK for
@@ -115,8 +103,7 @@ fp.SetTmin(tmin) # yrs
 >The initial condition is assumed to be the result of loss-free injection of particles until t = tmin. The spectral shape of the injection up until this point is fixed to the value at t = tmin, i.e. Q(t<=tmin) =  Q(t=tmin). Only at t>tmin will cooling, escape and the actual evolution of Q be taken
 into account.
 
-__Set solver method__
-
+### Set solver method
 If you are sure that the energy losses are constant in time and you haven't set 
 particle escape, you can also use a semi-analytical solver to the transport 
 equation (for more infos, see [here](documentation.md) with the following command:
@@ -129,8 +116,7 @@ _Please note that this will give you __wrong__ results if you have time-dependen
 losses!_
 
 
-Results
--------
+## Results
 
 Here are two working scripts incorporating the above steps:
 - [spectrum at a given time](particles_static.py)
