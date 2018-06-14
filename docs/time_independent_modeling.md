@@ -48,38 +48,6 @@ fp.AddThermalTargetPhotons(temperature,energy_density) #in K, erg/cm^3.
 >Environmental parameters determine the cooling rate of electrons. Check [this tutorial](energy_losses.md) on how to visualise this information.
 
 
-Step 4 (Optional): Set up the particle escape term
---------------------------------------------------
-
-there are several options for this. Either a constant, an energy-dependent, a 
-time-dependent or a both energy- and time-dependent escape time can be applied.
-[Here](particle_escape.md) you can learn how to do this. In the following we
-just assume a constant escape time value:
-
-```
-fp.SetConstantEscapeTime(t_esc) # in seconds
-```
-
-Step 5 (Optional): Set starting point of iteration
----------------------------------------
-
-The program needs to know at which point in time to start the iteration.
-It will then set the initial condition of the system accordingly. 
-Per default, a starting time of tmin = 1yr will be assumed, which is OK for
-sources that evolve on time scales larger than tens of years. 
-If you are interested in modeling sources that develop at a smaller time scale,
-you have to set tmin appropriately:
-
-```
-fp.SetTmin(tmin) # yrs
-```
-
->Note: 
->The initial condition is assumed to be the result of loss-free injection of particles until t = tmin. The spectral shape of the injection up until this point is fixed to the value at t = tmin, i.e. Q(t<=tmin) =  Q(t=tmin). Only at t>tmin will cooling, escape and the actual evolution of Q be taken
-into account.
-
-
-
 Step 6: Set the source age
 --------------------------
 
@@ -117,13 +85,59 @@ sp  = fp.GetParticleSpectrum() # returns diff. spectrum: E(erg) vs dN/dE (1/erg)
 sed = fp.GetParticleSED()  # returns SED: E(TeV) vs E**2*dN/dE (erg)
 ```
 
+Optional Steps
+--------------
+__Set up the particle escape term__ 
+
+there are several options for this. Either a constant, an energy-dependent, a 
+time-dependent or a both energy- and time-dependent escape time can be applied.
+[Here](particle_escape.md) you can learn how to do this. In the following we
+just assume a constant escape time value:
+
+```
+fp.SetConstantEscapeTime(t_esc) # in seconds
+```
+
+__Set starting point of iteration__
+
+The program needs to know at which point in time to start the iteration.
+It will then set the initial condition of the system accordingly. 
+Per default, a starting time of tmin = 1yr will be assumed, which is OK for
+sources that evolve on time scales larger than tens of years. 
+If you are interested in modeling sources that develop at a smaller time scale,
+you have to set tmin appropriately:
+
+```
+fp.SetTmin(tmin) # yrs
+```
+
+>Note: 
+>The initial condition is assumed to be the result of loss-free injection of particles until t = tmin. The spectral shape of the injection up until this point is fixed to the value at t = tmin, i.e. Q(t<=tmin) =  Q(t=tmin). Only at t>tmin will cooling, escape and the actual evolution of Q be taken
+into account.
+
+__Set solver method__
+
+If you are sure that the energy losses are constant in time and you haven't set 
+particle escape, you can also use a semi-analytical solver to the transport 
+equation (for more infos, see [here](documentation.md) with the following command:
+
+```
+fp.SetSolverMethod(1)
+```
+
+_Please note that this will give you __wrong__ results if you have time-dependent
+losses!_
+
+
 Results
 -------
 
-Here are two working scripts:
-- [spectrum at a given time](particles_static.py) producing this plot:
+Here are two working scripts incorporating the above steps:
+- [spectrum at a given time](particles_static.py)
+  producing this plot:
   ![particles_static](particles_static.png)
-- [time series](particles_static_timeseries.py)producing this plot:
+- [time series](particles_static_timeseries.py) 
+  producing this plot:
   ![particles_static](particles_static_timeseries.png)
 
 
