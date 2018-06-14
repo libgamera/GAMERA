@@ -1282,11 +1282,11 @@ void Radiation::SetParticles(vector<vector<double> > PARTICLES, int type) {
     return;
   }
   if(!type && ElectronLookup && !QUIETMODE) {
-      cout << "Radiation::SetParticles: Overriding existing electron lookup."
+      cout << "Radiation::SetParticles: Overwriting existing electron lookup."
            << endl;
   }
   if(type && ProtonLookup && !QUIETMODE) {
-      cout << "Radiation::SetParticles: Overriding existing proton lookup."
+      cout << "Radiation::SetParticles: Overwriting existing proton lookup."
            << endl;
   }
   int size = (int)PARTICLES.size();
