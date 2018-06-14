@@ -76,12 +76,22 @@ sp  = fp.GetParticleSpectrum() # returns diff. spectrum: E(erg) vs dN/dE (1/erg)
 sed = fp.GetParticleSED()  # returns SED: E(TeV) vs E**2*dN/dE (erg)
 ```
 
+## Results
+
+Here are two working scripts incorporating the above steps:
+- [spectrum at a given time](particles_static.py)
+  producing this plot:
+  ![particles_static](particles_static.png)
+- [time series](particles_static_timeseries.py) 
+  producing this plot:
+  ![particles_static](particles_static_timeseries.png)
+
 ## Optional Steps
-### Set up the particle escape term
+### Set up a particle escape term
 there are several options for this. Either a constant, an energy-dependent, a 
 time-dependent or a both energy- and time-dependent escape time can be applied.
-[Here](particle_escape.md) you can learn how to do this. In the following we
-just assume a constant escape time value:
+[Here](particle_escape.md) you can learn how to do this. The easies case, a constant
+escape time, is set up like this:
 
 ```
 fp.SetConstantEscapeTime(t_esc) # in seconds
@@ -116,15 +126,6 @@ _Please note that this will give you __wrong__ results if you have time-dependen
 losses!_
 
 
-## Results
-
-Here are two working scripts incorporating the above steps:
-- [spectrum at a given time](particles_static.py)
-  producing this plot:
-  ![particles_static](particles_static.png)
-- [time series](particles_static_timeseries.py) 
-  producing this plot:
-  ![particles_static](particles_static_timeseries.png)
 
 
 
