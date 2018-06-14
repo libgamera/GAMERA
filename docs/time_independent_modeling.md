@@ -79,6 +79,7 @@ fp.SetTmin(tmin) # yrs
 into account.
 
 
+
 Step 6: Set the source age
 --------------------------
 
@@ -115,6 +116,16 @@ You can access the result via two options:
 sp  = fp.GetParticleSpectrum() # returns diff. spectrum: E(erg) vs dN/dE (1/erg)
 sed = fp.GetParticleSED()  # returns SED: E(TeV) vs E**2*dN/dE (erg)
 ```
+
+Results
+-------
+
+Here are two working scripts:
+- [spectrum at a given time](particles_static.py) producing this plot:
+  ![particles_static](particles_static.png)
+- [time series](particles_static_timeseries.py)producing this plot:
+  ![particles_static](particles_static_timeseries.png)
+
 
 
 
