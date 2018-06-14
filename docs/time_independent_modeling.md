@@ -82,6 +82,7 @@ Here are two working scripts incorporating the above steps:
 - [spectrum at a given time](particles_static.py)
   producing this plot:
   ![particles_static](particles_static.png)
+  _see the optional steps below to learn more about the semi-analytical solution_
 - [time series](particles_static_timeseries.py) 
   producing this plot:
   ![particles_static](particles_static_timeseries.png)
@@ -123,9 +124,9 @@ fp.SetSolverMethod(1)
 ```
 
 _Please note that this will give you __wrong__ results if you have time-dependent
-losses!_
+losses, like changing B-fields, adiabatic losses etc.!_
 
-
+This method is less flexible but more precise in those cases where it is applicable.
 
 
 
