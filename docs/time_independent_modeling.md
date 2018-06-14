@@ -58,12 +58,12 @@ fp.SetAge(age) # in yrs
 
 Finally, the spectrum can be calculated:
 
-__For electrons:__
+## For electrons:
 ```
 fp.CalculateElectronSpectrum()
 ```
 
-__For protons:__
+## For protons:
 ```
 fp.CalculateProtonSpectrum()
 ```
