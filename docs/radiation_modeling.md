@@ -1,4 +1,4 @@
-[(one page up)](tutorials_main_page.md)
+[(one page up)](tutorials_main.md)
 
 Step-by-step: broad-band radiation spectrum from a parent population of particles
 =================================================================================
@@ -123,4 +123,4 @@ for time-dependent modeling. Tutorials how to use it are available, too.
 
 ![SEDs](radiation_SEDs.png) 
 
-[(one page up)](tutorials_main_page.md)
+[(one page up)](tutorials_main.md)
