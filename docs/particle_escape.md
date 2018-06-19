@@ -41,9 +41,9 @@ The analytical solution to equation (i) is
 $$ N(E,t) = Q(E) \cdot t_{esc} (1 - e^{-t/t_{esc}})$$ 
  
 The amplitude evolution of the differential particle spectrum at E=1erg is shown here: 
-(produced with [setup_escape_constant.py](this) script) 
+(produced with [this](setup_escape_constant.py) script) 
 
-@esc_amp_const.png[width:450px] 
+![esc_amp_const](esc_amp_const.png)
 
 
 ## 2. Energy-Constant but Time-Dependent Escape Time Scale
@@ -62,13 +62,13 @@ The analytical solution of (i) to this problem is
 $$N(E,t) = Q(E)\cdot e^{-\int_1^t\frac{1}{t_{esc}(\tau)}d\tau}\left( \int_1^t e^{\int_1^\tau\frac{1}{t_{esc}(\eta)}d\eta}d\tau - \int_0^1 e^{\int_1^\tau\frac{1}{t_{esc}(\eta)}d\eta}d\tau\right)  $$
  
 The escape time scale evolution in this example is shown here 
-@tesc_osc.png[width:350px] 
+![tesc_osc](tesc_osc.png)
  
 and the resulting time evolution of the differential particle density at E=1erg looks 
 like this: 
-@esc_amp_tdep.png[width:450px] 
+![esc_amp_tdep](esc_amp_tdep.png)
  
-The above plot has been generated with [setup_escape_time_dependent.py](this script).
+The above plot has been generated with [this script](setup_escape_time_dependent.py).
 
 ## 3. Time-Constant but Energy-Dependent Escape Time Scale
 
@@ -89,12 +89,12 @@ section 1, the energy dependence of the escape time scale changes the spectral
 shape of the evolving particle distribution. 
 
 The shape of the escape time scale in energy looks like this 
-@tesc_e.png[width:350px]
+![tesc_e](tesc_e.png)
  
 and the resulting spectral evolution of the particle population is shown here: 
-@esc_spectra_edep.png[width:450px] 
+![esc_spectra_edep](esc_spectra_edep.png)
  
-You can reproduce these plots with [setup_escape_energy_dependent.py](this script).
+You can reproduce these plots with [this script](setup_escape_energy_dependent.py).
 
 
 
@@ -135,15 +135,15 @@ is energy in erg.
 In this example, 
 $$ t_{esc}(E,t) = t_{esc,0}\cdot (1+E/E')^{-0.5(1-0.2\cdot t/t')} \cdot (cos(t/t')^2 + 0.1)$$, 
 where $$E' = 5\mathrm{GeV}$$ and $$t_{esc,0} = t' = 200 \mathrm{yrs}$$. This looks like this: 
-@tesc_t_e.png[height:450px] 
+![tesc_t_e](tesc_t_e.png)
  
 The particle spectrum evolution can be seen here 
-@esc_spectra_edep_tdep.png[height:450px] 
+![esc_spectra_edep_tdep](esc_spectra_edep_tdep.png)
  
 and here: 
-@spec_t_e.png[height:450px]
+![spec_t_e](spec_t_e.png)
  
-These plots were created with [setup_escape_energy_time_dependent.py](this script).
+These plots were created with [this script](setup_escape_energy_time_dependent.py).
 
 
 
