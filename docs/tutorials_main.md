@@ -10,6 +10,7 @@ How to ...
 - [evolve a particle population in a time-constant environment](time_independent_modeling.md)
 - [evolve a particle population in a changing environment](time_dependent_modeling.md)
 - [set up more complicated Inverse-Compton radiation fields (SSC, anisotropy, arbitrary shape)](inverse_compton.md)
+- [pick your hadronic interaction model](hadronic_models.md)
 - [take particle escape into account](particle_escape.md)
 - [display the particle energy loss scales](energy_loss.md)
 

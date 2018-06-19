@@ -108,6 +108,8 @@ You can get an idea of the required binning [here](binning.md).
 
 - For the IC process there are several ways to set up the radiation fields, including for SSC modelling or anisotropy, [see here](inverse_compton.md)
 
+- There are different hadronic interaction models that you can choose from. See [here](hadronic_models.md) how to do it!
+
 - If you have set up more than one IC target field, you can access the individual contributions to the resulting radiation spectrum via `fr.GetICSpectrum(field)`,
 where `field` is the index of the field (e.g. the for the first field you have set 
 it is `field=0`, for the second `field=1` and so on).
