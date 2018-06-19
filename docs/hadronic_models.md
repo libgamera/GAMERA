@@ -1,6 +1,6 @@
 [(one page up)](tutorials_main_page.md)
 
-# How to specify the hadronic interaction model
+# Specifying the hadronic interaction model
 
 `GAMERA` uses the parametrisation developed by [Kafexhiu](http://adsabs.harvard.edu/abs/2014PhRvD..90l3014K). In this work, four high energy emission 
 models were accounted for, namely `GEANT 4.10.0`, `PYTHIA 8.18`, `SIBYLL 2.1` and `QGSJET-I`. 
