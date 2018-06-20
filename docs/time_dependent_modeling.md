@@ -4,7 +4,7 @@ Time-dependent modeling, i.e. modeling the spectral evolution of sources while
 physical parameters like magnetic fields are changing over time, can be done 
 in `GAMERA` in much the same way as static modeling described [in a separate tutorial](time_independent_modeling.md).
 
-## energy-independent parameters
+## Energy-independent parameters
 If you want to model the time-dependency of energy-independent parameters such as the ambient magnetic field or gas density the only difference to the time-independent procedure is to provide 2D-vectors instead of doubles to the corresponding `Setter`-functions you have. 
 
 These vectors need to constist of two columns, with the first column holding the 
@@ -25,17 +25,17 @@ fp.SetBField(b_lookup)
 ```
 
 This simple implementation works with
-- ambient density 
-- source injection luminosity 
-- expansion velocity and radius
-- a small difference for time-dependent but energy-independent particle escape times:
+- ambient density (`fp.SetAmbientDensity(dens)`)
+- the injection luminosity, i.e. the normalisation of the injection spectrum  (`fp.SetLuminosity(dens)`)
+- expansion velocity and radius (`fp.SetExpansionVelocity(vel)`, `fp.SetRadius()`)
+- using a slightly different nomenclature in case of time-dependent but energy-independent particle escape times:
 ```
 t_esc_0 = 1000 * gp.yr_to_sec
 t_esc = t_esc_0 * (time_steps / t_ref) ** 0.5
 t_esc_lookup = zip(time_steps)
 fp.SetTimeDependentEscapeTime(t_esc_lookup)
 ```
-## energy-independent parameters
+## Energy-dependent parameters
 For energy-dependent parameters, the method of applying time-dependency
 is different:
 - If the particle escape time scale depends both on energy and time, also the spectral shape can be made to change with time, see [here](particle_escape.md).
