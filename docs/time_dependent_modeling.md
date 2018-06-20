@@ -25,35 +25,32 @@ b_lookup = zip(time_steps,b)
 fp.SetBField(b_lookup)
 ```
 
-At the moment, time-dependent 
+This simple implementation works with
 - ambient density 
-- source luminosity 
+- source injection luminosity 
 - expansion velocity and radius
-can be implemented in this fashion. 
 
-CurrentlyTime-dependent radiation fields are only possible via an iterative
-approach. There is an [extra tutorial on iterating](iteration.md).
- 
-## Time-Dependent But Energy-Independent Particle Escape Time-Scales
-Very similar is the treatment for energy-independent but time-dependent 
-particle escape time, here an example:
+For more complicated parameters, the method of applying time-dependency
+is different:
+- Very similar to the steps above is the treatment for energy-independent but time-dependent particle escape time:
 ```
 t_esc_0 = 1000 * gp.yr_to_sec
 t_esc = t_esc_0 * (time_steps / t_ref) ** 0.5
 t_esc_lookup = zip(time_steps)
 fp.SetTimeDependentEscapeTime(t_esc_lookup)
 ```
+If the escape time depends also on energy, also the spectral shape can be made
+to change with time, see [here](particle_escape.md).
 
-## Time-Dependent Spectral Shapes Of Injection Spectra and Particle Escape Time-Scales
-`GAMERA` can handle a time-dependent spectral shapes of the injection spectrum 
-as well as the particle ecape. 
-The former point is described [in this tutorial](tt.md). 
-A dynamically changing spectral shape of the particle escape time-scale is covered 
-in this [tutorial](particle_escape.md).
- 
+- CurrentlyTime-dependent radiation fields are only possible via an iterative
+approach. There is an [extra tutorial on iterating](iteration.md).
 
-That's the whole difference to static modeling as far as the `GAMERA` interface 
-is concerned. A working script can be found [ParticlesTimeDep.py](here), which will output the following plots: 
+- Apart from the injection luminosity `GAMERA` can also handle time-dependent spectral shapes of the injection spectrum, see [this tutorial](tt.md) 
+
+- Currently time-changing radiation fields are only possible via an iterative
+approach. There is an [extra tutorial on iterating](iteration.md).
+
+A working script can be found [here](particles_time_dep.py), which will output the following plots: 
 
 Temporal evolution of the particle spectrum assuming the following time dependences 
 (escape time not set in this example): 
