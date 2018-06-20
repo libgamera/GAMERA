@@ -4,10 +4,9 @@ Time-dependent modeling, i.e. modeling the spectral evolution of sources while
 physical parameters like magnetic fields are changing over time, can be done 
 in `GAMERA` in much the same way as static modeling described [in a separate tutorial](time_independent_modeling.md).
 
-## Time-Dependent Environmental Observables And Energy Losses
-If you want to model time-dependent observables such as the ambient magnetic field 
-and therefore also time-dependent energy losse, the only difference is instead 
-of giving skalars to the `Setter`-functions you have to provide 2D-vectors. 
+## energy-independent parameters
+If you want to model the time-dependency of energy-independent parameters such as the ambient magnetic field or gas density the only difference to the time-independent procedure is to provide 2D-vectors instead of doubles to the corresponding `Setter`-functions you have. 
+
 These vectors need to constist of two columns, with the first column holding the 
 time steps and the second the value of the environmental parameter at that time. 
 For instance, if you wanted to define a magnetic field declining with time as 
@@ -29,25 +28,21 @@ This simple implementation works with
 - ambient density 
 - source injection luminosity 
 - expansion velocity and radius
-
-For more complicated parameters, the method of applying time-dependency
-is different:
-- Very similar to the steps above is the treatment for energy-independent but time-dependent particle escape time:
+- a small difference for time-dependent but energy-independent particle escape times:
 ```
 t_esc_0 = 1000 * gp.yr_to_sec
 t_esc = t_esc_0 * (time_steps / t_ref) ** 0.5
 t_esc_lookup = zip(time_steps)
 fp.SetTimeDependentEscapeTime(t_esc_lookup)
 ```
-If the escape time depends also on energy, also the spectral shape can be made
-to change with time, see [here](particle_escape.md).
+## energy-independent parameters
+For energy-dependent parameters, the method of applying time-dependency
+is different:
+- If the particle escape time scale depends both on energy and time, also the spectral shape can be made to change with time, see [here](particle_escape.md).
 
-- CurrentlyTime-dependent radiation fields are only possible via an iterative
-approach. There is an [extra tutorial on iterating](iteration.md).
+- If not only the injection spectrum normalisation (luminosity) but also its spectral shape, this can be modeled [following these steps](tt.md) 
 
-- Apart from the injection luminosity `GAMERA` can also handle time-dependent spectral shapes of the injection spectrum, see [this tutorial](tt.md) 
-
-- Currently time-changing radiation fields are only possible via an iterative
+- Currently time-dependent radiation fields are only possible via an iterative
 approach. There is an [extra tutorial on iterating](iteration.md).
 
 A working script can be found [here](particles_time_dep.py), which will output the following plots: 
