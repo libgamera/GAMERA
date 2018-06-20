@@ -105,5 +105,5 @@ if __name__ == "__main__":
     plt.legend()
     plt.grid()
     plt.title("Different Hadronic Emission Models")
-    f.savefig("HadronicEmissionModelsSEDs.png",bbox_inches='tight')
+    f.savefig("hadronic_emission_models_SEDs.png",bbox_inches='tight')
 
