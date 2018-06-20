@@ -29,7 +29,7 @@ This simple implementation works with
 - expansion velocity and radius (`fp.SetExpansionVelocity(vel)`, `fp.SetRadius()`)
 - a slightly different nomenclature in case of time-dependent but energy-independent particle escape times, here an example:
 ```
-t_esc_0 = 1000 * gp.yr_to_sec
+t_esc_0 = 1000 * gp.yr_to_sec # in seconds
 t_esc = t_esc_0 * (time_steps / t_ref) ** 0.5
 t_esc_lookup = zip(time_steps)
 fp.SetTimeDependentEscapeTime(t_esc_lookup)
