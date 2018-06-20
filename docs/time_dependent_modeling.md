@@ -28,7 +28,7 @@ fp.SetBField(b_lookup)
 This simple implementation works with
 - ambient density (`fp.SetAmbientDensity(dens)`)
 - the injection luminosity, i.e. the normalisation of the injection spectrum  (`fp.SetLuminosity(dens)`)
-- expansion velocity and radius (`fp.SetExpansionVelocity(vel)`, `fp.SetRadius()`)
+- expansion velocity and radius (`fp.SetExpansionVelocity(vel)`, `fp.SetRadius(radius)`)
 - a slightly different nomenclature in case of time-dependent but energy-independent particle escape times, here an example:
 ```
 t_esc_0 = 1000 * gp.yr_to_sec # in seconds
