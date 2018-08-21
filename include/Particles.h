@@ -47,7 +47,9 @@ struct timespec time0, time1, time2, time3;
               /// 0: grid solver,
               /// 1: semi-analytical method in the presence of constant losses
               /// 2: no losses (simply adds up according to luminosity)
+  bool FASTMODE; /// grid solver: sacrifice accuracy for speed. -> true: disables slope limiters. default: false
 
+  bool ESCTIME;/// boolean that indicates whether an escape time has been set. This will be automatically set to 'true' if any method for escape is used. default: false
   double theta;           ///< CR acceleration efficiency
   double SpectralIndex;   ///< spectral index of injected particles
   double SpectralIndex2;  ///< low-energy spectral index for broken power law
@@ -206,7 +208,6 @@ struct timespec time0, time1, time2, time3;
       *taccsp,*eaccsp,*taccesc,*eaccesc;
   double SourceSpectrum(double e);  ///< particle injection spectrum
   double EscapeTime(double e, double t);  ///< particle escape time spectrum
-  vector<double> timeAxis;          ///< time axis for numerical integrator
   vector<double> energyAxis;        ///< energy axis for numerical integrator
   vector<vector<double> > grid;     ///< 2D grid on which solving takes place
   vector<vector<double> > diffusegrid;  ///< 2D grid of the streaming particles
@@ -228,14 +229,12 @@ struct timespec time0, time1, time2, time3;
                                    ///with a real value (e.g. time axis, energy
                                    ///axis).
   void CreateGrid();  ///< create the 2D propagation grid out of 2 1D-vectors
-  void SetInitialCondition(vector<vector<double> > &Grid,
-                           vector<double> EnergyAxis,
+  void SetInitialCondition(vector<double> EnergyAxis,
                            double startTime);  ///< set initial condition
                                                ///(a.k.a. set the first time
                                                ///spectrum in the grid)
-  void ComputeGrid(vector<vector<double> > &Grid, vector<double> EnergyAxis,
-                   double startTime, double Age, vector<double> &TimeAxis,
-                   double minTimeBin =
+  void ComputeGrid(vector<double> EnergyAxis,
+                   double startTime, double Age, double minTimeBin =
                        1. * yr_to_sec);  ///< Iterate through the time-energy
                                          ///grid. Implemented is a piece-wise
                                          ///linear advection algorithm,
@@ -249,12 +248,10 @@ struct timespec time0, time1, time2, time3;
                 double b);  ///< Mod function required for slope delimiters
   double MinMod(double a,
                 double b);  ///< Mod function required for slope delimiters
-  double GetSuperBeeSlope(int i, double deltaX,
-                          vector<vector<double> > *Grid);  ///< slope for
+  double GetSuperBeeSlope(int i, double deltaX,int i0);  ///< slope for
                                                            ///superbee slope
                                                            ///limiter method
-  double GetMinModSlope(int i, double deltaX,
-                        vector<vector<double> > *Grid);  ///< slope for the
+  double GetMinModSlope(int i, double deltaX,int i0);  ///< slope for the
                                                          ///minmod slope limiter
                                                          ///method
   vector<vector<double> > ParticleSpectrum;  ///< vector containing the final
@@ -494,7 +491,6 @@ struct timespec time0, time1, time2, time3;
   void SetRadius(double r) {
     RVector.clear();
     RConstant = pc_to_cm*r;
-    std::cout<<"Rconst = "<<RConstant<<std::endl;
     SetMembers(TminInternal);
   }  ///< Constanty set value of source extension (pc)
   void SetExpansionVelocity(double v) {
@@ -519,12 +515,6 @@ struct timespec time0, time1, time2, time3;
     sharpEnergyCut = false;
   }  ///< untoggle a sharp energy cut in the particle spectrum (position given
      ///by Emax)
-  void SetEnergyAxisLowerBoundary(double BOUND) {
-    EnergyAxisLowerBoundary = BOUND;
-  }  ///< might be superflous
-  void SetEnergyAxisUpperBoundary(double BOUND) {
-    EnergyAxisUpperBoundary = BOUND;
-  }  ///< might be superflous
   void SetTminInternal(double TMININTERNAL) {
     TminInternal = TMININTERNAL;
   }  ///< set minimal time from where to start the iteration (default: 1yr).
@@ -574,6 +564,7 @@ struct timespec time0, time1, time2, time3;
  
   /* methods to set particle escape */
   void SetConstantEscapeTime(double EscapeTime) {
+    if(EscapeTime>0.) ESCTIME = true;
     escapeTimeLookupTdep = NULL;
     escapeTimeLookupEdep = NULL;
     EscapeTimeEnergyTimeEvolution = NULL;
@@ -581,12 +572,14 @@ struct timespec time0, time1, time2, time3;
   }  ///< set the time scale of particle escape
 
   void SetTimeDependentEscapeTime(vector< vector<double> > vEsc) {
+    ESCTIME = true;
     escapeTimeConstant = NAN;
     escapeTimeLookupEdep = NULL;
     EscapeTimeEnergyTimeEvolution = NULL;
     SetLookup(vEsc, "EscapeTimeTdep");} ///< Set escape time evolution
 
   void SetEnergyDependentEscapeTime(vector<vector<double> > ESCTIMELOOKUP) {
+    ESCTIME = true;
     escapeTimeConstant = NAN;
     escapeTimeLookupTdep = NULL;
     EscapeTimeEnergyTimeEvolution = NULL;
@@ -594,6 +587,7 @@ struct timespec time0, time1, time2, time3;
   } ///< set energy-dependent escape time, constant 
 
   void SetTimeAndEnergyDependentEscapeTime(vector< vector<double> > vEsc) {
+    ESCTIME = true;
     escapeTimeConstant = NAN;
     escapeTimeLookupEdep = NULL;
     escapeTimeLookupTdep = NULL;
@@ -601,6 +595,7 @@ struct timespec time0, time1, time2, time3;
 
   void SetTimeAndEnergyDependentEscapeTime(vector<double> t, vector<double> e, 
                                                 vector< vector<double> > mesh) {
+    ESCTIME = true;
     escapeTimeConstant = NAN;
     escapeTimeLookupEdep = NULL;
     escapeTimeLookupTdep = NULL;
@@ -634,8 +629,8 @@ struct timespec time0, time1, time2, time3;
   }  ///< externally switch the parameterisation of the synchrotron emission
      ///model. See SynchModel docu for options.
   vector<double> CalculateSSCEquilibrium(double tolerance = 5e-2, int bins = 100);
-
-
+  void SetFastIteration() {FASTMODE = true;}
+  void SetPreciseIteration() {FASTMODE = false;}
   /*********************************************************/
   /* DEPRECATED FUNCTIONS KEPT FOR BACKWARDS COMPATIBILITY */
   void SetEmin(double EMIN, bool ONLYFORNORMALISATION =
@@ -703,6 +698,7 @@ struct timespec time0, time1, time2, time3;
   }  ///< DEPRECATED!
   void SetEscapeTimeLookup(vector<vector<double> > ESCTIMELOOKUP) {
     cout<< "SetEscapeTimeLookup: DEPRECATED! USE Particles::SetEscapeTime(<vector<vector<double>>v) instead!"<<endl;
+    ESCTIME = true;
     SetTimeDependentEscapeTime(ESCTIMELOOKUP);
   }  ///< DEPRECATED
   void SetRadiusLookup(vector<vector<double> > RADIUSLOOKUP) {
@@ -716,6 +712,5 @@ struct timespec time0, time1, time2, time3;
   void SetEnergyBins(double EBINS) {
     ebins = EBINS;
   }   ///< DEPRECATED
-
 };
 #endif

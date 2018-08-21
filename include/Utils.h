@@ -183,6 +183,8 @@ class Utils {
   bool GetQuietMode() {return QUIETMODE;}
   vector< vector<double> > RemoveZeroEntries(vector< vector<double> > v);
   vector< vector<double> > TwoDVectorFabs(vector< vector<double> > v);
-
+  vector<double> RotateVector(vector<double> v, vector<double> p1, vector<double> p2);
+  double Gaussian1D(double x, double sigma, double mu=0., double norm=0.);
+  double LogisticsFunction(double z, double h, double w);
 };
 #endif

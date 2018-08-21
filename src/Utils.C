@@ -838,6 +838,84 @@ vector< vector<double> > Utils::MeshgridToTwoDVector(vector<double> x, vector<do
     return v;
 }
 
+/**
+ * Rotate 3d-space vector v relative to position p1 to position p2. This uses Rodrigues' rotation formula.
+ * The result is relative to p2.
+ */
+vector<double> Utils::RotateVector(vector<double> v, vector<double> p1, vector<double> p2) {
+
+    double p1_norm = sqrt(p1[0]*p1[0]+p1[1]*p1[1]+p1[2]*p1[2]);
+    double p2_norm = sqrt(p2[0]*p2[0]+p2[1]*p2[1]+p2[2]*p2[2]);
+
+    // dot product to get rotation angle
+    double angle = acos((p1[0]*p2[0]+p1[1]*p2[1]+p1[2]*p2[2])/p1_norm/p2_norm);
+    if (!angle) return v;
+    if (fabs((angle-pi)/pi)<1e-8) {
+        cout<<"Utils::Rotate: y-axis vector size doesn't match y-dimension "
+              "of mesh grid. Returning empty vector."<< endl;
+        return v;
+    }
+    double sine = sin(angle);
+    double cosine_factor = 1.-cos(angle);
+
+    // vector product p1xp2, defining plane of rotation  
+    double k_norm = p1_norm * p2_norm * sin(angle);
+    double k_0,k_1,k_2;
+    k_0 = (p1[1]*p2[2]-p1[2]*p2[1])/k_norm;
+    k_1 = (p1[2]*p2[0]-p1[0]*p2[2])/k_norm;
+    k_2 = (p1[0]*p2[1]-p1[1]*p2[0])/k_norm;
+
+    // Idendity matrix
+    double I_00,I_01,I_02,I_10,I_11,I_12,I_20,I_21,I_22;
+    I_00 = 1.; I_01 = 0.; I_02 = 0.;
+    I_10 = 0.; I_11 = 1.; I_12 = 0.;
+    I_20 = 0.; I_21 = 0.; I_22 = 1.;    
+    
+    // auxiliary matrix K
+    double K_00,K_01,K_02,K_10,K_11,K_12,K_20,K_21,K_22;
+    K_00 =   0.; K_01 = -k_2;  K_02 = k_1;
+    K_10 =  k_2; K_11 =   0.; K_12 = -k_0;
+    K_20 = -k_1; K_21 =  k_0; K_22 =   0.;
+
+    
+    // auxiliary matrix K^2
+    double Ks_00,Ks_01,Ks_02,Ks_10,Ks_11,Ks_12,Ks_20,Ks_21,Ks_22;
+    Ks_00 = K_00*K_00+K_01*K_10+K_02*K_20; 
+    Ks_01 = K_00*K_01+K_01*K_11+K_02*K_21; 
+    Ks_02 = K_00*K_02+K_01*K_12+K_02*K_22;
+
+    Ks_10 = K_10*K_00+K_11*K_10+K_12*K_20;
+    Ks_11 = K_10*K_01+K_11*K_11+K_12*K_21;
+    Ks_12 = K_10*K_02+K_11*K_12+K_12*K_22;
+
+    Ks_20 = K_20*K_00+K_21*K_10+K_22*K_20;
+    Ks_21 = K_20*K_01+K_21*K_11+K_22*K_21;
+    Ks_22 = K_20*K_02+K_21*K_12+K_22*K_22;
+
+    // final rotation matrix R
+    double R_00,R_01,R_02,R_10,R_11,R_12,R_20,R_21,R_22;
+    R_00 = I_00 + sine*K_00 + cosine_factor*Ks_00;
+    R_01 = I_01 + sine*K_01 + cosine_factor*Ks_01;
+    R_02 = I_02 + sine*K_02 + cosine_factor*Ks_02;
+    R_10 = I_10 + sine*K_10 + cosine_factor*Ks_10;
+    R_11 = I_11 + sine*K_11 + cosine_factor*Ks_11;
+    R_12 = I_12 + sine*K_12 + cosine_factor*Ks_12;
+    R_20 = I_20 + sine*K_20 + cosine_factor*Ks_20;
+    R_21 = I_21 + sine*K_21 + cosine_factor*Ks_21;
+    R_22 = I_22 + sine*K_22 + cosine_factor*Ks_22;
+    
+    // multiply vector with rotation matrix to obtain result
+    vector<double> v_rot;
+    v_rot.push_back(R_00*v[0]+R_01*v[1]+R_02*v[2]);
+    v_rot.push_back(R_10*v[0]+R_11*v[1]+R_12*v[2]);
+    v_rot.push_back(R_20*v[0]+R_21*v[1]+R_22*v[2]);
+                        
+    return v_rot;
+}
+ 
+
+
+
 //void Utils::TwoDVectorToMeshgrid(vector< vector<double> > vec)//, vector<double> &x,
 ////                                vector<double> &y, vector< vector<double> > &mesh) {
 //    {
@@ -876,3 +954,15 @@ void Utils::SetInterpolationMethod(string intermeth) {
   }
   return;
 }
+
+double Utils::Gaussian1D(double x, double sigma, double mu, double norm) {
+    double s = (x - mu) / sigma;
+    double gaus = exp(-0.5 * s * s );
+    return (norm) ? norm * gaus: gaus / sigma / sqrt(2.*pi);
+}
+
+double Utils::LogisticsFunction(double z, double h, double w) {
+  double val  = (1. + exp(-2.*(fabs(z)-h)/w));
+  return 1./val;
+}
+

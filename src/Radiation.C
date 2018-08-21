@@ -176,6 +176,7 @@ void Radiation::CalculateDifferentialGammaEmission(double e, int particletype) {
         double ldiffic_sum = 0.;
         radiationMechanism = "InverseCompton";
         for(unsigned int i = 0;i<RADFIELDS_MAX;i++) {
+//            std::cout<<i<<" "<<TargetPhotonAngularDistrs[i]<<" "<<FASTMODE_IC<<std::endl;
             if(TargetPhotonLookups[i]!=NULL) {
                 if(FASTMODE_IC == true && TargetPhotonAngularDistrs[i] == NULL) 
                     continue;
@@ -494,29 +495,59 @@ double Radiation::ICEmissivityAnisotropic(double x, void *par) {
 
     double beta = sqrt(1. - 1. / (lorentz*lorentz));
     double Q = 0.; double F = 0.; double cos_zeta = 0.;
-    double cos_zeta_min = (egamma/m_e)/(2.*ephoton/m_e*lorentz*(lorentz-egamma/m_e))-1.; 
+    double cos_zeta_min = egamma/(2.*ephoton*lorentz*(lorentz-egamma/c_speed))-1.; 
+
+//    double cos_zeta_min2 = (egamma/m_e)/(2.*ephoton/m_e*lorentz*(lorentz-egamma/m_e))-1.; 
+    double zeta_min = acos(cos_zeta_min);
     double integral = 0.;
-    
+    double cos_kappa = cos(theta_e); double sin_kappa = sin(theta_e);   
+    double pi_min_ka = pi - theta_e; 
+
     double phi_min = (*TargetPhotonAngularBoundsCurrent)[0];
     double phi_max = (*TargetPhotonAngularBoundsCurrent)[1];
     double theta_min = (*TargetPhotonAngularBoundsCurrent)[2];
     double theta_max = (*TargetPhotonAngularBoundsCurrent)[3];
     for (double phi = phi_min; phi <= phi_max; phi += d_phi) {
+//        std::cout<<phi<<"("<<phi_min<<" - "<<phi_max<<")"<<std::endl;
         for (double theta = theta_min; theta <= theta_max; theta += d_theta) {
-            cos_zeta = interp2d_spline_eval(*CosZetaLookupCurrent, phi, theta, 
-                                     *phiaccesc_zetaCurrent,*thetaaccesc_zetaCurrent);
+//            cos_zeta = interp2d_spline_eval(*CosZetaLookupCurrent, phi, theta, 
+//                                     *phiaccesc_zetaCurrent,*thetaaccesc_zetaCurrent);
+
+            cos_zeta = -cos_kappa *cos(theta) + sin_kappa * sin(theta) * cos(phi - phi_e);
+////            std::cout<<"cosz,cosz_min = "<<cos_zeta<<" "<<cos_zeta_min<<" "<<cos_zeta_min2<<std::endl;
+//            cos_zeta  = cos(phi) * cos(phi_e) * sin(theta) * sin(theta_e);
+//            cos_zeta += sin(phi) * sin(phi_e) * sin(theta) * sin(theta_e);
+//            cos_zeta += cos(theta) * cos(theta_e);
+//            std::cout<<"cos_zeta1,cos_zeta "<<cos_zeta1<<" "<<cos_zeta<<std::endl;
+//            cos_zeta = cos(phi) * sin(theta);
+//            std::cout<<phi<<" "<<theta<<" "<<Q<<" "<<F<<std::endl;
             if (cos_zeta < cos_zeta_min) continue;
+
+            // Kinematic limits from sec. 2.2.1.
+            double upsilon = cos_zeta_min+cos_kappa*cos(theta) / (sin_kappa*sin(theta));
+            if (std::isinf(upsilon) || std::isnan(upsilon)) continue;
+            if(fabs(theta - pi_min_ka) > zeta_min) { continue;}
+            if (fabs(upsilon) < 1.) {
+                
+                if(fabs(phi - phi_e) > acos(upsilon)) continue;
+            }            
+            else {
+                if(upsilon > 0.) continue;
+                if(upsilon < 0. && fabs(phi-phi_e) > pi) continue;
+            }
+        
             Q = interp2d_spline_eval(*TargetPhotonAngularDistrCurrent, 
                                      phi, theta, *phiaccescCurrent,*thetaaccescCurrent);
-            
             double eph_d = ephoton/m_e * lorentz * (1. + beta*cos_zeta);
             if (egamma/m_e > 2. * lorentz * eph_d / (1. + 2.*eph_d)) continue;
 
             F = ICAnisotropicAuxFunc(phi,theta,ephoton,egamma,lorentz,beta,cos_zeta);
             integral += sin(theta) * d_phi * d_theta * F * Q;
+//                std::cout<<"Q,F,int,cz,dph,dth: "<<Q<<","<<F<<","<<integral<<","<<cos_zeta<<","<<d_phi<<","<<d_theta<<std::endl;
             
         }
     }
+
     double targetphotons = fUtils->EvalSpline(x,
                                               *TargetPhotonLookupCurrent,
                                               *TargetAccCurrent,__func__,__LINE__);
@@ -524,6 +555,7 @@ double Radiation::ICEmissivityAnisotropic(double x, void *par) {
     integrand /= ephoton * (lorentz-egamma/m_e) * (lorentz-egamma/m_e);
     integrand *= integral * pow(10.,targetphotons);
     integrand *= ln10 * ephoton;
+//    std::cout<<"-------------------------------------"<<std::endl;
     return integrand;
 }
 
@@ -1806,7 +1838,7 @@ void Radiation::SetTargetPhotonAnisotropy(int i, vector<double> obs_angle,
     
     TargetPhotonAngularDistrsVectors[i] = mesh;
     TargetPhotonAngularPhiVectors[i] = phi;
-    TargetPhotonAngularThetaVectors[i] = phi;
+    TargetPhotonAngularThetaVectors[i] = theta;
 
 
     phiaccescs[i] = gsl_interp_accel_alloc();
@@ -2062,6 +2094,7 @@ vector<vector<double> > Radiation::GetICSpectrum(unsigned int i, double emin, do
     if(IC_CALCULATED && FASTMODE_IC==true && epoints_temp.size()) {
         FASTMODE_IC=false;
         CalculateDifferentialPhotonSpectrum(epoints_temp);
+        FASTMODE_IC=true;
     }
     return ReturnDifferentialPhotonSpectrum(i+1, emin, emax, diffSpecICComponents);
 }  ///< return pi0 decay spectrum
@@ -2071,6 +2104,7 @@ vector<vector<double> > Radiation::GetICSED(unsigned int i, double emin, double 
     if(IC_CALCULATED && FASTMODE_IC==true && epoints_temp.size()) {
         FASTMODE_IC=false;
         CalculateDifferentialPhotonSpectrum(epoints_temp);
+        FASTMODE_IC=true;
     }
     return ReturnSED(i+1, emin, emax, diffSpecICComponents);
   }  ///< return pi0 decay spectrum

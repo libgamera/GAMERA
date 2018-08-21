@@ -124,10 +124,25 @@ Astro::Astro() {
   avstr = gsl_interp_accel_alloc();
   arstf = gsl_interp_accel_alloc();
   avstf = gsl_interp_accel_alloc();
-
+  xyzref.push_back(0.);
+  xyzref.push_back(0.);
+  xyzref.push_back(0.);
 }
 
 Astro::~Astro() {}
+
+
+void Astro::SetGalacticReferencePoint(vector<double> xyz_ref) {
+    xyzref = xyz_ref;
+    return;
+}
+
+void Astro::TranslateToReferencePoint(double &x, double &y, double &z) {
+    x += xyzref[0];
+    y += xyzref[1];
+    z += xyzref[2];
+    return;
+}
 
 
 /*    ------        SNR PROGENITOR STUFF       ------    */
@@ -321,6 +336,306 @@ vector< vector<double> > Astro::CreateDensityProfile(vector<double> pars,
 
 /*    ------      B-Field stuff      ------ */
 
+int Astro::BFieldGetSpiralArm(vector<double> xyz) {
+  double r = sqrt(xyz[0]*xyz[0]+xyz[1]*xyz[1]);
+  double phi = atan2(xyz[1],xyz[0]);
+  double rx[] = {15.5, 5.1, 6.3, 7.1, 8.3, 9.8, 11.4, 12.7, 15.5};
+  double opening_angle = pi * 11.5 / 180.;
+
+  // Those represent multiple turns on the log spirals. Needed to find the right arm.
+  double exp_fac[4];
+  exp_fac[0] = exp(((phi-0.5*pi) - 2.*pi) / tan(pi/2. - opening_angle));
+  exp_fac[1] = exp(((phi-0.5*pi) ) / tan(pi/2. - opening_angle));
+  exp_fac[2] = exp(((phi-0.5*pi) + 2.*pi) / tan(pi/2. - opening_angle));
+  exp_fac[3] = exp(((phi-0.5*pi) + 4.*pi) / tan(pi/2. - opening_angle));
+
+  // get the right spiral arm
+  double dr = 1e100;
+  int spiral_arm = -1;
+  if (r>5.) {
+    for(int i=0;i<8;i++) {
+      for(int j=0;j<4;j++) {
+        double r1 =rx[i]*exp_fac[j];
+        for(int k=0;k<4;k++) {
+          double r2 =rx[i+1]*exp_fac[k];
+          if (r1 <= r && r < r2 && fabs(r1-r2) < dr) {
+            spiral_arm = i;
+            dr = fabs(r1-r2);
+          }
+        }
+      }
+    }
+  }
+  return spiral_arm;
+}
+
+
+/**
+ * regular B-Field disk component
+ */
+vector< double > Astro::BFieldDiskComponent(vector<double> xyz) {
+
+  double r = sqrt(xyz[0]*xyz[0]+xyz[1]*xyz[1]);
+  double z = xyz[2];
+  double opening_angle = pi * 11.5 / 180.;
+
+  double r_fac = 5. / r; // factor describing radial field strength decrease along spiral arms
+  int spiral_arm = BFieldGetSpiralArm(xyz);
+
+  double b_regular_i[] = {.1, 3.,-.9,-.8,-2.,-4.2,0., 2.7,.1};
+  double b_regular_ring = 0.1;
+  double h_disk = 0.5;
+  double w_disk = 0.27;
+  double transition = fUtils->LogisticsFunction(z,h_disk,w_disk);
+
+  vector<double> RegularDisk; // B-field direction in reference coordinate system
+  RegularDisk.resize(3,0.);
+
+  double b_regular_disk = (r<5.) ? b_regular_ring: r_fac * b_regular_i[spiral_arm];
+  b_regular_disk *= (1.-transition);
+  if (r>3. && r < 5.) {
+    RegularDisk[1]= b_regular_disk; 
+  }
+  if (r>=5. && r < 20.) {
+    RegularDisk[0]= b_regular_disk * sin(opening_angle); 
+    RegularDisk[1]= b_regular_disk * cos(opening_angle); 
+  }
+
+  return RotateBFieldComponent(RegularDisk,xyz);
+}
+
+/**
+ * Regular toroidal halo component
+ **/
+vector<double> Astro::BFieldRegularHaloComponent(vector<double> xyz) {
+
+  double r = sqrt(xyz[0]*xyz[0]+xyz[1]*xyz[1]);
+  double z = xyz[2];
+
+  double b_n = 1.4;
+  double b_s = -1.1;
+  double r_n = 9.22;
+  double r_s = 16.7;
+  double w_h = 0.2;
+  double z_0_tor = 5.3;
+  double h_disk = 0.5;
+  double w_disk = 0.27;
+
+  double transition = fUtils->LogisticsFunction(z,h_disk,w_disk);
+  double b_tor = exp(-fabs(z) / z_0_tor) * transition;
+  b_tor *= (z>0) ? b_n * (1. - fUtils->LogisticsFunction(r,r_n,w_h)):
+               b_s * (1. - fUtils->LogisticsFunction(r,r_s,w_h));
+
+  vector<double> RegularHalo; // B-field direction in reference coordinate system
+  RegularHalo.resize(3,0.);
+  RegularHalo[1] = b_tor;
+
+  return RotateBFieldComponent(RegularHalo,xyz);
+}
+
+/**
+ * Regular X-shaped (when looking edge-on galaxy) component
+ **/
+vector<double> Astro::BFieldXComponent(vector<double> xyz) {
+
+  double r = sqrt(xyz[0]*xyz[0]+xyz[1]*xyz[1]);
+  double z = xyz[2];
+
+  //#### X-field component
+  double b_x_0 = 4.6;
+  double theta_x_0 = 49. * pi / 180.;
+  double r_x_c = 4.8;
+  double r_x = 2.9;
+
+  double r_p,theta,b_x;
+  r_p = r * r_x_c / (r_x_c + fabs(z) / tan(theta_x_0));
+  if(r_p < r_x_c) {
+    theta = (r!=r_p) ? atan(fabs(z)/(r-r_p)): pi/2.;
+    b_x = b_x_0 * exp(-r_p / r_x) * r_p*r_p / (r*r);
+  }
+  else {
+    r_p = r - fabs(z)/tan(theta_x_0);
+    theta = theta_x_0;
+    b_x = b_x_0 * exp(-r_p / r_x) * r_p / r;//Intensity jumps between both domains ... Intended by the authors?
+  }
+
+  if (!z) theta = pi/2.; // field lines to cross the plane in perpendicular manner
+  vector<double> RegularX; 
+  RegularX.resize(3,0.);
+  RegularX[0] = b_x * cos(theta); 
+  RegularX[2] = b_x * sin(theta);
+  if(z<0) RegularX[0] *= -1.;
+  
+
+  return RotateBFieldComponent(RegularX,xyz);
+}
+
+/**
+ * Random, unordered B-field component
+ */
+vector<double> Astro::BFieldRandomComponent(vector<double> xyz) {
+  double r = sqrt(xyz[0]*xyz[0]+xyz[1]*xyz[1]);
+  double z = xyz[2];
+  double r_fac = 5. / r; // factor describing radial field strength decrease along spiral arms
+
+  int spiral_arm = BFieldGetSpiralArm(xyz);
+
+  double b_random_i[] = {10.81, 6.96,9.59,6.96,1.96,16.34,37.29,10.35};
+  double b_random_int = 7.63;
+  double z_0_disk = 0.61;
+  double b_0 = 4.68;
+  double r_0 = 10.97;
+  double z_0 = 2.84;
+
+  //####  random disk component rms strength
+  double b_random_disk = (r<5.) ? b_random_int: r_fac * b_random_i[spiral_arm];
+  if (r>20.) b_random_disk = 0.;
+  b_random_disk *= fUtils->Gaussian1D(z,z_0_disk,0.,1.);
+  b_random_disk = fUtils->GaussianRandom(b_random_disk,0,1)[0];
+
+  //#### random halo component rms strength
+  double b_random_halo = b_0 * exp(-r / r_0) * exp(-z*z / (2.*z_0*z_0) );
+  b_random_halo = fUtils->GaussianRandom(b_random_halo,0,1)[0];
+
+  //#### random sum rms strength
+  double b_random = sqrt(b_random_disk*b_random_disk + b_random_halo*b_random_halo);
+  b_random = fUtils->GaussianRandom(b_random,0,1)[0];
+  
+  //#### random direction
+  vector<double> Random = fUtils->UniformRandom(-1.,1.,3);
+  double norm = sqrt(Random[0]*Random[0]+
+                     Random[1]*Random[1]+
+                     Random[2]*Random[2]);
+
+  Random[0] *= b_random / norm; 
+  Random[1] *= b_random / norm; 
+  Random[2] *= b_random / norm; 
+
+  return Random;
+}
+
+/**
+ * Striated random component (i.e. oriented along regular B-field)
+ **/
+vector<double> Astro::BFieldStriatedComponent(vector<double> RegularDisk, 
+                                              vector<double> RegularHalo,
+                                              vector<double> RegularX) {
+
+  // sum of all regular components
+  vector<double> Regular;
+  Regular.resize(3,0.);
+  Regular[0] = RegularDisk[0] + RegularHalo[0] + RegularX[0];
+  Regular[1] = RegularDisk[1] + RegularHalo[1] + RegularX[1];
+  Regular[2] = RegularDisk[2] + RegularHalo[2] + RegularX[2];
+
+  double beta = 1.36;
+  double norm = sqrt(Regular[0]*Regular[0]+
+                     Regular[1]*Regular[1]+
+                     Regular[2]*Regular[2]);
+
+  vector<double> Striated;
+  Striated.resize(3);
+  double striated_norm = fUtils->GaussianRandom(sqrt(beta) * norm,0,1)[0];
+
+  Striated[0] = striated_norm / norm * Regular[0]; 
+  Striated[1] = striated_norm / norm * Regular[1]; 
+  Striated[2] = striated_norm / norm * Regular[2]; 
+
+  return Striated;
+}
+
+/**
+ * Rotate B-field Vector to the right position in the xy plane
+ **/
+vector< double > Astro::RotateBFieldComponent(vector<double> component, vector<double> xyz) {
+
+
+
+  vector<double> plane,reference;
+  plane.resize(3,0.);reference.resize(3,0.);
+  plane[0] = xyz[0]; plane[1] = xyz[1];
+  reference[0] = 1.;
+  if(plane[0] < 0. && !plane[1]) {
+    vector<double> plane_int;
+    plane_int.resize(3,0.);
+    plane_int[1] = -plane[0];
+     
+    component = fUtils->RotateVector(component,reference,plane_int);
+    reference = plane_int;
+  }
+
+  component = fUtils->RotateVector(component,reference,plane);
+  return component;
+}
+
+
+vector< vector<double> > Astro::CalculateBFieldComponents(vector<double> xyz, 
+                                                          int component) {
+  
+  vector<double> reference; 
+  reference.resize(3,0.);
+  reference[0]=1.; 
+    
+  vector<double> RegularDisk,RegularHalo,RegularX,Random,Striated;
+  RegularDisk.resize(3,0.); RegularHalo.resize(3,0.); RegularX.resize(3,0.);
+  Random.resize(3,0.); Striated.resize(3,0.);
+  
+
+  // regular field components
+  if(component==-1||!component||component==4) RegularDisk = BFieldDiskComponent(xyz);
+  if(component==-1||component==1||component==4) RegularHalo = BFieldRegularHaloComponent(xyz);
+  if(component==-1||component==2||component==4) RegularX = BFieldXComponent(xyz);
+  if(component==-1||component==3) Random = BFieldRandomComponent(xyz);
+  if(component==-1||component==4) Striated = BFieldStriatedComponent(RegularDisk,RegularHalo,RegularX);
+
+  vector< vector<double> > components;
+  components.push_back(RegularDisk);
+  components.push_back(RegularHalo);
+  components.push_back(RegularX);
+  components.push_back(Striated);
+  components.push_back(Random);
+
+  return components;
+}
+
+
+vector< vector<double> > Astro::CalculateBField(vector< vector<double> > pos, int component) {
+
+    vector< vector<double> > bvecs;
+    for(unsigned int i=0;i<pos.size();i++) {
+        bvecs.push_back(CalculateBField(pos[i],component));
+    }
+    return bvecs;
+}
+
+vector<double> Astro::CalculateBField(vector<double> xyz, int component) {
+
+  vector< vector<double> > components = CalculateBFieldComponents(xyz,component);
+  vector<double> total;
+  total.resize(3,0.);
+  
+  if(component>-1 && component<(int)components.size()) {
+    total[0] += components[component][0];
+    total[1] += components[component][1];
+    total[2] += components[component][2];
+  }
+  if(component==-1) {
+    for (unsigned int i=0; i<components.size(); i++) {
+      total[0] += components[i][0];
+      total[1] += components[i][1];
+      total[2] += components[i][2];
+    }
+  }
+  if(component>=(int)components.size() || component< -1) {
+    cout<<"Astro::CalculateBField: Component "<<component<<" not available. Viable indices are "
+        <<0<<" to "<<  components.size() - 1<< ". Returning empty vector."<<endl;
+  }
+
+  return total;
+
+}
+
+
 /**
  * 2D-Model of the large-scale galactic magnetic field structure
  * by Jaffe et al, 2010.
@@ -334,147 +649,147 @@ vector< vector<double> > Astro::CreateDensityProfile(vector<double> pars,
  * Note: it is only in the x-y plane at the moment, thus the z variable doesn't
  * do anything!
  */
-void Astro::CalculateBField(double x, double y, double z, double &B_tot, double &B_coh, double &B_ord, double &B_iso, vector<double> &regFieldDirection, vector<double> &isoFieldDirection) {
-  regFieldDirection.clear();
-  isoFieldDirection.clear();
-  double DistanceToClosestArm = 0.;
-  int ClosestArm = 0;
-  GetDistanceToNearestSpiralArm(x,y,DistanceToClosestArm,ClosestArm);
-  double r = sqrt(pow(x,2.)+pow(y,2.));
-  double R0 = 20.;
-  double R1 = 3.;
-  double R2 = 0.5;
-  double Rarms = 15.;
-  double RmolRing = 5.;
-  double Rmin = 3.;
-  double C0 = 1.;
-  double an = 1.;
-  double an1 = 1.26;
-  double an2 = 1.04;
-  double an3 = 0.61;
-  double an4 = 1.65;
-  double anMolRing  = 1.;
-  switch (ClosestArm){
-    case 4:
-      an = an4;
-      break;
-    case 3:
-      an = an3;
-      break;
-    case 2:
-      an = an2;
-      break;
-    case 1:
-      an = an1;
-      break;
-  }
-  double B_0 = 1.e-6;
-  double d0 = 0.3; //could be replaced by arm-width
-  double B_rms = 2.1e-6;
-  double ford = 1.9;
-  regFieldDirection.push_back(0.);
-  regFieldDirection.push_back(0.);
-  regFieldDirection.push_back(0.);
+//void Astro::CalculateBField(double x, double y, double z, double &B_tot, double &B_coh, double &B_ord, double &B_iso, vector<double> &regFieldDirection, vector<double> &isoFieldDirection) {
+//  regFieldDirection.clear();
+//  isoFieldDirection.clear();
+//  double DistanceToClosestArm = 0.;
+//  int ClosestArm = 0;
+//  GetDistanceToNearestSpiralArm(x,y,DistanceToClosestArm,ClosestArm);
+//  double r = sqrt(pow(x,2.)+pow(y,2.));
+//  double R0 = 20.;
+//  double R1 = 3.;
+//  double R2 = 0.5;
+//  double Rarms = 15.;
+//  double RmolRing = 5.;
+//  double Rmin = 3.;
+//  double C0 = 1.;
+//  double an = 1.;
+//  double an1 = 1.26;
+//  double an2 = 1.04;
+//  double an3 = 0.61;
+//  double an4 = 1.65;
+//  double anMolRing  = 1.;
+//  switch (ClosestArm){
+//    case 4:
+//      an = an4;
+//      break;
+//    case 3:
+//      an = an3;
+//      break;
+//    case 2:
+//      an = an2;
+//      break;
+//    case 1:
+//      an = an1;
+//      break;
+//  }
+//  double B_0 = 1.e-6;
+//  double d0 = 0.3; //could be replaced by arm-width
+//  double B_rms = 2.1e-6;
+//  double ford = 1.9;
+//  regFieldDirection.push_back(0.);
+//  regFieldDirection.push_back(0.);
+//  regFieldDirection.push_back(0.);
 
-  isoFieldDirection.push_back(0.);
-  isoFieldDirection.push_back(0.);
-  isoFieldDirection.push_back(0.);
-  if(r<Rmin||r>R0) {
-    B_coh = 0.;
-    B_iso = 0.;
-    B_ord = 0.;
-    B_tot = 0.;
+//  isoFieldDirection.push_back(0.);
+//  isoFieldDirection.push_back(0.);
+//  isoFieldDirection.push_back(0.);
+//  if(r<Rmin||r>R0) {
+//    B_coh = 0.;
+//    B_iso = 0.;
+//    B_ord = 0.;
+//    B_tot = 0.;
 
-    return;
+//    return;
 
-  }
-  double rhoc = C0*exp(-DistanceToClosestArm*DistanceToClosestArm/(d0*d0))+1.;
-  if(r>Rarms) rhoc = 1.;
-  if(r>Rmin && r<RmolRing) {
-    rhoc  =  C0*exp(-pow(r-RmolRing,2.)/(d0*d0))+1.;///< own description, since exact profile is not described in paper
-    an = anMolRing;
-  }
-  /* coherent, large scale B-field along spiral arms */
-  B_coh = B_0*(1.-exp(-r*r/(R2*R2)));
-  B_coh *= exp(-r*r/(R0*R0))+exp(-r*r*r*r/(R1*R1*R1*R1));
-  B_coh *= rhoc*an;
-  /* small-scale irregular component of B-field */ //NOTE: This is only random in 2D! If 3D (incl. scatter perpendicular to the plane), the component along the arms would smaller)
-  B_iso = rhoc*B_rms;
-  /* irregular component along spiral arms */
-  B_ord = ford*(rhoc-1.)*B_rms;
-  /* dice relative orientation of irregular components to coherent one */
-  double phi_iso = 2.*pi*fUtils->Random();
-  /* Component along the coherent field lines */
-  double B_sumx = B_coh+B_iso*cos(phi_iso)+B_ord*cos(phi_iso);
-  /* Component perpendicular to the coherent field lines (only isotropic field) */
-  double B_sumy = B_iso*sin(phi_iso);
+//  }
+//  double rhoc = C0*exp(-DistanceToClosestArm*DistanceToClosestArm/(d0*d0))+1.;
+//  if(r>Rarms) rhoc = 1.;
+//  if(r>Rmin && r<RmolRing) {
+//    rhoc  =  C0*exp(-pow(r-RmolRing,2.)/(d0*d0))+1.;///< own description, since exact profile is not described in paper
+//    an = anMolRing;
+//  }
+//  /* coherent, large scale B-field along spiral arms */
+//  B_coh = B_0*(1.-exp(-r*r/(R2*R2)));
+//  B_coh *= exp(-r*r/(R0*R0))+exp(-r*r*r*r/(R1*R1*R1*R1));
+//  B_coh *= rhoc*an;
+//  /* small-scale irregular component of B-field */ //NOTE: This is only random in 2D! If 3D (incl. scatter perpendicular to the plane), the component along the arms would smaller)
+//  B_iso = rhoc*B_rms;
+//  /* irregular component along spiral arms */
+//  B_ord = ford*(rhoc-1.)*B_rms;
+//  /* dice relative orientation of irregular components to coherent one */
+//  double phi_iso = 2.*pi*fUtils->Random();
+//  /* Component along the coherent field lines */
+//  double B_sumx = B_coh+B_iso*cos(phi_iso)+B_ord*cos(phi_iso);
+//  /* Component perpendicular to the coherent field lines (only isotropic field) */
+//  double B_sumy = B_iso*sin(phi_iso);
 
-  B_tot = sqrt(B_sumx*B_sumx+B_sumy*B_sumy);
+//  B_tot = sqrt(B_sumx*B_sumx+B_sumy*B_sumy);
 
-  double e_B_coh[3];
-  double theta = -(180./pi)*atan2(x,y)+90;
-//  std::cout<<"(x,y)="<<x<<","<<y<<" "<<theta<<std::endl;
-  double xarmclose,yarmclose,rarmclose,xarmfar,yarmfar,rarmfar,x0,y0,x1,y1,rtest;
-  PositionOnSpiralArmAngular(theta, ClosestArm, xarmclose, yarmclose);
-  rarmclose = sqrt(xarmclose*xarmclose+yarmclose*yarmclose);
-  PositionOnSpiralArmAngular(theta+360., ClosestArm, xarmfar, yarmfar);
-  rarmfar = sqrt(xarmfar*xarmfar+yarmfar*yarmfar);
-  (fabs(r-rarmfar)>fabs(r-rarmclose))?(rtest=rarmclose):
-    rtest=rarmfar;
-  GalacticPositionXY(0.999*rtest,ClosestArm,x0,y0);
-  GalacticPositionXY(1.001*rtest,ClosestArm,x1,y1);
-//  std::cout<<r<<" -> ("<<x0<<","<<y0<<")"<<" ("<<x1<<","<<y1<<")"<<std::endl;
-  double l = sqrt((x1-x0)*(x1-x0)+(y1-y0)*(y1-y0));
-  e_B_coh[0] = (x1-x0)/l;
-  e_B_coh[1] = (y1-y0)/l;
-  e_B_coh[2] = 0.;
-  if(r>Rarms) {
-    double weight = (r-Rarms)/(R0-Rarms);
-    double xrand = 1.-2.*fUtils->Random();
-    double yrand = 1.-2.*fUtils->Random();
-    double zrand = 1.-2.*fUtils->Random();
+//  double e_B_coh[3];
+//  double theta = -(180./pi)*atan2(x,y)+90;
+////  std::cout<<"(x,y)="<<x<<","<<y<<" "<<theta<<std::endl;
+//  double xarmclose,yarmclose,rarmclose,xarmfar,yarmfar,rarmfar,x0,y0,x1,y1,rtest;
+//  PositionOnSpiralArmAngular(theta, ClosestArm, xarmclose, yarmclose);
+//  rarmclose = sqrt(xarmclose*xarmclose+yarmclose*yarmclose);
+//  PositionOnSpiralArmAngular(theta+360., ClosestArm, xarmfar, yarmfar);
+//  rarmfar = sqrt(xarmfar*xarmfar+yarmfar*yarmfar);
+//  (fabs(r-rarmfar)>fabs(r-rarmclose))?(rtest=rarmclose):
+//    rtest=rarmfar;
+//  GalacticPositionXY(0.999*rtest,ClosestArm,x0,y0);
+//  GalacticPositionXY(1.001*rtest,ClosestArm,x1,y1);
+////  std::cout<<r<<" -> ("<<x0<<","<<y0<<")"<<" ("<<x1<<","<<y1<<")"<<std::endl;
+//  double l = sqrt((x1-x0)*(x1-x0)+(y1-y0)*(y1-y0));
+//  e_B_coh[0] = (x1-x0)/l;
+//  e_B_coh[1] = (y1-y0)/l;
+//  e_B_coh[2] = 0.;
+//  if(r>Rarms) {
+//    double weight = (r-Rarms)/(R0-Rarms);
+//    double xrand = 1.-2.*fUtils->Random();
+//    double yrand = 1.-2.*fUtils->Random();
+//    double zrand = 1.-2.*fUtils->Random();
 
-    double rrand = sqrt(xrand*xrand+yrand*yrand+zrand*zrand);
-    xrand /= rrand;
-    yrand /= rrand;
-    zrand /= rrand;
+//    double rrand = sqrt(xrand*xrand+yrand*yrand+zrand*zrand);
+//    xrand /= rrand;
+//    yrand /= rrand;
+//    zrand /= rrand;
 
-    e_B_coh[0] += weight*xrand;
-    e_B_coh[1] += weight*yrand;
-    e_B_coh[2] += weight*zrand;
+//    e_B_coh[0] += weight*xrand;
+//    e_B_coh[1] += weight*yrand;
+//    e_B_coh[2] += weight*zrand;
 
-    double r_coh = sqrt(e_B_coh[0]*e_B_coh[0]+e_B_coh[1]*e_B_coh[1]+e_B_coh[2]*e_B_coh[2]);
+//    double r_coh = sqrt(e_B_coh[0]*e_B_coh[0]+e_B_coh[1]*e_B_coh[1]+e_B_coh[2]*e_B_coh[2]);
 
-    e_B_coh[0] /= r_coh;
-    e_B_coh[1] /= r_coh;
-    e_B_coh[2] /= r_coh;
-  }
-  if(r>RmolRing) {
-    regFieldDirection[0] = e_B_coh[0];
-    regFieldDirection[1] = e_B_coh[1];
-    regFieldDirection[2] = e_B_coh[2];
-  }
-//  std::cout<<"  -> "<<regFieldDirection[0]<<","<<regFieldDirection[1]<<","<<regFieldDirection[2]<<std::endl;
+//    e_B_coh[0] /= r_coh;
+//    e_B_coh[1] /= r_coh;
+//    e_B_coh[2] /= r_coh;
+//  }
+//  if(r>RmolRing) {
+//    regFieldDirection[0] = e_B_coh[0];
+//    regFieldDirection[1] = e_B_coh[1];
+//    regFieldDirection[2] = e_B_coh[2];
+//  }
+////  std::cout<<"  -> "<<regFieldDirection[0]<<","<<regFieldDirection[1]<<","<<regFieldDirection[2]<<std::endl;
 
-  double e_B_iso[3];
-  e_B_iso[0] = e_B_coh[0];
-  e_B_iso[1] = e_B_coh[1];
-  e_B_iso[2] = e_B_coh[2];
-  RotateCoordinates(e_B_iso[0],e_B_iso[1],e_B_iso[2],0.,0.,phi_iso);
-  isoFieldDirection[0] = e_B_iso[0];
-  isoFieldDirection[1] = e_B_iso[1];
-  isoFieldDirection[2] = e_B_iso[2];
+//  double e_B_iso[3];
+//  e_B_iso[0] = e_B_coh[0];
+//  e_B_iso[1] = e_B_coh[1];
+//  e_B_iso[2] = e_B_coh[2];
+//  RotateCoordinates(e_B_iso[0],e_B_iso[1],e_B_iso[2],0.,0.,phi_iso);
+//  isoFieldDirection[0] = e_B_iso[0];
+//  isoFieldDirection[1] = e_B_iso[1];
+//  isoFieldDirection[2] = e_B_iso[2];
 
-  return;
-}
+//  return;
+//}
 
-double Astro::TotalBField(double x, double y, double z) {
-  double B_tot,B_coh,B_ord,B_iso;
-  vector<double> regFieldDirection, isoFieldDirection;
-  CalculateBField(x, y, z, B_tot, B_coh, B_ord, B_iso, regFieldDirection, isoFieldDirection);
-  std::cout<<x<<" "<<y<<" "<<z<<" "<<B_tot<<" "<<B_coh<<" "<<B_ord<<" "<<B_iso<<std::endl;
-  return B_tot;
-}
+//double Astro::TotalBField(double x, double y, double z) {
+//  double B_tot,B_coh,B_ord,B_iso;
+//  vector<double> regFieldDirection, isoFieldDirection;
+//  CalculateBField(x, y, z, B_tot, B_coh, B_ord, B_iso, regFieldDirection, isoFieldDirection);
+//  std::cout<<x<<" "<<y<<" "<<z<<" "<<B_tot<<" "<<B_coh<<" "<<B_ord<<" "<<B_iso<<std::endl;
+//  return B_tot;
+//}
 
 /*  -----     AMBIENT DENSITY STUFF     ----- */
 
@@ -512,6 +827,10 @@ double Astro::HIDensity(double x, double y, double z, bool MODULATE) {
  *
  */
 double Astro::H2Density(double x, double y, double z, bool MODULATE) {
+//  std::cout<<x<<","<<y<<","<<z<<std::endl;
+  TranslateToReferencePoint(x,y,z);
+//  std::cout<<"->"<<x<<","<<y<<","<<z<<std::endl;
+//  std::cout<<"__________________"<<std::endl;
   double R = sqrt(pow(x,2.)+pow(y,2.));
   double n = 0.;
   if( R < 3.) {
@@ -850,35 +1169,35 @@ double Astro::ModulateGasDensityWithSpirals(double n, double x, double y, double
 /**
  *
  */
-double Astro::nRadial(double *x, double *pars) {
-  vector<double> xyzref;
-  xyzref.resize(3);
-  vector<double> lbr;
-  lbr.resize(3);
-  xyzref[0] = pars[2];
-  xyzref[1] = pars[3];
-  xyzref[2] = pars[4];
-  lbr[0] = pars[0];
-  lbr[1] = pars[1];
-  lbr[2] = x[0];
-  int gasspecies = pars[5];
-  int modulatewitharms = (int)pars[6];
+//double Astro::nRadial(double *x, double *pars) {
+//  vector<double> xyzobs;
+//  xyzobs.resize(3);
+//  vector<double> lbr;
+//  lbr.resize(3);
+//  xyzobs[0] = pars[2];
+//  xyzobs[1] = pars[3];
+//  xyzobs[2] = pars[4];
+//  lbr[0] = pars[0];
+//  lbr[1] = pars[1];
+//  lbr[2] = x[0];
+//  int gasspecies = pars[5];
+//  int modulatewitharms = (int)pars[6];
 
-  vector<double> xyzactual = GetCartesian(lbr,xyzref);
-  double xActual = xyzactual[0];
-  double yActual = xyzactual[1];
-  double zActual = xyzactual[2];
+//  vector<double> xyzactual = GetCartesian(lbr,xyzobs);
+//  double xActual = xyzactual[0];
+//  double yActual = xyzactual[1];
+//  double zActual = xyzactual[2];
 
-  double n=0.;
-  if(!gasspecies) n = HIDensity(xActual,yActual,zActual);
-  else if(gasspecies==1) n = H2Density(xActual,yActual,zActual);
-  else {
-    std::cout<<"Astro::nRadial: Specify implemented gas species! returning 0.!"<<std::endl;
-    return 0.;
-  }
-  if(modulatewitharms==1) n = ModulateGasDensityWithSpirals(n,xActual,yActual,zActual);
-  return n;
-}
+//  double n=0.;
+//  if(!gasspecies) n = HIDensity(xActual,yActual,zActual);
+//  else if(gasspecies==1) n = H2Density(xActual,yActual,zActual);
+//  else {
+//    std::cout<<"Astro::nRadial: Specify implemented gas species! returning 0.!"<<std::endl;
+//    return 0.;
+//  }
+//  if(modulatewitharms==1) n = ModulateGasDensityWithSpirals(n,xActual,yActual,zActual);
+//  return n;
+//}
 
 /*    ------            Galactic Structure stuff              ------    */
 
@@ -889,35 +1208,68 @@ double Astro::nRadial(double *x, double *pars) {
 /**
  * In there for backwards compability
  */
-vector<double> Astro::GetCartesian(double r, double l, double b, vector<double> xyzref) {
+vector<double> Astro::GetCartesian(double r, double l, double b, vector<double> xyzobs,vector<double> xyzorigin) {
     vector<double> lbr;
     lbr.push_back(l);
     lbr.push_back(b);
     lbr.push_back(r);
-    return GetCartesian(lbr, xyzref);
+    return GetCartesian(lbr,xyzobs,xyzorigin);
 }
-vector<double> Astro::GetCartesian(vector<double> lbr, vector<double> xyzref) {
+vector<double> Astro::GetCartesian(vector<double> lbr,vector<double> xyzobs,vector<double> xyzorigin) {
 
-  double l = lbr[0];
-  double b = lbr[1];
+
+  double l = pi * lbr[0] / 180.;
+  double b = pi * lbr[1] / 180.;
   double r = lbr[2];
 
-  double dl, db;
+  vector<double> v;
+  v.push_back(-r*cos(l)*cos(b)); //x component
+  v.push_back(r*sin(l)*cos(b)); //y component
+  v.push_back(r*sin(b)); //z component
+
+  // unit vector along x. This is the right direction for the xyz components of v
+  vector<double> p1;    
+  p1.push_back(1.);    
+  p1.push_back(0.);    
+  p1.push_back(0.);
+  
+  // rotate coordinates so that the (x,0,0)-axis lies along xyzorigin. This defines
+  // the orientation of the system. For instance, the earth would at xyzorigin = (0,8.5,0).
+  // This re-defines the coordinate system to point towards the earth's position.
+  vector<double> v_rel = fUtils->RotateVector(v,p1,xyzorigin);
+
+  // rotate v_rel to the final position in 3D space at the coordinates xyzobs
+  vector<double> v_rot = fUtils->RotateVector(v_rel,xyzorigin,xyzobs);
   vector<double> xyz;
   xyz.resize(3);
-  double xref = xyzref[0];
-  double yref = xyzref[1];
-  double zref = xyzref[2];
+  xyz[0] = xyzobs[0] + v_rot[0];
+  xyz[1] = xyzobs[1] + v_rot[1];
+  xyz[2] = xyzobs[2] + v_rot[2];
 
-  dl = db = 0.;
-  dl = atan2(yref,xref);
-  db = atan(zref/sqrt(xref*xref+yref*yref));
-  double phi = (pi/180.)*l+dl;
-  double theta = pi/2. - (pi/180.)*b+db;
-  xyz[0] = xref - r*sin(theta)*cos(phi);
-  xyz[1] = yref - r*sin(theta)*sin(phi);
-  xyz[2] = zref + r*cos(theta);
 
+
+//  double dl, db;
+//  vector<double> xyz;
+//  xyz.resize(3);
+//  double xobs = xyzobs[0];
+//  double yobs = xyzobs[1];
+//  double zobs = xyzobs[2];
+
+//  dl = db = 0.;
+//  dl = atan2(yobs,xobs);
+//  db = atan(zobs/sqrt(xobs*xobs+yobs*yobs));
+//  std::cout<<dl/(pi/180.)<<" "<<db/(pi/180.)<<std::endl;
+//  double phi = (pi/180.)*l+dl;
+//  double theta = pi/2. - (pi/180.)*b+db;
+//  theta = pi/2. - (db + (pi/180.)*b);
+//  std::cout<<theta/(pi/180.)<<" "<<phi/(pi/180.)<<std::endl;
+//  std::cout<<".............."<<std::endl;
+//  xyz[0] = xobs - r*sin(theta)*cos(phi);
+//  xyz[1] = yobs - r*sin(theta)*sin(phi);
+//  xyz[2] = zobs + r*cos(theta);
+
+
+ // neuer plan : l,b ->dxdydz -> rotation -> dxdydz' -> addition zu vobs
   return xyz;
 }
 
@@ -925,7 +1277,7 @@ vector<double> Astro::GetCartesian(vector<double> lbr, vector<double> xyzref) {
  * Galactic Coordinates(GL,GB,R) coordinates ->  Cartesian for vector of points
  */
 vector< vector<double> > Astro::GetCartesianPositions(
-                        vector< vector<double> > lbr, vector<double> xyzref) {
+                        vector< vector<double> > lbr, vector<double> xyzobs, vector<double> xyzorigin) {
     vector< vector<double> > temp;
     if (!lbr.size()) {
         cout << "Astro::GetCartesianPositions: Input vector of positions is "
@@ -934,7 +1286,7 @@ vector< vector<double> > Astro::GetCartesianPositions(
     }
 
     for(unsigned int i=0; i<lbr.size(); i++) {
-        vector<double> xyz = GetCartesian(lbr[i], xyzref);
+        vector<double> xyz = GetCartesian(lbr[i], xyzobs,xyzorigin);
         temp.push_back(vector<double>());
         temp[temp.size()-1].push_back(xyz[0]);
         temp[temp.size()-1].push_back(xyz[1]);
@@ -945,16 +1297,16 @@ vector< vector<double> > Astro::GetCartesianPositions(
 /**
  * In there for backwards compatibility
  */
-void Astro::GetGalactic(double x, double y, double z, double xref, double yref, double zref, double &l, double &b) {
+void Astro::GetGalactic(double x, double y, double z, double xobs, double yobs, double zobs, double &l, double &b) {
     vector<double> xyz;
     xyz.push_back(x);
     xyz.push_back(y);
     xyz.push_back(z);
-    vector<double> xyzref;
-    xyzref.push_back(xref);
-    xyzref.push_back(yref);
-    xyzref.push_back(zref);
-    vector<double> gal = GetGalactic(xyz, xyzref);
+    vector<double> xyzobs;
+    xyzobs.push_back(xobs);
+    xyzobs.push_back(yobs);
+    xyzobs.push_back(zobs);
+    vector<double> gal = GetGalactic(xyz, xyzobs);
     l = gal[0]; b = gal[1];
     return;
 
@@ -965,7 +1317,7 @@ void Astro::GetGalactic(double x, double y, double z, double xref, double yref, 
 /**
  * Cartesian coordinates -> Galactic Coordinates(GL,GB,R)
  */
-vector<double> Astro::GetGalactic(vector<double> xyz, vector<double> xyzref) {
+vector<double> Astro::GetGalactic(vector<double> xyz, vector<double> xyzobs) {
 
   double x = xyz[0];
   double y = xyz[1];
@@ -973,24 +1325,24 @@ vector<double> Astro::GetGalactic(vector<double> xyz, vector<double> xyzref) {
 
   double l,b,r;
   vector<double> lbr;
-  double xref = xyzref[0];
-  double yref = xyzref[1];
-  double zref = xyzref[2];
+  double xobs = xyzobs[0];
+  double yobs = xyzobs[1];
+  double zobs = xyzobs[2];
   lbr.resize(3);
 
-  double dx  = x-xref;
-  double dy  = y-yref;
-  double dz =  z-zref;
+  double dx  = x-xobs;
+  double dy  = y-yobs;
+  double dz =  z-zobs;
 
   r = sqrt(dx*dx+dy*dy+dz*dz);
-  double rrref = sqrt(xref*xref+yref*yref);
+  double rrobs = sqrt(xobs*xobs+yobs*yobs);
   double dr = sqrt(dx*dx+dy*dy);
-  double prod = -dx*xref - dy*yref;
+  double prod = -dx*xobs - dy*yobs;
 
-  double vec_prod = dx*yref - dy*xref;
-  l = 180.*acos(prod/(dr*rrref))/pi;
+  double vec_prod = dx*yobs - dy*xobs;
+  l = 180.*acos(prod/(dr*rrobs))/pi;
   if(vec_prod<=0.) l*=-1.;
-  b = 180.*asin(dz/r)/pi - 180.*asin(zref/rrref)/pi;
+  b = 180.*asin(dz/r)/pi - 180.*asin(zobs/rrobs)/pi;
   lbr[0] = l;
   lbr[1] = b;
   lbr[2] = r;
@@ -1002,7 +1354,7 @@ vector<double> Astro::GetGalactic(vector<double> xyz, vector<double> xyzref) {
  * Cartesian coordinates -> Galactic Coordinates(GL,GB,R) for vector of points
  */
 vector< vector<double> > Astro::GetGalacticPositions(
-                        vector< vector<double> > xyz, vector<double> xyzref) {
+                        vector< vector<double> > xyz, vector<double> xyzobs) {
     vector< vector<double> > temp;
     if (!xyz.size()) {
         cout << "Astro::GetGalacticPositions: Input vector of positions is "
@@ -1011,7 +1363,7 @@ vector< vector<double> > Astro::GetGalacticPositions(
     }
 
     for(unsigned int i=0; i<xyz.size(); i++) {
-        vector<double> lbr = GetGalactic(xyz[i], xyzref);
+        vector<double> lbr = GetGalactic(xyz[i], xyzobs);
         temp.push_back(vector<double>());
         temp[temp.size()-1].push_back(lbr[0]);
         temp[temp.size()-1].push_back(lbr[1]);

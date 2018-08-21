@@ -62,6 +62,8 @@ using namespace std;
 class Astro  {
   private:
     Utils *fUtils;
+    vector<double> xyzref;
+    void TranslateToReferencePoint(double &x, double &y, double &z);
     int ClosestArm;
     double DistanceFromClosestArm;
     double x_a1[7];
@@ -149,9 +151,20 @@ class Astro  {
     int TrueloveMcKeeSedovTaylorPhaseReverseShock(double t,
                                                   double &R, double &V);
     void CalculateTrueLoveMcKeeParams(vector<double> pars);
+    vector< double > BFieldDiskComponent(vector<double> xyz);
+    vector<double> BFieldRegularHaloComponent(vector<double> xyz);
+    vector<double> BFieldXComponent(vector<double> xyz);
+    vector<double> BFieldRandomComponent(vector<double> xyz);
+    vector<double> BFieldStriatedComponent(vector<double> RegularDisk, 
+                                           vector<double> RegularHalo,
+                                           vector<double> RegularX);
+    vector< double > RotateBFieldComponent(vector<double> component, 
+                                           vector<double> xyz);
+    int BFieldGetSpiralArm(vector<double> xyz);
   public:
     Astro();
     ~Astro();
+    void SetGalacticReferencePoint(vector<double> xyz_ref);
     void DisableArm(int arm);///< Switch off an individual arm in Galaxy spiral model
     void EnableArm(int arm);///< Switch on an individual arm in Galaxy spiral model
     double RandomSalpeterInitialMass();///< Dice an initial star mass following the Salpeter law
@@ -161,9 +174,9 @@ class Astro  {
     double CalculateMSMassLuminosity(double initialMass);///< Main sequence wind mass luminosity as a function of initial star mass
     double CalculateMSWindSpeed(double initialMass);///< Main sequence wind speed as a function of initial star mass
     double CalculateRGWRadius(double pBubble, double mDotRGW, double vRGWind);///< Radius of the red giant wind zone
-    void CalculateBField(double x, double y, double z, double &B_tot, double &B_coh, double &B_ord, double &B_iso, vector<double> &regFieldDirection, vector<double> &isoFieldDirection);///< 2D-Model of the large-scale galactic magnetic field structure
+/*    void CalculateBField(double x, double y, double z, double &B_tot, double &B_coh, double &B_ord, double &B_iso, vector<double> &regFieldDirection, vector<double> &isoFieldDirection);///< 2D-Model of the large-scale galactic magnetic field structure*/
     double HTotalDensity(double x, double y, double z);
-    double TotalBField(double x, double y, double z);
+/*    double TotalBField(double x, double y, double z);*/
     double HIDensity(double x, double y, double z, bool MODULATE = true);///< TODO:COMMENT
     double H2Density(double x, double y, double z, bool MODULATE = true);///< TODO:COMMENT
     double HIIDensity(double x, double y, double z, bool MODULATE = true);///< TODO:COMMENT
@@ -187,10 +200,10 @@ class Astro  {
     double GetH2FWHM(double R);///< TODO:COMMENT
     double ModulateGasDensityWithSpirals(double n, double x, double y, double z);
     //double CalculateGasColumnDensity(vector<double> xyzReference,vector<double> GLGB,string gascomponent,double modulate,double range,double steps);///< calculate gas column densities
-    double nRadial(double *x, double *pars);///< TODO:COMMENT
-    vector<double> GetCartesian(vector<double> lbr, vector<double> xyzref);///< Galactic coordinates (GL,GB,R) ->Cartesian
-    vector<double> GetCartesian(double r, double l, double b, vector<double> xyzref);
-    vector< vector<double> > GetCartesianPositions(vector< vector<double> > lbr, vector<double> xyzref);
+/*    double nRadial(double *x, double *pars);///< TODO:COMMENT*/
+    vector<double> GetCartesian(vector<double> lbr, vector<double> xyzobs,vector<double> xyzorigin);///< Galactic coordinates (GL,GB,R) ->Cartesian
+    vector<double> GetCartesian(double r, double l, double b, vector<double> xyzobs,vector<double> xyzorigin);
+    vector< vector<double> > GetCartesianPositions(vector< vector<double> > lbr, vector<double> xyzobs,vector<double> xyzorigin);
     vector<double> GetGalactic(vector<double> xyz, vector<double> xyzref);///< Cartesian coordinates -> Galactic Coordinates(GL,GB,R)
     void GetGalactic(double x, double y, double z, double xref, double yref, double zref, double &l, double &b);
     vector< vector<double> > GetGalacticPositions(vector< vector<double> > xyz, vector<double> xyzref);
@@ -268,6 +281,8 @@ class Astro  {
        {fUtils->SetInterpolationMethod(intermeth);}
     void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }
     bool GetQuietMode() {return QUIETMODE;}
-
+    vector<double> CalculateBField(vector<double> xyz, int component = -1);
+    vector< vector<double> > CalculateBField(vector< vector<double> > pos, int component=-1);
+    vector< vector<double> > CalculateBFieldComponents(vector<double> xyz, int component = -1);
 };
 #endif
