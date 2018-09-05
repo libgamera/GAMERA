@@ -18,7 +18,7 @@ Documentation & Tutorials
 =========================
 [Download & Installation](download_installation.md) 
 
-[Documentation](documentation.md)
+[General Infos](documentation.md)
 
 [Tutorials](tutorials_main.md)
 
