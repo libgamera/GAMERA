@@ -124,9 +124,12 @@ Astro::Astro() {
   avstr = gsl_interp_accel_alloc();
   arstf = gsl_interp_accel_alloc();
   avstf = gsl_interp_accel_alloc();
+
+  xyzref.push_back(0.); // default origin of cartesian space = {0,0,0}
   xyzref.push_back(0.);
   xyzref.push_back(0.);
-  xyzref.push_back(0.);
+
+
 }
 
 Astro::~Astro() {}
@@ -599,7 +602,7 @@ vector< vector<double> > Astro::CalculateBFieldComponents(vector<double> xyz,
 }
 
 
-vector< vector<double> > Astro::CalculateBField(vector< vector<double> > pos, int component) {
+vector< vector<double> > Astro::CalculateBFieldPositions(vector< vector<double> > pos, int component) {
 
     vector< vector<double> > bvecs;
     for(unsigned int i=0;i<pos.size();i++) {
@@ -807,17 +810,17 @@ double Astro::HTotalDensity(double x, double y, double z) {
 double Astro::HIDensity(double x, double y, double z, bool MODULATE) {
   double R = sqrt(pow(x,2.)+pow(y,2.));
   double n = 0.;
-  if( R < 3.) {
-    n = HICMZ(x,y,z);
-    n += HIInnerDisk(x,y,z);
-  }
-  else {
+//  else {
     double norm = CalculateHINorm(R);
     double FWHM = GetHIFWHM(R)/1000.;
     n = 0.7*exp(-pow(z/(0.55*FWHM),2.));
     n += 0.19*exp(-pow(z/(1.38*FWHM),2.));
     n += 0.11*exp(-fabs(z)/(1.75*FWHM));
     n *= norm;
+//  }
+  if( R < 3.) {
+    n += HICMZ(x,y,z);
+    n += HIInnerDisk(x,y,z);
   }
   if(MODULATE && SPIRALARMMODEL != 2) n = ModulateGasDensityWithSpirals(n,x,y,z);
   return n;
@@ -828,21 +831,27 @@ double Astro::HIDensity(double x, double y, double z, bool MODULATE) {
  */
 double Astro::H2Density(double x, double y, double z, bool MODULATE) {
 //  std::cout<<x<<","<<y<<","<<z<<std::endl;
-  TranslateToReferencePoint(x,y,z);
+//  TranslateToReferencePoint(x,y,z);
 //  std::cout<<"->"<<x<<","<<y<<","<<z<<std::endl;
 //  std::cout<<"__________________"<<std::endl;
   double R = sqrt(pow(x,2.)+pow(y,2.));
   double n = 0.;
-  if( R < 3.) {
-    n = H2CMZ(x,y,z);
-    n += H2InnerDisk(x,y,z);
-    n *= 2.;
-  }
-  else {
+//  if( R < 3.) {
+//    n = H2CMZ(x,y,z);
+//    n += H2InnerDisk(x,y,z);
+//    n *= 2.;
+//  }
+//  else {
     double norm = CalculateH2Norm(R);
     double sigma = GetH2FWHM(R)/(2.*sqrt(2.*log(2.)));
     sigma /= 1000.;
     n = norm*exp(-pow(z/(sqrt(2.)*sigma),2.));
+//  }
+  
+  if( R < 3.) {
+    n += 2.* H2CMZ(x,y,z);
+    n += 2.*H2InnerDisk(x,y,z);
+//    n *= 2.;
   }
   if(MODULATE && SPIRALARMMODEL != 2) n = ModulateGasDensityWithSpirals(n,x,y,z);
   return n;
@@ -863,7 +872,7 @@ double Astro::HIIDensity(double x, double y, double z, bool MODULATE) {
   else n = HIIThickDisk(x,y,z) + HIIThinDisk(x,y,z);
 
   if(MODULATE && SPIRALARMMODEL != 2) n = ModulateGasDensityWithSpirals(n,x,y,z);
-  return n;
+  return std::isnan(n) ? 0.: n;
 }
 
 // TODO: can't implement this solution because infos in paper are not complete!
@@ -1208,19 +1217,27 @@ double Astro::ModulateGasDensityWithSpirals(double n, double x, double y, double
 /**
  * In there for backwards compability
  */
-vector<double> Astro::GetCartesian(double r, double l, double b, vector<double> xyzobs,vector<double> xyzorigin) {
+vector<double> Astro::GetCartesian(double r, double l, double b, vector<double> xyzobs) {
     vector<double> lbr;
     lbr.push_back(l);
     lbr.push_back(b);
     lbr.push_back(r);
-    return GetCartesian(lbr,xyzobs,xyzorigin);
+    return GetCartesian(lbr,xyzobs);
 }
-vector<double> Astro::GetCartesian(vector<double> lbr,vector<double> xyzobs,vector<double> xyzorigin) {
+vector<double> Astro::GetCartesian(vector<double> lbr,vector<double> xyzobs) {
 
 
   double l = pi * lbr[0] / 180.;
   double b = pi * lbr[1] / 180.;
   double r = lbr[2];
+
+  if(!xyzobs[0] && !xyzobs[1]) {
+    cout<<"Astro::GetCartesian: l and b at a observer's position directly above or below "<<
+          "the Galactic center (x,y components = 0) are not well defined. Please "<<
+          "provide x and/or y values to fix orientation of Galactic coordinates. Returning original vector." << endl;
+    return lbr;
+  }
+
 
   vector<double> v;
   v.push_back(-r*cos(l)*cos(b)); //x component
@@ -1232,10 +1249,26 @@ vector<double> Astro::GetCartesian(vector<double> lbr,vector<double> xyzobs,vect
   p1.push_back(1.);    
   p1.push_back(0.);    
   p1.push_back(0.);
+
+  vector<double> xyzorigin;    
+  xyzorigin.push_back(xyzobs[0]);    
+  xyzorigin.push_back(xyzobs[1]);    
+  xyzorigin.push_back(0.);
   
   // rotate coordinates so that the (x,0,0)-axis lies along xyzorigin. This defines
-  // the orientation of the system. For instance, the earth would at xyzorigin = (0,8.5,0).
+  // the orientation of the system, relative to which the coordinates will be transformed. 
+  // For instance, the earth would at xyzorigin = (0,8.5,0).
   // This re-defines the coordinate system to point towards the earth's position.
+
+  // put intermediate step if initial rotation is by 180 degree (for technical reasons)
+  if(xyzorigin[0]<0 && !xyzorigin[1]) {
+    vector<double> xyz_temp;    
+    xyz_temp.push_back(xyzorigin[0]);    
+    xyz_temp.push_back(fabs(xyzorigin[0]));    
+    xyz_temp.push_back(0.);
+    v = fUtils->RotateVector(v,p1,xyz_temp);
+    p1 = xyz_temp;
+  }
   vector<double> v_rel = fUtils->RotateVector(v,p1,xyzorigin);
 
   // rotate v_rel to the final position in 3D space at the coordinates xyzobs
@@ -1277,7 +1310,7 @@ vector<double> Astro::GetCartesian(vector<double> lbr,vector<double> xyzobs,vect
  * Galactic Coordinates(GL,GB,R) coordinates ->  Cartesian for vector of points
  */
 vector< vector<double> > Astro::GetCartesianPositions(
-                        vector< vector<double> > lbr, vector<double> xyzobs, vector<double> xyzorigin) {
+                        vector< vector<double> > lbr, vector<double> xyzobs) {
     vector< vector<double> > temp;
     if (!lbr.size()) {
         cout << "Astro::GetCartesianPositions: Input vector of positions is "
@@ -1286,7 +1319,7 @@ vector< vector<double> > Astro::GetCartesianPositions(
     }
 
     for(unsigned int i=0; i<lbr.size(); i++) {
-        vector<double> xyz = GetCartesian(lbr[i], xyzobs,xyzorigin);
+        vector<double> xyz = GetCartesian(lbr[i], xyzobs);
         temp.push_back(vector<double>());
         temp[temp.size()-1].push_back(xyz[0]);
         temp[temp.size()-1].push_back(xyz[1]);
@@ -2849,7 +2882,31 @@ void Astro::CalculateTangChevalierSolution(vector<double> pars, double tmin,
   return;
 }
 
+vector< vector<double> > Astro::LineOfSight(double gl, double gb, vector<double> obs, double r_max, int steps) {
+  double dr = r_max / steps;
+  vector<double> rvals;
+  for (double r = 0; r < r_max; r+= dr) {
+    rvals.push_back(r);
+  }
+  return LineOfSight(gl, gb, obs, rvals);
+}
 
+
+vector< vector<double> > Astro::LineOfSight(double gl, double gb, vector<double> obs, vector<double> rvals) {
+
+  vector< vector<double> > los;
+  vector<double> xyz,lbr;
+  lbr.resize(3);
+  lbr[0] = gl; lbr[1] = gb;
+  
+  for (unsigned int i = 0; i < rvals.size(); i++) {
+    lbr[2] = rvals[i];
+    xyz = GetCartesian(lbr,obs);
+    fUtils->TwoDVectorPushBack(xyz[0],xyz[1],xyz[2],los);
+  }
+
+  return los;
+}
 
 
 

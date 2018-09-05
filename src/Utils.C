@@ -851,8 +851,7 @@ vector<double> Utils::RotateVector(vector<double> v, vector<double> p1, vector<d
     double angle = acos((p1[0]*p2[0]+p1[1]*p2[1]+p1[2]*p2[2])/p1_norm/p2_norm);
     if (!angle) return v;
     if (fabs((angle-pi)/pi)<1e-8) {
-        cout<<"Utils::Rotate: y-axis vector size doesn't match y-dimension "
-              "of mesh grid. Returning empty vector."<< endl;
+        cout<<"Utils::RotateVector: Rotation of vector by 180 degrees is not well defined. You should supply an intermediate step in order to fix the orientation of rotation in 3D space. Returning original vector."<< endl;
         return v;
     }
     double sine = sin(angle);

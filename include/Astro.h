@@ -201,9 +201,9 @@ class Astro  {
     double ModulateGasDensityWithSpirals(double n, double x, double y, double z);
     //double CalculateGasColumnDensity(vector<double> xyzReference,vector<double> GLGB,string gascomponent,double modulate,double range,double steps);///< calculate gas column densities
 /*    double nRadial(double *x, double *pars);///< TODO:COMMENT*/
-    vector<double> GetCartesian(vector<double> lbr, vector<double> xyzobs,vector<double> xyzorigin);///< Galactic coordinates (GL,GB,R) ->Cartesian
-    vector<double> GetCartesian(double r, double l, double b, vector<double> xyzobs,vector<double> xyzorigin);
-    vector< vector<double> > GetCartesianPositions(vector< vector<double> > lbr, vector<double> xyzobs,vector<double> xyzorigin);
+    vector<double> GetCartesian(vector<double> lbr, vector<double> xyzobs);///< Galactic coordinates (GL,GB,R) ->Cartesian
+    vector<double> GetCartesian(double r, double l, double b, vector<double> xyzobs);
+    vector< vector<double> > GetCartesianPositions(vector< vector<double> > lbr, vector<double> xyzobs);
     vector<double> GetGalactic(vector<double> xyz, vector<double> xyzref);///< Cartesian coordinates -> Galactic Coordinates(GL,GB,R)
     void GetGalactic(double x, double y, double z, double xref, double yref, double zref, double &l, double &b);
     vector< vector<double> > GetGalacticPositions(vector< vector<double> > xyz, vector<double> xyzref);
@@ -282,7 +282,9 @@ class Astro  {
     void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }
     bool GetQuietMode() {return QUIETMODE;}
     vector<double> CalculateBField(vector<double> xyz, int component = -1);
-    vector< vector<double> > CalculateBField(vector< vector<double> > pos, int component=-1);
+    vector< vector<double> > CalculateBFieldPositions(vector< vector<double> > pos, int component=-1);
     vector< vector<double> > CalculateBFieldComponents(vector<double> xyz, int component = -1);
+    vector< vector<double> > LineOfSight(double gl, double gb, vector<double> obs, double r_max=50, int steps=200);
+    vector< vector<double> > LineOfSight(double gl, double gb, vector<double> obs, vector<double> rvals);
 };
 #endif
