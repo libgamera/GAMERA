@@ -744,8 +744,6 @@ void Particles::ComputeGrid(vector<double> EnergyAxis, double startTime,
   vector<double> EscTime;
   TIterationStart = startTime;
   vector< vector<double> > lossrates;
-  unsigned int max_loss_ind;
-  double max_loss_rate;
   double eMax0 = 0.;
   grid.push_back(vector<double>());
   int i0 = 0;
