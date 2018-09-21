@@ -1462,7 +1462,6 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
     return;
   }
   TminInternal = TminLookup;
-  TmaxInternal = TmaxInternal;
   DetermineLookupTimeBoundaries();
   MinELookup = pow(10.,MinELookup);
   MaxELookup = pow(10.,MaxELookup);

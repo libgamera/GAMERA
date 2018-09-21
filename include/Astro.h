@@ -64,8 +64,6 @@ class Astro  {
     Utils *fUtils;
     vector<double> xyzref;
     void TranslateToReferencePoint(double &x, double &y, double &z);
-    int ClosestArm;
-    double DistanceFromClosestArm;
     double x_a1[7];
     double y_a1[7];
     double x_a2[7];
@@ -92,10 +90,7 @@ class Astro  {
     int SPIRALARMMODEL;
     int SURFACEDENSITYMODEL;
     int CENTRALSTRUCTUREMODEL;
-    int MAINSEQUENCEWINDBUBBLEMODEL;
     int MSBUBBLEMODEL;
-    bool GAMERAALREADYONTHECONSOLE;
-    bool WRAPPINGHAPPENED;
     gsl_spline *TaylorCordesArm1,*TaylorCordesArm2,*TaylorCordesArm3,
                *TaylorCordesArm4,*TaylorCordesArm1Inv,*TaylorCordesArm2Inv,
                *TaylorCordesArm3Inv,*TaylorCordesArm4Inv,
