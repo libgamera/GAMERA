@@ -1,11 +1,11 @@
  
 __I am currently migrating the documentation here - so content will appear here gradually over the next couple days__
 
-Documentation under construction and will be updated continuously. 
  
 
 NEWS
 ====
+- low energy cut-offs in particle injection spectra will are now properly and automatically accounted for
 - if you use python, you can now use numpy meshgrids to set injection- and particle escape-spectra that change with time
 - overhauled particle escape time functionality. Check out the new tutorials!
 - unified naming of get and set functions in Particles class
