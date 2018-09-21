@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 
 import sys
-sys.path.append('../lib')
+sys.path.append('lib')
 import gappa as gp
 import numpy as np
 import matplotlib.pyplot as plt
@@ -19,6 +19,7 @@ if __name__ == "__main__":
     distance = 1e3 
 
     fr = gp.Radiation()
+    fr.ToggleQuietMode()
     fr.SetAmbientDensity(ambient_density)
     fr.SetBField(b_field)
     fr.AddThermalTargetPhotons(t_cmb,edens_cmb)
@@ -27,13 +28,31 @@ if __name__ == "__main__":
     fr.SetProtons(list(zip(energy_in_erg_pl,1e49*power_law)))
     fr.SetElectrons(list(zip(energy_in_erg_pl,1e47*power_law)))
 
-    fr.CalculateDifferentialPhotonSpectrum(np.logspace(-6,15,200) * gp.eV_to_erg)
+    fr.CalculateDifferentialPhotonSpectrum(np.logspace(-6,15,50) * gp.eV_to_erg)
 
     total_sed = np.array(fr.GetTotalSED())
     pp_sed = np.array(fr.GetPPSED())
     synch_sed = np.array(fr.GetSynchrotronSED())
     brems_sed = np.array(fr.GetBremsstrahlungSED())
     ic_sed = np.array(fr.GetICSED())
+
+
+    print "total_sed:"
+    print total_sed
+    print "-------------"
+    print "pp_sed:"
+    print pp_sed
+    print "-------------"
+    print "synch_sed:"
+    print synch_sed
+    print "-------------"
+    print "brems_sed:"
+    print brems_sed
+    print "-------------"
+    print "ic_sed:"
+    print ic_sed
+    print "-------------"
+
 
     f,ax = plt.subplots(figsize=(5,5))
     ax.set_prop_cycle('color',plt.get_cmap('plasma')(np.linspace(0., .8, 2))) #
@@ -45,7 +64,7 @@ if __name__ == "__main__":
     plt.legend()
     plt.title("particle spectra")
     plt.grid()
-    f.savefig("particle_spectra.png",bbox_inches='tight')
+    f.savefig("autotest/particle_spectra.png",bbox_inches='tight')
 
     f,ax = plt.subplots(figsize=(5,5))
     ax.set_prop_cycle('color',plt.get_cmap('plasma')(np.linspace(0., .8, 5)))  #
@@ -60,5 +79,5 @@ if __name__ == "__main__":
     plt.legend()
     plt.grid()
     plt.title("Radiation SEDs")
-    f.savefig("radiation_SEDs.png",bbox_inches='tight')
+    f.savefig("autotest/radiation_SEDs.png",bbox_inches='tight')
 
