@@ -5,7 +5,7 @@
 
 NEWS
 ====
-- low energy cut-offs in particle injection spectra will are now properly and automatically accounted for
+- low energy cut-offs in particle injection spectra are now properly and automatically accounted for in particle spectrum evolution
 - if you use python, you can now use numpy meshgrids to set injection- and particle escape-spectra that change with time
 - overhauled particle escape time functionality. Check out the new tutorials!
 - unified naming of get and set functions in Particles class
