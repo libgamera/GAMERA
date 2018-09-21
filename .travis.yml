@@ -12,9 +12,7 @@ before_install:
   - if [ $CXX == "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
   - if [ $TRAVIS_OS_NAME == linux ]; then export LD_LIBRARY_PATH=./lib:$LD_LIBRARY_PATH; fi
 
-install: make gamera gappa tutorial1
-
-script: bin/TutorialLevel1 docu/turorial/TutorialLevel1Params.dat
+install: make gamera gappa
 
 os:
   - linux
