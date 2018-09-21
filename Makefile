@@ -47,13 +47,13 @@ Astro : src/Astro.C
 
 
 bicubic : src/2D_interp/bicubic.C
-	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/bicubic.C -o $(OUTDIR)/bicubic.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
+	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/bicubic.C -o $(OUTDIR)/bicubic.o $(INCLUDES)
 bilinear : src/2D_interp/bilinear.C
-	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/bilinear.C -o $(OUTDIR)/bilinear.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
+	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/bilinear.C -o $(OUTDIR)/bilinear.o $(INCLUDES)
 interp2d : src/2D_interp/interp2d.C
-	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/interp2d.C -o $(OUTDIR)/interp2d.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
+	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/interp2d.C -o $(OUTDIR)/interp2d.o $(INCLUDES)
 interp2d_spline : src/2D_interp/interp2d_spline.C
-	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/interp2d_spline.C -o $(OUTDIR)/interp2d_spline.o $(INCLUDES) $(GSLCFLAGS) $(GSLLIBS)
+	$(CXX) -g -O2 -fpic -Wall -c src/2D_interp/interp2d_spline.C -o $(OUTDIR)/interp2d_spline.o $(INCLUDES)
 
 
 # create the shared library
@@ -62,11 +62,6 @@ libgamera : $(objectsSO)
 	@echo "Generating library $@..."
 	$(CXX) -shared -o $(LIBDIR)/libgamera.so $(objectsSO) $(CXXFLAGS) $(LDFLAGS)
 	@echo "-> done!"
-
-
-interp2D : testscripts/interp2Dtest.C
-	$(CXX) -g -O2 -Wall -c testscripts/interp2Dtest.C -o $(OUTDIR)/interp2Dtest.o $(CXXFLAGS) $(INCLUDES) $(LDFLAGS)
-	$(CXX) -g -Wall -o bin/interp2Dtest $(OUTDIR)/interp2Dtest.o $(OUTDIR)/bilinear.o $(OUTDIR)/bicubic.o $(OUTDIR)/interp2d.o $(OUTDIR)/interp2d_spline.o $(GSLCFLAGS) $(GSLLIBS)
 
 
 # make gappa package
