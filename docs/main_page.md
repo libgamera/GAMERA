@@ -18,11 +18,11 @@ Documentation & Tutorials
 =========================
 [Download & Installation](download_installation.md) 
 
-[General Infos](documentation.md)
+[General Info](documentation.md)
 
 [Tutorials](tutorials_main.md)
 
-[Model Examples](examples.md)
+#[Model Examples](examples.md)
 
 
 
