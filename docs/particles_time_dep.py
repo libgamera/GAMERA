@@ -23,9 +23,9 @@ if __name__ == "__main__":
     alpha_pl = 2; e_total_pl = 1e37 # erg
     power_law = (energy_in_erg_pl/e_ref)**-alpha_pl
     # renormalise to e_total_pl (integrate E*dN/dE over E)
-    power_law *= e_total_pl / fu.Integrate(zip(energy_in_erg_pl,power_law * energy_in_erg_pl))
+    power_law *= e_total_pl / fu.Integrate(list(zip(energy_in_erg_pl,power_law * energy_in_erg_pl)))
     # cast into a 2D array
-    power_law_spectrum = np.array(zip(energy_in_erg_pl,power_law))
+    power_law_spectrum = np.array(list(zip(energy_in_erg_pl,power_law)))
     # set it up
     fp.SetCustomInjectionSpectrum(power_law_spectrum)
 
@@ -56,11 +56,11 @@ if __name__ == "__main__":
     '''
         set up these lookups
     '''
-    fp.SetLuminosityLookup(zip(t_steps,lum))
-    fp.SetBField(zip(t_steps,b_field))
-    fp.SetAmbientDensity(zip(t_steps,density))
-    fp.SetExpansionVelocity(zip(t_steps,vel))
-    fp.SetRadius(zip(t_steps,radius))
+    fp.SetLuminosityLookup(list(zip(t_steps,lum)))
+    fp.SetBField(list(zip(t_steps,b_field)))
+    fp.SetAmbientDensity(list(zip(t_steps,density)))
+    fp.SetExpansionVelocity(list(zip(t_steps,vel)))
+    fp.SetRadius(list(zip(t_steps,radius)))
 
     # set CMB as radiation field
     fp.AddThermalTargetPhotons(2.7,0.255*gp.eV_to_erg)
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     '''
     alphas = np.linspace(0.2,1,9)
     f = plt.figure(figsize=(5,5))
-    for s,t,a in zip(p_seds,np.logspace(1,np.log10(age),10),alphas):
+    for s,t,a in list(zip(p_seds,np.logspace(1,np.log10(age),10),alphas)):
         plt.loglog(s[:,0],s[:,1],c=mpik_green,alpha=a,label=str(int(t)))
     plt.xlabel("E (TeV)")
     plt.ylabel("E"+r"$^2$"+"dN/dE (erg)")

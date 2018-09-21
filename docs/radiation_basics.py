@@ -36,10 +36,10 @@ if __name__ == "__main__":
     # renormalise it to e_total_protons using the Integrator (GSL) 
     # in the Utils class
     fu = gp.Utils()
-    power_law *= e_total_pl / fu.Integrate(zip(energy_in_erg_pl,power_law * energy_in_erg_pl))
+    power_law *= e_total_pl / fu.Integrate(list(zip(energy_in_erg_pl,power_law * energy_in_erg_pl)))
 
     # zip into a 2D-list
-    power_law_spectrum = np.array(zip(energy_in_erg_pl,power_law))
+    power_law_spectrum = np.array(list(zip(energy_in_erg_pl,power_law)))
 
 
     '''
@@ -53,9 +53,9 @@ if __name__ == "__main__":
     # calculate logparabola
     logparabola = (energy_in_erg_logpar/e_ref)**-(alpha_logpar + beta_logpar * np.log10((energy_in_erg_logpar/e_ref)))
 
-    logparabola *= e_total_logpar / fu.Integrate(zip(energy_in_erg_logpar,energy_in_erg_logpar * logparabola))
+    logparabola *= e_total_logpar / fu.Integrate(list(zip(energy_in_erg_logpar,energy_in_erg_logpar * logparabola)))
 
-    logparabola_spectrum = np.array(zip(energy_in_erg_logpar,logparabola))
+    logparabola_spectrum = np.array(list(zip(energy_in_erg_logpar,logparabola)))
     
 
     '''

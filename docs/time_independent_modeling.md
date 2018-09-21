@@ -26,10 +26,10 @@ power_law = (e/gp.TeV_to_erg)**-2
 
 # renormalise to 1e37 erg/s
 fu = gp.Utils()
-power_law *= 1e37/fu.Integrate(zip(e,e*power_law))
+power_law *= 1e37/fu.Integrate(list(zip(e,e*power_law)))
 
 # zip and set it up in the Particles-object
-fp.SetCustomInjectionSpectrum(zip(e,power_law))
+fp.SetCustomInjectionSpectrum(list(zip(e,power_law)))
 ```
 
 ## Step 3: Set up environmental parameters

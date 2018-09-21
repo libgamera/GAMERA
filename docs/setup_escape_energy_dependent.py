@@ -30,7 +30,7 @@ if __name__ == "__main__":
     '''
     e = np.logspace(-8,3,100) * gp.TeV_to_erg
     power_law = 1e40 * ((e/gp.TeV_to_erg)**-2)
-    power_law = np.array(zip(e,power_law))
+    power_law = np.array(list(zip(e,power_law)))
  
     '''
         define escape time lookup (here as function of energy)
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     t = np.linspace(5,tmax,8)
     global t_esc_lookup
     t_esc = t_esc * (1+e/e_dash)**-0.5
-    t_esc_lookup = np.array(zip(e,t_esc))
+    t_esc_lookup = np.array(list(zip(e,t_esc)))
     
     '''
         plot the escape time scale spectrum
@@ -76,7 +76,7 @@ if __name__ == "__main__":
         make a plot comparing numerical to analytical solution
     '''
     f = plt.figure(figsize=(4,4))
-    for p,tt in zip(p_sed,t):
+    for p,tt in list(zip(p_sed,t)):
         a = analytical(tt,copy.copy(power_law))
         if tt == t[0]:
             plt.loglog(a[:,0],a[:,1],c=mpik_green,lw=3,alpha=0.6,label="analytical")

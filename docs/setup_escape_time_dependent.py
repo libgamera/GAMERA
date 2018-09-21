@@ -15,7 +15,7 @@ def int_fac(x):
     else:
         xx = np.linspace(x,1,100)
     yy = 1 / np.interp(xx/gp.yr_to_sec,t_esc_lookup[:,0],t_esc_lookup[:,1]) 
-    return fu.Integrate(zip(xx,yy))
+    return fu.Integrate(list(zip(xx,yy)))
 
 def analytical(t):
     '''
@@ -30,7 +30,7 @@ def analytical(t):
         int_f.append(int_fac(x))
     int_f = np.array(int_f)
     yy = N0 * np.exp(int_f)
-    f = fu.Integrate(zip(xx,yy))
+    f = fu.Integrate(list(zip(xx,yy)))
 
     xx = np.linspace(0,0.999,100)
     int_f2 = []
@@ -38,7 +38,7 @@ def analytical(t):
         int_f2.append(-int_fac(x))
     int_f2 = np.array(int_f2)
     yy = N0 * np.exp(int_f2)
-    f2 = fu.Integrate(zip(xx,yy))
+    f2 = fu.Integrate(list(zip(xx,yy)))
 
 
     return  np.exp(-int_fac(t))*(f-f2)
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     '''
     e = np.logspace(-5,3,100) * gp.TeV_to_erg
     power_law = 1e40 * ((e/gp.TeV_to_erg)**-2)
-    power_law = np.array(zip(e,power_law))
+    power_law = np.array(list(zip(e,power_law)))
  
     '''
         define escape time
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     plt.grid(alpha=0.5)
     f.savefig("tst.png",bbox_inches="tight")
     global t_esc_lookup
-    t_esc_lookup = np.array(zip(t2,t_esc))
+    t_esc_lookup = np.array(list(zip(t2,t_esc)))
 
 
     '''
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     f = plt.figure(figsize=(4,4))
     plt.grid(alpha=0.5)
     a = []
-    for tt,p in zip(t,p_spec):
+    for tt,p in list(zip(t,p_spec)):
         N0 = np.interp(1,p[:,0],p[:,1])
         a.append(analytical(tt))
         if tt == t[0]:

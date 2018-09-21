@@ -14,7 +14,7 @@ Create a 2D vector (C++) or list / numpy array (python) representing a particle 
 ```
 e = np.logspace(-3,3,200) * gp.TeV_to_erg # energy axis
 power_law = norm * e**-alpha # define power law
-particles = zip(e,power_law) # input needs to be 2D-array
+particles = list(zip(e,power_law)) # input needs to be 2D-array
 ```
 >Note:
 >You have to make sure that the `norm` of the power-law is right. For example, if

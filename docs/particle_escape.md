@@ -55,7 +55,7 @@ the loss time scale may vary over time. This can be implemented in `GAMERA` as f
 ```
 t = np.linspace(tmin,tmax,1000) # define an increasing set of times
 t_esc = t_esc_0 * (np.cos(t / t_dash)**2+0.1) # define a custom function in time
-t_esc_lookup = zip(t,t_esc) # zip them to make a 2D-vector
+t_esc_lookup = list(zip(t,t_esc)) # zip them to make a 2D-vector
 pa.SetTimeDependentEscapeTime(t_esc_lookup) # set it up
 # (rest identical to above)
 ```
@@ -79,7 +79,7 @@ a spectral dependence.
 ```
 e = np.logspace(-8,3,100) * gp.TeV_to_erg # define a set of points in energy
 t_esc = t_esc_0 * (1+e/e_dash)**-0.5 # define custom function in energy
-t_esc_lookup = zip(e,t_esc) # zip them to make a 2D-vector
+t_esc_lookup = list(zip(e,t_esc)) # zip them to make a 2D-vector
 pa.SetEnergyDependentEscapeTime(t_esc_lookup)
 # (rest identical to above)
 ```

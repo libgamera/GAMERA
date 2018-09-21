@@ -16,7 +16,7 @@ if __name__ == "__main__":
     '''
     e = np.logspace(-5,3,100) * gp.TeV_to_erg
     power_law = 1e40 * ((e/gp.TeV_to_erg)**-2)
-    power_law = np.array(zip(e,power_law))
+    power_law = np.array(list(zip(e,power_law)))
  
     '''
         define escape time and some time steps
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     f = plt.figure(figsize=(4,4))
     plt.plot(t2,analytical_no_escape,c="gray",label="no escape",zorder=0,alpha=0.5)
     plt.plot(t2,analytical,c=mpik_green,label="analytical",zorder=0)
-    for tt,p in zip(t,p_spec):
+    for tt,p in list(zip(t,p_spec)):
         N0 = np.interp(1,p[:,0],p[:,1])
         if tt == t[0]:
             plt.scatter(tt,N0,c="black",s=10,label="GAMERA",zorder=1)

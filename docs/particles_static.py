@@ -25,9 +25,9 @@ if __name__ == "__main__":
     alpha_pl = 2; e_total_pl = 1e37 # erg
     power_law = (energy_in_erg_pl/e_ref)**-alpha_pl
     # renormalise to e_total_pl (integrate E*dN/dE over E)
-    power_law *= e_total_pl / fu.Integrate(zip(energy_in_erg_pl,power_law * energy_in_erg_pl))
+    power_law *= e_total_pl / fu.Integrate(list(zip(energy_in_erg_pl,power_law * energy_in_erg_pl)))
     # cast into a 2D array
-    power_law_spectrum = np.array(zip(energy_in_erg_pl,power_law))
+    power_law_spectrum = np.array(list(zip(energy_in_erg_pl,power_law)))
 
 
     fp = gp.Particles()

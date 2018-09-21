@@ -28,9 +28,9 @@ if __name__ == "__main__":
     alpha_pl = 2; e_total_pl = 1e37 # erg
     power_law = (energy_in_erg_pl/e_ref)**-alpha_pl
     # renormalise to e_total_pl (integrate E*dN/dE over E)
-    power_law *= e_total_pl / fu.Integrate(zip(energy_in_erg_pl,power_law * energy_in_erg_pl))
+    power_law *= e_total_pl / fu.Integrate(list(zip(energy_in_erg_pl,power_law * energy_in_erg_pl)))
     # cast into a 2D array
-    power_law_spectrum = np.array(zip(energy_in_erg_pl,power_law))
+    power_law_spectrum = np.array(list(zip(energy_in_erg_pl,power_law)))
 
 
     fp = gp.Particles()
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     #### make a plot #####
     f, (ax1, ax2) = plt.subplots(1, 2,figsize=(12,6))
     ax1.set_prop_cycle('color',plt.get_cmap('plasma_r')(np.linspace(0.2, .8, len(time_steps))))  #
-    for p,t in zip(part,time_steps):
+    for p,t in list(zip(part,time_steps)):
         ax1.loglog(p[:,0],p[:,1],label=str(int(t)))
     ax1.set_xlabel("E (TeV)")
     ax1.set_ylabel("E"+r"$^2$"+"dN/dE (erg)")
@@ -106,7 +106,7 @@ if __name__ == "__main__":
     ax1.set_title("Particle SEDs")
 
     ax2.set_prop_cycle('color',plt.get_cmap('plasma_r')(np.linspace(0.2, .8, len(time_steps))))  #
-    for r,t in zip(rad,time_steps):
+    for r,t in list(zip(rad,time_steps)):
         ax2.loglog(r[:,0],r[:,1],label=str(int(t)))
     ax2.set_xlabel("E (TeV)")
     ax2.set_ylabel("E"+r"$^2$"+"dN/dE (erg/cm^2/s)")

@@ -27,7 +27,7 @@ if __name__ == "__main__":
     '''
     e = np.logspace(-5,3,100) * gp.TeV_to_erg
     power_law = 1e40 * ((e/gp.TeV_to_erg)**-2)
-    power_law = np.array(zip(e,power_law))
+    power_law = np.array(list(zip(e,power_law)))
     t_max = 1700
     t = np.linspace(1,t_max,1000)
     t2 = np.linspace(2,t_max,10)
@@ -86,7 +86,7 @@ if __name__ == "__main__":
         make a plot comparing numerical to analytical solution
     '''
     f = plt.figure(figsize=(4,4))
-    for p,tt,a in zip(p_sed,t2,np.linspace(0.2,1,len(t2))):
+    for p,tt,a in list(zip(p_sed,t2,np.linspace(0.2,1,len(t2)))):
         plt.loglog(p[:,0],p[:,1],c=mpik_green,alpha=a,label=str(int(tt)))
                 
     plt.xlabel("energy (TeV)")

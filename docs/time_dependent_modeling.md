@@ -21,7 +21,7 @@ fp = Particles()
 t_ref = 100
 time_steps = np.logspace(1,4,100) #in years
 b = 1e-4 * (time_steps / t_ref) ** -0.5 #in Gauss
-b_lookup = zip(time_steps,b)
+b_lookup = list(zip(time_steps,b))
 fp.SetBField(b_lookup)
 ```
 
@@ -33,7 +33,7 @@ This simple implementation works with
 ```
 t_esc_0 = 1000 * gp.yr_to_sec # in seconds
 t_esc = t_esc_0 * (time_steps / t_ref) ** 0.5
-t_esc_lookup = zip(time_steps)
+t_esc_lookup = list(zip(time_steps))
 fp.SetTimeDependentEscapeTime(t_esc_lookup)
 ```
 ## Energy-dependent parameters
