@@ -1512,9 +1512,9 @@ void Radiation::ResetWithArbitraryTargetPhotons(int i,vector<vector<double> > Ph
 
 void Radiation::SetArbitraryTargetPhotons(vector<vector<double> > PhotonArray, int i) {
   vector< vector<double> > vint;
-  for (unsigned int i = 1; i < PhotonArray.size() - 1; i++) {
-    double E = PhotonArray[i][0];
-    double N = PhotonArray[i][1];
+  for (unsigned int j = 1; j < PhotonArray.size() - 1; j++) {
+    double E = PhotonArray[j][0];
+    double N = PhotonArray[j][1];
     if(E <=0. || N <=0.) continue;
     fUtils->TwoDVectorPushBack(log10(E),log10(N),vint);
   }
@@ -1560,8 +1560,8 @@ void Radiation::SetTargetPhotonsFromFile(const char *phFile, int i) {
                                log10(1.e12 * n / TeV_to_erg),v);
   }
   vector< vector<double> > vint;
-  for (unsigned int i = 0; i < v.size(); i++) {
-    fUtils->TwoDVectorPushBack(v[i][0],v[i][1],vint);
+  for (unsigned int j = 0; j < v.size(); j++) {
+    fUtils->TwoDVectorPushBack(v[j][0],v[j][1],vint);
   }
   PHfile.close();
   SetTargetPhotonVectorLookup(vint,i);
@@ -1737,18 +1737,18 @@ void Radiation::SetTargetPhotonVectorLookup(vector< vector<double> > v, int i) {
   double elin[size];
   double en[size];
   double logEOld = 0;
-  for (unsigned int i = 0; i < (unsigned int)size; i++) {
-    double logE = v[i][0];
+  for (unsigned int j = 0; j < (unsigned int)size; j++) {
+    double logE = v[j][0];
     if (logE < logEOld && logEOld) {
       cout << "Radiation::SetTargetPhotonVectorLookup: Target field not "
               "ordered ascending in energy! Exiting!" << endl;
       return;
     }
-    double logN = v[i][1];
-    e[i] = logE;
-    n[i] = logN;
-    elin[i] = pow(10., e[i]);
-    en[i] = pow(10., e[i]) * pow(10., n[i]);
+    double logN = v[j][1];
+    e[j] = logE;
+    n[j] = logN;
+    elin[j] = pow(10., e[j]);
+    en[j] = pow(10., e[j]) * pow(10., n[j]);
     logE = logEOld;
   }
   double emin = pow(10., e[0]);
