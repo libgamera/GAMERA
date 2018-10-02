@@ -13,7 +13,7 @@ before_install:
 
 install: make gamera gappa
 
-script: python autotest/radiation_autotest.py
+script: cd unit_tests && python radiation_unit_test.py
 
 os:
   - linux
