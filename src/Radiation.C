@@ -104,7 +104,7 @@ void Radiation::Reset() {
   return;
 }
 
-/*
+/**
  * remove all previously set IC target photons
  */
 void Radiation::ClearTargetPhotons() {
@@ -212,6 +212,11 @@ void Radiation::CalculateDifferentialGammaEmission(double e, int particletype) {
   }
   return;
 }
+
+/**
+ * Set pointers so that in the other IC functions the appropriate lookups and 
+ * vectors (component i) will be adapted.
+ */
 
 void Radiation::SetICLookups(int i) {
     
@@ -469,6 +474,9 @@ double Radiation::ICEmissivity(double x, void *par) {
   return integrand;
 }
 
+/** 
+ * FIXME: is this function used anywhere?
+ */
 double Radiation::ICEmissivityWrapper(double e_ph, double e_e, double e_g) {
 
     double p[2] = {e_e,e_g};
@@ -476,6 +484,9 @@ double Radiation::ICEmissivityWrapper(double e_ph, double e_e, double e_g) {
     return ICEmissivity(e_ph,p);
 }
 
+/** 
+ * FIXME: is this function used anywhere?
+ */
 double Radiation::ICEmissivityAnisotropicWrapper(double e_ph, double e_e, double e_g) {
 
     double p[2] = {e_e,e_g};
@@ -559,6 +570,12 @@ double Radiation::ICEmissivityAnisotropic(double x, void *par) {
     return integrand;
 }
 
+/**
+ * This fills a lookup phi - theta - zeta. See Moskalenko paper for geometric 
+ * definition of zeta (angle between electron and incoming photon).
+ * FIXME: This function might not be used - lookup not faster than calculating
+ * value inside loop in ICEmissivityAnisotropic()
+ */ 
 void Radiation::FillCosZetaLookup(int i) {
     vector <vector<double> > v;
     double phi_min = TargetPhotonAngularBounds[i][0];
@@ -615,7 +632,13 @@ double Radiation::ICAnisotropicAuxFunc(double phi_p, double theta_p,
 }
 
 
-
+/**
+ * This creates a lookup that holds IC energy loss vs energy.
+ * Here, several lookups are filled: for individual photon fields, summed over
+ * all radiation fields and summed over all isotropic fields.
+ * The format of the lookup is: { Energy(erg) - Energy Loss Rate
+ * from IC scattering(erg/s) }
+ */
 void Radiation::CreateICLossLookup(int bins) {
     if (FASTMODE_IC_LOSSLOOK == true && RADFIELD_COUNTER) {
         SumTargetFieldsIsotropic();
@@ -689,8 +712,8 @@ void Radiation::CreateICLossLookup(int bins) {
 }
 
 /** return a lookup table holding the differential electron energy loss rate due
- * to inverse-Compton
- *  scattering. The format of the lookup is: { Energy(erg) - Energy Loss Rate
+ * to inverse-Compton scattering. 
+ * The format of the lookup is: { Energy(erg) - Energy Loss Rate
  * from IC scattering(erg/s) }
  */
 void Radiation::CreateICLossLookupIndividual(int i, int bins) {
@@ -715,6 +738,8 @@ void Radiation::CreateICLossLookupIndividual(int i, int bins) {
 
   fUtils->Clear2DVector(*ICLossVectorCurrent);
 
+  /* in anisotropic case, the angular distribution 2.15 in Blumenthal & Gould has
+     to be calculated. Otherwise, the value is 4/3 */
   double av_cos_xi = 0.; double area = 0.;
   if (ANISOTROPY_CURRENT == true) {
       phi_min = (*TargetPhotonAngularBoundsCurrent)[0];
@@ -754,10 +779,12 @@ void Radiation::CreateICLossLookupIndividual(int i, int bins) {
     cout << ">> CALCULATING IC LOSS LOOKUP " << endl;
   }
 
+  /* determine the highest energy where transition to thomson regime happens */
   double phEmax = pow(10.,(*TargetPhotonVectorCurrent)[(*TargetPhotonVectorCurrent).size()-1][0]);
   /* gamma value that indicates Thomson regime (see Blumenthal&Gould) */
   double GammaLow = 1.e-1;
-  /* transition energy to Thomson regime. Losses are then simply Edot~E*E*edens*/
+  /* transition energy to Thomson regime. Losses are then simply Edot~E*E*edens, 
+     for speed-up*/
   double Etrans = m_e * m_e * GammaLow / phEmax;
 
   for (double loge = logemin; loge < logemax; loge += logestep) {
@@ -789,6 +816,8 @@ void Radiation::CreateICLossLookupIndividual(int i, int bins) {
     ii++;
   }
   
+  /* copy vectors to arrays in order to be used in GSL inerpolation function 
+     and create the GSL lookup */
   unsigned int size = (*ICLossVectorCurrent).size();
   double e[size];
   double l[size];
@@ -796,12 +825,12 @@ void Radiation::CreateICLossLookupIndividual(int i, int bins) {
      e[g] = (*ICLossVectorCurrent)[g][0];  
      l[g] = (*ICLossVectorCurrent)[g][1];       
   }
-
-
   *ICLossLookupCurrent = gsl_spline_alloc(gsl_interp_linear, size);
   gsl_spline_init(*ICLossLookupCurrent, e, l, size);
   *ICLossLookupAccCurrent = gsl_interp_accel_alloc();
   INTEGRATEOVERGAMMAS = false;
+
+
   if (QUIETMODE == false) {
     cout << endl;
     cout << "    -> DONE!   " << endl;
@@ -812,6 +841,10 @@ void Radiation::CreateICLossLookupIndividual(int i, int bins) {
   return;
 }
 
+/**
+ * retrieve the invers compton lookup i. If lookup i isn't caculated yet,
+   it will be now. If i = -1, the sum over all lookups will be calculated.
+ */
 vector<vector<double> > Radiation::GetICLossLookup(int i) {
     vector< vector<double> > v;
     if(!RADFIELD_COUNTER) return v;
@@ -834,24 +867,14 @@ vector<vector<double> > Radiation::GetICLossLookup(int i) {
         return v;
     }
     else if (i==-1) {
-        if(!ICLossVectorSumAll.size()) {
-//            cout<< "Radiation::GetICLossLookup: Lookup not calculated yet. "
-//                   "Please run Radiation::CreateICLossLookup first. Returning "
-//                   "empty vector."<<endl;
-            CreateICLossLookup();
-//            return v;
-        }
-//        else {
-            for(unsigned int j=0;j<ICLossVectorSumAll.size();j++) {
-                
-                double E = ICLossVectorSumAll[j][0];
-                double L = fUtils->EvalSpline(E, ICLossLookupSumAll,ICLossLookupAccAll,
+        if(!ICLossVectorSumAll.size()) CreateICLossLookup();
+        for(unsigned int j=0;j<ICLossVectorSumAll.size();j++) {
+            double E = ICLossVectorSumAll[j][0];
+            double L = fUtils->EvalSpline(E, ICLossLookupSumAll,ICLossLookupAccAll,
                                               __func__,__LINE__);
-                
-                fUtils->TwoDVectorPushBack(pow(10.,E),pow(10.,L),v);
-            }
-            return v;
-//        }
+            fUtils->TwoDVectorPushBack(pow(10.,E),pow(10.,L),v);
+        }
+        return v;
     }
     else {
        cout<<"Radiation::GetICLossLookup: Index "<<i<<" not valid. Returning "
@@ -859,8 +882,6 @@ vector<vector<double> > Radiation::GetICLossLookup(int i) {
         return v;
     }
 }
-
-
 
 /* end of Inverse Compton part */
 
@@ -1354,14 +1375,7 @@ void Radiation::SetProtons(vector<vector<double> > PROTONS) {
 
 /* Here comes code that defines the spectral distributions of target photons in
  * the IC process.
- * The general idea is that you can add different components to the
- * "TargetPhotonGraphs" vector
- * storing TGraphs, which are then in the end added up to
- * "TotalTargetPhotonGraph", which is the
- * final, total radiation field in the IC process.
  */
-
-
 void Radiation::ClearTargetPhotonField(int i) {
 
 
@@ -1422,13 +1436,20 @@ void Radiation::ClearTargetPhotonField(int i) {
 
 }
 
-
+/**
+ * Add a greybody-distributed photon field to the set of IC target photon fields 
+ * with temperature T (K), energy density edens (erg/cm**3) and 'steps' bins. 
+ */
 void Radiation::AddThermalTargetPhotons(double T, double edens, int steps) {
     SetThermalTargetPhotons(T,edens,steps,RADFIELD_COUNTER);
     RADFIELD_COUNTER++;
     return;
 }
 
+/**
+ * Replace photon field I by a greybody-distributed photon field 
+ * with temperature T (K), energy density edens (erg/cm**3) and 'steps' bins. 
+ */
 void Radiation::ResetWithThermalTargetPhotons(int i, double T, double edens, int steps) {
     if (i<0 || i>=(int)RADFIELDS_MAX) {
       cout<<"Radiation::ResetWithThermalTargetPhotons: Invalid index "<<i<<
@@ -2089,17 +2110,27 @@ vector<vector<double> > Radiation::ReturnSED(int i, double emin, double emax,
   return tempVec;
 }
 
+/**
+ * This returns the Inverse Compton spectrum from the i-th target photon field.
+ * If i=-1 (default), the sum over all contributions is returned. If i
+ */
 vector<vector<double> > Radiation::GetICSpectrum(unsigned int i, double emin, double emax) {
 
+    // check whether the total spectrm has been calculated, whether fastmode was used 
+    // (i.e. only the sum and not the individual contributions have been calculated).
+    // If so, calculate also the individual contributions at the same energy points as
+    // the total spectrum. (Also check that these energy points exist)
     if(IC_CALCULATED && FASTMODE_IC==true && epoints_temp.size()) {
         FASTMODE_IC=false;
         CalculateDifferentialPhotonSpectrum(epoints_temp);
         FASTMODE_IC=true;
     }
     return ReturnDifferentialPhotonSpectrum(i+1, emin, emax, diffSpecICComponents);
-}  ///< return pi0 decay spectrum
+} 
 
-
+/**
+ * Same as GetICSpectrum(), but returns SED
+ */
 vector<vector<double> > Radiation::GetICSED(unsigned int i, double emin, double emax) {
     if(IC_CALCULATED && FASTMODE_IC==true && epoints_temp.size()) {
         FASTMODE_IC=false;
@@ -2107,7 +2138,7 @@ vector<vector<double> > Radiation::GetICSED(unsigned int i, double emin, double 
         FASTMODE_IC=true;
     }
     return ReturnSED(i+1, emin, emax, diffSpecICComponents);
-  }  ///< return pi0 decay spectrum
+  } 
 
 /**
  * Return a particle SED dN/dE vs E (erg vs TeV)
@@ -2149,6 +2180,7 @@ vector<vector<double> > Radiation::GetParticleSED(string type) {
   return v;
 }
 
+
 double Radiation::GetIntegratedFlux(int i, double emin, double emax, bool ENERGYFLUX) {
 
   if (!diffSpec.size()) {
@@ -2179,7 +2211,6 @@ double Radiation::GetIntegratedFlux(int i, double emin, double emax, bool ENERGY
 
 /**
  * Integration function using the GSL QAG functionality
- *
  */
 Radiation::fPointer Radiation::_funcPtr;
 Radiation *Radiation::_radPtr;

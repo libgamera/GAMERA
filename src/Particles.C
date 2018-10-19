@@ -198,7 +198,7 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   if (EminConstant) {
     Emin = EminConstant;
   }
-  if (EminConstant>EminInternal) {
+  if (EminConstant>EminInternal) { // FIXME: is this functionality still relevant after natural handling of low-E cut-offs has been implemented?
     EminInternal = 1.1*EminConstant;
   }
   CalculateConstants();
@@ -577,8 +577,8 @@ double Particles::EnergyLossRate(double E) {
  */
 void Particles::PrepareAndRunNumericalSolver(
     vector<vector<double> > &particlespectrum, bool onlyprepare,
-    bool dontinitialise) {
-  GetAxis(Emin, eMax, ebins, energyAxis, true);
+    bool dontinitialise) { //FIXME: are the onlyprepare and dontinitialize options still needed?
+  CreateAxis(Emin, eMax, ebins, energyAxis, true);
   CreateGrid();
   if (dontinitialise == false) SetInitialCondition(energyAxis, Tmin);
 
@@ -592,7 +592,7 @@ void Particles::PrepareAndRunNumericalSolver(
 }
 
 /** create an axis that attributes each bin with a real value. */
-void Particles::GetAxis(double min, double max, int steps, vector<double> &Axis,
+void Particles::CreateAxis(double min, double max, int steps, vector<double> &Axis,
                         bool logarithmic) {
 
   double min_mass = Type ? m_p : m_e;
@@ -886,7 +886,8 @@ void Particles::ComputeGrid(vector<double> EnergyAxis, double startTime,
       if(ElossRate_e1>=0. && i) value -= quot * grid[i0][i] * ElossRate_e1;
       if(ElossRate_e2>=0.) value += quot * grid[i0][i+1] * ElossRate_e2;
 
-      /* slope limiters (per default enabled, toggle on/off with FASTMODE flag) */    
+      /* piece-wise linear advection with slope limiters (per default enabled, 
+         toggle on/off with FASTMODE flag) */    
       if(FASTMODE == false) {
         double mm,sb;
         mm = 0.5 * quot * (GetMinModSlope(i, ebin, i0) * ElossRate_e1 *
@@ -894,7 +895,8 @@ void Particles::ComputeGrid(vector<double> EnergyAxis, double startTime,
                              GetMinModSlope(i + 1, ebin, i0) * ElossRate_e2 *
                                  (ebin - deltaE2));
         sb =
-            0.5*quot*(GetSuperBeeSlope(i,ebin,i0)*ElossRate_e1*(ebin-deltaE1)-GetSuperBeeSlope(i+1,ebin,i0)*ElossRate_e2*(ebin-deltaE2));
+            0.5*quot*(GetSuperBeeSlope(i,ebin,i0)*ElossRate_e1*(ebin-deltaE1)-
+                    GetSuperBeeSlope(i+1,ebin,i0)*ElossRate_e2*(ebin-deltaE2));
         value -= 0.5 * sqrt(mm*mm + sb*sb);
       }
 
@@ -1035,6 +1037,11 @@ void Particles::ComputeGridInTimeInterval(double T1, double T2, string type,
   return;
 }
 
+/**
+ * This is the 'trivial' case of injection without losses.
+ * The resulting spectrum is simply N(E,t) = Q(E) * t, where
+ * Q is the injection spectrum.
+ */
 void Particles::CalcSpecSemiAnalyticNoELoss() {
   if (Tmin >= Age) {
     cout << "CalcSpecSemiAnalyticNoELoss: Tmin is larger/equal "
@@ -1064,6 +1071,19 @@ void Particles::CalcSpecSemiAnalyticNoELoss() {
   return;
 }
 
+/**
+ * Solution in case of time - constant energy losses. In this case a semi-analytical
+ * solution is available. For a derivation, see the nice paper 
+ * Atoyan & Aharonian MNRAS 302, 253-276 (1999). 
+ * Note that particle escape is not accounted for in this implementation, for
+ * that please use the grid solver.
+ * In prinicple the time - constant loss problem is also covered with the grid 
+ * solver, and therefore the latter is the default method. Hence, the following
+ * function is only invoked if SetSolverMethod() is set to 1. 
+ * The main advantage is that this function is much faster than the grid solver if 
+ * the energy losses are very high. 
+ * The main disadvantage is that it is limited to time-constant losses.
+ */
 void Particles::CalcSpecSemiAnalyticConstELoss() {
   if (Tmin >= Age) {
     cout << "Particles::CalcSpecSemiAnalyticConstELoss: Tmin is larger/equal "

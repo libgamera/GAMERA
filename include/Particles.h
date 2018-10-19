@@ -224,7 +224,7 @@ struct timespec time0, time1, time2, time3;
                                     bool dontinitialise =
                                         false);  ///< grid solver to calculate
                                                  ///the final particle spectrum
-  void GetAxis(double min, double max, int steps, vector<double> &Axis,
+  void CreateAxis(double min, double max, int steps, vector<double> &Axis,
                bool logarithmic);  ///< create an axis that attributes each bin
                                    ///with a real value (e.g. time axis, energy
                                    ///axis).
