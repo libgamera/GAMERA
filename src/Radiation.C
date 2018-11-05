@@ -1487,7 +1487,6 @@ void Radiation::SetThermalTargetPhotons(double T, double edens, int steps, int i
  * class to calculate
  * IC cooling losses. This requires as input a 2D vector of format:
  *              ~~~    energy[erg] number_density   ~~~
- * The photons will be added to TotalTargetPhotonGraph
  */
 void Radiation::AddArbitraryTargetPhotons(vector<vector<double> > PhotonArray) {
     SetArbitraryTargetPhotons(PhotonArray,RADFIELD_COUNTER);
@@ -1883,6 +1882,10 @@ vector< vector<double> > Radiation::GetTargetPhotonAnisotropy(int i,
 
 }
 
+/**
+ * Wrapper around CalculateDifferentialPhotonSpectrum(vector<double> points) that
+ * will create an log-evenly distributed set of energy points between emin and emax.
+ */
 void Radiation::CalculateDifferentialPhotonSpectrum(int steps, double emin,
                                                     double emax) {
   if (!emin || !emax) {
