@@ -889,18 +889,21 @@ void Particles::ComputeGrid(vector<double> EnergyAxis, double startTime,
       /* slope limiters (per default enabled, toggle on/off with FASTMODE flag) */    
       if(FASTMODE == false) {
         double mm,sb;
-        mm =  quot * (LaxWendroffSlope(i, ebin, i0) * ElossRate_e1 *
+        // uncomment the following def. for Lax-Wendroff slope limiter
+        /*mm =  quot * (LaxWendroffSlope(i, ebin, i0) * ElossRate_e1 *
                 (ebin - deltaE1) -
                              LaxWendroffSlope(i + 1, ebin, i0) * ElossRate_e2 *
-                                 (ebin - deltaE2));
-        /*mm =  0.5*quot * (GetMinModSlope(i, ebin, i0) * ElossRate_e1 *
+                                 (ebin - deltaE2));*/
+        //Comment this line if Lax-Wendroff is used
+        mm =  0.5*quot * (GetMinModSlope(i, ebin, i0) * ElossRate_e1 *
                                  (ebin - deltaE1) -
                              GetMinModSlope(i + 1, ebin, i0) * ElossRate_e2 *
-                                 (ebin - deltaE2));*/
+                                 (ebin - deltaE2));
         double lw = 0.5*quot*(LaxWendroffSlope(i,ebin,i0)*ElossRate_e1*(ebin-deltaE1)-LaxWendroffSlope(i+1,ebin,i0)*ElossRate_e2*(ebin-deltaE2));
         sb =
             0.5*quot*(GetSuperBeeSlope(i,ebin,i0)*ElossRate_e1*(ebin-deltaE1)-GetSuperBeeSlope(i+1,ebin,i0)*ElossRate_e2*(ebin-deltaE2));
-        value -= lw; // 0.5 * sqrt(mm*mm + sb*sb);
+        //value -= lw; //uncomment line if LaxWendroff is used
+        value -= 0.5 * sqrt(mm*mm + sb*sb); //comment if LaxWendroff is used
       }
 
       //TODO: get slope limiter right in case of adiabatic heating!
