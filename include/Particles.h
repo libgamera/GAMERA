@@ -254,6 +254,8 @@ struct timespec time0, time1, time2, time3;
   double GetMinModSlope(int i, double deltaX,int i0);  ///< slope for the
                                                          ///minmod slope limiter
                                                          ///method
+  double LaxWendroffSlope(int i, double deltaX, int i0);  ///< slope for the
+                                                          // Lax-Wendroff slope limiter
   vector<vector<double> > ParticleSpectrum;  ///< vector containing the final
                                              ///source particle spectrum (i.e.
                                              ///at time=Age)

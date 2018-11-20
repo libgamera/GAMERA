@@ -889,13 +889,18 @@ void Particles::ComputeGrid(vector<double> EnergyAxis, double startTime,
       /* slope limiters (per default enabled, toggle on/off with FASTMODE flag) */    
       if(FASTMODE == false) {
         double mm,sb;
-        mm = 0.5 * quot * (GetMinModSlope(i, ebin, i0) * ElossRate_e1 *
+        mm =  quot * (LaxWendroffSlope(i, ebin, i0) * ElossRate_e1 *
+                (ebin - deltaE1) -
+                             LaxWendroffSlope(i + 1, ebin, i0) * ElossRate_e2 *
+                                 (ebin - deltaE2));
+        /*mm =  0.5*quot * (GetMinModSlope(i, ebin, i0) * ElossRate_e1 *
                                  (ebin - deltaE1) -
                              GetMinModSlope(i + 1, ebin, i0) * ElossRate_e2 *
-                                 (ebin - deltaE2));
+                                 (ebin - deltaE2));*/
+        double lw = 0.5*quot*(LaxWendroffSlope(i,ebin,i0)*ElossRate_e1*(ebin-deltaE1)-LaxWendroffSlope(i+1,ebin,i0)*ElossRate_e2*(ebin-deltaE2));
         sb =
             0.5*quot*(GetSuperBeeSlope(i,ebin,i0)*ElossRate_e1*(ebin-deltaE1)-GetSuperBeeSlope(i+1,ebin,i0)*ElossRate_e2*(ebin-deltaE2));
-        value -= 0.5 * sqrt(mm*mm + sb*sb);
+        value -= lw; // 0.5 * sqrt(mm*mm + sb*sb);
       }
 
       //TODO: get slope limiter right in case of adiabatic heating!
@@ -977,6 +982,13 @@ double Particles::GetSuperBeeSlope(int i, double deltaX, int i0) {
   double sigma = MaxMod(sigma1, sigma2);
   return sigma;
 }
+
+
+double Particles::LaxWendroffSlope(int i, double deltaX, int i0) {
+  double sigma = (grid[i0][i] - grid[i0][i+1])/ deltaX;
+  return sigma;
+}
+
 
 /** MaxMod function for slope limiters */
 double Particles::MaxMod(double a, double b) {
