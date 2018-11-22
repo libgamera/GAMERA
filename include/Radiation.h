@@ -37,6 +37,7 @@ class Radiation {
   bool FASTMODE_IC; ///< speed up IC calculation by not calculating emission on
                    ///< isotropic target fields individually but only sum
   bool IC_CALCULATED;
+
   bool ISOTROPIC_ELECTRONS; ///< Set to true for isotropic electrons in IC scattering
 
   bool FASTMODE_IC_LOSSLOOK; ///< speed up IC calculation by not calculating emission on
@@ -48,7 +49,7 @@ class Radiation {
   double ICEmissivity(double x, void *par);           ///< Emissivity from IC scattering
   double ICEmissivityAnisotropic(double x, void *par);  ///< Anisitropic IC emissivity
   double ICAnisotropicAuxFunc(double phi_p, double theta_p, double ephoton,
-                              double egamma, double lorentz, double beta, 
+                              double egamma, double lorentz, double beta,
                               double cos_zeta); ///< Auxiliary function for IC scattering 
   double ICEmissivityAnisotropicIsotropicElectrons(double x, void *par);  ///< Anisotropic IC emissivity with isotropic electrons
   double ICEmissivityAnisotropicIsotropicElectronsSecondIntegral(double x, void *par);
@@ -294,9 +295,9 @@ class Radiation {
   Radiation();
   /// standard destructor
   ~Radiation();
-  /// Set Protons
+  /// Set the proton spectrum (e.g. calculated in the "Particles" class, but also arbitrary spectra. Input format: 2D vector, E(erg)-N(number))
   void SetProtons(vector<vector<double> > PROTONS);
-  /// Set Electrons
+  /// Set the electron spectrum (e.g. calculated in the "Particles" class, but also arbitrary spectra). Input format: 2D vector, E(erg)-N(number))
   void SetElectrons(vector<vector<double> > ELECTRONS);
   /// Setting isotropic electrons variable to true for anisotropic IC scattering
   void SetElectronsIsotropic(void);
