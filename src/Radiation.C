@@ -576,27 +576,24 @@ double Radiation::ICEmissivityAnisotropic(double x, void *par) {
 
 
 
-/*-------------------------------------------------------------------------------------------------------
+/*----------------------------------------------------------------------------------------------------
  *      This Block calculates the Anisotropic IC emission for isotropic electrons
  * 
- *------------------------------------------------------------------------------------------------------*/
-
+ *--------------------------------------------------------------------------------------------------*/
 
 // Returns the over all electron angles integrated Anisotropic emission
 double Radiation::ICEmissivityAnisotropicIsotropicElectrons(double x, void *par){
     double normalization = 4*pi;
-    double ephoton = pow(10.,x);  ///< energy of the target photon
     double *p = (double *)par;
     double lorentz = p[0] / m_e;
-    double egamma = p[1];  ///< energy of the resulting gamma photon
     double integral;
     
     fPointer theta_int_function = &Radiation::ICEmissivityAnisotropicSecondIntegral;
     
     double integralinput[3];
-    integralinput[0] = lorentz;
-    integralinput[1] = egamma;
-    integralinput[2] = ephoton;
+    integralinput[0] = lorentz;        // Lorentzfactor
+    integralinput[1] = p[1];      // energy of the resulting gamma photon
+    integralinput[2] = x;       // Photon Energy
     
     integral = Integrate(theta_int_function, integralinput, 0.0, 1.0*pi, integratorTolerance*5,
                          2);
@@ -605,38 +602,31 @@ double Radiation::ICEmissivityAnisotropicIsotropicElectrons(double x, void *par)
     
 }
 
-
-
+// Function to be integrated over theta-angle of electrons
 double Radiation::ICEmissivityAnisotropicSecondIntegral(double x, void *par) {
     double theta_el = x;   // Phi electron angle for integration
     double *p = (double *)par;
-    double ephoton = pow(10.,p[2]);  ///< energy of the target photon
-    double lorentz = p[0] / m_e;
-    double egamma = p[1];  ///< energy of the resulting gamma photon
-    double integral;
+    double integral = 0.;
     fPointer phi_int_function = &Radiation::ICEmissivityAnisotropicFirstIntegral;
     
     double integralinput[4];
-    integralinput[0] = lorentz;
-    integralinput[1] = egamma;
-    integralinput[2] = ephoton;
-    integralinput[3] = theta_el;
+    integralinput[0] = p[0];    // Lorentzfactor
+    integralinput[1] = p[1];  // egamma
+    integralinput[2] = p[2];    // Photon energy
+    integralinput[3] = theta_el;    //  theta
     
     
     
     integral = Integrate(phi_int_function, integralinput,0.0, 2.0*pi,integratorTolerance*5,
                          2);
-    return integral;
+    return (sin(theta_el)*integral);
 }
     
-  
-
-
-// Function to integrate over phi-angle of electrons
+// Function to be integrated over phi-angle of electrons
 double Radiation::ICEmissivityAnisotropicFirstIntegral(double x, void *par) {
     double phi_el = x;   // Phi electron angle for integration
     double *p = (double *)par;
-    double lorentz = p[0] / m_e;
+    double lorentz = p[0];
     double egamma = p[1];  ///< energy of the resulting gamma photon
     double ephoton = pow(10.,p[2]);  ///< energy of the target photon
     double theta_el = p[3];
@@ -687,15 +677,15 @@ double Radiation::ICEmissivityAnisotropicFirstIntegral(double x, void *par) {
             
         }
     }
-
-    double targetphotons = fUtils->EvalSpline(x,
+      
+    double targetphotons = fUtils->EvalSpline(p[2],
                                               *TargetPhotonLookupCurrent,
                                               *TargetAccCurrent,__func__,__LINE__);
     double integrand = pi * e_radius * e_radius * c_speed;
     integrand /= ephoton * (lorentz-egamma/m_e) * (lorentz-egamma/m_e);
     integrand *= integral * pow(10.,targetphotons);
     integrand *= ln10 * ephoton;
-    return (sin(theta_el)*integrand);
+    return integrand;
 }
 
 
