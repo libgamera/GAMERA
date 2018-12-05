@@ -37,6 +37,8 @@ class Radiation {
                    /// isotropic target fields individually but only sum
   bool IC_CALCULATED;
   bool ISOTROPIC_ELECTRONS; /// < Set to true for isotropic electrons in IC scattering
+  bool USE_AHARONIAN; // < Set to true if Aharonians equation for isotropic el. in ansiotropic
+			// IC scattering is used
   bool FASTMODE_IC_LOSSLOOK; ///< speed up IC calculation by not calculating emission on
                    /// isotropic target fields individually but only sum
   bool IC_LOSSLOOK_CALCULATED;
@@ -51,6 +53,10 @@ class Radiation {
   double ICEmissivityAnisotropicIsotropicElectrons(double x, void *par);
   double ICEmissivityAnisotropicSecondIntegral(double x, void *par);
   double ICEmissivityAnisotropicFirstIntegral(double x, void *par);
+  double ICEmissivityAnisotropicIsotropicElectronsAharonian(double x, void *par);
+  double ICEmissivityAnisotropicIsotropicElectronsAharonianSecondIntegral(double x, void *par);
+  double ICEmissivityAnisotropicIsotropicElectronsAharonianFirstIntegral(double x, void *par);
+  void UseAharonian(void);
   double K(double nu, double x);             ///< modified Bessel function
   double K_53(double x, void *par);  ///< modified Bessel function of order 5/3
   double SynchEmissivity(double x, void *par);  ///< Synchrotron emission from a
