@@ -401,10 +401,10 @@ double Radiation::ICEmissivityRadFieldIntegrated(double x, void *par) {
   if(ANISOTROPY_CURRENT == true)  {
     if(ISOTROPIC_ELECTRONS){
 //      if(ISOTROPIC_ELECTRONS && (!USE_AHARONIAN)) {
-//        IntFunc = &Radiation::ICEmissivityAnisotropicIsotropicElectrons;
+        IntFunc = &Radiation::ICEmissivityAnisotropicIsotropicElectrons;
 //    }
 //    else if(ISOTROPIC_ELECTRONS){  //&& USE_AHARONIAN){
-        IntFunc = &Radiation::ICEmissivityAnisotropicIsotropicElectronsAharonian;
+//        IntFunc = &Radiation::ICEmissivityAnisotropicIsotropicElectronsAharonian;
     }
     else {
         IntFunc = &Radiation::ICEmissivityAnisotropic;
@@ -638,8 +638,8 @@ double Radiation::ICEmissivityAnisotropicFirstIntegral(double x, void *par) {
     
     double beta = sqrt(1. - 1. / (lorentz*lorentz));
     double Q = 0.; double F = 0.; double cos_zeta = 0.;
-    double cos_zeta_min = egamma/(2.*ephoton*lorentz*(lorentz-egamma/c_speed))-1.; 
-
+    //double cos_zeta_min = egamma/(2.*ephoton*lorentz*(lorentz-egamma/c_speed))-1.; 
+    double cos_zeta_min = egamma/(2.*ephoton*lorentz*(lorentz-egamma/m_e))-1.;
 
     double zeta_min = acos(cos_zeta_min);
     double integral = 0.;
@@ -656,11 +656,12 @@ double Radiation::ICEmissivityAnisotropicFirstIntegral(double x, void *par) {
 
 
             cos_zeta = -cos_kappa *cos(theta) + sin_kappa * sin(theta) * cos(phi - phi_el);
-
+            //cos_zeta = cos_kappa *cos(theta) + sin_kappa * sin(theta) * cos(phi - phi_el);
             if (cos_zeta < cos_zeta_min) continue;
 
+            
             // Kinematic limits from sec. 2.2.1.
-            double upsilon = cos_zeta_min+cos_kappa*cos(theta) / (sin_kappa*sin(theta));
+            double upsilon = (cos_zeta_min+cos_kappa*cos(theta)) / (sin_kappa*sin(theta));
             if (std::isinf(upsilon) || std::isnan(upsilon)) continue;
             if(fabs(theta - pi_min_ka) > zeta_min) { continue;}
             if (fabs(upsilon) < 1.) {
