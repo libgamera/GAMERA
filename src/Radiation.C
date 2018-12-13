@@ -659,7 +659,7 @@ double Radiation::ICEmissivityAnisotropicFirstIntegral(double x, void *par) {
             cos_zeta = cos_kappa *cos(theta) + sin_kappa * sin(theta) * cos(phi - phi_el);
             if (cos_zeta < cos_zeta_min) continue;
 
-            
+        /*    
             // Kinematic limits from sec. 2.2.1.
             double upsilon = (cos_zeta_min+cos_kappa*cos(theta)) / (sin_kappa*sin(theta));
             if (std::isinf(upsilon) || std::isnan(upsilon)) continue;
@@ -672,7 +672,7 @@ double Radiation::ICEmissivityAnisotropicFirstIntegral(double x, void *par) {
                 if(upsilon > 0.) continue;
                 if(upsilon < 0. && fabs(phi-phi_el) > pi) continue;
             }
-        
+        */
             Q = interp2d_spline_eval(*TargetPhotonAngularDistrCurrent, 
                                      phi, theta, *phiaccescCurrent,*thetaaccescCurrent);
             double eph_d = ephoton/m_e * lorentz * (1. + beta*cos_zeta);
