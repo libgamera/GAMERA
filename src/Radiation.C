@@ -655,8 +655,8 @@ double Radiation::ICEmissivityAnisotropicFirstIntegral(double x, void *par) {
         for (double theta = theta_min; theta <= theta_max; theta += d_theta) {
 
 
-            //cos_zeta = -cos_kappa *cos(theta) + sin_kappa * sin(theta) * cos(phi - phi_el);
-            cos_zeta = cos_kappa *cos(theta) + sin_kappa * sin(theta) * cos(phi - phi_el);
+            cos_zeta = -cos_kappa *cos(theta) + sin_kappa * sin(theta) * cos(phi - phi_el);
+            //cos_zeta = cos_kappa *cos(theta) + sin_kappa * sin(theta) * cos(phi - phi_el);
             if (cos_zeta < cos_zeta_min) continue;
 
         /*    
