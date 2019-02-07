@@ -16,7 +16,6 @@ Radiation::Radiation() {
   ISOTROPIC_ELECTRONS = false;  //If true, calculate anisotropic IC scattering with isotropic electrons
   SPATIALDEP_CURRENT = false;
   DEFAULT_HADRON_COMPOSITION = false;
-  USE_AHARONIAN = false;    //If true, use Aharonian 1981 equ. for anisotr. IC scattering with isotr. el.
   lumtoflux = 0.;
   ldiffbrems = fdiffbrems = ldiffsynch = fdiffsynch = 0.;
   ldiffic = fdiffic = ldiffpp = fdiffpp = 0.;
@@ -669,7 +668,6 @@ double Radiation::ICEmissivityAnisotropicIsotropicElectrons(double x, void *par)
     double eelectron = p[0];
     double egamma = p[1];  // energy of the resulting gamma photon
     
-
     double phi_min = (*TargetPhotonAngularBoundsCurrent)[0];
     double phi_max = (*TargetPhotonAngularBoundsCurrent)[1];
     double theta_min = (*TargetPhotonAngularBoundsCurrent)[2];
