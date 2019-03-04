@@ -1491,7 +1491,7 @@ void Astro::DisableArm(int arm) {
 }
 
 /**
- * Switch off an individual arm in Astro spiral model
+ * Switch on an individual arm in Astro spiral model
  */
 void Astro::EnableArm(int arm) {
   if(!QUIETMODE) std::cout<<"Enabling Arm no. "<<arm<<"."<<std::endl;
@@ -2907,6 +2907,5 @@ vector< vector<double> > Astro::LineOfSight(double gl, double gb, vector<double>
 
   return los;
 }
-
 
 

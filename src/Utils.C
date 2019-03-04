@@ -964,35 +964,3 @@ double Utils::LogisticsFunction(double z, double h, double w) {
   double val  = (1. + exp(-2.*(fabs(z)-h)/w));
   return 1./val;
 }
-
-/**
- * Function for the gamma gamma absorption cross section
- * Analytical average over solid angle
- * Eq. 5 from (Eungwanichayapant & Aharonian, 2009) https://arxiv.org/pdf/0907.2971.pdf
- * This is approximated and good within 3%
- * !!!UNDER CONSTRUCTION!!!
- */
-double Utils::AverageSigmaGammaGamma(double Eph1, double Eph2) {
-  double CMene = Eph1*Eph2/(m_e*m_e);
-  if (CMene < 1.){
-	  //std::cout<<"ERROR, you'll get a negative number in the square root!\n"
-	  //	  "You are below threshold for pair production\n";
-      return 0;}
-  return 3./(2.*CMene*CMene)*sigma_T*((CMene+0.5*log(CMene)-1./6.+1./(2.*CMene))
-		  *log(sqrt(CMene)+sqrt(CMene-1))-(CMene+4./9.-1./(9.*CMene))*sqrt(1.-(1./CMene)));
-}
-
-/*
- * Function for the full gamma gamma absorption cross section
- * Eq. 1 from Vernetto&Lipari 2016 (https://arxiv.org/pdf/1608.01587v2.pdf)
- */
-double Utils::SigmaGammaGamma(double Eph1,double Eph2, double theta) {
-	double CMene = 2.*Eph1*Eph2*(1-cos(theta))/(4.*m_e*m_e);  //Centr Mass energy
-	if (CMene <= 0) {
-		//below threshold for pair production return a cross section = 0
-		return 0;
-	}
-	double beta = sqrt(1.-1./CMene);  //ausiliary variable
-	return sigma_T*3./16.*(1.-beta*beta)*(2.*beta*(beta*beta-2.)+(3.-beta*beta*beta*beta)*log((1+beta)/(1-beta)));
-}
-

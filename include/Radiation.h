@@ -240,7 +240,9 @@ class Radiation {
                                              ///format E(erg)
                                              ///photon_density(erg^-1cm^-3)
 
-  void SetSSCTargetPhotons(double R, int steps, int i); 
+  void SetSSCTargetPhotons(double R, int steps, int i);
+  
+  vector <double> sizephfield; //size of the photon field in which gamma-gamma absoption has to be considered (allows diffrent size for each field)
 
  public:
   Radiation();                                       ///< standard constructor
@@ -506,32 +508,48 @@ class Radiation {
   void SumTargetFieldsIsotropic(int bins=1000);
   unsigned int GetTargetFieldCount(){return RADFIELD_COUNTER;}
   void SetICFastMode() {FASTMODE_IC = true;}
-
-  /*
-   * Functions for the calculation of the optical depth
-   * Fill use in the definition the functions GetTotalSpectrum() and GetTargetPhotons()
-   * Need to define a method to speed up the calculation and compute the contribution
-   * only for the relevant part of the cross section
-   * !!! CAREFUL UNDER CONSTRUCTION !!!
-   */
-  double AverageSigmaGammaGamma(double Eph1, double Eph2);
-  double SigmaGammaGamma(double Eph1, double Eph2, double theta);
   
-  //vector<double> ComputeOptDepth(double Egammamin,double Egammamax, double emin,double emax, double distance);
-  double ComputeOptDepth(double Egamma, int target, double distance);
-
-/* //to be fixed
-  vector <vector <double> > RetAbsDiffSpectrum(double emin, double emax);
-  vector <vector <double> > RetAbsSED(double emin, double emax);
-  vector<vector<double> > GetAbsSED(double emin = 0., double emax = 0.) {
-      return RetAbsSED(emin, emax);
-    }  ///< return total SED
-  vector<vector<double> > GetAbsSpectrum(double emin = 0., double emax = 0.) {
-        return RetAbsDiffSpectrum(emin, emax);
-      }  ///< return total Diff Spectrum
-*/
-
-
-
+  /* 
+   * Adding functions for the gamma-gamma absorption calculations
+   */
+  void SetSizePhotonField(vector <double> size){
+    // if not inizialized, the default value is 1 pc
+    // size to be given in [pc]
+      for (unsigned int i=0;i<size.size();i++){
+          sizephfield.push_back(size[i] * pc_to_cm);
+      }
+  } // Sets the size of the photon field for which gamma-gamma absorption has to be considered
+  
+  void ClearPhotonFieldSize();
+  
+  vector <double> GetSizePhotonField(); //get the photon filed
+  
+  double AverageSigmaGammaGamma(double Eph1, double Eph2);             // Average cross section for isotropic and homogeneous case
+  double SigmaGammaGamma(double Eph1, double Eph2, double costheta);      // Full gamma-gamma cross section
+  double ComputeAbsCoeff(double Egamma, int target);  //Auxiliary function to compute only the absorption coefficient, no spatial integration
+  double ComputeOptDepth(double Egamma, int target, double phsize);
+  double ComputeOptDepthIsotropic(double Egamma, int target, double phsize); // Computation of the optical depth parameter isotropic only
+  vector< vector<double> > ReturnAbsorbedSEDonFields(double emin, double emax, 
+                                                        vector< vector<double> > vec, vector <int> fields, vector <double> size); // Wrapper around function ReturnSED to return the gamma-gamma absorbed values
+  vector< vector<double> > ReturnAbsorbedSpectrumOnFields(double emin, double emax, 
+                                                        vector< vector<double> > vec, vector <int> fields, vector <double> size); // Wrapper around function ReturnDifferentialPhotonSpectrum to return the gamma-gamma absorbed values
+  vector<vector<double> > GetTotalAbsorbedSpectrum(vector< vector<double> > vec, vector <int> fields, double emin = 0., double emax = 0.) {
+    return ReturnAbsorbedSpectrumOnFields(emin, emax, vec, fields, sizephfield);
+  }
+  vector<vector<double> > GetTotalAbsorbedSED(vector< vector<double> > vec, vector <int> fields, double emin = 0., double emax = 0.) {
+    return ReturnAbsorbedSEDonFields(emin, emax, vec, fields, sizephfield);
+  }  ///< return total absorbed SED on selected fields, default behaviour should be to use all of them. TODO
+  double ReturnAbsorbedIntergratedFlux(double emin, double emax, bool ENERGYFLUX,vector <int> fields, vector <double> size);
+  
+  double GetIntegralTotalAbsEnergyFlux(double emin, double emax, vector <int> fields) { ///< get integrated 
+    return ReturnAbsorbedIntergratedFlux(emin,emax,true,fields,sizephfield); }                      /// absorbed energy flux between
+                                                                                          /// emin and emax (erg) 
+                                                                                          /// summed over all 
+                                                                                          /// radiation processes
+  double GetIntegralTotalAbsFlux(double emin, double emax, vector <int> fields) { ///< get integrated 
+    return ReturnAbsorbedIntergratedFlux(emin,emax,false,fields,sizephfield); }                      /// absorbed energy flux between
+                                                                                          /// emin and emax (erg) 
+                                                                                          /// summed over all 
+                                                                                          /// radiation processes
 };
 #endif
