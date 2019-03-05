@@ -530,14 +530,14 @@ class Radiation {
   double ComputeOptDepth(double Egamma, int target, double phsize);
   double ComputeOptDepthIsotropic(double Egamma, int target, double phsize); // Computation of the optical depth parameter isotropic only
   vector< vector<double> > ReturnAbsorbedSEDonFields(double emin, double emax, 
-                                                        vector< vector<double> > vec, vector <int> fields, vector <double> size); // Wrapper around function ReturnSED to return the gamma-gamma absorbed values
+                                                         vector <int> fields, vector <double> size); // Wrapper around function ReturnSED to return the gamma-gamma absorbed values
   vector< vector<double> > ReturnAbsorbedSpectrumOnFields(double emin, double emax, 
-                                                        vector< vector<double> > vec, vector <int> fields, vector <double> size); // Wrapper around function ReturnDifferentialPhotonSpectrum to return the gamma-gamma absorbed values
-  vector<vector<double> > GetTotalAbsorbedSpectrum(vector< vector<double> > vec, vector <int> fields, double emin = 0., double emax = 0.) {
-    return ReturnAbsorbedSpectrumOnFields(emin, emax, vec, fields, sizephfield);
+                                                         vector <int> fields, vector <double> size); // Wrapper around function ReturnDifferentialPhotonSpectrum to return the gamma-gamma absorbed values
+  vector<vector<double> > GetTotalAbsorbedSpectrum(vector <int> fields, double emin = 0., double emax = 0.) {
+    return ReturnAbsorbedSpectrumOnFields(emin, emax, fields, sizephfield);
   }
-  vector<vector<double> > GetTotalAbsorbedSED(vector< vector<double> > vec, vector <int> fields, double emin = 0., double emax = 0.) {
-    return ReturnAbsorbedSEDonFields(emin, emax, vec, fields, sizephfield);
+  vector<vector<double> > GetTotalAbsorbedSED(vector <int> fields, double emin = 0., double emax = 0.) {
+    return ReturnAbsorbedSEDonFields(emin, emax, fields, sizephfield);
   }  ///< return total absorbed SED on selected fields, default behaviour should be to use all of them. TODO
   double ReturnAbsorbedIntergratedFlux(double emin, double emax, bool ENERGYFLUX,vector <int> fields, vector <double> size);
   

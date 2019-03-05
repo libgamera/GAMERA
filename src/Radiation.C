@@ -2328,7 +2328,8 @@ double Radiation::ComputeAbsCoeff(double Egamma, int target) {
     double Q=0; //the scaling factor due to the angular distribution of target field
     if ( ANISOTROPY_CURRENT ){
         double cos_zeta = 0.;
-        //because the photon direction is aligned with the x-axis by definition
+        // because the photon direction is aligned with the x-axis by definition
+        // hard coded so that it is not influenced by the direction of the electron beam
         double cos_kappa = 0.; double sin_kappa = 1.;
         double phi_min = (*TargetPhotonAngularBoundsCurrent)[0];
         double phi_max = (*TargetPhotonAngularBoundsCurrent)[1];
@@ -2410,26 +2411,26 @@ double Radiation::ComputeOptDepthIsotropic(double Egamma, int target, double phs
 
 
 /*
- * Return the total absorbed differential spectrum (for the moment using the homogenous and isotropic case)
+ * Return the total absorbed differential spectrum (for the moment using the homogeneous and isotropic case)
  * This is a wrapper around the function ReturnSED to which it was added the distance
  * parameter needed to compute the right absorption and the target photon field for the absorption
  * 
  * Parameters:
  *  - double emin = minimum energy
  *  - double emax = maximum energy
- *  - vector < vector <double> > vec = vector that stores the SED
  *  - int k = vector photon field counter to be used in the order the fields were added
  *  - size = size of the photon field integration
  * Returns:
  *  - Absorbed SED
  */
 vector< vector<double> > Radiation::ReturnAbsorbedSpectrumOnFields(double emin, double emax, 
-                                                        vector< vector<double> > vec, vector <int> fields, vector <double> size){
+														vector <int> fields,
+														vector <double> size) {
     double tauval=0;
     double singletau;
     vector< vector<double> > tempVec;
     //returns the total Differential Photon Spectrum
-    tempVec = Radiation::ReturnDifferentialPhotonSpectrum(1, emin, emax, vec);
+    tempVec = Radiation::ReturnDifferentialPhotonSpectrum(1, emin, emax, diffSpec);
     if (!fields.size()){
         std::cout<<"You have not added any photon field\n"
                  <<"Add photon fields before proceeding with this step\n"
@@ -2438,8 +2439,8 @@ vector< vector<double> > Radiation::ReturnAbsorbedSpectrumOnFields(double emin, 
     }
     for (unsigned int j=0; j < tempVec.size(); j++){
         tauval = 0;
-        if (fields.size()!=size.size()){
-            std::cout<<"WARNING! Array of the fields and array of the sizes do not match!\n"
+        if (fields.size() > size.size()){
+            std::cout<<"WARNING! You have not set the size for one of the fields!\n"
                      <<"Returning unmodified spectrum!"<<std::endl;
             return tempVec;
         }
@@ -2462,18 +2463,17 @@ vector< vector<double> > Radiation::ReturnAbsorbedSpectrumOnFields(double emin, 
  * Parameters:
  *  - double emin = minimum energy
  *  - double emax = maximum energy
- *  - vector < vector <double> > vec = vector that stores the SED
- *  - int k = vector photon field counter to be used in the ordere the fields were added
+ *  - int k = vector photon field counter to be used in the order the fields were added
  *  - size = size of the photon field integration
  * Returns:
  *  - Absorbed SED
  */
-vector< vector<double> > Radiation::ReturnAbsorbedSEDonFields(double emin, double emax, 
-                                                        vector< vector<double> > vec, vector <int> fields, vector <double> size){
+vector< vector<double> > Radiation::ReturnAbsorbedSEDonFields(double emin, double emax,
+                                                        vector <int> fields, vector <double> size){
     double tauval=0;
     double singletau;
     vector< vector<double> > tempVec;
-    tempVec = Radiation::ReturnSED(1, emin, emax, vec);  //returns the total SED
+    tempVec = Radiation::ReturnSED(1, emin, emax, diffSpec);  //returns the total SED
     // std::cout<<"tempVec size: "<<tempVec.size()<<std::endl;
     // std::cout<<"vec size: "<<vec.size()<<std::endl;
     if (!fields.size()){
@@ -2484,8 +2484,8 @@ vector< vector<double> > Radiation::ReturnAbsorbedSEDonFields(double emin, doubl
     }
     for (unsigned int j=0; j < tempVec.size(); j++){
         tauval = 0;
-        if (fields.size()!=size.size()){
-            std::cout<<"WARNING! Array of the fields and array of the sizes do not match!\n"
+        if (fields.size() > size.size()){
+            std::cout<<"WARNING! You have not set the size for one of the fields!\n"
                      <<"Returning unmodified spectrum!"<<std::endl;
             return tempVec;
         }
