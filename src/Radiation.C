@@ -2542,6 +2542,7 @@ void Radiation::SetTargetPhotonAnisotropy(int i,
     phiaccesc_zetas[i] = gsl_interp_accel_alloc();
     thetaaccesc_zetas[i] = gsl_interp_accel_alloc();
 
+
     ANISOTROPY[i] = true;
     ISOTROPIC_ELECTRONS = true;
 
