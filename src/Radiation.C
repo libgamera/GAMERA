@@ -13,6 +13,7 @@ Radiation::Radiation() {
   IC_CALCULATED = false;
   SSCSET = false;
   ANISOTROPY_CURRENT = false;
+  ISOTROPIC_ELECTRONS = false;  //If true, calculate anisotropip IC scattering with isotropic electrons
   lumtoflux = 0.;
   ldiffbrems = fdiffbrems = ldiffsynch = fdiffsynch = 0.;
   ldiffic = fdiffic = ldiffpp = fdiffpp = 0.;
@@ -397,7 +398,12 @@ double Radiation::ICEmissivityRadFieldIntegrated(double x, void *par) {
   double integratorTolerance_IC = integratorTolerance;
   int kronrod = 6; 
   if(ANISOTROPY_CURRENT == true)  {
-    IntFunc = &Radiation::ICEmissivityAnisotropic;
+    if(ISOTROPIC_ELECTRONS){
+        IntFunc = &Radiation::ICEmissivityAnisotropicIsotropicElectrons;
+    }
+    else {
+        IntFunc = &Radiation::ICEmissivityAnisotropic;
+    }
     integratorTolerance_IC = integratorTolerance*5;
     kronrod = 2;
   }
@@ -538,8 +544,8 @@ double Radiation::ICEmissivityAnisotropic(double x, void *par) {
         
             Q = interp2d_spline_eval(*TargetPhotonAngularDistrCurrent, 
                                      phi, theta, *phiaccescCurrent,*thetaaccescCurrent);
-            double eph_d = ephoton/m_e * lorentz * (1. + beta*cos_zeta);
-            if (egamma/m_e > 2. * lorentz * eph_d / (1. + 2.*eph_d)) continue;
+            double eph_d = ephoton/m_e * lorentz * (1. + beta*cos_zeta);    // M&S equ. 9
+            if (egamma/m_e > 2. * lorentz * eph_d / (1. + 2.*eph_d)) continue; // see M&S equ.9
 
             F = ICAnisotropicAuxFunc(phi,theta,ephoton,egamma,lorentz,beta,cos_zeta);
             integral += sin(theta) * d_phi * d_theta * F * Q;
@@ -559,16 +565,141 @@ double Radiation::ICEmissivityAnisotropic(double x, void *par) {
     return integrand;
 }
 
+
+
+
+
+
+
+/*----------------------------------------------------------------------------------------------------
+ *      This Block calculates the Anisotropic IC emission for isotropic electrons
+ *      with equation 20 from Aharonian & Atoyan 1981
+ *--------------------------------------------------------------------------------------------------*/
+
+double Radiation::ICEmissivityAnisotropicIsotropicElectrons(double x, void *par){
+    double ephoton = pow(10.,x);  ///< energy of the target photon
+    double *p = (double *)par;
+    double eelectron = p[0];
+    double egamma = p[1];  ///< energy of the resulting gamma photon
+    
+    double phi_min = (*TargetPhotonAngularBoundsCurrent)[0];
+    double phi_max = (*TargetPhotonAngularBoundsCurrent)[1];
+    double theta_min = (*TargetPhotonAngularBoundsCurrent)[2];
+    double theta_max = (*TargetPhotonAngularBoundsCurrent)[3];
+    
+    fPointer theta_int_function = &Radiation::ICEmissivityAnisotropicIsotropicElectronsSecondIntegral;
+    
+    
+    
+    double integralinput[6];
+    
+    integralinput[0] = ephoton;
+    integralinput[1] = egamma;
+    integralinput[2] = eelectron;
+    integralinput[3] = phi_min;
+    integralinput[4] = phi_max;
+    
+    
+    double result;
+    
+    result = Integrate(theta_int_function, integralinput, theta_min, theta_max,integratorTolerance*5.,integratorKronrodRule);
+    
+    double targetphotons = fUtils->EvalSpline(x,
+                                              *TargetPhotonLookupCurrent,
+                                              *TargetAccCurrent,__func__,__LINE__);
+
+    result = e_radius*e_radius/(2.*ephoton*eelectron*eelectron)*result*pow(10.,targetphotons)*ln10*ephoton;
+
+    
+    result *= m_e*m_e*c_speed;      // To Get the right units
+    result *= 4.*pi;                // Have to multiply with 4*pi, because otherwise the flux at a specific
+                                    // distance is wrong (see Radiation::CalculateDifferentialGammaEmission)
+    return result;
+}
+
+
+double Radiation::ICEmissivityAnisotropicIsotropicElectronsSecondIntegral(double x, void *par){
+    double theta = x;
+    double *p = (double *)par;
+    
+    double phi_min = p[3];
+    double phi_max = p[4];
+    
+    double integralinput[4];
+    
+    fPointer phi_int_function = &Radiation::ICEmissivityAnisotropicIsotropicElectronsFirstIntegral;
+    
+    integralinput[0] = p[0];
+    integralinput[1] = p[1];
+    integralinput[2] = p[2];
+    integralinput[3] = theta;
+    
+    double result;
+    result = Integrate(phi_int_function, integralinput, phi_min, phi_max,integratorTolerance*5., integratorKronrodRule);
+    
+    return (result*sin(theta));
+}
+
+double Radiation::ICEmissivityAnisotropicIsotropicElectronsFirstIntegral(double x, void *par){
+    double phi = x;
+    double *p = (double *)par;
+    
+    double ephoton = p[0];
+    double egamma = p[1];
+    double eelectron = p[2];
+    double theta = p[3];
+    
+    
+    double cos_angle = sin(theta)*cos(phi);
+
+    
+    double z = egamma/eelectron;
+    
+    double b_theta = 2.*(1.- cos_angle)*ephoton*eelectron/(m_e*m_e);
+    
+    
+    if(egamma/m_e > (b_theta/(1.+b_theta) * eelectron/m_e)) return 0.0;
+    if((10.*ephoton) > egamma) return 0.0;
+    //if( eelectron < 10.*m_e ) return 0.0;
+    
+    double oneminusz = 1.-z;
+    
+    double Q = interp2d_spline_eval(*TargetPhotonAngularDistrCurrent, 
+                                     phi, theta, *phiaccescCurrent,*thetaaccescCurrent);
+
+    double result = 1. + z*z/(2.*oneminusz) -
+                    2.*z/(b_theta*oneminusz) + 2.*z*z/(b_theta*b_theta*oneminusz*oneminusz);
+    
+
+                    
+    return (result*Q);
+    
+    
+}
+
+//--------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
 void Radiation::FillCosZetaLookup(int i) {
     vector <vector<double> > v;
+
     double phi_min = TargetPhotonAngularBounds[i][0];
     double phi_max = TargetPhotonAngularBounds[i][1];
     double theta_min = TargetPhotonAngularBounds[i][2];
     double theta_max = TargetPhotonAngularBounds[i][3];
+
     double ph_ma = phi_max+0.1*fabs(phi_max); double ph_mi = phi_min-0.1*fabs(phi_min);
     double th_ma = theta_max+0.1*fabs(theta_max); double th_mi = theta_min-0.1*fabs(theta_min);
     double d_ph = 0.25*d_phi;
     double d_th = 0.25*d_theta;
+
     for (double theta = th_mi; theta <= th_ma; theta += d_th) {
         for (double phi = ph_mi; phi <= ph_ma; phi += d_ph) {
             double sin_phi = sin(phi); double cos_phi = cos(phi);
@@ -1821,9 +1952,12 @@ void Radiation::SetTargetPhotonAnisotropy(int i, vector<double> obs_angle,
     d_phi = phi[1]-phi[0];
     d_theta = theta[1]-theta[0];
 
+    
     // now set the target field anisotropy map
     vector< vector<double> > ani = fUtils->MeshgridToTwoDVector(phi,theta,mesh);
+
     vector<double> extrema = fUtils->GetVectorMinMax(ani,2);
+
     ani_minval = extrema[0];
     ani_maxval = extrema[1];
     TargetPhotonAngularDistrs[i] = 
@@ -1834,22 +1968,35 @@ void Radiation::SetTargetPhotonAnisotropy(int i, vector<double> obs_angle,
     TargetPhotonAngularBounds[i].push_back(theta_max);
     TargetPhotonAngularBounds[i].push_back(ani_minval);
     TargetPhotonAngularBounds[i].push_back(ani_maxval);
-    
+
     TargetPhotonAngularDistrsVectors[i] = mesh;
     TargetPhotonAngularPhiVectors[i] = phi;
     TargetPhotonAngularThetaVectors[i] = theta;
-
 
     phiaccescs[i] = gsl_interp_accel_alloc();
     thetaaccescs[i] = gsl_interp_accel_alloc();
     phiaccesc_zetas[i] = gsl_interp_accel_alloc();
     thetaaccesc_zetas[i] = gsl_interp_accel_alloc();
-
-    FillCosZetaLookup(i);
+    //FillCosZetaLookup(i);
     ANISOTROPY[i] = true;
+    
+    if ( distance == 0.0 ){
+        SetDistance(1./pc_to_cm);
+        if ( !QUIETMODE ) 
+            cout << "\nRadiation::SetTargetPhotonAnisotropy: So far no distance specified. Since an anisotropic photon field was defined, not the total luminosity but the radiation in the observation direction is calculated.\n";
+    }
 
     return;
 }
+
+
+
+/* Function to set an isotropic electron distribution for the case of   *
+ * anisotropic inverse Compton scattering                               */
+void Radiation::SetElectronsIsotropic(void){
+    ISOTROPIC_ELECTRONS = true;
+}
+
 
 vector< vector<double> > Radiation::GetTargetPhotonAnisotropy(int i, 
                                      vector<double> phi, vector<double> theta) { 
