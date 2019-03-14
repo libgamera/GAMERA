@@ -36,6 +36,8 @@ class Radiation {
   bool FASTMODE_IC; ///< speed up IC calculation by not calculating emission on
                    /// isotropic target fields individually but only sum
   bool IC_CALCULATED;
+  bool ISOTROPIC_ELECTRONS; /// < Set to true for isotropic electrons in IC scattering
+
   bool FASTMODE_IC_LOSSLOOK; ///< speed up IC calculation by not calculating emission on
                    /// isotropic target fields individually but only sum
   bool IC_LOSSLOOK_CALCULATED;
@@ -47,7 +49,14 @@ class Radiation {
   double ICAnisotropicAuxFunc(double phi_p, double theta_p, double ephoton,
                               double egamma, double lorentz, double beta, 
                               double cos_zeta);
-
+  double ICEmissivityAnisotropicIsotropicElectrons(double x, void *par);
+  double ICEmissivityAnisotropicIsotropicElectronsSecondIntegral(double x, void *par);
+  double ICEmissivityAnisotropicIsotropicElectronsFirstIntegral(double x, void *par);
+  double ICEmissivityAnisotropicSecondIntegral(double x, void *par);
+  double ICEmissivityAnisotropicFirstIntegral(double x, void *par);
+  double ICEmissivityAnisotropicIsotropicElectronsAharonian(double x, void *par);
+  double ICEmissivityAnisotropicIsotropicElectronsAharonianSecondIntegral(double x, void *par);
+  double ICEmissivityAnisotropicIsotropicElectronsAharonianFirstIntegral(double x, void *par);
   double K(double nu, double x);             ///< modified Bessel function
   double K_53(double x, void *par);  ///< modified Bessel function of order 5/3
   double SynchEmissivity(double x, void *par);  ///< Synchrotron emission from a
@@ -262,6 +271,8 @@ class Radiation {
                                                          ///spectra). Input
                                                          ///format: 2D vector,
                                                          ///E(erg)-N(number)
+  void SetElectronsIsotropic(void);			///<Setting isotropic electrons variable
+						/// to true for anisotropic IC scattering
   vector<vector<double> > GetProtonVector() {
     return ProtonVector;
   }  ///< return proton spectrum return format: 2D vector

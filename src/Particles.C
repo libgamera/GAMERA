@@ -895,7 +895,20 @@ void Particles::ComputeGrid(vector<double> EnergyAxis, double startTime,
       /* slope limiters (per default enabled, toggle on/off with FASTMODE flag) */    
       if(FASTMODE == false) {
         double mm,sb;
-        mm = 0.5 * quot * (GetMinModSlope(i, ebin, i0) * ElossRate_e1 *
+        /* Uncomment the following lines if you want to use the
+         * Lax-Wendroff slope limiter. You also have to comment
+         * the code after until the curly bracket. Normally you
+         * don't want to do this, the MinMod slope limiter is better */
+        /*mm =  quot * (LaxWendroffSlope(i, ebin, i0) * ElossRate_e1 *
+                (ebin - deltaE1) -
+                             LaxWendroffSlope(i + 1, ebin, i0) * ElossRate_e2 *
+                                 (ebin - deltaE2));
+        double lw = 0.5*quot*(LaxWendroffSlope(i,ebin,i0)*ElossRate_e1*(ebin-deltaE1)-LaxWendroffSlope(i+1,ebin,i0)*ElossRate_e2*(ebin-deltaE2));
+        value -= lw;*/
+        
+        /* Comment the next lines until the curly bracket if the
+         * Lax-Wendroff slope limiter is used.                   */
+        mm =  0.5*quot * (GetMinModSlope(i, ebin, i0) * ElossRate_e1 *
                                  (ebin - deltaE1) -
                              GetMinModSlope(i + 1, ebin, i0) * ElossRate_e2 *
                                  (ebin - deltaE2));
@@ -983,6 +996,13 @@ double Particles::GetSuperBeeSlope(int i, double deltaX, int i0) {
   double sigma = MaxMod(sigma1, sigma2);
   return sigma;
 }
+
+
+double Particles::LaxWendroffSlope(int i, double deltaX, int i0) {
+  double sigma = (grid[i0][i] - grid[i0][i+1])/ deltaX;
+  return sigma;
+}
+
 
 /** MaxMod function for slope limiters */
 double Particles::MaxMod(double a, double b) {
