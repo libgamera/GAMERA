@@ -573,19 +573,15 @@ void Radiation::FillCosZetaLookup(int i) {
         for (double phi = ph_mi; phi <= ph_ma; phi += d_ph) {
             double sin_phi = sin(phi); double cos_phi = cos(phi);
             double sin_theta = sin(theta); double cos_theta = cos(theta);
-
             double cos_zeta = (cos_phi_e * cos_phi + sin_phi_e * sin_phi);
             cos_zeta = sin_theta_e * sin_theta * cos_zeta + cos_theta_e * cos_theta;
-
             fUtils->TwoDVectorPushBack(phi,theta,cos_zeta,v);
         }
     }
     double a,b,c,d;
-    cout << "v content\n"<<endl;
     for (unsigned int k=0;k<v.size();k++){for (unsigned int l=0;l<v[k].size();l++){ cout<<v[k][l]<<endl;}}
     CosZetaLookups[i] =
       fUtils->TwoDsplineFromTwoDVector(v,a,b,c,d);
-    cout << "Before return\n"<<endl;
     return;
 }
 
