@@ -689,14 +689,17 @@ double Radiation::ICEmissivityAnisotropicIsotropicElectronsFirstIntegral(double 
 
 void Radiation::FillCosZetaLookup(int i) {
     vector <vector<double> > v;
+
     double phi_min = TargetPhotonAngularBounds[i][0];
     double phi_max = TargetPhotonAngularBounds[i][1];
     double theta_min = TargetPhotonAngularBounds[i][2];
     double theta_max = TargetPhotonAngularBounds[i][3];
+
     double ph_ma = phi_max+0.1*fabs(phi_max); double ph_mi = phi_min-0.1*fabs(phi_min);
     double th_ma = theta_max+0.1*fabs(theta_max); double th_mi = theta_min-0.1*fabs(theta_min);
     double d_ph = 0.25*d_phi;
     double d_th = 0.25*d_theta;
+
     for (double theta = th_mi; theta <= th_ma; theta += d_th) {
         for (double phi = ph_mi; phi <= ph_ma; phi += d_ph) {
             double sin_phi = sin(phi); double cos_phi = cos(phi);
@@ -1950,9 +1953,12 @@ void Radiation::SetTargetPhotonAnisotropy(int i, vector<double> obs_angle,
     d_phi = phi[1]-phi[0];
     d_theta = theta[1]-theta[0];
 
+    
     // now set the target field anisotropy map
     vector< vector<double> > ani = fUtils->MeshgridToTwoDVector(phi,theta,mesh);
+
     vector<double> extrema = fUtils->GetVectorMinMax(ani,2);
+
     ani_minval = extrema[0];
     ani_maxval = extrema[1];
     TargetPhotonAngularDistrs[i] = 
@@ -1963,18 +1969,16 @@ void Radiation::SetTargetPhotonAnisotropy(int i, vector<double> obs_angle,
     TargetPhotonAngularBounds[i].push_back(theta_max);
     TargetPhotonAngularBounds[i].push_back(ani_minval);
     TargetPhotonAngularBounds[i].push_back(ani_maxval);
-    
+
     TargetPhotonAngularDistrsVectors[i] = mesh;
     TargetPhotonAngularPhiVectors[i] = phi;
     TargetPhotonAngularThetaVectors[i] = theta;
-
 
     phiaccescs[i] = gsl_interp_accel_alloc();
     thetaaccescs[i] = gsl_interp_accel_alloc();
     phiaccesc_zetas[i] = gsl_interp_accel_alloc();
     thetaaccesc_zetas[i] = gsl_interp_accel_alloc();
-
-    FillCosZetaLookup(i);
+    //FillCosZetaLookup(i);
     ANISOTROPY[i] = true;
     
     if ( distance == 0.0 ){
