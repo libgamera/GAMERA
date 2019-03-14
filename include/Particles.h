@@ -316,17 +316,17 @@ struct timespec time0, time1, time2, time3;
                                                         bool TIMESCALE);
   vector< vector<double> > GetInjectionSpectrumVector(vector<double> epoints,
                                                       double age, bool SED);
-
- public:
-  Particles();
-  ~Particles();
-  void SetMembers(double t);  ///< set the values for the class variables
-                              ///BField,eElectronMax and Ecr at a given time t
   void CalculateParticleSpectrum(string type = "electrons", int bins = 100,
                                  bool onlyprepare = false,
                                  bool dontinitialise = false); ///< fill the
                                                         ///lookup that holds
                                                     ///the particle spectrum.
+ public:
+  Particles();
+  ~Particles();
+  void SetMembers(double t);  ///< set the values for the class variables
+                              ///BField,eElectronMax and Ecr at a given time t
+
   void CalculateProtonSpectrum(int bins = 100) {CalculateParticleSpectrum("protons",bins);}
   void CalculateElectronSpectrum(int bins = 100) {CalculateParticleSpectrum("electrons",bins);}
   void CalculateProtonSpectrumInTimeInterval(double T1, double T2,
