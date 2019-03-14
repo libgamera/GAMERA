@@ -581,8 +581,11 @@ void Radiation::FillCosZetaLookup(int i) {
         }
     }
     double a,b,c,d;
+    cout << "v content\n"<<endl;
+    for (unsigned int k=0;k<v.size();k++){for (unsigned int l=0;l<v[k].size();l++){ cout<<v[k][l]<<endl;}}
     CosZetaLookups[i] =
-      fUtils->TwoDsplineFromTwoDVector(v,a,b,c,d);  
+      fUtils->TwoDsplineFromTwoDVector(v,a,b,c,d);
+    cout << "Before return\n"<<endl;
     return;
 }
 
@@ -1844,8 +1847,7 @@ void Radiation::SetTargetPhotonAnisotropy(int i, vector<double> obs_angle,
     thetaaccescs[i] = gsl_interp_accel_alloc();
     phiaccesc_zetas[i] = gsl_interp_accel_alloc();
     thetaaccesc_zetas[i] = gsl_interp_accel_alloc();
-
-    FillCosZetaLookup(i);
+    // FillCosZetaLookup(i);
     ANISOTROPY[i] = true;
 
     return;
