@@ -2443,6 +2443,7 @@ void Radiation::SetTargetPhotonAnisotropy(int i, vector<double> obs_angle,
     d_phi = phi[1]-phi[0];
     d_theta = theta[1]-theta[0];
 
+    
     // now set the target field anisotropy map
     vector< vector<double> > ani = fUtils->MeshgridToTwoDVector(phi,theta,mesh);
 
@@ -2540,7 +2541,6 @@ void Radiation::SetTargetPhotonAnisotropy(int i,
     thetaaccescs[i] = gsl_interp_accel_alloc();
     phiaccesc_zetas[i] = gsl_interp_accel_alloc();
     thetaaccesc_zetas[i] = gsl_interp_accel_alloc();
-
 
     ANISOTROPY[i] = true;
     ISOTROPIC_ELECTRONS = true;
