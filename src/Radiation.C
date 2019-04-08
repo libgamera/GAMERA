@@ -2412,8 +2412,22 @@ void Radiation::ClearPhotonFieldSize(){
           std::cout << "Already empty" <<std::endl;
       }
       sizephfield.clear();
+      return;
 }
 
+
+void Radiation::SetTargetFieldSpatialDep(vector< vector<double>> SpatialDep){
+	int size = (int)SpatialDep.size();
+	double x[SpatialDep.size()];
+	double y[SpatialDep.size()];
+	  for (unsigned int i = 0; i < SpatialDep.size(); i++) {
+	    x[i] = SpatialDep[i][0] > 0. ? SpatialDep[i][0] : 0;
+	    y[i] = SpatialDep[i][1] > 0. ? SpatialDep[i][1] : 0;
+	  }
+	SpatialDepLookup = gsl_spline_alloc(gsl_interp_linear, size);
+    gsl_spline_init(ElectronLookup, x, y, size);
+    return;
+}
 
 /**
  * Function for the gamma gamma absorption cross section

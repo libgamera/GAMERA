@@ -251,7 +251,14 @@ class Radiation {
 
   void SetSSCTargetPhotons(double R, int steps, int i);
   
-  vector <double> sizephfield; //size of the photon field in which gamma-gamma absoption has to be considered (allows diffrent size for each field)
+  vector <double> sizephfield; ///< size of the photon field in which gamma-gamma absorption has to be considered
+                               ///(allows different size for each field)
+
+  vector<vector<double> > SpatialDep;  ///< format of 'ParticleLookup',
+  gsl_spline *SpatialDepLookup; ///< Lookup for the spatial dependency for the gamma-gamma absorption
+  gsl_interp_accel *accsp; ///< gsl accelerator for the spatial lookup
+
+
 
  public:
   Radiation();                                       ///< standard constructor
@@ -533,7 +540,8 @@ class Radiation {
   
   void ClearPhotonFieldSize();
   
-  vector <double> GetSizePhotonField(); //get the photon filed
+  vector <double> GetSizePhotonField(); //get the photon field
+  void SetTargetFieldSpatialDep(vector< vector<double>> SpatialDep); ///< Set the spatial dependence for the Target field
   
   double AverageSigmaGammaGamma(double Eph1, double Eph2);             // Average cross section for isotropic and homogeneous case
   double SigmaGammaGamma(double Eph1, double Eph2, double costheta);      // Full gamma-gamma cross section
