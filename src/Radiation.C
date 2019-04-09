@@ -1991,6 +1991,77 @@ void Radiation::SetTargetPhotonAnisotropy(int i, vector<double> obs_angle,
 
 
 
+
+
+void Radiation::SetTargetPhotonAnisotropy(int i, 
+                                          vector<double> phi, vector<double> theta, 
+                                          vector< vector<double> > mesh) {
+
+    if(TargetPhotonAngularDistrs[i] != NULL || CosZetaLookups[i] != NULL) {
+        TargetPhotonAngularDistrs[i] = NULL;
+        CosZetaLookups[i] = NULL;
+        TargetPhotonAngularBounds[i].clear();
+        gsl_interp_accel_free(phiaccescs[i]);
+        gsl_interp_accel_free(thetaaccescs[i]);
+        fUtils->Clear2DVector(TargetPhotonAngularDistrsVectors[i]);
+        TargetPhotonAngularPhiVectors[i].clear();
+        TargetPhotonAngularPhiVectors[i].clear();
+    }
+
+    d_phi = phi[1]-phi[0];
+    d_theta = theta[1]-theta[0];
+
+    
+    // now set the target field anisotropy map
+    vector< vector<double> > ani = fUtils->MeshgridToTwoDVector(phi,theta,mesh);
+
+    vector<double> extrema = fUtils->GetVectorMinMax(ani,2);
+
+    ani_minval = extrema[0];
+    ani_maxval = extrema[1];
+    TargetPhotonAngularDistrs[i] = 
+      fUtils->TwoDsplineFromTwoDVector(ani,phi_min,phi_max,theta_min,theta_max);
+    TargetPhotonAngularBounds[i].push_back(phi_min);
+    TargetPhotonAngularBounds[i].push_back(phi_max);
+    TargetPhotonAngularBounds[i].push_back(theta_min);
+    TargetPhotonAngularBounds[i].push_back(theta_max);
+    TargetPhotonAngularBounds[i].push_back(ani_minval);
+    TargetPhotonAngularBounds[i].push_back(ani_maxval);
+
+    TargetPhotonAngularDistrsVectors[i] = mesh;
+    TargetPhotonAngularPhiVectors[i] = phi;
+    TargetPhotonAngularThetaVectors[i] = theta;
+
+    phiaccescs[i] = gsl_interp_accel_alloc();
+    thetaaccescs[i] = gsl_interp_accel_alloc();
+    phiaccesc_zetas[i] = gsl_interp_accel_alloc();
+    thetaaccesc_zetas[i] = gsl_interp_accel_alloc();
+
+    ANISOTROPY[i] = true;
+    ISOTROPIC_ELECTRONS = true;
+    if ( distance == 0.0 ){
+        SetDistance(1./pc_to_cm);
+        if ( !QUIETMODE ) 
+            cout << "\nRadiation::SetTargetPhotonAnisotropy: So far no distance specified. Since an anisotropic photon field was defined, not the total luminosity but the radiation in the observation direction is calculated.\n";
+    }
+
+    return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Function to set an isotropic electron distribution for the case of   *
  * anisotropic inverse Compton scattering                               */
 void Radiation::SetElectronsIsotropic(void){
