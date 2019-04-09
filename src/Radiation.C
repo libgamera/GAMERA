@@ -704,16 +704,15 @@ void Radiation::FillCosZetaLookup(int i) {
         for (double phi = ph_mi; phi <= ph_ma; phi += d_ph) {
             double sin_phi = sin(phi); double cos_phi = cos(phi);
             double sin_theta = sin(theta); double cos_theta = cos(theta);
-
             double cos_zeta = (cos_phi_e * cos_phi + sin_phi_e * sin_phi);
             cos_zeta = sin_theta_e * sin_theta * cos_zeta + cos_theta_e * cos_theta;
-
             fUtils->TwoDVectorPushBack(phi,theta,cos_zeta,v);
         }
     }
     double a,b,c,d;
+    for (unsigned int k=0;k<v.size();k++){for (unsigned int l=0;l<v[k].size();l++){ cout<<v[k][l]<<endl;}}
     CosZetaLookups[i] =
-      fUtils->TwoDsplineFromTwoDVector(v,a,b,c,d);  
+      fUtils->TwoDsplineFromTwoDVector(v,a,b,c,d);
     return;
 }
 
@@ -1973,6 +1972,7 @@ void Radiation::SetTargetPhotonAnisotropy(int i, vector<double> obs_angle,
     TargetPhotonAngularPhiVectors[i] = phi;
     TargetPhotonAngularThetaVectors[i] = theta;
 
+
     phiaccescs[i] = gsl_interp_accel_alloc();
     thetaaccescs[i] = gsl_interp_accel_alloc();
     phiaccesc_zetas[i] = gsl_interp_accel_alloc();
@@ -2032,13 +2032,17 @@ void Radiation::SetTargetPhotonAnisotropy(int i,
     TargetPhotonAngularPhiVectors[i] = phi;
     TargetPhotonAngularThetaVectors[i] = theta;
 
+
     phiaccescs[i] = gsl_interp_accel_alloc();
     thetaaccescs[i] = gsl_interp_accel_alloc();
     phiaccesc_zetas[i] = gsl_interp_accel_alloc();
     thetaaccesc_zetas[i] = gsl_interp_accel_alloc();
 
+
     ANISOTROPY[i] = true;
     ISOTROPIC_ELECTRONS = true;
+
+    
     if ( distance == 0.0 ){
         SetDistance(1./pc_to_cm);
         if ( !QUIETMODE ) 
@@ -2047,9 +2051,6 @@ void Radiation::SetTargetPhotonAnisotropy(int i,
 
     return;
 }
-
-
-
 
 
 
@@ -2431,8 +2432,9 @@ double Radiation::Integrate(fPointer f, double *x, double emin, double emax,
 }
 
 vector<vector<double> > Radiation::GetTargetPhotons(int i) {
-
-    if(i<-1 || i > (int)RADFIELDS_MAX) {
+	// Now throws error when the field has not been specified
+	// Otherwise crash without explanation given
+    if(i<-1 || i >= (int)RADFIELD_COUNTER) {
         cout<<"Radiation::GetTargetPhotons: Index "
             << i << " not valid. Exiting."<<endl;
         exit(1);}
@@ -2465,4 +2467,293 @@ vector<vector<double> > Radiation::GetTargetPhotons(int i) {
       fUtils->TwoDVectorPushBack(loge,ph,vint);
     }
     return fUtils->VectorAxisPow10(vint,-1);
+}
+
+vector <double> Radiation::GetSizePhotonField(){
+      if (!sizephfield.size()){
+          std::cout << "No size assigned to photon field!" <<std::endl;
+          return sizephfield;
+      }
+      for (unsigned int i=0; i<Radiation::sizephfield.size(); i++){
+          std::cout << "Photon field "<<i<<", size: "<< sizephfield[i]<<" cm"<<std::endl;
+      }
+      return sizephfield;
+  }
+  
+void Radiation::ClearPhotonFieldSize(){
+    if (!Radiation::sizephfield.size()){
+          std::cout << "Already empty" <<std::endl;
+      }
+      sizephfield.clear();
+}
+
+
+/**
+ * Function for the gamma gamma absorption cross section
+ * Analytical average over solid angle
+ * Eq. 5 from (Eungwanichayapant & Aharonian, 2009) https://arxiv.org/pdf/0907.2971.pdf
+ * This is approximated and good within 3%
+ * 
+ * Arguments:
+ *     - Eph1 = energy of the first photon (in ergs)
+ *     - Eph2 = energy of the second photon (in ergs)
+ * Returns:
+ *     - the averaged gamma-gamma cross section
+ * 
+ */
+double Radiation::AverageSigmaGammaGamma(double Eph1, double Eph2) {
+  double CMene = Eph1*Eph2/(m_e*m_e);
+  if (CMene < 1.){
+      //std::cout<<"ERROR, you'll get a negative number in the square root!\n"
+      //  "You are below threshold for pair production\n";
+      return 0;}
+  return 3./(2.*CMene*CMene)*sigma_T*((CMene+0.5*log(CMene)-1./6.+1./(2.*CMene))
+		  *log(sqrt(CMene)+sqrt(CMene-1))-(CMene+4./9.-1./(9.*CMene))*sqrt(1.-(1./CMene)));
+}
+
+
+/*
+ * Function for the full gamma gamma absorption cross section
+ * Eq. 1 from Vernetto&Lipari 2016 (https://arxiv.org/pdf/1608.01587v2.pdf)
+ * 
+ * Arguments:
+ *     - Eph1 = energy of the first photon (in ergs)
+ *     - Eph2 = energy of the second photon (in ergs)
+ *     - costheta= cosine of scattering angle  (in radiands)
+ * Returns:
+ *     - the gamma-gamma cross section
+ * 
+ */
+double Radiation::SigmaGammaGamma(double Eph1,double Eph2, double costheta) {
+	double CMene = 2.*Eph1*Eph2*(1-costheta)/(4.*m_e*m_e);  // Centre Mass energy
+	if (CMene < 1) {
+		//below threshold for pair production return a cross section = 0
+		return 0;
+	}
+	double beta = sqrt(1.-1./CMene);  //auxiliary variable
+	return sigma_T*3./16.*(1.-beta*beta)*(2.*beta*(beta*beta-2.)+(3.-beta*beta*beta*beta)*log((1+beta)/(1-beta)));
+}
+
+
+double Radiation::ComputeAbsCoeff(double Egamma, int target) {
+	//SetICLookups(target); // Load the right lookup for the photon field
+	//automatically sets the correct lookup
+	vector< vector<double> > targets = Radiation::GetTargetPhotons(target);
+    vector< vector<double> > TempVect;
+    double product=0;
+    double integrand = 0;
+    double integrand2 = 0;
+    double integral=0;
+    double Q=0; //the scaling factor due to the angular distribution of target field
+    if ( ANISOTROPY_CURRENT ){
+        double cos_zeta = 0.;
+        // because the photon direction is aligned with the x-axis by definition
+        // hard coded so that it is not influenced by the direction of the electron beam
+        double cos_kappa = 0.; double sin_kappa = 1.;
+        double phi_min = (*TargetPhotonAngularBoundsCurrent)[0];
+        double phi_max = (*TargetPhotonAngularBoundsCurrent)[1];
+        double theta_min = (*TargetPhotonAngularBoundsCurrent)[2];
+        double theta_max = (*TargetPhotonAngularBoundsCurrent)[3];
+        for (unsigned int j=0;j<targets.size();j++){
+            integrand2 = 0;
+        	for (double phi = phi_min; phi <= phi_max; phi += d_phi) {
+        		integrand = 0;
+        		for (double theta = theta_min; theta <= theta_max; theta += d_theta) {
+        			// simplified cos_zeta: the photon direction is always along x-axis
+        			cos_zeta = -cos_kappa *cos(theta) + sin_kappa * sin(theta) * cos(phi);
+
+        			Q = interp2d_spline_eval(*TargetPhotonAngularDistrCurrent,
+        			                                     phi, theta, *phiaccescCurrent,*thetaaccescCurrent);
+        			product = Radiation::SigmaGammaGamma(Egamma,targets[j][0],cos_zeta)*targets[j][1]*Q*(1-cos_zeta);
+        			integrand += product*sin(theta)*d_theta;
+        		}
+                integrand2 += integrand*d_phi;
+        	}
+        	fUtils->TwoDVectorPushBack(targets[j][0],integrand2,TempVect);
+        }
+    }
+    else {
+    	for (unsigned int j=0;j<targets.size();j++){
+    	        product = Radiation::AverageSigmaGammaGamma(Egamma,targets[j][0])*targets[j][1];
+    	        fUtils->TwoDVectorPushBack(targets[j][0],product,TempVect);
+    	    }
+    }
+    integral = fUtils->Integrate(TempVect,targets[0][0],targets[targets.size()-1][0]);  //Make this process smarter
+    //TEST:
+    //cout << Egamma << '\t' << integral << endl;
+    return integral;  // returned value is in units of 1/cm
+}
+
+
+/*
+ * Functions for the calculation of the optical depth
+ * Takes as argument just the energy f the gamma ray photon and computes the optical
+ * depth for the chosen target photon
+ * !!! CAREFUL UNDER CONSTRUCTION !!!
+ * !!! FOR THE MOMENT TEST ONLY WITH HOMOGENEOUS FIELDS!!!
+ * !!! Not implemented yet a spatial variability of the target photons
+ * only an angular one
+ */
+double Radiation::ComputeOptDepth(double Egamma, int target, double phsize){
+	double tauval,integral=0;
+    integral = ComputeAbsCoeff(Egamma,target);
+    tauval= (integral*phsize); //assumes a homogeneous field. Would need another integral if the density varies
+    return tauval;
+}
+
+
+/*
+ * Functions for the calculation of the optical depth
+ * Takes as argument just the energy f the gamma ray photon and computes the optical
+ * depth for the sum of the target photons that are present
+ * At the moment it works only for isotropic and homogeneous case
+ * !!! CAREFUL UNDER CONSTRUCTION !!!
+ * !!! FOR THE MOMENT TEST ONLY WITH ISOTROPIC AND HOMOGENEOUS FIELDS!!!
+ */
+double Radiation::ComputeOptDepthIsotropic(double Egamma, int target, double phsize){
+    //cout<<"This function is under construction, it works only with homogeneous and isotropic fields"<<endl;
+    double tauval=0;
+    vector< vector<double> > targets = Radiation::GetTargetPhotons(target);
+    vector< vector<double> > TempVect;
+    double product=0;
+    double integral=0;
+    // std::cout << "target size: " <<targets.size() << std::endl;
+    for (unsigned int j=0;j<targets.size();j++){
+        product = Radiation::AverageSigmaGammaGamma(Egamma,targets[j][0])*targets[j][1];
+        // cout<<"product in ComputeOptDepth: "<<product<<endl;
+        fUtils->TwoDVectorPushBack(targets[j][0],product,TempVect);
+    }
+    integral = fUtils->Integrate(TempVect,targets[0][0],targets[targets.size()-1][0]);  //Make this process smarter
+    tauval= (integral*phsize); //assumes a homogeneous field. Would need another integral if the density varies
+    return tauval;
+}
+
+
+/*
+ * Return the total absorbed differential spectrum (for the moment using the homogeneous and isotropic case)
+ * This is a wrapper around the function ReturnSED to which it was added the distance
+ * parameter needed to compute the right absorption and the target photon field for the absorption
+ * 
+ * Parameters:
+ *  - double emin = minimum energy
+ *  - double emax = maximum energy
+ *  - int k = vector photon field counter to be used in the order the fields were added
+ *  - size = size of the photon field integration
+ * Returns:
+ *  - Absorbed SED
+ */
+vector< vector<double> > Radiation::ReturnAbsorbedSpectrumOnFields(double emin, double emax, 
+														vector <int> fields,
+														vector <double> size) {
+    double tauval=0;
+    double singletau;
+    vector< vector<double> > tempVec;
+    //returns the total Differential Photon Spectrum
+    tempVec = Radiation::ReturnDifferentialPhotonSpectrum(1, emin, emax, diffSpec);
+    if (!fields.size()){
+        std::cout<<"You have not added any photon field\n"
+                 <<"Add photon fields before proceeding with this step\n"
+                 <<"Returning unmodified spectrum!"<<std::endl;
+        return tempVec;
+    }
+    for (unsigned int j=0; j < tempVec.size(); j++){
+        tauval = 0;
+        if (fields.size() > size.size()){
+            std::cout<<"WARNING! You have not set the size for one of the fields!\n"
+                     <<"Returning unmodified spectrum!"<<std::endl;
+            return tempVec;
+        }
+        for (unsigned int k=0; k < fields.size(); k++){
+        	// energy units of tempVec is already in ergs
+            singletau = Radiation::ComputeOptDepth(tempVec[j][0],fields[k],size[k]);
+            tauval += singletau;
+        }
+        tempVec[j][1] = tempVec[j][1]*exp(-tauval);
+    }
+    return tempVec;
+}
+
+
+/*
+ * Return the total absorbed SED (for the moment using the homogenous and isotropic case)
+ * This is a wrapper around the function ReturnSED to which it was added the distance
+ * parameter needed to compute the right absoption and the target photon field for the absorption
+ * 
+ * Parameters:
+ *  - double emin = minimum energy
+ *  - double emax = maximum energy
+ *  - int k = vector photon field counter to be used in the order the fields were added
+ *  - size = size of the photon field integration
+ * Returns:
+ *  - Absorbed SED
+ */
+vector< vector<double> > Radiation::ReturnAbsorbedSEDonFields(double emin, double emax,
+                                                        vector <int> fields, vector <double> size){
+    double tauval=0;
+    double singletau;
+    vector< vector<double> > tempVec;
+    tempVec = Radiation::ReturnSED(1, emin, emax, diffSpec);  //returns the total SED
+    // std::cout<<"tempVec size: "<<tempVec.size()<<std::endl;
+    // std::cout<<"vec size: "<<vec.size()<<std::endl;
+    if (!fields.size()){
+        std::cout<<"You have not added any photon field\n"
+                 <<"Add photon fields before proceeding with this step\n"
+                 <<"Returning unmodified SED!"<<std::endl;
+        return tempVec;
+    }
+    for (unsigned int j=0; j < tempVec.size(); j++){
+        tauval = 0;
+        if (fields.size() > size.size()){
+            std::cout<<"WARNING! You have not set the size for one of the fields!\n"
+                     <<"Returning unmodified spectrum!"<<std::endl;
+            return tempVec;
+        }
+        for (unsigned int k=0; k < fields.size(); k++){
+        	// need to convert the energy of the photon field beacuse it is returned in TeV
+            singletau = Radiation::ComputeOptDepth(tempVec[j][0]*TeV_to_erg,fields[k],size[k]);
+            tauval += singletau;
+            // std::cout << "Field: "<< fields[k]<< "\tTauval: " <<singletau << std::endl;
+        }
+        tempVec[j][1] = tempVec[j][1]*exp(-tauval);
+    }
+    return tempVec;
+}
+
+/*TODO: Add functions to compute the integrated flux (or energy flux) in the absorption case.
+*      In principle possible to have it for the single components, does not
+*      seem a useful feature.
+*      For this reason the functions does not require the index of the component
+*      because it's hard coded to be 1: the total differential flux
+*/     
+double Radiation::ReturnAbsorbedIntergratedFlux(double emin, double emax, bool ENERGYFLUX, vector <int> fields, vector <double > size){
+    if (!diffSpec.size()){
+        cout << "Radiation::GetIntegratedFlux: Differential spectrum "
+            "vector empty. Fill it via "
+            "Radiation::CalculateDifferentialSpectrum() first! Returning zero."
+            << endl;
+        return 0.;
+    }
+    double tauval=0;
+    double singletau=0;
+    if (!emin) emin = diffSpec[0][0];
+    if (!emax) emax = diffSpec[diffSpec.size()-1][0];
+    vector <vector <double> > tempVec;
+    double e, dNdE, val;
+    for (unsigned int j = 0; j < diffSpec.size(); j++) {
+        tauval =0;
+        e = diffSpec[j][0];
+        for (unsigned int k=0; k < fields.size(); k++){
+            singletau = Radiation::ComputeOptDepth(e,fields[k],size[k]);
+            tauval += singletau;
+        }
+        dNdE = diffSpec[j][1]*exp(-tauval);
+        if (dNdE <= 0. ) continue;
+        if (ENERGYFLUX == false) fUtils->TwoDVectorPushBack(e,dNdE,tempVec);
+        else fUtils->TwoDVectorPushBack(e,e*dNdE,tempVec);
+    }
+    if (tempVec.size() < 3) return 0.;
+    fUtils->ToggleQuietMode();
+    val = fUtils->Integrate(tempVec,emin,emax);
+    fUtils->ToggleQuietMode();
+    return val;
 }
