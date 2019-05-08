@@ -106,7 +106,8 @@ Supported gamma-ray production mechanisms:
   - using the full Klein-Nishina cross-section [(see e.g. Blumenthal & Gould 1970)](http://adsabs.harvard.edu/abs/1970RvMP...42..237B)
   - allowing for arbitrary target field spectra
   - supporting synchrotron-self-Compton(SSC) emission [(using Atoyan & Aharonian 1996)](http://adsabs.harvard.edu/abs/1996MNRAS.278..525A)
-  - anisotropic radiation fields [(following Moskalenko & Strong 2000)](http://iopscience.iop.org/article/10.1086/308138/meta)
+  - anisotropic radiation fields for anisotropic electrons [(following Moskalenko & Strong 2000)](http://iopscience.iop.org/article/10.1086/308138/meta)
+  - anisotropic radiation field for isotropic electrons [(following Aharonian & Atoyan 1981)](https://ui.adsabs.harvard.edu/abs/1981Ap%26SS..79..321A/abstract)
 
 ### for Hadrons
 
