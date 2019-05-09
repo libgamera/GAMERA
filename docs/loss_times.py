@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 import sys
-sys.path.append(YOUR_GAMERA_LIB)
+sys.path.append('../GAMERA/lib/')
 import gappa as gp
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,6 +24,7 @@ if __name__ == "__main__":
     brems = np.array(fp.GetCoolingTimeScale(e,"bremsstrahlung"))
     ad = np.array(fp.GetCoolingTimeScale(e,"adiabatic_losses"))
     synch = np.array(fp.GetCoolingTimeScale(e,"synchrotron"))
+    ioniz = np.array(fp.GetCoolingTimeScale(e,"ionization"))
 
     # make a plot
     f = plt.figure(figsize=(5,5))
@@ -31,6 +32,7 @@ if __name__ == "__main__":
     plt.loglog(ic[:,0],ic[:,1],c="orange",label="IC")
     plt.loglog(ad[:,0],ad[:,1],c="green",label="adiab.")
     plt.loglog(synch[:,0],synch[:,1],c="blue",label="synch")
+    plt.loglog(ioniz[:,0],ioniz[:,1],c="yellow",label="ionization")
     plt.loglog(total[:,0],total[:,1],c="black",lw=1,ls="--",label="sum")
     plt.xlabel("energy (erg)")
     plt.ylabel("cooling time scale (yrs)")
