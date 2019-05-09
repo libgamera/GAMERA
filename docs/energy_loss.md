@@ -33,6 +33,7 @@ fp.GetCoolingTimeScale(e,"inverse_compton")
 fp.GetCoolingTimeScale(e,"bremsstrahlung")
 fp.GetCoolingTimeScale(e,"adiabatic_losses")
 fp.GetCoolingTimeScale(e,"synchrotron")
+fp.GetCoolingTimeScale(e,"ionization")
 ```
 
 This will give you the cooling time scales at `t=age`. If you are interested
