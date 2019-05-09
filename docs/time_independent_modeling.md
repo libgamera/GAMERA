@@ -44,7 +44,7 @@ fp.AddThermalTargetPhotons(temperature,energy_density) #in K, erg/cm^3.
 >There is a [dedicated tutorial](inverse_compton.md) on how to set radiation fields for the IC process.
  
 >Note 2:
->Environmental parameters determine the cooling rate of electrons. Check [this tutorial](energy_losses.md) on how to visualise this information.
+>Environmental parameters determine the cooling rate of electrons. Check [this tutorial](energy_loss.md) on how to visualise this information.
 
 
 ## Step 4: Set the source age
