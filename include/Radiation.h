@@ -251,7 +251,16 @@ class Radiation {
 
   void SetSSCTargetPhotons(double R, int steps, int i);
   
-  vector <double> sizephfield; //size of the photon field in which gamma-gamma absoption has to be considered (allows diffrent size for each field)
+  vector <double> sizephfield; ///< size of the photon field in which gamma-gamma absorption has to be considered
+                               ///(allows different size for each field)
+
+  vector < vector <vector<double> > > SpatialDep;  ///< Triple vector to store the spatial dependency for each photon field
+  //gsl_spline *SpatialDepLookup; ///< Lookup for the spatial dependency for the gamma-gamma absorption
+  //gsl_interp_accel *accsp; ///< gsl accelerator for the spatial lookup
+  bool SPATIALDEP_CURRENT; ///< boolean state if the absorption target field has a homogeneous density or not
+  vector <bool> SPATIALDEP; ///< vector of booleans to state which photon field has a spatial dependency
+
+
 
  public:
   Radiation();                                       ///< standard constructor
@@ -535,8 +544,9 @@ class Radiation {
   
   void ClearPhotonFieldSize();
   
-  vector <double> GetSizePhotonField(); //get the photon filed
-  
+  vector <double> GetSizePhotonField(); //get the photon field
+  void SetTargetFieldSpatialDep(int i, vector< vector<double> > SpatialDep); ///< Set the spatial dependence for the Target field
+  vector< vector<double> > GetTargetFieldSPatialDep(int i);  ///< Return the spatial dependency of the photon field (space in cm)
   double AverageSigmaGammaGamma(double Eph1, double Eph2);             // Average cross section for isotropic and homogeneous case
   double SigmaGammaGamma(double Eph1, double Eph2, double costheta);      // Full gamma-gamma cross section
   double ComputeAbsCoeff(double Egamma, int target);  //Auxiliary function to compute only the absorption coefficient, no spatial integration

@@ -14,6 +14,7 @@ Radiation::Radiation() {
   SSCSET = false;
   ANISOTROPY_CURRENT = false;
   ISOTROPIC_ELECTRONS = false;  //If true, calculate anisotropip IC scattering with isotropic electrons
+  SPATIALDEP_CURRENT = false;
   lumtoflux = 0.;
   ldiffbrems = fdiffbrems = ldiffsynch = fdiffsynch = 0.;
   ldiffic = fdiffic = ldiffpp = fdiffpp = 0.;
@@ -50,10 +51,13 @@ Radiation::Radiation() {
   TargetPhotonAngularDistrsVectors.resize(RADFIELDS_MAX);
   TargetPhotonAngularPhiVectors.resize(RADFIELDS_MAX);
   TargetPhotonAngularThetaVectors.resize(RADFIELDS_MAX);
+  SpatialDep.resize(RADFIELDS_MAX);
+  SPATIALDEP.resize(RADFIELDS_MAX);
   for(unsigned int i=0;i<RADFIELDS_MAX;i++) {
     fdiffics[i] = NAN;
     TargetPhotonEdensities[i] = 0.;
     ANISOTROPY[i] = false;
+    SPATIALDEP[i] = false;
     TargetPhotonLookups[i] = NULL;
     ICLossLookups[i] = NULL;
     ICLossLookupAccs[i] = NULL;
@@ -85,6 +89,8 @@ Radiation::Radiation() {
   ICLossLookupAccAll = gsl_interp_accel_alloc();
   loraccesc = gsl_interp_accel_alloc();
   edaccesc = gsl_interp_accel_alloc();
+  /// for spatial dependency of the gamma-gamma absorption target field
+  // accsp = gsl_interp_accel_alloc();
 }
 
 /**
@@ -2469,6 +2475,11 @@ vector<vector<double> > Radiation::GetTargetPhotons(int i) {
     return fUtils->VectorAxisPow10(vint,-1);
 }
 
+
+/*
+ * Returns the size for all the photon fields introduced.
+ * Photon fields sizes returned in units of cm
+ */
 vector <double> Radiation::GetSizePhotonField(){
       if (!sizephfield.size()){
           std::cout << "No size assigned to photon field!" <<std::endl;
@@ -2479,14 +2490,53 @@ vector <double> Radiation::GetSizePhotonField(){
       }
       return sizephfield;
   }
-  
+
+/*
+ * Clears the vector of photon field sizes
+ */
 void Radiation::ClearPhotonFieldSize(){
     if (!Radiation::sizephfield.size()){
           std::cout << "Already empty" <<std::endl;
       }
       sizephfield.clear();
+      return;
 }
 
+/*
+ * Sets the spatial dependency of the photon field along the line of sigth.
+ * The user provides a vector of tuples composed of 2 elements:
+ *  * distance from source along the line of sight (in parsecs)
+ *  * fractional value of the intensity value given when setting the photon field
+ *  Arguments:
+ *      - int i = index of the target photon index
+ *      - vector < vector<double> > SpDp = Vector of the spatial dependency
+ *  The function sets the boolean variable of the spatial dependency to true
+ *  So to properly compute the integral of the absorption coefficient along
+ *  the line of sight.
+ *  The function converts the spatial quantity given in parsec to a quantity in cm
+ */
+void Radiation::SetTargetFieldSpatialDep(int i,vector< vector<double> > SpDp){
+	SPATIALDEP_CURRENT = true;
+	SPATIALDEP[i] = true;
+    vector <vector<double> > tempVec;
+    tempVec = SpDp;
+	for (unsigned int j = 0;j<SpDp.size();j++){
+	    tempVec[j][0] = SpDp[j][0]*pc_to_cm;
+	}
+    SpatialDep[i] = tempVec;
+	return;
+}
+
+
+/*
+ *  Return the spatial dependence of the target field i
+ *  The return gives the spatial size in cm
+ *  If the target does not exist or has no spatial dependency
+ *  returns an empty vector
+*/
+vector< vector<double> > Radiation::GetTargetFieldSPatialDep(int i){
+	return SpatialDep[i];
+}
 
 /**
  * Function for the gamma gamma absorption cross section
@@ -2535,9 +2585,18 @@ double Radiation::SigmaGammaGamma(double Eph1,double Eph2, double costheta) {
 }
 
 
+/*
+ * Computation of the absorption coefficient.
+ * The function takes into account the angular anisotropy of the photon field
+ * through interpolation of the mesh grid of the angular dependencies.
+ * Angular integration is a simple rectangular integration.
+ * Arguments:
+ *      - double Egamma = energy of the gamma-ray photon (in erg)
+ *      - int target = target photon field to compute the absorption
+ * Returns:
+ *      - Absorption coefficient. Units of 1/cm
+ */
 double Radiation::ComputeAbsCoeff(double Egamma, int target) {
-	//SetICLookups(target); // Load the right lookup for the photon field
-	//automatically sets the correct lookup
 	vector< vector<double> > targets = Radiation::GetTargetPhotons(target);
     vector< vector<double> > TempVect;
     double product=0;
@@ -2579,8 +2638,6 @@ double Radiation::ComputeAbsCoeff(double Egamma, int target) {
     	    }
     }
     integral = fUtils->Integrate(TempVect,targets[0][0],targets[targets.size()-1][0]);  //Make this process smarter
-    //TEST:
-    //cout << Egamma << '\t' << integral << endl;
     return integral;  // returned value is in units of 1/cm
 }
 
@@ -2595,9 +2652,21 @@ double Radiation::ComputeAbsCoeff(double Egamma, int target) {
  * only an angular one
  */
 double Radiation::ComputeOptDepth(double Egamma, int target, double phsize){
-	double tauval,integral=0;
+	double tauval = 0;
+    double integral =0;
     integral = ComputeAbsCoeff(Egamma,target);
-    tauval= (integral*phsize); //assumes a homogeneous field. Would need another integral if the density varies
+    if (SPATIALDEP[target]) {
+    	// integrate over the real spatial dependence along the line of sight
+    	// TEST: Use the simple multiplication (then will use the lookup)
+    	// Assume a fixed step in the definition of the spatial range
+    	double deltar = SpatialDep[target][1][0]-SpatialDep[target][0][0];
+    	for (unsigned int i=0;i<SpatialDep[target].size();i++){
+    	    tauval += (integral*SpatialDep[target][i][1]*deltar);
+    	}
+    }
+    else {
+            tauval = (integral*phsize); //assumes a homogeneous field. Would need another integral if the density varies
+        }
     return tauval;
 }
 
@@ -2607,8 +2676,6 @@ double Radiation::ComputeOptDepth(double Egamma, int target, double phsize){
  * Takes as argument just the energy f the gamma ray photon and computes the optical
  * depth for the sum of the target photons that are present
  * At the moment it works only for isotropic and homogeneous case
- * !!! CAREFUL UNDER CONSTRUCTION !!!
- * !!! FOR THE MOMENT TEST ONLY WITH ISOTROPIC AND HOMOGENEOUS FIELDS!!!
  */
 double Radiation::ComputeOptDepthIsotropic(double Egamma, int target, double phsize){
     //cout<<"This function is under construction, it works only with homogeneous and isotropic fields"<<endl;
