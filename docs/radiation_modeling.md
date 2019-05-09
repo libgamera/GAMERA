@@ -72,7 +72,7 @@ fr.CalculateDifferentialPhotonSpectrum(e)
 Step 7: Get the spectra
 -----------------------
 There are different formats you can now extract:
-- differential photon spectra (`dN/dE`, units: `1 / erg / cm^2 / s`)
+- differential photon spectra (`dN/dE` vs `E`, units: `1 / erg / cm^2 / s` vs `erg`)
 ```
 fr.GetTotalSpectrum()  # sum of all components
 fr.GetPPSpectrum() # inelastic proton scattering
@@ -81,17 +81,17 @@ fr.GetBremsstrahlungSpectrum() # bremsstrahlung
 fr.GetICSpectrum() # inverse-compton scattering
 ```
    
-- SEDs (`E^2*dN/dE`, units: `erg / cm^2 / s`) 
+- SEDs (`E^2*dN/dE` vs `E`, units: `erg / cm^2 / s` vs `TeV`) 
 ```
 fr.Get*SED() # * denotes the radiation mechanisms above!
 ```
 - integrated flux (`int_e^inf dE dN/dE`, units: `1 / cm^2 / s`)
 ```
-fr.GetIntegral*Flux(emin,emax) # emin, emax in TeV!
+fr.GetIntegral*Flux(emin,emax) # emin, emax in erg!
 ```
 - integrated energy flux (`int_e^inf dE E*dN/dE`, units: `erg / cm^2 / s`)
 ```
-fr.GetIntegral*EnergyFlux(emin,emax) # emin, emax in TeV!
+fr.GetIntegral*EnergyFlux(emin,emax) # emin, emax in erg!
 ```
 
 The so-retrieved spectra are in the format of 2D-vectors (C++) or 2D-lists (python). 
@@ -100,13 +100,13 @@ Important Notes
 ---------------
 - Specifying a distance value is optional. If set to non-zero value, photon flux from particle population at that distance will be calculated. Otherwise, the luminosity is calculated. 
 
-- For integral fluxes to be precise, you should make sure that your spectrum's 
+<!-- - OUTDATED: For integral fluxes to be precise, you should make sure that your spectrum's 
 binning is fine enough (you can change that by adjusting `bins` in the above step `[a]`). 
-You can get an idea of the required binning [here](binning.md). 
+You can get an idea of the required binning [here](binning.md). -->
 
 - You only have to set the parameters relevant to the radiation process you want to calculate. For example, if you are only interested in Bremsstrahlung, you don't have to specify the B-Field
 
-- For the IC process there are several ways to set up the radiation fields, including for SSC modelling or anisotropy, [see here](inverse_compton.md)
+- For the IC process there are several ways to set up the radiation fields, including for SSC modelling or anisotropy, [see here](inverse_compton.md) \(Currently in construction\)
 
 - There are different hadronic interaction models that you can choose from. See [here](hadronic_models.md) how to do it!
 
