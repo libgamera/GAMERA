@@ -3,10 +3,10 @@
 Download
 ========
 
-GAMERA is available on [github](https://github.com/JoachimHahn/GAMERA).
-There, you can download a [zip archive](https://github.com/JoachimHahn/GAMERA/archive/master.zip) with the source code or clone it with git via 
+GAMERA is available on [github](https://github.com/libgamera/GAMERA).
+There, you can download a [zip archive](https://github.com/libgamera/GAMERA/archive/master.zip) with the source code or clone it with git via 
 ```
-$ git clone https://github.com/JoachimHahn/GAMERA.git
+$ git clone https://github.com/libgamera/GAMERA.git
 ```
 
 Installation
