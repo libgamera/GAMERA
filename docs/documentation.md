@@ -53,7 +53,7 @@ The `Particles` class is designed to solve the following transport equation
 ![dgl](DGL.png)
  
 where _Q(E,t)_, the source term, is the spectrum of particles injected into a system, 
-_b=b(E,t)_ is the energy loss rate of these particles, _t_esc_=_t_esc(E,t)_ is the time 
+_b=b(E,t)_ is the energy loss rate of these particles, _t<sub>esc</sub>_=_t<sub>esc</sub>(E,t)_ is the time 
 scale on which particle escape the system and _N_=_N(E,t)_ is the total resulting 
 particle spectrum in the system at a time _t_. 
 
@@ -62,7 +62,7 @@ where the pulsar steadily injects a spectrum of accelerated electrons / positron
 the surrounding medium, where these particles suffer Synchrotron- and other losses 
 over time.
  
-If the energy loss rate and escape time scale are constant in time, $$b=b(E)$$ and  $$t_{esc}=t_{esc}(E)$$, 
+If the energy loss rate and escape time scale are constant in time, _b=b(E)_ and  _t<sub>esc</sub>=t<sub>esc</sub>(E)_, 
 the differential equation can be solved analytically or semi-analytically. 
 An excellent discussion of this solution can be found in [Atoyan & Aharonian 1999](http://adsabs.harvard.edu/abs/1999MNRAS.302..253A).
  
@@ -79,7 +79,7 @@ energy losses are constant in time, the semi-analytical method can be applied,
 which in certain circumstances can be much faster. However, the latter does presently
 not support the treatment of particle escape.
 
-The output of this class, namely particle spectra $$N(E,t)$$, is in the right format 
+The output of this class, namely particle spectra _N(E,t)_, is in the right format 
 to be directly used in the `Radiation` class, so that radiation spectra can be calculated easily. 
 
 
@@ -153,7 +153,7 @@ in the astrophysical context.
 - times are in years, except for particle escape time scales
 - lengths are in parsecs
 - when retrieving SEDs, for convenience the units are
-  - erg / s / cm^2 vs TeV for radiation flux SEDs
+  - erg / s / cm<sup>2</sup> vs TeV for radiation flux SEDs
   - erg / s vs. TeV for luminosity SEDs (i.e. when the distance to the source is not set)
   - erg vs. TeV for particle SEDs
 
@@ -166,9 +166,9 @@ For instance, if the unit of the particle spectrum is only differential in energ
 i.e. 1/erg, the output radiation spectra will have the unit of a flux if a 
 source distance is specified (see below) or differential photon count per energy and time if not. 
 
-On the other hand, if the input unit is differential also in volume, i.e. 1/erg/cm^3, 
+On the other hand, if the input unit is differential also in volume, i.e. 1/erg/cm<sup>3</sup>, 
 then also the output radiation spectrum will be. Therefore, if no distance is 
-specified in this case, a volume photon emissivity will be calculated, i.e. d³N/dEdVdt. 
+specified in this case, a volume photon emissivity will be calculated, i.e. d<sup>3</sup>N/dEdVdt. 
 
 Libraries
 =========
