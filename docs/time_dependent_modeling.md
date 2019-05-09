@@ -41,10 +41,10 @@ For energy-dependent parameters, the method of applying time-dependency
 is different:
 - If the particle escape time scale depends both on energy and time, also the spectral shape can be made to change with time, see [here](particle_escape.md).
 
-- If not only the injection spectrum normalisation (luminosity) but also its spectral shape, this can be modeled [following these steps](tt.md) 
+- If not only the injection spectrum normalisation (luminosity) but also its spectral shape, this can be modeled [following these steps](tt.md). \(Under Construction\)
 
 - Currently time-dependent radiation fields are only possible via an iterative
-approach. There is an [extra tutorial on iterating](iteration.md).
+approach. There is an [extra tutorial on iterating](iteration.md). \(Under Construction\)
 
 A working script can be found [here](particles_time_dep.py), which will output the following plots: 
 
