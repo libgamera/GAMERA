@@ -91,7 +91,7 @@ be explored with the previous methods.
 
 ### Isotropic distribution of electrons
 
-This is a rather recent addition to the code. In case we have a isotropic distribution of electrons, we can follow the same steps as before additionally stating that our electrons are isotropically distributed:
+This is a rather recent addition to the code. In case we have an isotropic distribution of electrons, we can follow the same steps as before additionally stating that our electrons are isotropically distributed:
 ```python
 fr.SetElectronsIsotropic()
 fr.SetTargetPhotonAnisotropy(target, angles_e, phi, theta, distr)
