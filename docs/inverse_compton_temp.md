@@ -21,7 +21,7 @@ fr.AddArbitraryTargetPhotons(photon_array)
 ```
 where `photon_array` is an array of tuples \(E,photon_density\) in units of `erg` vs `erg^-1 cm^-3`.
 
-A further possibility is to import a photon field from file with:
+A further possibility is to import a photon field from a file with:
 ```python
 fr.ImportTargetPhotonsFromFile(filename)
 ```
@@ -32,7 +32,7 @@ Case 1: Isotropic photon fields
 -------------------------------
 
 Let's start with the simple case of a thermal photon field. In principle we can add multiple photon fields. In the default
-case, when asking for the Inverse Compton component of the gamma ray sectrum, it will be computed on the sum of the
+case, when asking for the Inverse Compton component of the gamma ray spectrum, it will be computed on the sum of the
 photon fields. If we explicitily want the component associated to the i-th field, the code will recompute the component
 associated only to that field:
 ```python
@@ -48,7 +48,7 @@ Case 2: Anisotropic photon fields
 ---------------------------------
 
 In this section we will go through the steps to consider anisotropic fields.
-The first step is to give give an angular dependency to the target photon field. There are here 2 possibilities:
+The first step is to give an angular dependency to the target photon field. There are 2 possibilities:
  1. anisotropic beam of electrons
  2. isotropic distribution of electrons
 
