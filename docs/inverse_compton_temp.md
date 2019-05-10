@@ -57,7 +57,7 @@ Before going into the details of the 2 cases, here is the geometry used in GAMER
 In the following figure it is illustrated how the angles are defined together with the direction of the electrons \(in case 1.\)
 and the direction of the line of sight \(always along the x-axis\)
 
-![geometry](anisotropy_geometry_v2.png) 
+![geometry](anisotropy_geometry_v3.png) 
 
 so the phi angle goes from 0 to 2\*pi and the theta angle from 0 to pi.
 
