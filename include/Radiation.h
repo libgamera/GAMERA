@@ -418,7 +418,7 @@ class Radiation {
   vector<vector<double> > GetSynchrotronSpectrum(double emin = 0.,
                                                  double emax = 0.) {
     return ReturnDifferentialPhotonSpectrum(5, emin, emax, diffSpec);
-  }  ///< return Bremsstrahlung spectrum
+  }  ///< return Synchrotron spectrum
   vector<vector<double> > GetTotalSED(double emin = 0., double emax = 0.) {
     return ReturnSED(1, emin, emax, diffSpec);
   }  ///< return total SED
@@ -427,7 +427,7 @@ class Radiation {
   }  ///< return pi0 decay SED
   vector<vector<double> > GetICSED(double emin = 0., double emax = 0.) {
     return ReturnSED(3, emin, emax, diffSpec);
-  }  ///< return pi0 decay SED
+  }  ///< return Inverse Compton SED
   vector<vector<double> > GetBremsstrahlungSED(double emin = 0.,
                                                double emax = 0.) {
     return ReturnSED(4, emin, emax, diffSpec);
@@ -435,11 +435,11 @@ class Radiation {
   vector<vector<double> > GetSynchrotronSED(double emin = 0.,
                                             double emax = 0.) {
     return ReturnSED(5, emin, emax, diffSpec);
-  }  ///< return Bremsstrahlung sed
+  }  ///< return Synchrotron SED
 
 
-  vector<vector<double> > GetICSpectrum(unsigned int i, double emin = 0., double emax = 0.);
-  vector<vector<double> > GetICSED(unsigned int i, double emin = 0., double emax = 0.); ///< return pi0 decay spectrum
+  vector<vector<double> > GetICSpectrum(unsigned int i, double emin = 0., double emax = 0.); ///< return Inverse Compton spectrum
+  vector<vector<double> > GetICSED(unsigned int i, double emin = 0., double emax = 0.); ///< return Inverse Compton SED
 
 
   Radiation *Clone() { return this; }
@@ -517,5 +517,6 @@ class Radiation {
   void SumTargetFieldsIsotropic(int bins=1000);
   unsigned int GetTargetFieldCount(){return RADFIELD_COUNTER;}
   void SetICFastMode() {FASTMODE_IC = true;}
+  void UnsetICFastMode() {FASTMODE_IC = false;}
 };
 #endif
