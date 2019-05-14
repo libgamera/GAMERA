@@ -159,8 +159,8 @@ struct timespec time0, time1, time2, time3;
   double bremsl_eef;   ///< constant used in 'EnergyLossRate'. Used for speed
                        ///optimisation
 
-  double synchl,icl,adl,bremsl; ///< loss rates for synchrotron, IC, adiabatic exp.
-                                /// and bremsstrahlug.
+  double synchl,icl,adl,bremsl,ionization,ppcol; ///< loss rates for synchrotron, IC, adiabatic exp.,
+                                                 /// bremsstrahlug and ionizarion and pp collision for protons
 
   bool logarithmicCRLumLookupTimeBins;  ///< boolean indicating that time steps
                                         ///in CRLumLookup are logarithmic. In
@@ -338,7 +338,6 @@ struct timespec time0, time1, time2, time3;
   void CalculateElectronSpectrumInTimeInterval(int bins = 100) {CalculateParticleSpectrum("electrons",bins);}
   void SetType(string type);
   double EnergyLossRate(double E);  ///< total energy loss rate of particles
-
   void SetAge(double age) {
     Age = age;
     SetMembers(Age);

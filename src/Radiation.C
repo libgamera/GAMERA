@@ -181,8 +181,8 @@ void Radiation::CalculateDifferentialGammaEmission(double e, int particletype) {
             if(TargetPhotonLookups[i]!=NULL) {
                 if(FASTMODE_IC == true && TargetPhotonAngularDistrs[i] == NULL) 
                     continue;
-                if(FASTMODE_IC == false && TargetPhotonAngularDistrs[i] != NULL) 
-                    continue;
+                //if(FASTMODE_IC == false && TargetPhotonAngularDistrs[i] != NULL) 
+                //    continue;
                 SetICLookups(i);
                 ldiffic = DifferentialEmissionComponent(e, p);
                 fdiffics[i] = lumtoflux * ldiffic;
@@ -1225,7 +1225,7 @@ double Radiation::MeanMultiplicity(double Tp) {
   else if (PiModel == 2 || PiModel == 3)
     TpTrans = 100.;
   else
-    cout << "Radiation::MeanMultiplicity: WTF, specify supported "
+    cout << "Radiation::MeanMultiplicity: please, specify supported "
             "parameterisation!" << endl;
   /* Eq. 6 */
   if (Tp < 5.) {
