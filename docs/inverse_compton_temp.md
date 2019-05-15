@@ -44,7 +44,9 @@ photon fields.
 fr.GetICSpectrum()  # IC spectrum for the sum of all the target photon fields.
 fr.GetICSED()       # IC SED for the sum of all the target photon fields.
 ```
-If instead we want to know what is the contribution of each target field to the total Inverse Compton spectrum, we have to esplicitely specify that before filling the differential photon spectrum. This is done by calling the function `fr.UnsetICFastMode()` that forces GAMERA to compute all the single Inverse Compton components.
+If instead we want to know what is the contribution of each target field to the total Inverse Compton spectrum, we have to
+esplicitely specify that before filling the differential photon spectrum. This is done by calling the function
+`fr.UnsetICFastMode()` that forces GAMERA to compute all the single Inverse Compton components.
 ```python
 fr.UnsetICFastMode()
 fr.CalculateDifferentialPhotonSpectrum(e)
@@ -99,14 +101,27 @@ An example script that produces the plot below can be found [here](anisotropic_I
 
 ### Isotropic distribution of electrons
 
-This is a rather recent addition to the code. In case we have an isotropic distribution of electrons, we can follow the same steps as before additionally stating that our electrons are isotropically distributed:
+This is a rather recent addition to the code. In case we have an isotropic distribution of electrons, we can follow the same
+steps as before additionally stating that our electrons are isotropically distributed:
 ```python
 fr.SetElectronsIsotropic()
 fr.SetTargetPhotonAnisotropy(target, angles_e, phi, theta, distr)
 ```
-the first function will set an inner GAMERA variable so that the code will use an isotropic distribution of electrons. The second function is exactly the same as before, but the variable `angles_e` will not actually be used in the calculations.
+the first function will set an inner GAMERA variable so that the code will use an isotropic distribution of electrons.
+The second function is exactly the same as before, but the variable `angles_e` will not actually be used in the calculations.
+**WARNING:** currently this implementation is rather slow, so don't panic if your code takes long time to run. We will try to
+speed up the computations.
 
 At the moment the code does not allow to switch back from an isotropic distribution of electrons to an anisotropic one. We would recommend not to mix the two options and use only one of the possibilities at a time. Also in this case holds the same procedure to access single components of the Inverse Compton spectrum. The script linked above has also the line to set up the isotropic electrons needed for this case.
+
+Synchrotron Self Compton process
+--------------------------------
+
+The Synchrotron Self Compton (abbreviated as _SSC_) process is that radiation process in which the same particle distribution first produces
+synchrotron photons and then uses this photon field as target for Inverse Compton scattering.
+
+In GAMERA, the SSC component is obtained via an iterative approach in which the equilibrium solution between the losses in the
+Synchrotron and IC channel is found.
 
 [(one page up)](tutorials_main.md)
 
