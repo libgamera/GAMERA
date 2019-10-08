@@ -528,26 +528,29 @@ class Radiation {
   void SumTargetFieldsIsotropic(int bins=1000);
   unsigned int GetTargetFieldCount(){return RADFIELD_COUNTER;}
   void SetICFastMode() {FASTMODE_IC = true;}
+  void UnsetICFastMode() {FASTMODE_IC = false;}
   
   /* 
    * Adding functions for the gamma-gamma absorption calculations
    */
-  void SetSizePhotonField(vector <double> size){
+  //void SetSizePhotonField(vector <double> size){
     // if not inizialized, the default value is 1 pc
     // size to be given in [pc]
-      for (unsigned int i=0;i<size.size();i++){
-          sizephfield.push_back(size[i] * pc_to_cm);
-      }
-  } // Sets the size of the photon field for which gamma-gamma absorption has to be considered
+   //   for (unsigned int i=0;i<size.size();i++){
+   //       sizephfield.push_back(size[i] * pc_to_cm);
+   //   }
+  //} // Sets the size of the photon field for which gamma-gamma absorption has to be considered
+  void SetSizePhotonField(int i, double size);
   
   void ClearPhotonFieldSize();
   
   vector <double> GetSizePhotonField(); //get the photon field
+  double GetSizePhotonField(int i);
   void SetTargetFieldSpatialDep(int i, vector< vector<double> > SpatialDep); ///< Set the spatial dependence for the Target field
   vector< vector<double> > GetTargetFieldSPatialDep(int i);  ///< Return the spatial dependency of the photon field (space in cm)
   double AverageSigmaGammaGamma(double Eph1, double Eph2);             // Average cross section for isotropic and homogeneous case
   double SigmaGammaGamma(double Eph1, double Eph2, double costheta);      // Full gamma-gamma cross section
-  double ComputeAbsCoeff(double Egamma, int target);  //Auxiliary function to compute only the absorption coefficient, no spatial integration
+  double ComputeAbsCoeff(double Egamma, int target);  ///< Auxiliary function to compute only the absorption coefficient, no spatial integration
   double ComputeOptDepth(double Egamma, int target, double phsize);
   double ComputeOptDepthIsotropic(double Egamma, int target, double phsize); // Computation of the optical depth parameter isotropic only
   vector< vector<double> > ReturnAbsorbedSEDonFields(double emin, double emax, 
