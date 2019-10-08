@@ -47,6 +47,7 @@ fr.GetICSED()       # IC SED for the sum of all the target photon fields.
 If instead we want to know what is the contribution of each target field to the total Inverse Compton spectrum, we have to
 esplicitely specify that before filling the differential photon spectrum. This is done by calling the function
 `fr.UnsetICFastMode()` that forces GAMERA to compute all the single Inverse Compton components.
+
 ```python
 fr.UnsetICFastMode()
 fr.CalculateDifferentialPhotonSpectrum(e)
@@ -54,6 +55,8 @@ fr.CalculateDifferentialPhotonSpectrum(e)
 fr.GetICSpectrum(0)  # IC spectrum for the target photon field 0
 fr.GetICSED(0)       # IC SED for the target photon field 0
 ```
+
+
 Case 2: Anisotropic photon fields
 ---------------------------------
 
@@ -72,12 +75,14 @@ and the direction of the line of sight \(always along the x-axis\)
 so the phi angle goes from 0 to 2\*pi and the theta angle from 0 to pi.
 
 If you work in python, the angular dependency can be implemented by filling a `numpy.meshgrid`:
+
 ```python
 phi = np.linspace(1.,1.5,20)          # angles from 1 to 1.5 radiants divided in 20 bins
 theta = np.linspace(0.5,1.,20)        # angles from 0.5 to 1 radiant divided in 20 bins
 ph_m, th_m = np.meshgrid(phi, theta)  # defining the meshgrid
 distr = fill_grid(ph_m,th_m)          # fill the meshgrid with a user defined function
 ```
+
 The filled grid `distr` needs to be normalized over solid angle by the user \(see the example scripts\).
 Once we have the angular distribution of the photon field, we can complete the geometry of the system.
 
@@ -96,7 +101,7 @@ be explored with the previous methods (including the unsetting of the fast mode 
 
 An example script that produces the plot below can be found [here](anisotropic_IC_scattering.py)
 
-<img src=anisotropy_distribution.png height="400"> <img src=SED_iso_aniso.png height="400">
+<img src="anisotropy_distribution.png" height="400"> <img src="SED_iso_aniso.png" height="400">
 
 
 ### Isotropic distribution of electrons
