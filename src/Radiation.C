@@ -757,8 +757,8 @@ double Radiation::ICEmissivityAnisotropicIsotropicElectronsFirstIntegral(double 
     return (result*Q);
 }
 
-//--------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------
 
 
 /**
@@ -1521,6 +1521,165 @@ void Radiation::GetBParams(double Tp, double &b1, double &b2, double &b3) {
   if (Tp > 50. && PiModel == 1) b1 = 9.06, b2 = 0.3795, b3 = 1.105e-2;
   return;
 }
+
+
+
+
+
+/*---- Calculation of neutrinos following Kelner et al 2006 --- */
+
+/*  Integrates and returns the result
+*   Input:  - Energy of the neutrinos (or electrons) in [erg]
+            - leptontype: '0' for electrons and '1' for muons
+    Output: - Flux
+*/
+double Radiation::CalculateNeutrinoFlux(double energy, int leptontype) {
+    double integral = 0;
+    const double ethresh = 1.22e-3 * TeV_to_erg;  // Threshold for pion production
+    double emax = ProtonVector[ProtonVector.size() - 1][0];
+    double emin = energy;
+    if (emin < ethresh) emin = ethresh; // Don't start integration below the threshold
+    if (emin >= emax) return 0.; // We can not produce neutrinos more energetic than the protons
+    
+
+    // Contains the energy of the muon
+    double integralinput[1];
+    integralinput[0] = energy;
+    
+    
+    // Convert everything to logarithmic values
+    double emin_log = log10(emin);
+    double emax_log = log10(emax);
+    
+    // Set the function for the spectrum to electron neutrinos (or electrons) or muon neutrinos
+    if (leptontype == 0) {
+        fPointer Fnu = &Radiation::NeutrinoFlux1;
+        integral = Integrate(Fnu, integralinput, emin_log, emax_log,integratorTolerance*5., integratorKronrodRule);
+    }
+    
+    else if (leptontype == 1) {
+        double emin_new = energy/0.427;
+        if(emin_new > emin) emin_log = log10(emin_new);
+        if(emax_log < emin_log) return 0.0;
+        fPointer Fnu = &Radiation::NeutrinoFlux2;
+        // integrate the function
+        integral = Integrate(Fnu, integralinput, emin_log, emax_log,integratorTolerance*5., integratorKronrodRule);
+    }
+    else {
+        cout << "Radiation::CalculateNeutrinoFlux: No valid lepton type specified.";
+        return 0.;
+    }
+    double constant = c_speed * n;  // n is the ambient density of protons in [cm-3]
+    double result = constant * integral * ln10;
+    return result;
+}
+
+
+double Radiation::NeutrinoFlux1(double energy_proton, void *par) {
+    double *p = (double *)par;
+    double energy_nu = p[0];
+    
+    double logprotons = fUtils->EvalSpline(energy_proton,ProtonLookup,
+                                      acc,__func__,__LINE__);
+    double Jp = pow(10, logprotons);   // Proton flux, Jp in Kelner 2006
+    
+    // Convert the energy to the real value again
+    energy_proton = pow(10, energy_proton);
+    double sigma = InelasticPPXSectionKaf(energy_proton);   // calculate the cross section
+    double Fnu = Felectron(energy_nu, energy_proton);
+    
+    double result = sigma*Jp*Fnu;
+    return result;
+}
+
+
+double Radiation::NeutrinoFlux2(double energy_proton, void *par) {
+    double *p = (double *)par;
+    double energy_nu = p[0];
+    
+    
+    double logprotons = fUtils->EvalSpline(energy_proton,ProtonLookup,
+                                      acc,__func__,__LINE__);
+    double Jp = pow(10, logprotons);   // Proton flux, Jp in Kelner 2006
+    energy_proton = pow(10, energy_proton);
+    double sigma = InelasticPPXSectionKaf(energy_proton);   // calculate the cross section
+    double Fnu = Fnumu(energy_nu, energy_proton);
+    
+    double result = sigma*Jp*Fnu;
+    return result;
+}
+
+
+// function for electrons and muon neutrinos from pion and muon decay
+// Equations 62 to 65 from Kelner et al 2006
+/*  Input:
+        - Energy of electrons or neutrinos, where the flux should
+            be calculated in [erg]
+        - Energy of protons in [erg]
+    Output:
+        - Flux
+*/
+double Radiation::Felectron(double Ee_erg, double Ep_erg) 
+{
+
+  double Ee = Ee_erg*erg_to_TeV;    // Elektron/neutrino energy in TeV
+  double Ep = Ep_erg*erg_to_TeV;
+
+
+  double x = Ee/Ep; 
+  //if (x<1.e-4) return 0.0; /// hack
+
+  if (Ep < 0.04) Ep = 0.04; // HACK!!!!!!!!
+
+  double L = log(Ep);
+  double L2 = L*L; 
+  double B = 1.0/(69.5 + 2.65*L + 0.3*L2);
+  double beta = 1.0/pow(0.201 + 0.062*L+0.00042*L2,0.25); 
+  double kappa = (0.279 + 0.141*L + 0.0172*L2)/(0.3 + pow(2.3 + L,2));
+  
+  double xb = pow(x,beta);
+
+  double p1 = B;
+  double p2 = pow(1+kappa*log(x)*log(x),3)/(x*(1 + 0.3/xb));
+  double p3 = pow(-log(x),5);
+  
+  return p1*p2*p3;
+}
+
+// Eq. 66 - 69 in Kelner
+double Radiation::Fnumu(double Enu_erg, double Ep_erg)
+{
+
+  double Ep = Ep_erg*erg_to_TeV;
+  double Enu = Enu_erg*erg_to_TeV;
+
+  double x = Enu/Ep;
+  double y = x/0.427;
+  //if (x > 0.427) return 0.0;
+
+  double L = log(Ep);
+  double L2 = L * L; 
+  double B = 1.75 + 0.204 * L + 0.010 * L2;
+  double beta = 1.0/(1.67 + 0.111 * L + 0.0038*L2); 
+  double kappa = 1.07 - 0.086*L + 0.002*L2;
+
+  double yb = pow(y,beta);
+
+  double p1 = B*log(y)/y;
+  double p2 = pow((1-yb)/(1+kappa*yb*(1-yb)),4);
+  double p3 = (1/log(y)) 
+    - (4*beta*yb/(1-yb)) 
+    - 4*kappa*beta*yb*(1-2*yb)/(1+kappa*yb*(1-yb));
+  
+  return p1*p2*p3;
+} 
+
+
+
+
+
+
+
 
 /* ----         END OF RADIATION MODELS        ----  */
 
