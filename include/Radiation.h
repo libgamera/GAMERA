@@ -62,6 +62,11 @@ class Radiation {
   double NeutrinoFlux1(double energy_proton, void *par);
   double Felectron(double Ee_erg, double Ep_erg);
   double Fnumu(double Enu_erg, double Ep_erg);
+<<<<<<< HEAD
+=======
+  //double CalculateNeutrinoFlux(double energy, int leptontype);
+  
+>>>>>>> eef84c8 (Completed implementation of neutrino calculation)
   double K(double nu, double x);             ///< modified Bessel function
   double K_53(double x, void *par);          ///< modified Bessel function of order 5/3
   double SynchEmissivity(double x, void *par);  ///< Synchrotron Emissivity
@@ -128,9 +133,17 @@ class Radiation {
   vector<vector<double> > *TargetPhotonVectorCurrent;  ///< Pointer to the current target field in use
   /**\brief Target photon field for Synchrotron Self Compton mechanism */
   vector<vector<double> > SSCTargetPhotons;  ///< 2D-vector object holding the
-                                             ///< SSC target photon spectrum  {
-                                             ///< E(erg) - Edens(erg cm^-3) }
-  double n;  ///< ambient density for Bremsstrahlung and inelastic p-p emission mechanisms (cm^-3)
+                                             ///SSC target photon spectrum  {
+                                             ///E(erg) - Edens(erg cm^-3) }
+  vector<vector<double> > MuonNeutrinoVector; /// Vector containing muon neutrinos from
+                                            /// first decay of charged pions
+  vector<vector<double> > ElectronNeutrinoVector; /// Vector containing electron/muon Neutrinos from
+                                            /// decay of muon into an electron after decay of 
+                                            /// charged pions
+  vector<vector<double> > TotalNeutrinoVector; /// Vector containing the total neutrino emission from
+                                            /// pp-collisions.
+  double n;  ///< ambient density for Bremsstrahlung and inelastic p-p emission
+             ///mechanisms (cm^-3)
   double fdiffbrems;  ///< differential flux at specified energy E (in
                       ///< Radiation::CalculateDifferentialGammaEmission) due to
                       ///< Bremsstrahlung
@@ -299,6 +312,7 @@ class Radiation {
 
 
  public:
+<<<<<<< HEAD
   /// standard constructor
   Radiation();
   /// standard destructor
@@ -330,6 +344,28 @@ class Radiation {
   /// Calculates the nucleus-nucleus reaction cross section
   double NuNuXSection(double ProjMass, double TargetMass);
   /// return proton spectrum return format: 2D vector
+=======
+  Radiation();                                       ///< standard constructor
+  ~Radiation();                                     ///< standard destructor
+  double CalculateNeutrinoFlux(double energy, int leptontype);
+  void SetProtons(vector<vector<double> > PROTONS);  ///< set the proton
+                                                     ///spectrum (e.g.
+                                                     ///calculated in the
+                                                     ///"Particles" class, but
+                                                     ///also arbitrary spectra).
+                                                     ///Input format: 2D vector,
+                                                     ///E(erg)-N(number)
+  void SetElectrons(vector<vector<double> > ELECTRONS);  ///< set the electron
+                                                         ///spectrum (e.g.
+                                                         ///calculated in the
+                                                         ///"Particles" class,
+                                                         ///but also arbitrary
+                                                         ///spectra). Input
+                                                         ///format: 2D vector,
+                                                         ///E(erg)-N(number)
+  void SetElectronsIsotropic(void);			///<Setting isotropic electrons variable
+						/// to true for anisotropic IC scattering
+>>>>>>> eef84c8 (Completed implementation of neutrino calculation)
   vector<vector<double> > GetProtonVector() {
     return ProtonVector;
   }
@@ -350,20 +386,30 @@ class Radiation {
                                            double emax = 0.);
   /// Calculate differential photon spectrum at given \a points
   void CalculateDifferentialPhotonSpectrum(vector<double> points);
+<<<<<<< HEAD
   /**
    * Return the differential photon spectra
    * dN/dE [number of photons/(erg*s*cm^2)] vs E [erg] in a 2D-Vector
    * */
+=======
+  void CalculateNeutrinoSpectrum(vector<double> points);
+>>>>>>> eef84c8 (Completed implementation of neutrino calculation)
   vector<vector<double> > ReturnDifferentialPhotonSpectrum(int i,
                                                            double emin,
                                                            double emax,
                                                   vector< vector<double> > vec);
   /// returns SED for emission component \a i as 2D vector
   vector<vector<double> > ReturnSED(int i, double emin,double emax, 
+<<<<<<< HEAD
                                       vector< vector<double> > vec);
 
   double CalculateNeutrinoFlux(double energy, int leptontype);
   /// set the source B-Field (G)
+=======
+                                      vector< vector<double> > vec);  ///< returns SED for
+                                                        ///emission component i
+                                                        ///as 2D vector
+>>>>>>> eef84c8 (Completed implementation of neutrino calculation)
   void SetBField(double BFIELD) {
     BField = BFIELD;
   }
@@ -518,6 +564,7 @@ class Radiation {
     return ReturnSED(6, emin, emax, diffSpec);
   }  ///< Return total pi0 decay (from more hadronic species) SED between emin and emax (in TeV)
 
+<<<<<<< HEAD
   /// Returns IC spectrum for target field \a i
   vector<vector<double> > GetICSpectrum(unsigned int i, double emin = 0., double emax = 0.);
   /// Returns IC SED for target field \a i
@@ -527,6 +574,12 @@ class Radiation {
   vector<vector<double> > GetHadronSpectrum(unsigned int i, double emin = 0., double emax = 0.);
   /// Return pi0 decay SED from hadronic component i
   vector<vector<double> > GetHadronSED(unsigned int i, double emin = 0., double emax = 0.);
+=======
+  vector<vector<double> > GetNeutrinoSpectrum(void); /// Return the neutrino spectrum
+  vector<vector<double> > GetNeutrinoSED(void); /// Return the neutrino SED
+  vector<vector<double> > GetNeutrinoSpectrumMuon(void);
+  vector<vector<double> > GetNeutrinoSpectrumElectron(void);
+>>>>>>> eef84c8 (Completed implementation of neutrino calculation)
   
   
   Radiation *Clone() { return this; }
