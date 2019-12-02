@@ -1579,6 +1579,12 @@ void Radiation::CalculateNeutrinoSpectrum(vector<double> points){
     Output: - Flux
 */
 double Radiation::CalculateNeutrinoFlux(double energy, int leptontype) {
+    if (!n) {
+        if(!QUIETMODE) cout << "Radiation::CalculateNeutrinoFlux: "
+                             "No ambient density value set "
+                             "for p-p scattering. Returning zero value." << endl;
+        return 0.;
+    }
     double integral = 0;
     const double ethresh = 1.22e-3 * TeV_to_erg;  // Threshold for pion production
     double emax = ProtonVector[ProtonVector.size() - 1][0];
@@ -3299,7 +3305,7 @@ vector<vector<double> > Radiation::GetNeutrinoSED(void){
  int size = (int)TotalNeutrinoVector.size();
  vector<vector<double> > tempVec;
  if (size == 0){
-     cout << "Radiation::GetNeutrinoSpectrum: No neutrinos calculated. "
+     cout << "Radiation::GetNeutrinoSED: No neutrinos calculated. "
             "Returning empty vector. Fill it via "
             "Radiation::CalculateNeutrinoSpectrum() first!" << endl;
     return tempVec;
@@ -3320,23 +3326,62 @@ vector<vector<double> > Radiation::GetNeutrinoSED(void){
 vector<vector<double> > Radiation::GetNeutrinoSpectrumMuon(void){
  int size = (int)MuonNeutrinoVector.size();
  if (size == 0){
-     cout << "Radiation::GetNeutrinoSpectrum: No neutrinos calculated. "
+     cout << "Radiation::GetNeutrinoSpectrumMuon: No neutrinos calculated. "
             "Returning empty vector. Fill it via "
             "Radiation::CalculateNeutrinoSpectrum() first!" << endl;
  }
  return MuonNeutrinoVector;   
 }
 
+vector<vector<double> > Radiation::GetNeutrinoSEDMuon(void){
+ int size = (int)MuonNeutrinoVector.size();
+ vector<vector<double> > tempVec;
+ if (size == 0){
+     cout << "Radiation::GetNeutrinoSEDMuon: No neutrinos calculated. "
+            "Returning empty vector. Fill it via "
+            "Radiation::CalculateNeutrinoSpectrum() first!" << endl;
+    return tempVec;
+ }
+ double E, E_TeV, flux, sed_value;
+ for ( int i = 0; i < size; i++ ){
+     E = MuonNeutrinoVector[i][0];
+     flux = MuonNeutrinoVector[i][1];
+     E_TeV = E*erg_to_TeV;
+     sed_value = flux*E*E;
+     fUtils->TwoDVectorPushBack(E_TeV, sed_value, tempVec);
+ }
+ return tempVec;
+}
+
+
 vector<vector<double> > Radiation::GetNeutrinoSpectrumElectron(void){
  int size = (int)ElectronNeutrinoVector.size();
  if (size == 0){
-     cout << "Radiation::GetNeutrinoSpectrum: No neutrinos calculated. "
+     cout << "Radiation::GetNeutrinoSpectrumElectron: No neutrinos calculated. "
             "Returning empty vector. Fill it via "
             "Radiation::CalculateNeutrinoSpectrum() first!" << endl;
  }
  return ElectronNeutrinoVector;   
 }
-
+vector<vector<double> > Radiation::GetNeutrinoSEDElectron(void){
+ int size = (int)ElectronNeutrinoVector.size();
+ vector<vector<double> > tempVec;
+ if (size == 0){
+     cout << "Radiation::GetNeutrinoSEDElectron: No neutrinos calculated. "
+            "Returning empty vector. Fill it via "
+            "Radiation::CalculateNeutrinoSpectrum() first!" << endl;
+    return tempVec;
+ }
+ double E, E_TeV, flux, sed_value;
+ for ( int i = 0; i < size; i++ ){
+     E = ElectronNeutrinoVector[i][0];
+     flux = ElectronNeutrinoVector[i][1];
+     E_TeV = E*erg_to_TeV;
+     sed_value = flux*E*E;
+     fUtils->TwoDVectorPushBack(E_TeV, sed_value, tempVec);
+ }
+ return tempVec;
+}
 
 
 
