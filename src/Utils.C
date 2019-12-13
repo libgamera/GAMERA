@@ -964,4 +964,3 @@ double Utils::LogisticsFunction(double z, double h, double w) {
   double val  = (1. + exp(-2.*(fabs(z)-h)/w));
   return 1./val;
 }
-

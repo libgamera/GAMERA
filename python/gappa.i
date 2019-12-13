@@ -14,6 +14,7 @@
 %include "std_iostream.i"
 namespace std
 {
+%template(OneIVector) vector<int>;
 %template(OneDVector) vector<double>;
 %template(TwoDVector) vector< vector<double> >;
 }
