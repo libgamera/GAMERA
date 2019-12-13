@@ -13,6 +13,7 @@ How to ...
 - [pick your hadronic interaction model](hadronic_models.md)
 - [take particle escape into account](particle_escape.md)
 - [display the particle energy loss scales](energy_loss.md)
+- [Take into account gammagamma absorption](gammagamma_absorption.md)
 
 
 Please note:
