@@ -30,26 +30,26 @@ class Radiation {
 
   
   double lumtoflux;///< Conversion of differential photon rate to flux
-                   /// [ph/(erg*s) -> ph/(erg*s*cm^2)]
+                   ///< [ph/(erg*s) -> ph/(erg*s*cm^2)]
   bool LUMFLAG; ///< this boolean is set to TRUE if no distance is given. 
-                /// In this case, the luminosity is calculated.
+                ///< In this case, the luminosity is calculated.
   bool FASTMODE_IC; ///< speed up IC calculation by not calculating emission on
-                   /// isotropic target fields individually but only sum
+                   ///< isotropic target fields individually but only sum
   bool IC_CALCULATED;
-  bool ISOTROPIC_ELECTRONS; /// < Set to true for isotropic electrons in IC scattering
+  bool ISOTROPIC_ELECTRONS; ///< Set to true for isotropic electrons in IC scattering
 
   bool FASTMODE_IC_LOSSLOOK; ///< speed up IC calculation by not calculating emission on
-                   /// isotropic target fields individually but only sum
-  bool IC_LOSSLOOK_CALCULATED;
-  double DifferentialEmissionComponent(double e, void *par);
-  double GreyBody(double ephoton, double temp, double edens);
-  double ICEmissivityRadFieldIntegrated(double x, void *par);
-  double ICEmissivity(double x, void *par);
-  double ICEmissivityAnisotropic(double x, void *par);
+                             ///< isotropic target fields individually but only sum
+  bool IC_LOSSLOOK_CALCULATED;  ///< Store if the Inverse Compton Lookup has been computed
+  double DifferentialEmissionComponent(double e, void *par); ///< Calculates the differential photon rate
+  double GreyBody(double ephoton, double temp, double edens); ///< Thermal grey body
+  double ICEmissivityRadFieldIntegrated(double x, void *par); ///< IC emission from electrons integrated over the target photon population.
+  double ICEmissivity(double x, void *par);           ///< Emissivity from IC scattering
+  double ICEmissivityAnisotropic(double x, void *par);  ///< Anisitropic IC emissivity
   double ICAnisotropicAuxFunc(double phi_p, double theta_p, double ephoton,
                               double egamma, double lorentz, double beta, 
-                              double cos_zeta);
-  double ICEmissivityAnisotropicIsotropicElectrons(double x, void *par);
+                              double cos_zeta); ///< Auxiliary function for IC scattering 
+  double ICEmissivityAnisotropicIsotropicElectrons(double x, void *par);  ///< Anisotropic IC emissivity with isotropic electrons
   double ICEmissivityAnisotropicIsotropicElectronsSecondIntegral(double x, void *par);
   double ICEmissivityAnisotropicIsotropicElectronsFirstIntegral(double x, void *par);
   double ICEmissivityAnisotropicSecondIntegral(double x, void *par);
@@ -58,198 +58,203 @@ class Radiation {
   double ICEmissivityAnisotropicIsotropicElectronsAharonianSecondIntegral(double x, void *par);
   double ICEmissivityAnisotropicIsotropicElectronsAharonianFirstIntegral(double x, void *par);
   double K(double nu, double x);             ///< modified Bessel function
-  double K_53(double x, void *par);  ///< modified Bessel function of order 5/3
-  double SynchEmissivity(double x, void *par);  ///< Synchrotron emission from a
-                                                ///number of electrons with
-                                                ///energy eElectron at frequency
-                                                ///nu
+  double K_53(double x, void *par);          ///< modified Bessel function of order 5/3
+  double SynchEmissivity(double x, void *par);  ///< Synchrotron Emissivity
   double SynchEmissivityExplicit(double e,
-                                 void *par);  ///< Synchrotron emission from a
-                                              ///number of electrons with energy
-                                              ///eElectron at frequency nu,
-                                              ///following Blumenthal&Gould
+                                 void *par);  ///< Synchrotron Emissivity with pitch angle
   double SynchAngle;///< inclination angle between electrons spiraling along the B-Field and
-                    /// observer as used in SynchEmissivityExplicit(). Default: 90degrees.
-  double BremsEmissivity(double x, void *par);  ///< Bremsstrahlung emissivity,
-                                                ///e-p and e-e, follwing From
-                                                ///Baring 1999, ApJ, 513,
-                                                ///311-338, Eq. (27)
+                    ///< observer as used in Radiation::SynchEmissivityExplicit. DEFAULT: 90degrees.
+  double BremsEmissivity(double x, void *par);  ///< Bremsstrahlung emissivity for e-p and e-e    
   double A(double g,
            double e);  ///< Equation (A4) from Baring 1999, ApJ, 513, 311-338
   double sigma1(double g, double e);   ///< Equation (A2) from Baring 1999, ApJ,
-                                       ///513, 311-338
+                                       ///< 513, 311-338
   double sigma2(double g, double e);   ///< Equation (A3) from Baring 1999, ApJ,
-                                       ///513, 311-338
+                                       ///< 513, 311-338
   double sigmaNR(double g, double e);  ///< Equation (A5) from Baring 1999, ApJ,
-                                       ///513, 311-338
+                                       ///< 513, 311-338
   double Fbr(double x, double g);  ///< Equations (A6,A7) from Baring 1999, ApJ,
-                                   ///513, 311-338
-  double ParticleSpectrum(double E);  ///< particle spectrum emitting the
-                                      ///emission. This is basically reading in
-                                      ///a 2D vector(i.e. 'ParticleLookup')
-                                      ///holding E-N(particles).
-  double GetIntegratedFlux(int i, double emin, double emax, bool ENERGYFLUX=false); /// integrate spectrum i between emin and emax. if ENERGYFLUX == true, the integrated energy flux instead of the integrated flux will be calculated.
-  vector<vector<double> > ParticleVector;  ///< 2D vector holding the particle
-                                           ///spectrum that emits the radiation.
-                                           ///Format: E(erg)-N(number). This can
-                                           ///be either electrons or protons,
-                                           ///and is set to either species
-                                           ///automatically depending on the
-                                           ///radiation mechanism that needs to
-                                           ///be calculated.
-  vector<vector<double> > ElectronVector;  ///< format of 'ParticleLookup',
-                                           ///holding the electron spectrum
-  vector<vector<double> > ProtonVector;    ///< format of 'ParticleLookup',
-                                           ///holding the proton spectrum
-  vector<vector<double> > TargetPhotonVectorSumAll;  ///< 2D format
-                                               ///E(erg)-dN/dE(differential
-                                               ///number) vector holding the
-                                               ///total target field for IC
-                                               ///scattering. This is the sum of
-                                               ///individual components
-                                               ///specified by public functions
-  vector<vector<double> > TargetPhotonVectorSumIso;///< same as TargetPhotonVectorSum
-                                                  /// but only summed over isotropic fields
-  vector<vector<double> > *TargetPhotonVectorCurrent;  ///< 2D format
-                                                  ///E(erg)-dN/dE(differential
-                                                  ///number) vector holding the
-                                                  ///total target field for IC
-                                                  ///scattering. This is the sum
-                                                  ///of individual components
-                                                  ///specified by public
-                                                  ///functions
+                                   ///< 513, 311-338
+  double ParticleSpectrum(double E);  ///< DEPRECATED: particle spectrum emitting the
+                                      ///< emission. This is basically reading in
+                                      ///< a 2D vector(i.e. 'ParticleLookup')
+                                      ///< holding E-N(particles).
+  double GetIntegratedFlux(int i, double emin, double emax, bool ENERGYFLUX=false); ///< Integrate spectrum "i" between emin and emax. if ENERGYFLUX == true, the integrated energy flux instead of the integrated flux will be calculated.
+  
+  /** \brief 2D vector holding the particle spectrum that emits the radiation. */
+  vector<vector<double> > ParticleVector;  ///< Format: E (erg)-dN/dE (number). This can
+                                           ///< be either electrons or protons,
+                                           ///< and is set to either species
+                                           ///< automatically depending on the
+                                           ///< radiation mechanism that needs to
+                                           ///< be calculated.
+  vector<vector<double> > ElectronVector;  ///< format of Radiation::ParticleVector, holding the electron spectrum
+  vector<vector<double> > ProtonVector;    ///< format of Radiation::ParticleVector, holding the proton spectrum
+  /**\brief 2D Vector holding the total target field for IC scattering*/
+  vector<vector<double> > TargetPhotonVectorSumAll;  ///< Format: 
+                                               ///< E(erg)-dN/dE(differential
+                                               ///< number). The vector holds the
+                                               ///< total target field for IC
+                                               ///< scattering. This is the sum of
+                                               ///< individual components
+                                               ///< specified by public functions
+  vector<vector<double> > TargetPhotonVectorSumIso;///< same as Radiation::TargetPhotonVectorSumAll
+                                                   ///< but only summed over isotropic fields
+  vector<vector<double> > *TargetPhotonVectorCurrent;  ///< Pointer to the current target field in use
+  /**\brief Target photon field for Synchrotron Self Compton mechanism */
   vector<vector<double> > SSCTargetPhotons;  ///< 2D-vector object holding the
-                                             ///SSC target photon spectrum  {
-                                             ///E(erg) - Edens(erg cm^-3) }
-  double n;  ///< ambient density for Bremsstrahlung and inelastic p-p emission
-             ///mechanisms (cm^-3)
+                                             ///< SSC target photon spectrum  {
+                                             ///< E(erg) - Edens(erg cm^-3) }
+  double n;  ///< ambient density for Bremsstrahlung and inelastic p-p emission mechanisms (cm^-3)
   double fdiffbrems;  ///< differential flux at specified energy E (in
-                      ///CalculateDifferentialGammaEmission) due to
-                      ///Bremsstrahlung
+                      ///< Radiation::CalculateDifferentialGammaEmission) due to
+                      ///< Bremsstrahlung
   double ldiffbrems;  ///< differential luminosity at specified energy E (in
-                      ///CalculateDifferentialGammaEmission) due to
-                      ///Bremsstrahlung
+                      ///< Radiation::CalculateDifferentialGammaEmission) due to
+                      ///< Bremsstrahlung
   double fdiffpp;     ///< differential flux at specified energy E (in
-                   ///CalculateDifferentialGammaEmission) due to inelastic p-p
-                   ///collision
+                   ///< Radiation::CalculateDifferentialGammaEmission) due to inelastic p-p
+                   ///< collision
   double ldiffpp;  ///< differential luminosity at specified energy E (in
-                   ///CalculateDifferentialGammaEmission) due to inelastic p-p
-                   ///collision
+                   ///< Radiation::CalculateDifferentialGammaEmission) due to inelastic p-p
+                   ///< collision
   double fdiffic;  ///< differential flux at specified energy E (in
-                   ///CalculateDifferentialGammaEmission) due to IC emission.
-                   ///SUM OF ALL TARGET FIELD CONTRIBUTIONS.
+                   ///< Radiation::CalculateDifferentialGammaEmission) due to IC emission.
+                   ///< SUM OF ALL TARGET FIELD CONTRIBUTIONS.
   vector<double> fdiffics;///< differential flux at specified energy E (in
-                   ///CalculateDifferentialGammaEmission) due to IC emission.
-                   ///HOLDS INDIVIDUAL TARGET FIELD CONTRIBUTIONS.
+                   ///< Radiation::CalculateDifferentialGammaEmission) due to IC emission.
+                   ///< HOLDS INDIVIDUAL TARGET FIELD CONTRIBUTIONS.
   double ldiffic;  ///< differential luminosity at specified energy E (in
-                   ///CalculateDifferentialGammaEmission) due to IC emission
+                   ///< Radiation::CalculateDifferentialGammaEmission) due to IC emission
   double fdiffsynch;  ///< differential flux at specified energy E (in
-                      ///CalculateDifferentialGammaEmission) Synchrotron
-                      ///emission
+                      ///< Radiation::CalculateDifferentialGammaEmission) Synchrotron
+                      ///< emission
   double ldiffsynch;  ///< differential luminosity at specified energy E (in
-                      ///CalculateDifferentialGammaEmission) Synchrotron
-                      ///emission
+                      ///< Radiation::CalculateDifferentialGammaEmission) Synchrotron
+                      ///< emission
   double distance;    ///< source distance (cm)
   double targetphotonenergymin;  ///< lower energy boundary for the target
-                                 ///photon spectrum (erg, dynamically
-                                 ///determined)
+                                 ///< photon spectrum (erg, dynamically
+                                 ///< determined)
   double targetphotonenergymax;  ///< upper energy boundary for the target
-                                 ///photon spectrum (erg, dynamically
-                                 ///determined)
-  void FillTargetPhotonVectorAndGraph(int steps);  ///< function that adds
-                                                   ///individual target photon
-                                                   ///spectrum to
-                                                   ///"TotalTargetPhotonGraph"
-                                                   ///and
-                                                   ///"TotalTargetPhotonVector"
-  void FillCosZetaLookup(int i);///< fill lookup for angular distance btw. photon and electrons 
-                           ///< for anisotropic IC scattering following MoskalenkoStrong1999 
+                                 ///< photon spectrum (erg, dynamically
+                                 ///< determined)
+  void FillTargetPhotonVectorAndGraph(int steps);  ///< DEPRECATED: function that adds
+                                                   ///< individual target photon
+                                                   ///< spectrum to
+                                                   ///< "TotalTargetPhotonGraph"
+                                                   ///< and
+                                                   ///< "TotalTargetPhotonVector"
+  void FillCosZetaLookup(int i);///< fill lookup for angular distance btw. photon and electrons for anisotropic IC scattering
   double d_theta, d_phi; ///< binning of target photon anisotropy map (For MoskalenkoStrong 1999)
   int TargetPhotonSteps;  ///< binning of the target photon spectrum
   bool DEBUG;             ///< debugging boolean
-  double integratorTolerance;///
-  int integratorKronrodRule;///
-  string radiationMechanism;  ///< string query the radiation mechanism that is
-                              ///to be calculated
-  double hadronicAmpFactor;   ///< amplification factor of the p-p emission (due
-                              ///to heavier species in the ISM)
-  double BField;              ///< BField value (G)
-  bool INTEGRATEOVERGAMMAS;   ///< boolean that switches between calculation IC
-                              ///emission loss rate and emission
+  double integratorTolerance; ///< Tolerance for gsl integration DEFAULT = 0.1
+  int integratorKronrodRule;  ///< Integration rule for gsl integration DEFAULT = 2
+  string radiationMechanism;  ///< string query the radiation mechanism that is to be calculated
+  double hadronicAmpFactor;   ///< amplification factor of the p-p emission (due to heavier species in the ISM)
+  double BField;              ///< BField value (in Gauss)
+  bool INTEGRATEOVERGAMMAS;   ///< boolean that switches between calculation IC emission loss rate and emission
   bool QUIETMODE;  ///< boolean that toggles quiet output mode if set to true
   bool VERBOSEMODE;
-  vector<vector<double> > diffSpec;  ///< vector holding all the individual
-                                     ///differential spectra in erg -
-                                     ///erg^-1s^-1cm^-2
+  /**\brief Vector holding all the individual differential spectra*/
+  vector<vector<double> > diffSpec;  ///< Format: (erg) vs. (erg^-1 s^-1 cm^-2)
   vector<vector<double> > diffSpecICComponents;  ///< vector holding all 
                                      /// the individual components of the IC
                                      ///differential spectrum from different 
                                      /// target fields in erg - erg^-1s^-1cm^-2
-  int PiModel;  ///< indicates which parameterisation to use in the Kafexhiu pi0
-                ///model. 0 - Geant4.10, 1 - Pythia8.1, 2 - SIBYLL2.1, 3 - QGSJET-I.
-                ///DEFAULT = 1
-  int SynchModel;  ///< indicates which synchrotron emissivity model should be used.
-                   /// 0 - isotropic pitch angle distribution, following Ghisellini et al. 1988 
-                   /// 1 - fixed pitch angle, default 90 degrees, following Blumenthal&Gould 1970
-                   /// if set to 1, angle to observer is controled by'SynchAngle' (default angle 90 degrees.). 
-                   ///DEFAULT = 0
-  double PPEmissivity(double x, void *par);
+ /**
+  * \brief hadronic model for pi0 emission
+  * 
+  * Indicates which parameterisation to use in the Kafexhiu pi0 model. 
+  * 
+  * \li 0 - Geant4.10, 
+  * \li 1 - Pythia8.1, 
+  * \li 2 - SIBYLL2.1, 
+  * \li 3 - QGSJET-I.
+  * 
+  * DEFAULT = 1
+  */
+  int PiModel;  
+  
+  /** 
+   * \brief Define Synchrotron model being used
+   * 
+   * Indicates which synchrotron emissivity model should be used.
+   * \li 0 = isotropic pitch angle distribution, following Ghisellini et al. 1988 
+   * \li 1 = fixed pitch angle, default 90 degrees, following Blumenthal&Gould 1970
+   * 
+   * If set to 1, the angle to the observer is controled by Radiation::SynchAngle
+   * (DEFAULT angle 90 degrees)
+   */
+  int SynchModel;  
+  double PPEmissivity(double x, void *par);  ///< Compute pi0 emissivity
   void GetABGParams(double Tp, double &alpha, double &beta, double &gamma,
-                    double &lambda);
+                    double &lambda); ///< auxiliary function for Radiation::PPEmissivity
   void GetAParams(double Tp, double &a1, double &a2, double &a3, double &a4,
-                  double &a5);
-  void GetBParams(double Tp, double &b1, double &b2, double &b3);
-  static double GSLFunctionWrapper(double x, void *params);
+                  double &a5); ///< auxiliary function for Radiation::PPEmissivity
+  void GetBParams(double Tp, double &b1, double &b2, double &b3); ///< auxiliary function for Radiation::PPEmissivity
+  static double GSLFunctionWrapper(double x, void *params);  
   /*    Utils *fUtils;*/
   double Integrate(fPointer f, double *x, double emin, double emax,
-                   double tolerance, int pointslevel);  ///< generic integration routine
+                   double tolerance, int pointslevel);  ///< Generic integration routine
   gsl_interp_accel *acc, *acciso, *accall,  
                    *loraccesc, *edaccesc, *ICLossLookupAccIso,*ICLossLookupAccAll; ///< gsl accelerator objects 
   gsl_interp_accel **TargetAccCurrent,**phiaccescCurrent, **thetaaccescCurrent,
                    **phiaccesc_zetaCurrent,**thetaaccesc_zetaCurrent,
-                   **ICLossLookupAccCurrent;
-                                                   ///for interpolation
+                   **ICLossLookupAccCurrent;  ///< gsl accelerator objects for interpolation
+                                                   
   gsl_spline *ElectronLookup, *ProtonLookup, *TargetPhotonLookupSumIso,*TargetPhotonLookupSumAll,
-       *ICLossLookupSumIso,*ICLossLookupSumAll;
-  gsl_spline **TargetPhotonLookupCurrent,**ICLossLookupCurrent;
-  interp2d_spline **TargetPhotonAngularDistrCurrent,**CosZetaLookupCurrent;
-  unsigned int RADFIELDS_MAX,RADFIELD_CURRENT,RADFIELD_COUNTER;
-  vector<double> epoints_temp, TargetPhotonEdensities;
-  vector<bool> ANISOTROPY;
-  bool ANISOTROPY_CURRENT;
-  vector<double> *TargetPhotonAngularBoundsCurrent;
-  vector< vector< vector<double> > > TargetPhotonVectors,ICLossVectors,TargetPhotonAngularDistrsVectors;
-  vector< gsl_interp_accel * > TargetPhotonAccs, phiaccescs, thetaaccescs,phiaccesc_zetas,thetaaccesc_zetas,ICLossLookupAccs;
-  vector<gsl_spline *> TargetPhotonLookups,ICLossLookups;
+       *ICLossLookupSumIso,*ICLossLookupSumAll; ///< Lookup tables for particles and IC
+  gsl_spline **TargetPhotonLookupCurrent,**ICLossLookupCurrent;  ///< Lookup tables for IC scattering on current field
+  interp2d_spline **TargetPhotonAngularDistrCurrent,**CosZetaLookupCurrent; ///< 2D lookups for IC anisotropy calculations
+  unsigned int RADFIELDS_MAX,RADFIELD_CURRENT,RADFIELD_COUNTER; ///< Counters for radiation fields
+  vector<double> epoints_temp;  ///< temp variable for the energy values of the resulting emission spectrum
+  vector<double> TargetPhotonEdensities;  ///< Vector of energy density of the target photon fields
+  vector<bool> ANISOTROPY;  ///< Vector to store if atarget field is anisotripic or not
+  bool ANISOTROPY_CURRENT;  ///< To state if current vector is anisotropic or not
+  vector<double> *TargetPhotonAngularBoundsCurrent;  ///< Angular bounds for current target photon field
+  
+  /** \brief Vector storing all the target photon fields */
+  vector< vector< vector<double> > > TargetPhotonVectors; ///< Format: vector of vectors of vectors of (Ephoton [erg] vs. differential photon density [N/cm^3/erg])
+  vector< vector< vector<double> > > ICLossVectors; ///< Vector storing the IC loss rate for each field
+  vector< vector< vector<double> > > TargetPhotonAngularDistrsVectors;  ///< Vector storing the angular distribution for each target photon field
+  vector< gsl_interp_accel * > TargetPhotonAccs, phiaccescs, thetaaccescs,phiaccesc_zetas,thetaaccesc_zetas,ICLossLookupAccs; ///< vectors of gsl accelerator objects
+  vector<gsl_spline *> TargetPhotonLookups; ///< Vectors of Lookups for the every target photon field
+  vector<gsl_spline *> ICLossLookups; ///< Vectors of Lookups for the IC loos rates
   vector<interp2d_spline*> TargetPhotonAngularDistrs, CosZetaLookups;
   vector< vector<double> > TargetPhotonAngularBounds,ICLossVectorSumIso,ICLossVectorSumAll,TargetPhotonAngularPhiVectors,TargetPhotonAngularThetaVectors;
-  vector< vector<double> > *ICLossVectorCurrent;
-  void SetParticles(vector<vector<double> > PARTICLES, int type);
-  void SetTargetPhotonVectorLookup(vector< vector<double> > v, int i);
-  void SetICLookups(int i);
+  vector< vector<double> > *ICLossVectorCurrent; ///< Vector for current ICLossVector filled in Radiation::CreateICLossLookupIndividual
+  
+  void SetParticles(vector<vector<double> > PARTICLES, int type);   ///< Fill the lookup for the particle spectrum. 0 for electrons, 1 for protons
+  void SetTargetPhotonVectorLookup(vector< vector<double> > v, int i);  ///< Fill the lookup for the target photon field
+  void SetICLookups(int i);  ///< Fill in all the IC related Lookups for field \a i
   const gsl_interp_type *interp_type;
   double TargetPhotonEdensSumIso,TargetPhotonEdensSumAll;
   double *TargetPhotonEdensCurrent;
   vector<vector<double> > GetParticleSED(string type);
   bool SSCSET; ///< boolean that states if SSC target photons have already been added.
-  double phi_min,phi_max,theta_min, theta_max;///< bounds of target photon anisotropy map
+  //@{
+  double phi_min,phi_max,theta_min, theta_max; ///< bounds of target photon anisotropy map
+  //@}
+  //@{
   double phi_e,theta_e;///< offset to observer-source direction (context of anisotropic IC)
+  //@}
+  //@{
   double ani_minval, ani_maxval; ///< extreme values of target field anisotropy dist.
-  double sin_phi_e, cos_phi_e, sin_theta_e, cos_theta_e;
-  void SetThermalTargetPhotons(double T, double edens, int steps, int i);
+  //@}
+  //@{
+  double sin_phi_e, cos_phi_e, sin_theta_e, cos_theta_e; ///< sin and cos of offset to observer-source direction (context of anisotropic IC)
+  //@}
+  void SetThermalTargetPhotons(double T, double edens, int steps, int i); ///< Set a grey body photon field
   void SetTargetPhotonsFromFile(
       const char *phFile, int i);  ///< add a target photon density from an ASCII file
-                            ///of format E(eV) photon_density(eV^-1cm^-3) !!!
-                            ///here eV, as this is what is typically used in the
-                            ///literature !!!
-  void CreateICLossLookupIndividual(int i=-1, int bins = 100); 
+                            
+  void CreateICLossLookupIndividual(int i=-1, int bins = 100); ///< Fills a lookup table for the IC loos rate
   void SetArbitraryTargetPhotons(
-      vector<vector<double> > PhotonArray, int i);  ///< add an arbitrary target photon
-                                             ///field. input is a 2D-vector of
-                                             ///format E(erg)
-                                             ///photon_density(erg^-1cm^-3)
+      vector<vector<double> > PhotonArray, int i);  ///< add an arbitrary target photon field.
 
-  void SetSSCTargetPhotons(double R, int steps, int i);
+  void SetSSCTargetPhotons(double R, int steps, int i); ///< Add SSC target photons.
   
   vector <double> sizephfield; ///< size of the photon field in which gamma-gamma absorption has to be considered
                                ///(allows different size for each field)
@@ -261,27 +266,13 @@ class Radiation {
   vector <bool> SPATIALDEP; ///< vector of booleans to state which photon field has a spatial dependency
 
 
-
  public:
   Radiation();                                       ///< standard constructor
   ~Radiation();                                      ///< standard destructor
-  void SetProtons(vector<vector<double> > PROTONS);  ///< set the proton
-                                                     ///spectrum (e.g.
-                                                     ///calculated in the
-                                                     ///"Particles" class, but
-                                                     ///also arbitrary spectra).
-                                                     ///Input format: 2D vector,
-                                                     ///E(erg)-N(number)
-  void SetElectrons(vector<vector<double> > ELECTRONS);  ///< set the electron
-                                                         ///spectrum (e.g.
-                                                         ///calculated in the
-                                                         ///"Particles" class,
-                                                         ///but also arbitrary
-                                                         ///spectra). Input
-                                                         ///format: 2D vector,
-                                                         ///E(erg)-N(number)
-  void SetElectronsIsotropic(void);			///<Setting isotropic electrons variable
-						/// to true for anisotropic IC scattering
+  void SetProtons(vector<vector<double> > PROTONS);  ///< Set Protons
+  void SetElectrons(vector<vector<double> > ELECTRONS);  ///< Set Electrons
+                                                         
+  void SetElectronsIsotropic(void);    ///<Setting isotropic electrons variable to true for anisotropic IC scattering
   vector<vector<double> > GetProtonVector() {
     return ProtonVector;
   }  ///< return proton spectrum return format: 2D vector
@@ -312,100 +303,96 @@ class Radiation {
   double GetBField() {return BField;}
   void SetDistance(double d) {
     distance = d*pc_to_cm;
-  }  ///< set the distance to the source (cm)
+  }  ///< set the distance to the source (\a d to be given in units of parsecs)
   double GetDifferentialICFlux(int i=-1) { 
     if(i<-1) return 0.;
     else if(i==-1) return fdiffic;
-    else return fdiffics[i]; }        ///< get FdiffIC
-  double GetDifferentialSynchFlux() { return fdiffsynch; }  ///< get fdiffsynch
-  double GetDifferentialBremsFlux() { return fdiffbrems; }  ///< get fdiffbrems
-  double GetDifferentialPPFlux() { return fdiffpp; }        ///< get fdiffpp
-  double GetIntegralTotalFlux(double emin, double emax) {  ///< get integrated
-    return GetIntegratedFlux(1,emin,emax); }             /// gamma-ray flux between
-                                                         /// emin and emax (erg) 
-                                                         /// summed over all 
-                                                         /// radiation processes
+    else return fdiffics[i]; }        ///< get Radiation::fdiffIC. \a i to retrieve different components. With \a i = -1 (DEFAULT), returns the total IC components
+  double GetDifferentialSynchFlux() { return fdiffsynch; }  ///< get Radiation::fdiffsynch
+  double GetDifferentialBremsFlux() { return fdiffbrems; }  ///< get Radiation::fdiffbrems
+  double GetDifferentialPPFlux() { return fdiffpp; }        ///< get Radiation::fdiffpp
+  double GetIntegralTotalFlux(double emin, double emax) {  
+    return GetIntegratedFlux(1,emin,emax); }               ///< get integrated gamma-ray flux between
+                                                           ///< emin and emax (erg) 
+                                                           ///< summed over all 
+                                                           ///< radiation processes
+                                                           ///< Using Radiation::GetIntegratedFlux
                                                          
-  double GetIntegralPPFlux(double emin, double emax) { ///< get integrated 
-    return GetIntegratedFlux(2,emin,emax); }             /// gamma-ray flux between
-                                                         /// emin and emax (erg) 
-                                                         /// from proton-proton
-                                                         /// interaction
+  double GetIntegralPPFlux(double emin, double emax) {  
+    return GetIntegratedFlux(2,emin,emax); }           ///< get integrated gamma-ray flux between
+                                                       ///< emin and emax (erg) 
+                                                       ///< from proton-proton
+                                                       ///< interaction
+                                                       ///< Using Radiation::GetIntegratedFlux
                                                          
-  double GetIntegralICFlux(double emin, double emax) { ///< get integrated 
-    return GetIntegratedFlux(3,emin,emax); }             /// gamma-ray flux between
-                                                         /// emin and emax (erg) 
-                                                         /// from IC-mechanism
+  double GetIntegralICFlux(double emin, double emax) { 
+    return GetIntegratedFlux(3,emin,emax); }           ///< get integrated gamma-ray flux between
+                                                       ///< emin and emax (erg) 
+                                                       ///< from IC-mechanism
+                                                       ///< Using Radiation::GetIntegratedFlux
                                                          
-  double GetIntegralBremsstrahlungFlux(double emin, double emax) { ///< get integrated 
-    return GetIntegratedFlux(4,emin,emax); }             /// gamma-ray flux between
-                                                         /// emin and emax (erg) 
-                                                         /// from Bremsstrahlung
+  double GetIntegralBremsstrahlungFlux(double emin, double emax) { 
+    return GetIntegratedFlux(4,emin,emax); }             ///< get integrated 
+                                                         ///< gamma-ray flux between
+                                                         ///< emin and emax (erg) 
+                                                         ///< from Bremsstrahlung
+                                                         ///< Using Radiation::GetIntegratedFlux
                                                          
-  double GetIntegralSynchrotronFlux(double emin, double emax) { ///< get integrated 
-    return GetIntegratedFlux(5,emin,emax); }             /// flux between
-                                                         /// emin and emax (erg) 
-                                                         /// from synchrotron
-                                                         /// process
+  double GetIntegralSynchrotronFlux(double emin, double emax) { 
+    return GetIntegratedFlux(5,emin,emax); }               ///< get integrated 
+                                                           ///< flux between
+                                                           ///< emin and emax (erg) 
+                                                           ///< from synchrotron
+                                                           ///< process.
+                                                           ///< Using Radiation::GetIntegratedFlux
                                                          
-  double GetIntegralTotalEnergyFlux(double emin, double emax) { ///< get integrated 
-    return GetIntegratedFlux(1,emin,emax,true); }        /// energy flux between
-                                                         /// emin and emax (erg) 
-                                                         /// summed over all 
-                                                         /// radiation processes
+  double GetIntegralTotalEnergyFlux(double emin, double emax) { 
+    return GetIntegratedFlux(1,emin,emax,true); }        ///< get integrated energy flux between
+                                                         ///< emin and emax (erg) 
+                                                         ///< summed over all 
+                                                         ///< radiation processes
+                                                         ///< Using Radiation::GetIntegratedFlux
                                                          
-  double GetIntegralPPEnergyFlux(double emin, double emax) { ///< get integrated 
-    return GetIntegratedFlux(2,emin,emax,true); }        /// energy flux between
-                                                         /// emin and emax (erg) 
-                                                         /// from proton-proton
-                                                         /// interaction
+  double GetIntegralPPEnergyFlux(double emin, double emax) { 
+    return GetIntegratedFlux(2,emin,emax,true); }        ///< get integrated energy flux between
+                                                         ///< emin and emax (erg) 
+                                                         ///< from proton-proton
+                                                         ///< interaction
+                                                         ///< Using Radiation::GetIntegratedFlux
                                                          
-  double GetIntegralICEnergyFlux(double emin, double emax) { ///< get integrated
-    return GetIntegratedFlux(3,emin,emax,true); }        /// energy flux between
-                                                         /// emin and emax (erg) 
-                                                         /// from IC-mechanism
+  double GetIntegralICEnergyFlux(double emin, double emax) { 
+    return GetIntegratedFlux(3,emin,emax,true); }        ///< get integrated energy flux between
+                                                         ///< emin and emax (erg) 
+                                                         ///< from IC-mechanism
+                                                         ///< Using Radiation::GetIntegratedFlux
                                                          
-  double GetIntegralBremsstrahlungEnergyFlux(double emin, double emax) { ///< get integrated 
-    return GetIntegratedFlux(4,emin,emax,true); }        /// energy flux between
-                                                         /// emin and emax (erg) 
-                                                         /// from Bremsstrahlung
+  double GetIntegralBremsstrahlungEnergyFlux(double emin, double emax) {  
+    return GetIntegratedFlux(4,emin,emax,true); }        ///< get integrated energy flux between
+                                                         ///< emin and emax (erg) 
+                                                         ///< from Bremsstrahlung
+                                                         ///< Using Radiation::GetIntegratedFlux
                                                          
-  double GetIntegralSynchrotronEnergyFlux(double emin, double emax) { ///< get integrated 
-    return GetIntegratedFlux(5,emin,emax,true); }        /// energy flux between
-                                                         /// emin and emax (erg) 
-                                                         /// from synchrotron
-                                                         /// process
+  double GetIntegralSynchrotronEnergyFlux(double emin, double emax) {  
+    return GetIntegratedFlux(5,emin,emax,true); }        ///< get integrated energy flux between
+                                                         ///< emin and emax (erg) 
+                                                         ///< from synchrotron
+                                                         ///< process
+                                                         ///< Using Radiation::GetIntegratedFlux
                                                          
-  void CreateICLossLookup(int bins = 100); ///< creates a 2D vector holding the
-                                            ///energy-dependent energy loss rate
-                                            ///due to IC cooling. Useful to
-                                            ///apply in spectral iterations in
-                                            ///conjunction in the "Particles"
-                                            ///class. Format: E(erg) -
-                                            ///-1.*LossrateIC (erg/s)
+  void CreateICLossLookup(int bins = 100); ///< Creates a 2D vector holding the energy-dependent energy loss rate due to IC cooling.
+ 
+  
   void AddThermalTargetPhotons(double T, double energydens,
-                               int steps = 1000);  ///< add a thermal target
-                                                  ///radiation field component
-                                                  ///to the total local
-                                                  ///radiation field
+                               int steps = 1000);  ///< add a thermal target radiation field component
+                                                  
   void ResetWithThermalTargetPhotons(int i, double T, double energydens,
-                               int steps = 1000);  ///< add a thermal target
-                                                  ///radiation field component
-                                                  ///to the total local
-                                                  ///radiation field
+                               int steps = 1000);  ///< Resets photon field i with another thermal field
   void AddArbitraryTargetPhotons(
-      vector<vector<double> > PhotonArray);  ///< add an arbitrary target photon
-                                             ///field. input is a 2D-vector of
-                                             ///format E(erg)
-                                             ///photon_density(erg^-1cm^-3)
-  void ResetWithArbitraryTargetPhotons(int i,vector<vector<double> > PhotonArray);
-  void ImportTargetPhotonsFromFile(const char *phFile);
-  void ResetWithTargetPhotonsFromFile(int i,const char *phFile);
-  void AddSSCTargetPhotons(double R, int steps = 200);  ///< add target photons
-                                                  ///resulting from Synchrotron
-                                                  ///radiation due to current
-                                                  ///electron spectrum and
-                                                  ///B-Field. R (source extension) in pc
+      vector<vector<double> > PhotonArray);  ///< add an arbitrary target photon field.
+  void ResetWithArbitraryTargetPhotons(int i,vector<vector<double> > PhotonArray);  ///< Resets photon field i with another arbitrary field
+  void ImportTargetPhotonsFromFile(const char *phFile);  ///< Add photon field from file
+  void ResetWithTargetPhotonsFromFile(int i,const char *phFile);  ///< Reset field i with field from file
+  void AddSSCTargetPhotons(double R, int steps = 200);  ///< Add target photons resulting from Synchrotron radiation
   void ResetWithSSCTargetPhotons(int i, double R, int steps = 200); 
   vector<vector<double> > GetTargetPhotons(int i=-1);///< return TotalTargetPhotonVector
   void ClearTargetPhotons(); ///< remove all previously set IC target photons
@@ -429,7 +416,7 @@ class Radiation {
   vector<vector<double> > GetSynchrotronSpectrum(double emin = 0.,
                                                  double emax = 0.) {
     return ReturnDifferentialPhotonSpectrum(5, emin, emax, diffSpec);
-  }  ///< return Bremsstrahlung spectrum
+  }  ///< return Synchrotron spectrum
   vector<vector<double> > GetTotalSED(double emin = 0., double emax = 0.) {
     return ReturnSED(1, emin, emax, diffSpec);
   }  ///< return total SED
@@ -438,7 +425,7 @@ class Radiation {
   }  ///< return pi0 decay SED
   vector<vector<double> > GetICSED(double emin = 0., double emax = 0.) {
     return ReturnSED(3, emin, emax, diffSpec);
-  }  ///< return pi0 decay SED
+  }  ///< return Inverse Compton SED
   vector<vector<double> > GetBremsstrahlungSED(double emin = 0.,
                                                double emax = 0.) {
     return ReturnSED(4, emin, emax, diffSpec);
@@ -446,30 +433,26 @@ class Radiation {
   vector<vector<double> > GetSynchrotronSED(double emin = 0.,
                                             double emax = 0.) {
     return ReturnSED(5, emin, emax, diffSpec);
-  }  ///< return Bremsstrahlung sed
+  }  ///< return Synchrotron SED
 
 
-  vector<vector<double> > GetICSpectrum(unsigned int i, double emin = 0., double emax = 0.);
-  vector<vector<double> > GetICSED(unsigned int i, double emin = 0., double emax = 0.); ///< return pi0 decay spectrum
+  vector<vector<double> > GetICSpectrum(unsigned int i, double emin = 0., double emax = 0.); ///< return Inverse Compton spectrum
+  vector<vector<double> > GetICSED(unsigned int i, double emin = 0., double emax = 0.); ///< return Inverse Compton SED
 
 
   Radiation *Clone() { return this; }
   void SetPPEmissionModel(int PIMODEL) {
     PiModel = PIMODEL;
-  }  ///< externally switch the parameterisation of the pp emission model. See
-     ///PiModel docu for options.
+  }  ///< externally switch the parameterisation of the pp emission model. See Radiation::PiModel documentation for options.
   int GetPPEmissionModel() {
     return PiModel;
-  }  ///< return the parameterisation of the pp emission model. See PiModel docu
-     ///for options.
+  }  ///< return the parameterisation of the pp emission model. See Radiation::PiModel docu for options.
   void SetSynchrotronEmissionModel(int SYNCHMODEL) {
     SynchModel = SYNCHMODEL;
-  }  ///< externally switch the parameterisation of the synchrotron emission
-     ///model. See SynchModel docu for options.
+  }  ///< externally switch the parameterisation of the synchrotron emission model. See Radiation::SynchModel docu for options.
   int GetSynchrotronEmissionModel() {
     return SynchModel;
-  }  ///< return the parameterisation of the synchrotron emission model. See
-     ///SynchModel docu for options.
+  }  ///< return the parameterisation of the synchrotron emission model. See Radiation::SynchModel docu for options.
   void CheckSanityOfTargetPhotonLookup();
   vector< vector<double> > GetProtonSED() {return GetParticleSED("protons");}
   vector< vector<double> > GetElectronSED() {return GetParticleSED("electrons");}
@@ -503,7 +486,7 @@ class Radiation {
 /*    return;}*/
   void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }  ///< enable quiet mode (very little cout output)
   bool GetQuietMode() {return QUIETMODE;}
-  void ToggleVerboseMode() { VERBOSEMODE = VERBOSEMODE == true ? false : true; }  ///< enable quiet mode (very little cout output)
+  void ToggleVerboseMode() { VERBOSEMODE = VERBOSEMODE == true ? false : true; }  ///< enable verbose mode (more cout output)
   bool GetVerboseMode() {return VERBOSEMODE;}
   double ICEmissivityWrapper(double e_ph, double e_e, double e_g);
   double ICEmissivityAnisotropicWrapper(double e_ph, double e_e, double e_g);
@@ -518,28 +501,18 @@ class Radiation {
           "empty vector." <<endl;
     return TargetPhotonAngularDistrsVectors[i];}
 
-  void ClearTargetPhotonField(int i); ///< reset values for target photon 
-                                          ///< field component i
+  void ClearTargetPhotonField(int i); ///< reset values for target photon field component i
   void RemoveLastICTargetPhotonComponent() {
     ClearTargetPhotonField(--RADFIELD_COUNTER);
   }
   vector< vector<double> > SumTargetFields(int bins,bool ISO=true);
   void SumTargetFieldsAll(int bins=1000);
   void SumTargetFieldsIsotropic(int bins=1000);
+
   unsigned int GetTargetFieldCount(){return RADFIELD_COUNTER;}
   void SetICFastMode() {FASTMODE_IC = true;}
   void UnsetICFastMode() {FASTMODE_IC = false;}
   
-  /* 
-   * Adding functions for the gamma-gamma absorption calculations
-   */
-  //void SetSizePhotonField(vector <double> size){
-    // if not inizialized, the default value is 1 pc
-    // size to be given in [pc]
-   //   for (unsigned int i=0;i<size.size();i++){
-   //       sizephfield.push_back(size[i] * pc_to_cm);
-   //   }
-  //} // Sets the size of the photon field for which gamma-gamma absorption has to be considered
   void SetSizePhotonField(int i, double size);
   
   void ClearPhotonFieldSize();
