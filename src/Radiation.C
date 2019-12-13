@@ -2615,9 +2615,8 @@ double Radiation::ComputeAbsCoeff(double Egamma, int target) {
  * Takes as argument just the energy f the gamma ray photon and computes the optical
  * depth for the chosen target photon
  * !!! CAREFUL UNDER CONSTRUCTION !!!
- * !!! FOR THE MOMENT TEST ONLY WITH HOMOGENEOUS FIELDS!!!
- * !!! Not implemented yet a spatial variability of the target photons
- * only an angular one
+ * !!! Implemented simple spatial variability of the target photons
+ * !!! The SpatialDep array is a scaling relation.
  */
 double Radiation::ComputeOptDepth(double Egamma, int target, double phsize){
 	double tauval = 0;
