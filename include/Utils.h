@@ -135,7 +135,8 @@ class Utils {
                                                  int column);
   void TwoDVectorPushBack(double x, double y, vector< vector<double> > &v);
   void TwoDVectorPushBack(double x, double y, double z, vector< vector<double> > &v);
-
+  vector< vector<double> > ZipTwoOneDVectors(vector<double> x, 
+                                                vector<double> y);
   double EvalSpline(double x, gsl_spline *s, gsl_interp_accel *a,
                     const char* t, int l);
   void SetInterpolationMethod(string intermeth);

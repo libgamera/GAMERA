@@ -771,6 +771,25 @@ vector< vector<double> > Utils::RemoveZeroEntries(vector< vector<double> > v) {
 }
 
 
+
+vector< vector<double> > Utils::ZipTwoOneDVectors(vector<double> x, 
+                                                vector<double> y) {
+  vector< vector<double> > zipped;
+  if(x.size() != y.size()) {
+    cout << "Utils::ZipTwoOneDVectors: 1D vector sizes don't match!"
+            "First vector has length "<< x.size() << 
+            ", second vector has lenght " << y.size() << "."
+            " Returning empty vector." << endl;
+  }   
+  else {
+    for(unsigned int i=0; i<x.size();i++) {
+      TwoDVectorPushBack(x[i],y[i],zipped);
+    }
+  }
+  return zipped;
+}
+
+
 void Utils::TwoDVectorPushBack(double x, double y,
                                vector< vector<double> > &v) {
   v.push_back(vector<double>());
