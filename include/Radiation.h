@@ -460,6 +460,8 @@ class Radiation {
   void SetTargetPhotonAnisotropy(int i, vector<double> obs_angle, 
                                  vector<double> phi, vector<double> theta, 
                                  vector< vector<double> > mesh);
+  void SetTargetPhotonAnisotropy(int i, vector<double> phi, vector<double> theta, 
+                                          vector< vector<double> > mesh);
   vector< vector<double> > GetTargetPhotonAnisotropy(int i, 
                                      vector<double> phi, vector<double> theta);
   void SetSynchrotronPitchAngle(double synchangle) {SynchAngle = synchangle;}
