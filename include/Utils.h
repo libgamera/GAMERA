@@ -30,6 +30,8 @@
 #define pc_to_cm 3.0857e18
 /* kiloparsec to cm */
 #define kpc_to_cm 3.0857e21
+/* AU to cm*/
+#define AU_to_cm 1.496e13
 /* proton mass in g */
 #define m_p_g 1.6726e-24
 /* year in seconds */
