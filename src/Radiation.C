@@ -1674,7 +1674,6 @@ void Radiation::AddHadrons(vector<vector<double> > Spectrum, double Mass_number)
 }
 
 
-
 /**
  * Test the hadron lookup to see if the spectral returned is correct
  *

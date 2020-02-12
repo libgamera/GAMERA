@@ -100,7 +100,7 @@ class Radiation {
   vector<vector<double> > ElectronVector;  ///< format of Radiation::ParticleVector, holding the electron spectrum
   vector<vector<double> > ProtonVector;    ///< format of Radiation::ParticleVector, holding the proton spectrum
   /**\brief 2D Vector holding the total target field for IC scattering*/
-  
+
 
   vector<double> HadronMasses;
   vector<vector< vector <double> > > HadronSpectra;
