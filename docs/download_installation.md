@@ -22,11 +22,17 @@ You will have to compile `GAMERA` from source. Apart from a `C++` compiler (e.g.
 
 On `Linux`:
 
-These packages are readily available on all major Linux platforms. On Ubuntu 16.04 LTS,  
-you can install them via 
-```
-sudo apt install libgsl2 libgsl-dev swig python-dev
-```
+- On Ubuntu 16.04 LTS
+  
+  These packages are readily available on all major Linux platforms. On Ubuntu 16.04 LTS,  
+  you can install them via 
+  ```
+  sudo apt install libgsl2 libgsl-dev swig python-dev
+  ```
+- On Ubuntu 18.04 LTS
+  ```
+  sudo apt install libgsl23 libgsl-dev swig python-dev pkg-config
+  ```
 
 On `MacOS`: 
 
