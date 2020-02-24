@@ -40,6 +40,13 @@ many repositories provide `gsl` and `swig`, for example [homebrew](https://brew.
 ```
 $ brew install gsl swig
 ```
+on some MacOS systems, issues are encountered in the compilation phase. These can be fixed by adding 2 lines to the file \<GAMERA-path\>/python/setup.py
+
+after line 20 add:
+```
+extra_compile_args.append(“-stdlib=libc++”)
+extra_link_args.append(“-stdlib=libc++”)
+```
 
 Building: `python`
 ------------------
