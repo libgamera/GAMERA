@@ -388,9 +388,6 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
 	                           "p-p scattering. Returning zero value." << endl;
 	    return 0.;
 	  }
-    IntFunc = &Radiation::PPEmissivity;
-      
-      
       
   } else
     return 0.;
@@ -1445,7 +1442,6 @@ double Radiation::Epilabmax(double Tp) {
 }
 
 
-
 /** get the alpha beta and gamma parameters used in Eq. 11, Kafexhiu 2014
  *  this is basically an implementation of Table V in the paper.
  *  is lambda right for Tp<1GeV? in the paper, a dash is listed...
@@ -1563,6 +1559,7 @@ void Radiation::SetParticles(vector<vector<double> > PARTICLES, int type) {
   } else {
     ProtonLookup = gsl_spline_alloc(gsl_interp_linear, size);
     gsl_spline_init(ProtonLookup, x, y, size);
+    cout << "Min Eproton = " << x[0] << " Max Eproton = " << x[PARTICLES.size() -1] << "\n"; 
   }
   return;
 }
@@ -2768,6 +2765,7 @@ void Radiation::CalculateDifferentialPhotonSpectrum(vector<double> points) {
         total_hadron_emission += hadronVal[j];
     }
 
+    
     diffSpec.push_back(vector<double>());
     diffSpec[diffSpec.size() - 1].push_back(E);
     diffSpec[diffSpec.size() - 1]
@@ -2784,6 +2782,8 @@ void Radiation::CalculateDifferentialPhotonSpectrum(vector<double> points) {
     for(int j=0; j < (int)hadronVal.size(); j++) {
         diffSpecHadronComponents[diffSpecHadronComponents.size() - 1].push_back(hadronVal[j]);
     }    
+
+    
     
     diffSpecICComponents.push_back(vector<double>());
     diffSpecICComponents[diffSpecICComponents.size() - 1].push_back(E);

@@ -110,6 +110,11 @@ class Radiation {
   
   bool DEFAULT_HADRON_COMPOSITION;
   
+  gsl_spline *EpsilonLookup;
+  gsl_spline * ProtonEpsilonLookup;
+  
+  
+  
   vector<vector<double> > TargetPhotonVectorSumAll;  ///< Format: 
                                                ///< E(erg)-dN/dE(differential
                                                ///< number). The vector holds the
@@ -304,6 +309,7 @@ class Radiation {
   /// Setting isotropic electrons variable to true for anisotropic IC scattering
   void SetElectronsIsotropic(void);
   
+<<<<<<< HEAD
   /// Add hadronic species
   void AddHadrons(vector<vector<double> > Spectrum, double Mass_number);
   /// Return hadron spectrum number \a i
@@ -322,6 +328,54 @@ class Radiation {
   /// Calculate epsilon factor for hadronic interactions
   double CalculateEpsilon(double Tp, double Mass);
   /// Calculates the nucleus-nucleus reaction cross section
+=======
+  void SetProjHadronMass(vector<double> PROJ_HADRON_MASS);
+  void SetMedHadronMass(vector<double> MED_HADRON_MASS);
+  
+  void AddHadrons(vector<vector<double>> Spectrum, double Mass_number);
+  vector <vector <double>> GetHadronSpectrum(int i);
+  vector< double > GetHadronMasses(void);
+  void SetAmbientMediumComposition(vector<vector< double >> composition);
+  vector<vector<double>> GetAmbientMediumComposition(void);
+  
+  double TestHadronLookup(int i, double e); // TEST: Function exists only for
+                                                        // testing purposes of lookups
+  double TestEpsilonLookup(int i, double e); // TEST: Only for testing purposes
+  double TestProtonEpsilonLookup(double e); // TEST: Only for testing purposes
+  
+  void SetDefaultHadronicComposition(void);
+  
+  
+  vector<double> GetProjHadronMassVector(){
+    return ProjHadronMassVector;  ///return hadron mass vector of the projectile spectrum
+  }
+
+  vector<double> GetMedHadronMassVector(){
+    return MedHadronMassVector;  ///return hadron mass vector in medium of propagation
+  }
+   
+  void SetProjHadrons(vector<vector<double> > PROJ_HADRONS, int bins = 100); ///Set the relative abundances vector for different species in comparison to proton spectrum in projectile spectrum
+  
+  vector<vector<double> > GetProjHadronsVector(){
+    return ProjHadronsVector;
+  }
+
+  void SetMedRelativeHadronAbundances(vector<double> MED_REL_HADRONS_ABUN); ///Set the relative abundances vector for different species in comparison to proton spectrum in medium of propagation
+  
+  vector<double> GetMedRelativeHadronAbundancesVector(){
+    return MedRelativeHadronAbundancesVector;
+  }
+
+  void CalculateProjRelativeAbundancesVectors(double Tp);
+
+  vector<double> GetProjRelativeHadronAbundancesVector(){
+    return ProjRelativeHadronsAbunancesVector;
+  }
+  
+  
+  double CalculateEpsilon(double Tp, double Mass);
+  
+>>>>>>> 17285f9 (Added changes for Hadronic interactions)
   double NuNuXSection(double ProjMass, double TargetMass);
   /// return proton spectrum return format: 2D vector
   vector<vector<double> > GetProtonVector() {
