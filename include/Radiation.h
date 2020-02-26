@@ -70,6 +70,8 @@ class Radiation {
   double epsilon1;
   double epsilon2;
 
+  double current_mass_number;
+  gsl_spline *current_Hadron_lookup;
   
   double A(double g,
            double e);  ///< Equation (A4) from Baring 1999, ApJ, 513, 311-338
@@ -107,7 +109,8 @@ class Radiation {
 
   vector<double> ProjRelativeHadronsAbunancesVector;
   void CalculateProjRelativeAbundancesLookup(int bins=100);
-  void CalculateEpsilonLookups(int bins=100);
+  //void CalculateEpsilonLookups(int bins=100);  ///DEPRECATED: will be not used anymore soon
+  void CalculateEpsilonLookups(void);
   vector<gsl_spline *> ProjRelativeAbundanceLookups;
   vector<gsl_interp_accel *> ProjRelativeAbundanceLookupsAcc;
   vector< vector<double> > ProjRelativeAbundanceLookupsRanges;
@@ -116,6 +119,16 @@ class Radiation {
   vector< vector<double> > EpsilonLookupsRanges;
   vector< vector<double> > CreateVectorForProjRelativeAbundances(vector< double > x,
                                                       vector< double > y);
+  
+  gsl_spline *EpsilonLookup;
+  gsl_spline * ProtonEpsilonLookup;
+  vector<double> HadronMasses;
+  vector<vector< vector <double> >> HadronSpectra;
+  vector< gsl_spline * > HadronSpectraLookups;
+  vector<vector<double>> AmbientMediumComposition;
+  
+  
+  bool DEFAULT_HADRON_COMPOSITION;
   
   vector<vector<double> > TargetPhotonVectorSumAll;  ///< Format: 
                                                ///< E(erg)-dN/dE(differential
@@ -143,7 +156,8 @@ class Radiation {
                    ///< collision
   double ldiffpp;  ///< differential luminosity at specified energy E (in
                    ///< Radiation::CalculateDifferentialGammaEmission) due to inelastic p-p
-                   ///< collision
+  vector<double> fdiffhadr; ///< differential flux at specified energy E (in
+                    ///< Radiation::CalculateDifferentialGammaEmission) due to hadronic interactions
   double fdiffic;  ///< differential flux at specified energy E (in
                    ///< Radiation::CalculateDifferentialGammaEmission) due to IC emission.
                    ///< SUM OF ALL TARGET FIELD CONTRIBUTIONS.
@@ -190,6 +204,8 @@ class Radiation {
                                      /// the individual components of the IC
                                      ///differential spectrum from different 
                                      /// target fields in erg - erg^-1s^-1cm^-2
+  vector<vector<double> > diffSpecHadronComponents;  ///< vector holding all the components from hadronic
+                                                    ///interactions
  /**
   * \brief hadronic model for pi0 emission
   * 
@@ -252,6 +268,7 @@ class Radiation {
   vector<interp2d_spline*> TargetPhotonAngularDistrs, CosZetaLookups;
   vector< vector<double> > TargetPhotonAngularBounds,ICLossVectorSumIso,ICLossVectorSumAll,TargetPhotonAngularPhiVectors,TargetPhotonAngularThetaVectors;
   vector< vector<double> > *ICLossVectorCurrent; ///< Vector for current ICLossVector filled in Radiation::CreateICLossLookupIndividual
+
   
   void SetParticles(vector<vector<double> > PARTICLES, int type);   ///< Fill the lookup for the particle spectrum. 0 for electrons, 1 for protons
   void SetTargetPhotonVectorLookup(vector< vector<double> > v, int i);  ///< Fill the lookup for the target photon field
@@ -303,6 +320,20 @@ class Radiation {
   void SetProjHadronMass(vector<double> PROJ_HADRON_MASS);
   void SetMedHadronMass(vector<double> MED_HADRON_MASS);
   
+  void AddHadrons(vector<vector<double>> Spectrum, double Mass_number);
+  vector <vector <double>> GetHadronSpectrum(int i);
+  vector< double > GetHadronMasses(void);
+  void SetAmbientMediumComposition(vector<vector< double >> composition);
+  vector<vector<double>> GetAmbientMediumComposition(void);
+  
+  double TestHadronLookup(int i, double e); // TEST: Function exists only for
+                                                        // testing purposes of lookups
+  double TestEpsilonLookup(int i, double e); // TEST: Only for testing purposes
+  double TestProtonEpsilonLookup(double e); // TEST: Only for testing purposes
+  
+  void SetDefaultHadronicComposition(void);
+  
+  
   vector<double> GetProjHadronMassVector(){
     return ProjHadronMassVector;  ///return hadron mass vector of the projectile spectrum
   }
@@ -328,6 +359,9 @@ class Radiation {
   vector<double> GetProjRelativeHadronAbundancesVector(){
     return ProjRelativeHadronsAbunancesVector;
   }
+  
+  
+  double CalculateEpsilon(double Tp, double Mass);
   
   double NuNuXSection(double ProjMass, double TargetMass);
   double CalculateEpsilonc(vector<double> ProjMass, vector<double> ProjRelAbun, vector<double> MedMass, vector<double> MedRelAbun);
@@ -373,6 +407,7 @@ class Radiation {
   double GetDifferentialSynchFlux() { return fdiffsynch; }  ///< get Radiation::fdiffsynch
   double GetDifferentialBremsFlux() { return fdiffbrems; }  ///< get Radiation::fdiffbrems
   double GetDifferentialPPFlux() { return fdiffpp; }        ///< get Radiation::fdiffpp
+  vector<double> GetDifferentialHadronFlux() { return fdiffhadr; } ///< get Radiation::fdiffhadr
   double GetIntegralTotalFlux(double emin, double emax) {  
     return GetIntegratedFlux(1,emin,emax); }               ///< get integrated gamma-ray flux between
                                                            ///< emin and emax (erg) 
