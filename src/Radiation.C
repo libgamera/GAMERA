@@ -1559,7 +1559,6 @@ void Radiation::SetParticles(vector<vector<double> > PARTICLES, int type) {
   } else {
     ProtonLookup = gsl_spline_alloc(gsl_interp_linear, size);
     gsl_spline_init(ProtonLookup, x, y, size);
-    cout << "Min Eproton = " << x[0] << " Max Eproton = " << x[PARTICLES.size() -1] << "\n"; 
   }
   return;
 }
