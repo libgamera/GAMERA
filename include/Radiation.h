@@ -514,6 +514,11 @@ class Radiation {
                                                  double emax = 0.) {
     return ReturnDifferentialPhotonSpectrum(5, emin, emax, diffSpec);
   }  ///< return Synchrotron spectrum
+  vector<vector<double> > GetHadronSpectrum(double emin = 0.,
+                                                double emax = 0.) {
+    return ReturnDifferentialPhotonSpectrum(6, emin, emax, diffSpec);
+  }  ///< return Hadron spectrum                                            
+                                            
   vector<vector<double> > GetTotalSED(double emin = 0., double emax = 0.) {
     return ReturnSED(1, emin, emax, diffSpec);
   }  ///< return total SED
@@ -531,12 +536,20 @@ class Radiation {
                                             double emax = 0.) {
     return ReturnSED(5, emin, emax, diffSpec);
   }  ///< return Synchrotron SED
+  vector<vector<double> > GetHadronSED(double emin = 0.,
+                                            double emax = 0.) {
+    return ReturnSED(6, emin, emax, diffSpec);
+  }  ///< return Hadron SED
 
-
+  
   vector<vector<double> > GetICSpectrum(unsigned int i, double emin = 0., double emax = 0.); ///< return Inverse Compton spectrum
   vector<vector<double> > GetICSED(unsigned int i, double emin = 0., double emax = 0.); ///< return Inverse Compton SED
 
 
+  vector<vector<double> > GetHadronSpectrum(unsigned int i, double emin = 0., double emax = 0.); ///< return Hadron spectrum from component i
+  vector<vector<double> > GetHadronSED(unsigned int i, double emin = 0., double emax = 0.); ///< return Hadron SED from component i 
+  
+  
   Radiation *Clone() { return this; }
   void SetPPEmissionModel(int PIMODEL) {
     PiModel = PIMODEL;
