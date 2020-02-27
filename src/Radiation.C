@@ -1278,7 +1278,7 @@ double Radiation::PPEmissivity(double x, void *par) {
   if (Eg <= GetMinimumGammaEnergy(Tp)) return 0.;
   if (Eg >= GetMaximumGammaEnergy(Tp)) return 0.;
   double N = DiffPPXSection(Tp, Eg);
-  cout << "\n log10(EP) = " << log10(EP) << "\n";
+  cout << "  " << log10(EP) << "\n";
   //double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
   //                                    acc,__func__,__LINE__);
   double logprotons = fUtils->EvalSpline(log10(EP),ProtonLookup,
@@ -1290,13 +1290,12 @@ double Radiation::PPEmissivity(double x, void *par) {
  *  (Eq. 8)
  */
 double Radiation::DiffPPXSection(double Tp, double Eg) {
-  cout << "\n log10(Tp) = " << log10(Tp) << "\n";
-  //double NuclearEnhancementFactor = fUtils->EvalSpline(log10(Tp),EpsilonLookup,
-  //                                    acc,__func__,__LINE__);
+  cout << log10(Tp);
+  //double NuclearEnhancement = fUtils->EvalSpline(log10(Tp),EpsilonLookup,acc,__func__,__LINE__);
   double dsigmadE =
-      NuclearEnhancementFactor(Tp) * Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
-      //NuclearEnhancementFactor * Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
-      //Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
+      //NuclearEnhancementFactor(Tp) * Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
+      //NuclearEnhancement * Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
+      Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
   
   return dsigmadE;
 }
@@ -1599,7 +1598,6 @@ void Radiation::SetParticles(vector<vector<double> > PARTICLES, int type) {
   } else {
     ProtonLookup = gsl_spline_alloc(gsl_interp_linear, size);
     gsl_spline_init(ProtonLookup, x, y, size);
-    cout << "Min Eproton = " << x[0] << " Max Eproton = " << x[PARTICLES.size() -1] << "\n"; 
   }
   return;
 }
@@ -1808,9 +1806,8 @@ vector<double>  Radiation::CalculateEpsilons(double Tp) {
  ******************************************************************/
 void Radiation::CalculateEpsilonLookups(void){
     EpsilonLookups.clear();
-    //ProtonEpsilonLookup.clear();
     int bins = 0;
-    double logTp_min, logTp_max, deltaTp;
+    double e_min, e_max, logTp_min, logTp_max, deltaTp;
     
     if(!QUIETMODE){
         cout << "_________________________________________________________" << endl;
@@ -1827,28 +1824,29 @@ void Radiation::CalculateEpsilonLookups(void){
             if ( bins < 100 ) bins = 100;
             
             // Setup the energyvalues
-            logTp_min = log10(ProtonVector[0][0]);
-            logTp_max = log10(ProtonVector[ProtonVector.size()-1][0]);  
+            e_min = ProtonVector[0][0]; e_max = ProtonVector[ProtonVector.size()-1][0];
+            logTp_min = log10(sqrt(e_min*e_min - m_p*m_p));
+            logTp_max = log10(sqrt(e_max*e_max - m_p*m_p));  
             deltaTp = (logTp_max-logTp_min)/bins;
             
-            double x[bins +1];
-            double y[bins +1];
-            cout << "\n";
+            double x[bins +2];
+            double y[bins +2];
+
             temp.clear();
-            for( int j = 0; j <= bins; j++ ){
-                double log_evalue = logTp_min + j*deltaTp;
-                temp.push_back({log_evalue, CalculateEpsilon(pow(10,log_evalue), 1.0)});
-                cout << logTp_min + j*deltaTp << "\n";
-                //x[j] = logTp_min + j*deltaTp;
-                //y[j] = CalculateEpsilon(pow(x[j],10), 1.0);
-                //cout << x[j] << "   " << y[j] << "\n";
+            for( int j = 0; j < bins+2; j++ ){
+                cout << j << "\n";
+                double log_evalue = logTp_min + (j-1)*deltaTp;
+                //temp.push_back({log_evalue, CalculateEpsilon(pow(10,log_evalue), 1.0)});
+                //cout << log_evalue << "\n";
+                x[j] = log_evalue;
+                y[j] = CalculateEpsilon(pow(10,log_evalue), 1.0);
+                cout << x[j] << "   " << y[j] << "\n";
             }
-            
-            ProtonEpsilonLookup = fUtils->GSLsplineFromTwoDVector(temp);
-            //cout << "We are here now.";
-            //ProtonEpsilonLookup = gsl_spline_alloc(gsl_interp_linear, bins);
-            //cout << "This worked also.";
-            //gsl_spline_init(ProtonEpsilonLookup, x, y, bins+1);
+            //ProtonEpsilonLookup = fUtils->GSLsplineFromTwoDVector(temp);
+            cout << "We are here now.";
+            ProtonEpsilonLookup = gsl_spline_alloc(gsl_interp_linear, bins+2);
+            cout << "This worked also.";
+            gsl_spline_init(ProtonEpsilonLookup, x, y, bins+2);
             
             
         } else {
@@ -1900,6 +1898,7 @@ void Radiation::CalculateEpsilonLookups(void){
                 //temp.push_back({log_evalue, CalculateEpsilon(pow(log_evalue,10), HadronMasses[i])});
                 //cout << logTp_min + j*deltaTp << "\n";
                 x[j] = logTp_min + j*deltaTp;
+                x[j] = sqrt(x[j] * x[j] - m_p * m_p);
                 y[j] = CalculateEpsilon(pow(10,x[j]), HadronMasses[i]);
                 //cout << "
                 //cout << "\n" << x[j] << "  " << y[j] << "\n";
