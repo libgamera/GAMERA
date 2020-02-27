@@ -1278,6 +1278,8 @@ double Radiation::PPEmissivity(double x, void *par) {
 
   double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
                                       acc,__func__,__LINE__);
+  //double logprotons = fUtils->EvalSpline(log10(EP),ProtonLookup,
+  //                                    acc,__func__,__LINE__);
   return c_speed * N * pow(10., logprotons) * ln10 * EP;
 }
 
@@ -2910,6 +2912,43 @@ vector<vector<double> > Radiation::GetICSED(unsigned int i, double emin, double 
     return ReturnSED(i+1, emin, emax, diffSpecICComponents);
   }
 
+  
+  
+  
+vector<vector<double> > Radiation::GetHadronSpectrum(unsigned int i, double emin, double emax) {
+    /*
+    if(IC_CALCULATED && FASTMODE_IC==true && epoints_temp.size()) {
+        FASTMODE_IC=false;
+        CalculateDifferentialPhotonSpectrum(epoints_temp);
+        FASTMODE_IC=true;
+    }*/
+    return ReturnDifferentialPhotonSpectrum(i+1, emin, emax, diffSpecHadronComponents);
+}  ///< return pi0 decay spectrum from Hadron component i
+
+
+vector<vector<double> > Radiation::GetHadronSED(unsigned int i, double emin, double emax) {
+    /*
+    if(IC_CALCULATED && FASTMODE_IC==true && epoints_temp.size()) {
+        FASTMODE_IC=false;
+        CalculateDifferentialPhotonSpectrum(epoints_temp);
+        FASTMODE_IC=true;
+    }*/
+    return ReturnSED(i+1, emin, emax, diffSpecHadronComponents);
+  }  ///< return pi0 decay spectrum from Hadron component i
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 /**
  * Return pi0 decay spectrum from Hadron component \a i
  *
