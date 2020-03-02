@@ -47,6 +47,8 @@ after line 20 add:
 extra_compile_args.append(“-stdlib=libc++”)
 extra_link_args.append(“-stdlib=libc++”)
 ```
+on some other MacOS versions (e.g. Mojave 10.14.5) a further issue can stop the compilation of the gappa library: the swig version that can be installed does not support anymore the option `-nosafecstrings` option.
+The workaround is to remove it from the Makefile (at line 70).
 
 Building: `python`
 ------------------
