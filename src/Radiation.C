@@ -1277,7 +1277,7 @@ double Radiation::PPEmissivity(double x, void *par) {
   if (Tp <= Tpth) return 0.;
   if (Eg <= GetMinimumGammaEnergy(Tp)) return 0.;
   if (Eg >= GetMaximumGammaEnergy(Tp)) return 0.;
-  cout << "  " << log10(EP);
+  //cout << "  " << log10(EP);
   double N = DiffPPXSection(Tp, Eg);
 
   double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
@@ -1291,12 +1291,13 @@ double Radiation::PPEmissivity(double x, void *par) {
  *  (Eq. 8)
  */
 double Radiation::DiffPPXSection(double Tp, double Eg) {
-  cout << log10(Tp) << "\n";
+  //cout << log10(Tp) << "\n";
   //double NuclearEnhancement = fUtils->EvalSpline(log10(Tp),EpsilonLookup,acc,__func__,__LINE__);
   double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
+  //cout << "Epsilon = " << NuclearEnhancement << "\n";
   double dsigmadE =
       //NuclearEnhancementFactor(Tp) * Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
-      NuclearEnhancement * NuclearEnhancementFactor(Tp)*Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
+      NuclearEnhancement *Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
       //Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
   
   return dsigmadE;
@@ -1741,7 +1742,7 @@ void Radiation::SetAmbientMediumComposition(vector<vector< double >> composition
   * Input:  - Number of the hadron component
   * Output: - Spectrum, energy in [erg] and dN/dE in [1/(erg*cm^3)]
   *******************************************************************/
-vector<vector< double >> Radiation::GetHadronSpectrum(int i){
+vector<vector< double >> Radiation::GetHadrons(int i){
   vector<vector<double>> tempvec;
   tempvec = HadronSpectra[i];
   for(unsigned int j = 0; j < tempvec.size(); j++ ){
@@ -1836,23 +1837,23 @@ void Radiation::CalculateEpsilonLookups(void){
 
             temp.clear();
             for( int j = 0; j < bins+2; j++ ){
-                cout << j << "\n";
+                //cout << j << "\n";
                 double log_evalue = logTp_min + j*deltaTp;
                 //temp.push_back({log_evalue, CalculateEpsilon(pow(10,log_evalue), 1.0)});
                 //cout << log_evalue << "\n";
                 x[j] = log_evalue;
                 y[j] = CalculateEpsilon(pow(10,log_evalue), 1.0);
-                cout << x[j] << "   " << y[j] << "\n";
+                //cout << x[j] << "   " << y[j] << "\n";
             }
             //ProtonEpsilonLookup = fUtils->GSLsplineFromTwoDVector(temp);
-            cout << "We are here now.";
+            //cout << "We are here now.";
             ProtonEpsilonLookup = gsl_spline_alloc(gsl_interp_linear, bins+2);
-            cout << "This worked also.";
+            //cout << "This worked also.";
             gsl_spline_init(ProtonEpsilonLookup, x, y, bins+2);
             
             
         } else {
-            cout << "we are in the else condition";
+            //cout << "we are in the else condition";
             bins = 3;
             double x2[3];
             double y2[3];
@@ -1889,6 +1890,10 @@ void Radiation::CalculateEpsilonLookups(void){
             // Setup the energyvalues
             e_min = HadronSpectra[i][0][0]; e_max = HadronSpectra[i][HadronSpectra[i].size()-1][0];
             cout << e_min*e_min - m_p*m_p;
+            if (e_min*e_min - m_p*m_p < 0.0) {
+                cout << "Error, negative energies are not possible.";
+                return;
+            }
             logTp_min = log10(sqrt(e_min*e_min - m_p*m_p));
             logTp_max = log10(sqrt(e_max*e_max - m_p*m_p));  
             deltaTp = (logTp_max-logTp_min)/bins;
@@ -1911,10 +1916,10 @@ void Radiation::CalculateEpsilonLookups(void){
                 //cout << "\n" << x[j] << "  " << y[j] << "\n";
             }
             
-            cout << "we are here now";
+            //cout << "we are here now";
             //gsl_spline *EpsilonLookuptemp = fUtils->GSLsplineFromTwoDVector(temp);
             EpsilonLookuptemp = gsl_spline_alloc(gsl_interp_linear, bins+2);
-            cout << " this worked too";
+            //cout << " this worked too";
             gsl_spline_init(EpsilonLookuptemp, x, y, bins+2);
             EpsilonLookups.push_back(EpsilonLookuptemp);
             //EpsilonLookups.push_back(fUtils->GSLsplineFromTwoDVector(temp));

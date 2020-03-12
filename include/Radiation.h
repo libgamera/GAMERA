@@ -321,7 +321,7 @@ class Radiation {
   void SetMedHadronMass(vector<double> MED_HADRON_MASS);
   
   void AddHadrons(vector<vector<double>> Spectrum, double Mass_number);
-  vector <vector <double>> GetHadronSpectrum(int i);
+  vector <vector <double>> GetHadrons(int i);
   vector< double > GetHadronMasses(void);
   void SetAmbientMediumComposition(vector<vector< double >> composition);
   vector<vector<double>> GetAmbientMediumComposition(void);
