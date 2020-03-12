@@ -1289,6 +1289,7 @@ double Radiation::PPEmissivity(double x, void *par) {
  */
 double Radiation::DiffPPXSection(double Tp, double Eg) {
   double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
+  //cout << "Epsilon = " << NuclearEnhancement << "\n";
   double dsigmadE =
       NuclearEnhancement *Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
   
