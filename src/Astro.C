@@ -407,9 +407,12 @@ vector< double > Astro::BFieldDiskComponent(vector<double> xyz) {
   return RotateBFieldComponent(RegularDisk,xyz);
 }
 
-/**
- * Regular toroidal halo component
- **/
+
+/**********************************************************************
+ * Regular toroidal halo component. Equation 6 in Jansson&Farrar 2012
+ * Input:   - Position in the galaxy (x,y,z) in [kpc]
+ * Output:  - B-field vector in [micro Gauss]
+ **********************************************************************/
 vector<double> Astro::BFieldRegularHaloComponent(vector<double> xyz) {
 
   double r = sqrt(xyz[0]*xyz[0]+xyz[1]*xyz[1]);
@@ -421,7 +424,7 @@ vector<double> Astro::BFieldRegularHaloComponent(vector<double> xyz) {
   double r_s = 16.7;
   double w_h = 0.2;
   double z_0_tor = 5.3;
-  double h_disk = 0.5;
+  double h_disk = 0.4;      //DANGER: In Janson&Farrar it is 0.4. This was corrected now, before it was 0.5
   double w_disk = 0.27;
 
   double transition = fUtils->LogisticsFunction(z,h_disk,w_disk);
