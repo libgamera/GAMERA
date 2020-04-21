@@ -150,6 +150,7 @@ class Astro  {
     vector<double> BFieldRegularHaloComponent(vector<double> xyz);
     vector<double> BFieldXComponent(vector<double> xyz);
     vector<double> BFieldRandomComponent(vector<double> xyz);
+    double BFieldRandomRmsStrength(vector<double> xyz);
     vector<double> BFieldStriatedComponent(vector<double> RegularDisk, 
                                            vector<double> RegularHalo,
                                            vector<double> RegularX);
@@ -279,7 +280,10 @@ class Astro  {
     vector<double> CalculateBField(vector<double> xyz, int component = -1);
     vector< vector<double> > CalculateBFieldPositions(vector< vector<double> > pos, int component=-1);
     vector< vector<double> > CalculateBFieldComponents(vector<double> xyz, int component = -1);
+    vector<double> CalculateBFieldStrengthComposition(vector<double> xyz);
+    double CalculateBFieldStrength(vector<double> xyz);
     vector< vector<double> > LineOfSight(double gl, double gb, vector<double> obs, double r_max=50, int steps=200);
     vector< vector<double> > LineOfSight(double gl, double gb, vector<double> obs, vector<double> rvals);
+    
 };
 #endif

@@ -408,11 +408,12 @@ vector< double > Astro::BFieldDiskComponent(vector<double> xyz) {
 }
 
 
-/**********************************************************************
- * Regular toroidal halo component. Equation 6 in Jansson&Farrar 2012
+/***************************************************************************
+ * Regular toroidal halo component. Equation 6 in Jansson & Farrar 2012 (1)
+ * https://ui.adsabs.harvard.edu/abs/2012ApJ...757...14J/abstract
  * Input:   - Position in the galaxy (x,y,z) in [kpc]
  * Output:  - B-field vector in [micro Gauss]
- **********************************************************************/
+ **************************************************************************/
 vector<double> Astro::BFieldRegularHaloComponent(vector<double> xyz) {
 
   double r = sqrt(xyz[0]*xyz[0]+xyz[1]*xyz[1]);
@@ -424,7 +425,7 @@ vector<double> Astro::BFieldRegularHaloComponent(vector<double> xyz) {
   double r_s = 16.7;
   double w_h = 0.2;
   double z_0_tor = 5.3;
-  double h_disk = 0.4;      //DANGER: In Janson&Farrar it is 0.4. This was corrected now, before it was 0.5
+  double h_disk = 0.4;
   double w_disk = 0.27;
 
   double transition = fUtils->LogisticsFunction(z,h_disk,w_disk);
@@ -438,6 +439,8 @@ vector<double> Astro::BFieldRegularHaloComponent(vector<double> xyz) {
 
   return RotateBFieldComponent(RegularHalo,xyz);
 }
+
+
 
 /**
  * Regular X-shaped (when looking edge-on galaxy) component
@@ -476,9 +479,13 @@ vector<double> Astro::BFieldXComponent(vector<double> xyz) {
   return RotateBFieldComponent(RegularX,xyz);
 }
 
-/**
- * Random, unordered B-field component
- */
+/***************************************************************************
+ * Random, unordered B-field component from Jansson & Farrar 2012 (2),
+ * https://ui.adsabs.harvard.edu/abs/2012ApJ...761L..11J/abstract
+ * It returns a random vector.
+ * Input:   - vector<double> containing the position
+ * Output:  - Random B-field vector
+ ***************************************************************************/
 vector<double> Astro::BFieldRandomComponent(vector<double> xyz) {
   double r = sqrt(xyz[0]*xyz[0]+xyz[1]*xyz[1]);
   double z = xyz[2];
@@ -520,9 +527,53 @@ vector<double> Astro::BFieldRandomComponent(vector<double> xyz) {
   return Random;
 }
 
-/**
- * Striated random component (i.e. oriented along regular B-field)
- **/
+
+/***************************************************************************
+ * Random, unordered B-field component from Jansson & Farrar 2012 (2),
+ * https://ui.adsabs.harvard.edu/abs/2012ApJ...761L..11J/abstract
+ * It returns the rms-Strenght
+ * Input:   - vector<double> containing the position
+ * Output:  - rms strength of the random B-field
+ ***************************************************************************/
+double Astro::BFieldRandomRmsStrength(vector<double> xyz) {
+  double r = sqrt(xyz[0]*xyz[0]+xyz[1]*xyz[1]);
+  double z = xyz[2];
+  double r_fac = 5. / r; // factor describing radial field strength decrease along spiral arms
+
+  int spiral_arm = BFieldGetSpiralArm(xyz);
+
+  double b_random_i[] = {10.81, 6.96,9.59,6.96,1.96,16.34,37.29,10.35};
+  double b_random_int = 7.63;
+  double z_0_disk = 0.61;
+  double b_0 = 4.68;
+  double r_0 = 10.97;
+  double z_0 = 2.84;
+
+  //####  random disk component rms strength
+  double b_random_disk = (r<5.) ? b_random_int: r_fac * b_random_i[spiral_arm];
+  if (r>20.) b_random_disk = 0.;
+  b_random_disk *= fUtils->Gaussian1D(z,z_0_disk,0.,1.);
+
+  //#### random halo component rms strength
+  double b_random_halo = b_0 * exp(-r / r_0) * exp(-z*z / (2.*z_0*z_0) );
+
+  //#### random sum rms strength
+  double b_random = sqrt(b_random_disk*b_random_disk + b_random_halo*b_random_halo);
+  
+
+  return b_random;
+}
+
+
+/***********************************************************************
+ * Striated random component (i.e. oriented along regular B-field) from
+ * Jansson & Farrar 2012 (1) and (2).
+ * Input:   - RegularDisk component
+ *          - RegularHalo component
+ *          - RegularX component
+ * Output:  - Vector of the striated random B-field aligned with the
+ *              regular B-field
+ ***********************************************************************/
 vector<double> Astro::BFieldStriatedComponent(vector<double> RegularDisk, 
                                               vector<double> RegularHalo,
                                               vector<double> RegularX) {
@@ -639,6 +690,40 @@ vector<double> Astro::CalculateBField(vector<double> xyz, int component) {
 
   return total;
 
+}
+
+
+
+
+vector<double> Astro::CalculateBFieldStrengthComposition(vector<double> xyz) {
+  double beta = 1.36;
+  
+  // Calculate the regular field first
+  vector<double> RegularDisk,RegularHalo,RegularX, Regular;
+  RegularDisk.resize(3,0.); RegularHalo.resize(3,0.); RegularX.resize(3,0.), Regular.resize(3, 0.);
+    
+  RegularDisk = BFieldDiskComponent(xyz);
+  RegularHalo = BFieldRegularHaloComponent(xyz);
+  RegularX = BFieldXComponent(xyz);    
+ 
+  for (int i = 0; i < 3; i++) {
+      Regular[i] = RegularDisk[i] + RegularHalo[i] + RegularX[i];
+  }
+  double norm = fUtils->Norm(Regular);
+ 
+  double Random = BFieldRandomRmsStrength(xyz);
+  double Striated = sqrt(beta)*norm;
+  
+  vector<double> temp;
+  temp.push_back(norm); temp.push_back(Random); temp.push_back(Striated);
+  return temp;
+}
+
+
+double Astro::CalculateBFieldStrength(vector<double> xyz) {
+ vector<double> components = CalculateBFieldStrengthComposition(xyz); 
+ double result = fUtils->Norm(components);
+ return result;
 }
 
 

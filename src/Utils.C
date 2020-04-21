@@ -459,6 +459,17 @@ vector< vector<double> > Utils::CustomFunctionRandom2D(vector< vector<double> > 
   return v;
 }
 
+
+
+/***********************************************************************
+ * Function to calculate the total energy of a spectrum between a
+ * maximum nd a minimum energy.
+ * Input:   - vector containing the energy and dN/dE as tuples.
+ *              The energy and dN/dE should have the same energy unit.
+ *          - Minimum energy
+ *          - Maximum energy
+ * Output:  - Energy in units of the input energy
+ **********************************************************************/
 double Utils::EnergyContent(vector< vector<double> > f, double emin, double emax) {
   if(!f.size()) {
     cout << "Utils::EnergyContent: spectrum vector empty! "
@@ -475,6 +486,7 @@ double Utils::EnergyContentFast(vector< vector<double> > f) {
     sum += f[i][0] * f[i][1] * (f[i][0] - f[i-1][0]);
   return sum;
 }
+
 
 ///**
 // * get Poissonian variate (just wrapped from TRandom))
@@ -964,3 +976,11 @@ double Utils::LogisticsFunction(double z, double h, double w) {
   double val  = (1. + exp(-2.*(fabs(z)-h)/w));
   return 1./val;
 }
+
+
+double Utils::Norm(vector<double> v) {
+    double norm = 0.0;
+    for (unsigned int i=0; i < v.size(); i++) norm += v[i]*v[i];
+    return sqrt(norm);
+}
+

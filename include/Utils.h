@@ -190,5 +190,6 @@ class Utils {
   vector<double> RotateVector(vector<double> v, vector<double> p1, vector<double> p2);
   double Gaussian1D(double x, double sigma, double mu=0., double norm=0.);
   double LogisticsFunction(double z, double h, double w);
+  double Norm(vector<double> v);
 };
 #endif
