@@ -29,7 +29,7 @@ On `Linux`:
   ```
   sudo apt install libgsl2 libgsl-dev swig python-dev
   ```
-- On Ubuntu 18.04 LTS
+- On Ubuntu 18.04 LTS (and 20.04)
   ```
   sudo apt install libgsl23 libgsl-dev swig python-dev pkg-config
   ```
@@ -49,6 +49,8 @@ extra_link_args.append(“-stdlib=libc++”)
 ```
 on some other MacOS versions (e.g. Mojave 10.14.5) a further issue can stop the compilation of the gappa library: the swig version that can be installed does not support anymore the option `-nosafecstrings` option.
 The workaround is to remove it from the Makefile (at line 70).
+
+__The latest version of GAMERA does not need anymore the `-nosafecstrings` option.__
 
 Building: `python`
 ------------------
