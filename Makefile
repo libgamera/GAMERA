@@ -66,10 +66,9 @@ libgamera : $(objectsSO)
 
 # make gappa package
 gappa:
-	cd python;\
-	swig -python -c++ -nosafecstrings -outdir ../lib -o _gappa.cc gappa.i;\
-	python setup.py build_ext --build-lib ../lib;\
-	cd ..;\
+	cd python && \
+	swig -python -c++ -nosafecstrings -outdir ../lib -o _gappa.cc gappa.i && \
+	python setup.py build_ext --build-lib ../lib
 
 
 clean-out:
