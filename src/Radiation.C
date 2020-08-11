@@ -1682,7 +1682,7 @@ void Radiation::AddHadrons(vector<vector<double>> Spectrum, double Mass_number){
   for(unsigned int i = 0; i < Spectrum.size(); i++ ){
      Spectrum[i][0] = Spectrum[i][0]/Mass_number;
   }
-  HadronSpectra.push_back(Spectrum);        // Save the spectrum
+  
   int size = (int)Spectrum.size();
   double x[Spectrum.size()];
   double y[Spectrum.size()];
@@ -1695,10 +1695,49 @@ void Radiation::AddHadrons(vector<vector<double>> Spectrum, double Mass_number){
   gsl_spline *HadronLookup;
   HadronLookup = gsl_spline_alloc(gsl_interp_linear, size);
   gsl_spline_init(HadronLookup, x, y, size);
+  
+  // If the lowest energy is lower than the rest mass energy, we have
+  // to adapt the spectrum and the lookup
+  if (Spectrum[0][0]*Spectrum[0][0] - m_p*m_p < 0.0){
+    vector<vector<double>> tempVec;
+    double value = fUtils->EvalSpline(m_p*1.001,HadronLookup,
+                                      acc,__func__,__LINE__);
+    
+    for(unsigned int i = 0; i < Spectrum.size(); i++){
+        if (Spectrum[i][0]*Spectrum[i][0] - m_p*m_p > 0.0) {
+            if ((tempVec.size() == 0) && (Spectrum[i][0] > m_p*1.001)){
+                tempVec.push_back({m_p*1.001, value});
+            }
+            tempVec.push_back({Spectrum[i][0], Spectrum[i][1]});
+        }
+    }
+    
+    double x2[tempVec.size()];
+    double y2[tempVec.size()];
+    for (unsigned int i = 0; i < tempVec.size(); i++) {
+      x2[i] = tempVec[i][0] > 0. ? log10(tempVec[i][0]) : -100.;
+      y2[i] = tempVec[i][1] > 0. ? log10(tempVec[i][1]) : -100.;
+    }    
+
+    gsl_spline *HadronLookup2;
+    HadronLookup2 = gsl_spline_alloc(gsl_interp_linear, tempVec.size());
+    gsl_spline_init(HadronLookup2, x2, y2, tempVec.size());
+    
+    HadronSpectra.push_back(tempVec);        // Save the spectrum
+    HadronSpectraLookups.push_back(HadronLookup2);
+  }
+  
+  else {
+  
+  HadronSpectra.push_back(Spectrum);        // Save the spectrum
   HadronSpectraLookups.push_back(HadronLookup);
+  }
+  
   return;
 }
- 
+
+
+
  
 // TEST: Only for testing purposes of the lookups for Hadrons
 double Radiation::TestHadronLookup(int i, double e){
@@ -1889,37 +1928,32 @@ void Radiation::CalculateEpsilonLookups(void){
             
             // Setup the energyvalues
             e_min = HadronSpectra[i][0][0]; e_max = HadronSpectra[i][HadronSpectra[i].size()-1][0];
-            cout << e_min*e_min - m_p*m_p;
+            
             if (e_min*e_min - m_p*m_p < 0.0) {
-                cout << "Error, negative energies are not possible.";
+                cout << "In Radiation::CalculateEpsilonLookups: Energy values for Hadron species " << i << " smaller than rest mass of the particle.";
+                cout << " Epsilon lookup calculation not possible, please adapt your input spectrum.";
                 return;
             }
             logTp_min = log10(sqrt(e_min*e_min - m_p*m_p));
             logTp_max = log10(sqrt(e_max*e_max - m_p*m_p));  
             deltaTp = (logTp_max-logTp_min)/bins;
             
-            cout << "We have logTp_min = " << logTp_min << " logTp_max = " << logTp_max << " deltaTp = " << deltaTp;
             
             temp.clear();
             double x[bins +2];
             double y[bins +2];
             for( int j = 0; j < bins+2; j++ ){
                 //double log_evalue = logTp_min + j*deltaTp;
-                //cout << "\n" << j;
                 //temp.push_back({log_evalue, CalculateEpsilon(pow(log_evalue,10), HadronMasses[i])});
                 //cout << logTp_min + j*deltaTp << "\n";
                 double log_evalue = logTp_min + j*deltaTp;
                 //temp.push_back({log_evalue, CalculateEpsilon(pow(10,log_evalue), 1.0)});
                 x[j] = log_evalue;
                 y[j] = CalculateEpsilon(pow(10,log_evalue), HadronMasses[i]);
-                //cout << "
-                //cout << "\n" << x[j] << "  " << y[j] << "\n";
             }
             
-            //cout << "we are here now";
             //gsl_spline *EpsilonLookuptemp = fUtils->GSLsplineFromTwoDVector(temp);
             EpsilonLookuptemp = gsl_spline_alloc(gsl_interp_linear, bins+2);
-            //cout << " this worked too";
             gsl_spline_init(EpsilonLookuptemp, x, y, bins+2);
             EpsilonLookups.push_back(EpsilonLookuptemp);
             //EpsilonLookups.push_back(fUtils->GSLsplineFromTwoDVector(temp));
