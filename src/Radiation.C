@@ -1663,6 +1663,7 @@ void Radiation::AddHadrons(vector<vector<double> > Spectrum, double Mass_number)
     
     HadronSpectra.push_back(tempVec);        // Save the spectrum
     HadronSpectraLookups.push_back(HadronLookup2);
+    gsl_spline_free(HadronLookup);  // free the not needed allocated space of HadronLookup
   }
   else {
   HadronSpectra.push_back(Spectrum);        // Save the spectrum
