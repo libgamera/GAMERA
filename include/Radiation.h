@@ -123,9 +123,9 @@ class Radiation {
   gsl_spline *EpsilonLookup;
   gsl_spline * ProtonEpsilonLookup;
   vector<double> HadronMasses;
-  vector<vector< vector <double> >> HadronSpectra;
+  vector<vector< vector <double> > > HadronSpectra;
   vector< gsl_spline * > HadronSpectraLookups;
-  vector<vector<double>> AmbientMediumComposition;
+  vector<vector<double> > AmbientMediumComposition;
   
   
   bool DEFAULT_HADRON_COMPOSITION;
@@ -320,11 +320,11 @@ class Radiation {
   void SetProjHadronMass(vector<double> PROJ_HADRON_MASS);
   void SetMedHadronMass(vector<double> MED_HADRON_MASS);
   
-  void AddHadrons(vector<vector<double>> Spectrum, double Mass_number);
-  vector <vector <double>> GetHadrons(int i);
+  void AddHadrons(vector<vector<double> > Spectrum, double Mass_number);
+  vector <vector <double> > GetHadrons(int i);
   vector< double > GetHadronMasses(void);
-  void SetAmbientMediumComposition(vector<vector< double >> composition);
-  vector<vector<double>> GetAmbientMediumComposition(void);
+  void SetAmbientMediumComposition(vector<vector< double > > composition);
+  vector<vector<double> > GetAmbientMediumComposition(void);
   
   double TestHadronLookup(int i, double e); // TEST: Function exists only for
                                                         // testing purposes of lookups

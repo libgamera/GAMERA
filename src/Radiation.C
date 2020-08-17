@@ -1675,7 +1675,7 @@ void Radiation::SetMedRelativeHadronAbundances(vector<double> MED_REL_HADRONS_AB
  *         - Mass number of the hadrons (number of the nucleons)
  * Output: Nothing
  *******************************************************************************/
-void Radiation::AddHadrons(vector<vector<double>> Spectrum, double Mass_number){
+void Radiation::AddHadrons(vector<vector<double> > Spectrum, double Mass_number){
   HadronMasses.push_back(Mass_number);
   // The energy used in the equations is the energy per nucleon. Therefore we divide with the Mass_number
   // before creating the lookup and saving the spectrum
@@ -1699,7 +1699,7 @@ void Radiation::AddHadrons(vector<vector<double>> Spectrum, double Mass_number){
   // If the lowest energy is lower than the rest mass energy, we have
   // to adapt the spectrum and the lookup
   if (Spectrum[0][0]*Spectrum[0][0] - m_p*m_p < 0.0){
-    vector<vector<double>> tempVec;
+    vector<vector<double> > tempVec;
     double value = fUtils->EvalSpline(m_p*1.001,HadronLookup,
                                       acc,__func__,__LINE__);
     
@@ -1770,7 +1770,7 @@ double Radiation::TestProtonEpsilonLookup(double e){
   *             the density in [1/cm^3]
   * Output: - Nothing
   ***************************************************************************/
-void Radiation::SetAmbientMediumComposition(vector<vector< double >> composition){
+void Radiation::SetAmbientMediumComposition(vector<vector< double > > composition){
  AmbientMediumComposition = composition;
  return;
 }
@@ -1781,8 +1781,8 @@ void Radiation::SetAmbientMediumComposition(vector<vector< double >> composition
   * Input:  - Number of the hadron component
   * Output: - Spectrum, energy in [erg] and dN/dE in [1/(erg*cm^3)]
   *******************************************************************/
-vector<vector< double >> Radiation::GetHadrons(int i){
-  vector<vector<double>> tempvec;
+vector<vector< double > > Radiation::GetHadrons(int i){
+  vector<vector<double> > tempvec;
   tempvec = HadronSpectra[i];
   for(unsigned int j = 0; j < tempvec.size(); j++ ){
      tempvec[j][0] = tempvec[j][0]*HadronMasses[i];
@@ -1806,7 +1806,7 @@ vector< double > Radiation::GetHadronMasses(void){
  * Output:  - Vector of tuples containing the mass number (first entry)
  *              and the corresponding density
  *********************************************************************/
-vector<vector<double>> Radiation::GetAmbientMediumComposition(void){
+vector<vector<double> > Radiation::GetAmbientMediumComposition(void){
     return AmbientMediumComposition;
 }
 
@@ -1856,7 +1856,7 @@ void Radiation::CalculateEpsilonLookups(void){
         cout << ">> CALCULATING LOOKUPS FOR THE NUCLEAR ENHANCEMENT FACTOR " << endl;
     }
     gsl_spline *EpsilonLookuptemp;
-    vector<vector<double>> temp;
+    vector<vector<double> > temp;
     if(ProtonVector.size()){
         
         if(AmbientMediumComposition.size()){
@@ -1912,7 +1912,7 @@ void Radiation::CalculateEpsilonLookups(void){
     
     if ( HadronSpectra.size() ){
         int size = (int)HadronSpectra.size();
-        vector<vector<double>> temp;
+        vector<vector<double> > temp;
         // Loop over all hadronic contributions
         for (int i = 0; i < size; i++) {
             if (QUIETMODE == false) {
@@ -3077,9 +3077,9 @@ void Radiation::CalculateDifferentialPhotonSpectrum(vector<double> points) {
   if (diffSpecHadronComponents.size()) fUtils->Clear2DVector(diffSpecHadronComponents);
   if( !AmbientMediumComposition.size()){
       //cout << "\n Setting now ambient medium composition\n";
-      if (!n) { vector<vector<double>> temp = {{1.0, 0.0}};
+      if (!n) { vector<vector<double> > temp = {{1.0, 0.0}};
       SetAmbientMediumComposition(temp);}
-      else { vector<vector<double>> temp = {{1.0, n}};
+      else { vector<vector<double> > temp = {{1.0, n}};
       SetAmbientMediumComposition(temp);}
   }
   if (AmbientMediumComposition.size() || HadronSpectra.size()) CalculateEpsilonLookups();
