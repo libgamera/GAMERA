@@ -101,7 +101,10 @@ class Radiation {
   vector<vector<double> > ProtonVector;    ///< format of Radiation::ParticleVector, holding the proton spectrum
   /**\brief 2D Vector holding the total target field for IC scattering*/
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3b7577c (Deleted calculation and function for Epsilon lookups for the nuclear)
   vector<double> HadronMasses;
   vector<vector< vector <double> > > HadronSpectra;
   vector< gsl_spline * > HadronSpectraLookups;
@@ -319,16 +322,31 @@ class Radiation {
   void SetAmbientMediumComposition(vector<vector< double > > composition);
   /// Get the ambient medium composition
   vector<vector<double> > GetAmbientMediumComposition(void);
+<<<<<<< HEAD
   /// Delete all previously defined hadron spectra
   void ClearHadrons(void);
   /// Test the hadron lookup
   double TestHadronLookup(int i, double e);
+=======
+  
+  double TestHadronLookup(int i, double e); // TEST: Function exists only for
+                                                        // testing purposes of lookups
+  
+  
+   
+
+>>>>>>> 3b7577c (Deleted calculation and function for Epsilon lookups for the nuclear)
 
   /// Calculate epsilon factor for hadronic interactions
   double CalculateEpsilon(double Tp, double Mass);
   /// Calculates the nucleus-nucleus reaction cross section
   double NuNuXSection(double ProjMass, double TargetMass);
+<<<<<<< HEAD
   /// return proton spectrum return format: 2D vector
+=======
+
+  
+>>>>>>> 3b7577c (Deleted calculation and function for Epsilon lookups for the nuclear)
   vector<vector<double> > GetProtonVector() {
     return ProtonVector;
   }

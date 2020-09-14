@@ -1278,8 +1278,6 @@ double Radiation::PPEmissivity(double x, void *par) {
 
   double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
                                       acc,__func__,__LINE__);
-  //double logprotons = fUtils->EvalSpline(log10(EP),ProtonLookup,
-  //                                    acc,__func__,__LINE__);
   return c_speed * N * pow(10., logprotons) * ln10 * EP;
 }
 
@@ -1289,7 +1287,6 @@ double Radiation::PPEmissivity(double x, void *par) {
  */
 double Radiation::DiffPPXSection(double Tp, double Eg) {
   double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
-  //cout << "Epsilon = " << NuclearEnhancement << "\n";
   double dsigmadE =
       NuclearEnhancement *Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
   
