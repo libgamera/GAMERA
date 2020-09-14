@@ -1442,19 +1442,25 @@ double Radiation::Epilabmax(double Tp) {
   return Epilabmax;
 }
 
+
+
+
 /** correction factor that accounts for the abundance of heavier nuclei in
  *  the medium.(Eq. 24 in Kafexhiu et al. 2014)
  */
+/*
 double Radiation::NuclearEnhancementFactor(double Tp) {
   double Tp0 = 1.e3 * GeV_to_erg;
   double G;
   double sigmaTp = InelasticPPXSectionKaf(Tp);
-  double sigmaTp0 = InelasticPPXSectionKaf(Tp0);
+  double sigmaTp0 = InelasticPPXSectionKaf(Tp0);*/
   /* Eq. 19 */
+  /*
   (sigmaTp / sigmaTp0 > 1.) ? (G = 1. + log(sigmaTp / sigmaTp0)) : G = 1.;
-  double sigmaRpp = 31.4e-27;
+  double sigmaRpp = 31.4e-27; /*
   /* these values are derived from local galactic ISM values, see Kafexhiu paper
    * p.13*/
+  /*
   double epsilon = 0.0;
   vector<double> epsilons;
   if(DEFAULT_HADRON_COMPOSITION){
@@ -1476,6 +1482,8 @@ double Radiation::NuclearEnhancementFactor(double Tp) {
   epsilon = epsilonc + (epsilon1 + epsilon2) * (sigmaRpp * G) / sigmaTp;
   return epsilon;
 }
+*/
+
 
 /** get the alpha beta and gamma parameters used in Eq. 11, Kafexhiu 2014
  *  this is basically an implementation of Table V in the paper.

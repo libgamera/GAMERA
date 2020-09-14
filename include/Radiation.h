@@ -326,9 +326,7 @@ class Radiation {
   double CalculateEpsilon(double Tp, double Mass);
   
   double NuNuXSection(double ProjMass, double TargetMass);
-  double CalculateEpsilonc(vector<double> ProjMass, vector<double> ProjRelAbun, vector<double> MedMass, vector<double> MedRelAbun);
-  double CalculateEpsilon1(vector<double> ProjMass, vector<double> ProjRelAbun, vector<double> MedMass, vector<double> MedRelAbun);
-  double CalculateEpsilon2(vector<double> ProjMass, vector<double> ProjRelAbun, vector<double> MedMass, vector<double> MedRelAbun);
+
   vector<double> CalculateEpsilons(double Tp);
   
   vector<vector<double> > GetProtonVector() {
@@ -548,7 +546,7 @@ class Radiation {
   double GetMaximumGammaEnergy(double Tp);
   double GetMinimumGammaEnergy(double Tp);
   double Epilabmax(double Tp);
-  double NuclearEnhancementFactor(double Tp);
+  //double NuclearEnhancementFactor(double Tp);
   double InelasticPPXSectionKaf(double Tp);
   double InclusivePPXSection(double Tp);
 /*  void SetObserverOffsetAngle(double phi, double theta) {*/
