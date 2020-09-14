@@ -131,6 +131,19 @@ void Radiation::ClearTargetPhotons() {
     return;
 }
 
+/************************************************
+ * Remove all previously defined hadrons
+************************************************/
+void Radiation::ClearHadrons() {
+    HadronMasses.clear();
+    HadronSpectra.clear();
+    HadronSpectraLookups.clear();
+    return;
+}
+
+
+
+
 /**
  * Remove all previously defined hadrons via clearing the mass
  * vector, the spectral vector and the associated lookup.
