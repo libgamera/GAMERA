@@ -100,25 +100,14 @@ class Radiation {
   vector<vector<double> > ProtonVector;    ///< format of Radiation::ParticleVector, holding the proton spectrum
   /**\brief 2D Vector holding the total target field for IC scattering*/
   
-  
-  vector<double> ProjHadronMassVector;            ///holding the hadron mass vector of projectile spectrum
-  vector<vector<double> > ProjHadronsVector; /// holding the relative hadron abundances in projectile spectrum
 
-  vector<double> MedHadronMassVector;            ///holding the hadron mass vector in medium of propagation
-  vector<double> MedRelativeHadronAbundancesVector; /// holding the relative hadron abundances in medium of propagation
-
-  vector<double> ProjRelativeHadronsAbunancesVector;
-  void CalculateProjRelativeAbundancesLookup(int bins=100);
   //void CalculateEpsilonLookups(int bins=100);  ///DEPRECATED: will be not used anymore soon
   void CalculateEpsilonLookups(void);
-  vector<gsl_spline *> ProjRelativeAbundanceLookups;
-  vector<gsl_interp_accel *> ProjRelativeAbundanceLookupsAcc;
-  vector< vector<double> > ProjRelativeAbundanceLookupsRanges;
+
   vector< gsl_spline * > EpsilonLookups;
   vector< gsl_interp_accel * > EpsilonLookupsAcc;
   vector< vector<double> > EpsilonLookupsRanges;
-  vector< vector<double> > CreateVectorForProjRelativeAbundances(vector< double > x,
-                                                      vector< double > y);
+
   
   gsl_spline *EpsilonLookup;
   gsl_spline * ProtonEpsilonLookup;
@@ -317,8 +306,6 @@ class Radiation {
   void SetElectrons(vector<vector<double> > ELECTRONS);  ///< Set Electrons
   void SetElectronsIsotropic(void);    ///<Setting isotropic electrons variable to true for anisotropic IC scattering
   
-  void SetProjHadronMass(vector<double> PROJ_HADRON_MASS);
-  void SetMedHadronMass(vector<double> MED_HADRON_MASS);
   
   void AddHadrons(vector<vector<double> > Spectrum, double Mass_number);
   vector <vector <double> > GetHadrons(int i);
@@ -331,36 +318,11 @@ class Radiation {
   double TestEpsilonLookup(int i, double e); // TEST: Only for testing purposes
   double TestProtonEpsilonLookup(double e); // TEST: Only for testing purposes
   
-  void SetDefaultHadronicComposition(void);
+  void SetDefaultHadronicComposition(void); // DANGER: check if it is needed!
   
-  
-  vector<double> GetProjHadronMassVector(){
-    return ProjHadronMassVector;  ///return hadron mass vector of the projectile spectrum
-  }
-
-  vector<double> GetMedHadronMassVector(){
-    return MedHadronMassVector;  ///return hadron mass vector in medium of propagation
-  }
    
-  void SetProjHadrons(vector<vector<double> > PROJ_HADRONS, int bins = 100); ///Set the relative abundances vector for different species in comparison to proton spectrum in projectile spectrum
-  
-  vector<vector<double> > GetProjHadronsVector(){
-    return ProjHadronsVector;
-  }
 
-  void SetMedRelativeHadronAbundances(vector<double> MED_REL_HADRONS_ABUN); ///Set the relative abundances vector for different species in comparison to proton spectrum in medium of propagation
-  
-  vector<double> GetMedRelativeHadronAbundancesVector(){
-    return MedRelativeHadronAbundancesVector;
-  }
 
-  void CalculateProjRelativeAbundancesVectors(double Tp);
-
-  vector<double> GetProjRelativeHadronAbundancesVector(){
-    return ProjRelativeHadronsAbunancesVector;
-  }
-  
-  
   double CalculateEpsilon(double Tp, double Mass);
   
   double NuNuXSection(double ProjMass, double TargetMass);

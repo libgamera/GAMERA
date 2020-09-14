@@ -58,15 +58,6 @@ Radiation::Radiation() {
   sizephfield.resize(RADFIELDS_MAX);
 
   // This is used for calculation of hadronic interactions of nuclei
-  ProjHadronMassVector.clear();
-  ProjHadronsVector.clear();
-  MedHadronMassVector.clear();
-  MedRelativeHadronAbundancesVector.clear();
-  ProjRelativeHadronsAbunancesVector.clear();
-  
-  
-  
-  // My code
   HadronMasses.clear();
   HadronSpectra.clear();
   HadronSpectraLookups.clear();
@@ -1635,39 +1626,6 @@ void Radiation::SetProtons(vector<vector<double> > PROTONS) {
 
 
 
-
-/**
- * This part of the Code defines the nuclei content of the projectiles and
- * the targets.
-*/
-void Radiation::SetProjHadronMass(vector<double> PROJ_HADRON_MASS){
-  vector<double> *projhadmadr = &ProjHadronMassVector;
-  *projhadmadr = PROJ_HADRON_MASS;
-  return;
-}
-
-void Radiation::SetMedHadronMass(vector<double> MED_HADRON_MASS){
-  vector<double> *medhadmadr = &MedHadronMassVector;
-  *medhadmadr = MED_HADRON_MASS;
-  return;
-}
-
-void Radiation::SetProjHadrons(vector<vector<double> > PROJ_HADRONS, int bins){
-  vector<vector<double> > *projhadsadr = &ProjHadronsVector;
-  *projhadsadr = PROJ_HADRONS;  
-  CalculateProjRelativeAbundancesLookup(bins);
-  return;
-}
-
-void Radiation::SetMedRelativeHadronAbundances(vector<double> MED_REL_HADRONS_ABUN){
-  vector<double> *medrelhadabunadr = &MedRelativeHadronAbundancesVector;
-  *medrelhadabunadr = MED_REL_HADRONS_ABUN;  
-  return;
-}
-
-
-
-
 /*******************************************************************************
  * Function to add a spectrum of hadrons with a specific mass number. It also
  * calculates and saves a lookup for the spectrum.
@@ -1679,8 +1637,10 @@ void Radiation::AddHadrons(vector<vector<double> > Spectrum, double Mass_number)
   HadronMasses.push_back(Mass_number);
   // The energy used in the equations is the energy per nucleon. Therefore we divide with the Mass_number
   // before creating the lookup and saving the spectrum
+  // Since we are dealing with dN/dE and not with dN, we have to multiply with the mass number
   for(unsigned int i = 0; i < Spectrum.size(); i++ ){
      Spectrum[i][0] = Spectrum[i][0]/Mass_number;
+     Spectrum[i][1] = Spectrum[i][1]*Mass_number;
   }
   
   int size = (int)Spectrum.size();
@@ -1786,6 +1746,7 @@ vector<vector< double > > Radiation::GetHadrons(int i){
   tempvec = HadronSpectra[i];
   for(unsigned int j = 0; j < tempvec.size(); j++ ){
      tempvec[j][0] = tempvec[j][0]*HadronMasses[i];
+     tempvec[j][1] = tempvec[j][1]/HadronMasses[i];
   }
   return tempvec;
 }
@@ -1810,12 +1771,12 @@ vector<vector<double> > Radiation::GetAmbientMediumComposition(void){
     return AmbientMediumComposition;
 }
 
+
 /************************************************************************************
  * The next functions are used for the hadronic interactions of nuclei, not just
  * protons. They are used in the NuclearEnhancementFactor-Function by which the
  * resulting gamma-ray emission is multiplied.
  ***********************************************************************************/
-
 vector<double>  Radiation::CalculateEpsilons(double Tp) {
   vector<double> epsilons;
   if(!EpsilonLookups.size()) {
@@ -2014,173 +1975,6 @@ double Radiation::CalculateEpsilon(double Tp, double Mass){
 
 
 
-/*
-void Radiation::CalculateEpsilonLookups(int bins) {
-  EpsilonLookups.clear();
-  double logTp_min = log10(ProjHadronsVector[0][0]);
-  double logTp_max = log10(ProjHadronsVector[0][ProjHadronsVector[0].size()-1]);  
-  double deltaTp = (logTp_max-logTp_min)/bins;
-  
-  vector< vector< vector<double> > > temp;
-  temp.resize(3);
-  for (int i=0; i<bins ;i++) {
-    double logTp = logTp_min + i*deltaTp;
-    CalculateProjRelativeAbundancesVectors(pow(10.,logTp));
-    
-    for (unsigned int j=0; j<3; j++) {
-      double e = 0.;
-      if (!j) e = CalculateEpsilonc(ProjHadronMassVector,
-                                        ProjRelativeHadronsAbunancesVector,
-                                        MedHadronMassVector, 
-                                        MedRelativeHadronAbundancesVector);
-      else if (j == 1) e = CalculateEpsilon1(ProjHadronMassVector,
-                                        ProjRelativeHadronsAbunancesVector,
-                                        MedHadronMassVector, 
-                                        MedRelativeHadronAbundancesVector);
-      else if (j == 2) e = CalculateEpsilon2(ProjHadronMassVector,
-                                        ProjRelativeHadronsAbunancesVector,
-                                        MedHadronMassVector, 
-                                        MedRelativeHadronAbundancesVector);
-      else cout<<"wtf!?"<<endl;
-      fUtils->TwoDVectorPushBack(logTp,e,temp[j]);
-    }
-  }
-    
-  
-  for (unsigned int j=0; j<3; j++) {
-    temp[j] = fUtils->RemoveZeroEntries(temp[j]);
-    EpsilonLookups.push_back(fUtils->GSLsplineFromTwoDVector(temp[j]));
-    EpsilonLookupsAcc.push_back(gsl_interp_accel_alloc());
-    fUtils->TwoDVectorPushBack(temp[j][0][0],temp[j][temp[j].size()-1][0],EpsilonLookupsRanges);
-  }
-  return;  
-}
-
-*/
-void Radiation::CalculateProjRelativeAbundancesVectors(double Tp){
-  if(!ProjRelativeAbundanceLookups.size()) {
-    cout << "CalculateProjRelativeAbundancesVectors: Proj. relative abundances "
-            " lookups not filled. Exiting after doing nothing." << endl;
-    return;
-  }
-  vector<double> *AbunVector = &ProjRelativeHadronsAbunancesVector;
-  AbunVector->clear();
-
-  for (unsigned int i=0; i<ProjHadronsVector.size()-1; i++){
-    double logTp = log10(Tp);
-    if(logTp < ProjRelativeAbundanceLookupsRanges[i][0] || 
-       logTp > ProjRelativeAbundanceLookupsRanges[i][1]) 
-       AbunVector->push_back(0.);
-    else 
-       AbunVector->push_back(pow(10.,fUtils->EvalSpline(logTp,
-                          ProjRelativeAbundanceLookups[i],
-                          ProjRelativeAbundanceLookupsAcc[i],__func__,__LINE__)));
-        
-  }
-  
-  return;
-
-}
-
-
-
-vector< vector<double> > Radiation::CreateVectorForProjRelativeAbundances(vector< double > x,
-                                                      vector< double > y) {
-  vector< vector<double> > v = fUtils->ZipTwoOneDVectors(x,y);
-  v = fUtils->RemoveZeroEntries(v);
-  v = fUtils->VectorAxisLogarithm(v,0);
-  v = fUtils->VectorAxisLogarithm(v,1);
-  return v;
-}
-
-void Radiation::CalculateProjRelativeAbundancesLookup(int bins){
-
-  vector<vector<double> > h = ProjHadronsVector;
-  double logTp_min = log10(h[0][0]);
-  double logTp_max = log10(h[0][h[0].size()-1]);
-   
-
-  vector<vector<double> > ProjRelativeAbundanceMatrix;
-  ProjRelativeAbundanceLookups.clear();
-  ProjRelativeAbundanceLookupsAcc.clear();
-  ProjRelativeAbundanceLookupsRanges.clear();
-
-  vector<vector<double> > prot, hadrspecies;
-
-  // prepare lookup for the proton spectrum
-  prot = CreateVectorForProjRelativeAbundances(h[0],h[1]);
-  gsl_spline *prlookup = fUtils->GSLsplineFromTwoDVector(prot);
-  gsl_interp_accel *accpr= gsl_interp_accel_alloc();
-  
-  vector<double> abun;
-  abun.resize(bins);
-
-  double deltaTp = (logTp_max-logTp_min)/bins;
-  vector<double> kineticenergy;
-
-  for (int i = 1; i < (int)h.size(); i++) {
-    for (int j=0; j<bins ;j++) {
-      double logTp = logTp_min + j*deltaTp;
-      double ProtonFlux = 0.;
-      if(logTp >= prot[0][0] && logTp <= prot[prot.size()-1][0]) {
-            ProtonFlux = fUtils->EvalSpline(logTp,prlookup,accpr,__func__,__LINE__);
-      }
-      if(i==1) kineticenergy.push_back(logTp);
-      hadrspecies.clear();
-      hadrspecies = CreateVectorForProjRelativeAbundances(h[0],h[i]);
-      
-      if  (logTp < hadrspecies[0][0] || logTp > hadrspecies[hadrspecies.size()-1][0] ||
-           ProtonFlux == 0. ) {
-        abun[j] = 0.;
-      }
-      else {
-        
-        gsl_spline *hadrlookup = fUtils->GSLsplineFromTwoDVector(hadrspecies);
-        gsl_interp_accel *acchdr= gsl_interp_accel_alloc();
-        double HadronSpeciesFlux = 0.;
-        if(logTp >= hadrspecies[0][0] && logTp <= hadrspecies[hadrspecies.size()-1][0]) {
-        HadronSpeciesFlux = fUtils->EvalSpline(logTp,hadrlookup,acchdr,__func__,__LINE__);
-        }
-        double HadronFluxRatio = pow(10.,HadronSpeciesFlux)/pow(10.,ProtonFlux);
-        abun[j] = HadronFluxRatio;
-        gsl_spline_free(hadrlookup);
-        gsl_interp_accel_free(acchdr);
-      }
-    }
-    ProjRelativeAbundanceMatrix.push_back(abun);
-  }
-  
-  gsl_spline_free(prlookup);
-  gsl_interp_accel_free(accpr);
-  
-  vector < vector < vector <double> > > temp;
-  temp.resize(ProjRelativeAbundanceMatrix.size());
-  
-  for(unsigned int i=0;i<kineticenergy.size();i++) {
-    for(unsigned int j=0;j<ProjRelativeAbundanceMatrix.size();j++) {
-      if (!ProjRelativeAbundanceMatrix[j][i] || fabs(log10(ProjRelativeAbundanceMatrix[j][i]))>50.) continue;
-      fUtils->TwoDVectorPushBack(kineticenergy[i],
-                                    log10(ProjRelativeAbundanceMatrix[j][i]),temp[j]);
-    }
-  }
-  
-  vector< double> range;  
-  vector< vector<double> > cleaned;
-  range.resize(2);
-  for(unsigned int i=0;i<temp.size();i++) {
-    range.clear();
-    ProjRelativeAbundanceLookups.push_back(fUtils->GSLsplineFromTwoDVector(
-                                           temp[i]));
-    ProjRelativeAbundanceLookupsAcc.push_back(gsl_interp_accel_alloc());
-    range.push_back(temp[i][0][0]);
-    range.push_back(temp[i][temp[i].size()-1][0]);
-    ProjRelativeAbundanceLookupsRanges.push_back(range);
-  }
-  
-  return;
-}
-
-
 
 
 /*
@@ -2206,83 +2000,6 @@ double Radiation::NuNuXSection(double ProjMass, double TargetMass){
 
 
 
-
-/*
- * Equation 21 in Kafexhiu et al. 2014
- * */
-double Radiation::CalculateEpsilonc(vector<double> ProjMass, vector<double> ProjRelAbun, vector<double> MedMass, vector<double> MedRelAbun){
-  double proj = 0.0;
-  double med = 0.0;
-  double epsilonc = 0.0;
-  for(unsigned int i = 0; i < ProjMass.size(); i++){
-    if(ProjMass[i]==1.) continue;
-    proj += ProjMass[i]*ProjRelAbun[i];
-  }
-
-  for(unsigned int i = 0; i < MedMass.size(); i++){
-    if(MedMass[i]==1.) continue;
-    med += MedMass[i]*MedRelAbun[i];
-  }
-
-  epsilonc = 1. + 0.5*(proj + med);
-  return epsilonc;
-}
-// Function was double checked by Mischa
-
-
-
-
-/*
- * Equation 22 in Kafexhiu et al. 2014
- * */
-double Radiation::CalculateEpsilon1(vector<double> ProjMass, vector<double> ProjRelAbun, vector<double> MedMass, vector<double> MedRelAbun){
-
-  double sigma_pp = 31.4; // mb
-  int ProtonMass = 1;
-  double proj = 0.0; double med = 0.0;
-  double epsilon1 = 0.0;
-  
-  for(unsigned int i = 0; i < ProjMass.size(); i++){
-    if(ProjMass[i]==1.) continue;
-    proj += ProjRelAbun[i]*NuNuXSection(ProtonMass,ProjMass[i])/sigma_pp;
-  }
-
-  for(unsigned int i = 0; i < MedMass.size(); i++){
-    if(MedMass[i]==1.) continue;
-    med += MedRelAbun[i]*NuNuXSection(ProtonMass,MedMass[i])/sigma_pp;
-  }
-
-  epsilon1 = 0.5*(proj + med);
-  return epsilon1;  
-}
-// Function was double checked by Mischa
-
-
-
-/*
- * Equation 23 in Kafexhiu et al. 2014
- * */
-double Radiation::CalculateEpsilon2(vector<double> ProjMass, vector<double> ProjRelAbun, vector<double> MedMass, vector<double> MedRelAbun){
-
-  double sigma_pp = 31.4; //mb
-  double ProtonMass = 1;
-  double epsilon2 = 0.0;
-  
-  for(unsigned int i = 0; i < ProjMass.size(); i++){
-    if(ProjMass[i]==1.) continue;
-    for(unsigned int j = 0; j < MedMass.size(); j++){
-      if(MedMass[j]==1.) continue;
-
-      epsilon2 += ProjRelAbun[i]*MedRelAbun[j]*(ProjMass[i]*NuNuXSection(ProtonMass,MedMass[j]) + MedMass[j]*NuNuXSection(ProtonMass,ProjMass[i]))/(2*sigma_pp);
-      
-    }
-  }
-
-  return epsilon2;
-}
-// Function was double checked by Mischa
-
-
 /**
  * Setting the default Hadronic contribution used in Kafexhiu et al. 2014 page 13.
  * In consequence the values epsilonc = 1.37, epsilon1 = 0.29 and epsilon2 = 0.1
@@ -2293,7 +2010,7 @@ void Radiation::SetDefaultHadronicComposition(void){
   DEFAULT_HADRON_COMPOSITION = true;
 }
 
-/*************** End of Functions for hadronic interactions of nuclei ************************************/
+/****** End of Functions for hadronic interactions of nuclei *****************/
 
 
 
