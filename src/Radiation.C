@@ -134,6 +134,19 @@ void Radiation::ClearTargetPhotons() {
     return;
 }
 
+/************************************************
+ * Remove all previously defined hadrons
+************************************************/
+void Radiation::ClearHadrons() {
+    HadronMasses.clear();
+    HadronSpectra.clear();
+    HadronSpectraLookups.clear();
+    return;
+}
+
+
+
+
 /**
  * Calculates the differential photon emission at energy 'e' [erg]. This results
  *  in
@@ -1684,8 +1697,12 @@ void Radiation::SetAmbientMediumComposition(vector<vector< double > > compositio
   * Input:  - Number of the hadron component
   * Output: - Spectrum, energy in [erg] and dN/dE in [1/(erg*cm^3)]
   *******************************************************************/
-vector<vector< double > > Radiation::GetHadrons(int i){
+vector<vector< double > > Radiation::GetHadrons(int i){ 
   vector<vector<double> > tempvec;
+  if (i  >= (int)HadronSpectra.size()){
+      cout << "In Radiation::GetHadrons: The hadron spectrum for i=" << i << " does not exist, " << HadronSpectra.size() << " different hadrons are defined so far. Returning empty vector. ";
+      return tempvec;
+  }
   tempvec = HadronSpectra[i];
   for(unsigned int j = 0; j < tempvec.size(); j++ ){
      tempvec[j][0] = tempvec[j][0]*HadronMasses[i];
@@ -1783,9 +1800,6 @@ double Radiation::NuNuXSection(double ProjMass, double TargetMass){
 
 
 /****** End of Functions for hadronic interactions of nuclei *****************/
-
-
-
 
 
 
@@ -2566,11 +2580,15 @@ void Radiation::CalculateDifferentialPhotonSpectrum(vector<double> points) {
   
   if (diffSpecHadronComponents.size()) fUtils->Clear2DVector(diffSpecHadronComponents);
   if( !AmbientMediumComposition.size()){
-      //cout << "\n Setting now ambient medium composition\n";
-      if (!n) { vector<vector<double> > temp = {{1.0, 0.0}};
-      SetAmbientMediumComposition(temp);}
-      else { vector<vector<double> > temp = {{1.0, n}};
-      SetAmbientMediumComposition(temp);}
+      vector<double> temp0; temp0.resize(2);
+      vector<vector<double> > temp;
+      if (!n) { temp0[0] = 1.0; temp0[1] = 0.0;
+          temp.push_back(temp0);
+      }
+      else { temp0[0] = 1.0; temp0[1] = n;
+          temp.push_back(temp0);
+      }
+      SetAmbientMediumComposition(temp);
   }
   
   if (!QUIETMODE) {

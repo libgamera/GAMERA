@@ -300,6 +300,8 @@ class Radiation {
   void SetAmbientMediumComposition(vector<vector< double > > composition);
   vector<vector<double> > GetAmbientMediumComposition(void);
   
+  void ClearHadrons(void);  // Delete all previously defined hadron spectra
+  
   double TestHadronLookup(int i, double e); // TEST: Function exists only for
                                                         // testing purposes of lookups
   
