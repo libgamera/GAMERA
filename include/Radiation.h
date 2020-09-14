@@ -66,9 +66,6 @@ class Radiation {
                     ///< observer as used in Radiation::SynchEmissivityExplicit. DEFAULT: 90degrees.
   double BremsEmissivity(double x, void *par);  ///< Bremsstrahlung emissivity for e-p and e-e  
 
-  double epsilonc; ///< epsilon parameters from Kafhexiu paper
-  double epsilon1;
-  double epsilon2;
 
   double current_mass_number;
   gsl_spline *current_Hadron_lookup;
@@ -101,16 +98,6 @@ class Radiation {
   /**\brief 2D Vector holding the total target field for IC scattering*/
   
 
-  //void CalculateEpsilonLookups(int bins=100);  ///DEPRECATED: will be not used anymore soon
-  void CalculateEpsilonLookups(void);
-
-  vector< gsl_spline * > EpsilonLookups;
-  vector< gsl_interp_accel * > EpsilonLookupsAcc;
-  vector< vector<double> > EpsilonLookupsRanges;
-
-  
-  gsl_spline *EpsilonLookup;
-  gsl_spline * ProtonEpsilonLookup;
   vector<double> HadronMasses;
   vector<vector< vector <double> > > HadronSpectra;
   vector< gsl_spline * > HadronSpectraLookups;
@@ -315,10 +302,7 @@ class Radiation {
   
   double TestHadronLookup(int i, double e); // TEST: Function exists only for
                                                         // testing purposes of lookups
-  double TestEpsilonLookup(int i, double e); // TEST: Only for testing purposes
-  double TestProtonEpsilonLookup(double e); // TEST: Only for testing purposes
   
-  void SetDefaultHadronicComposition(void); // DANGER: check if it is needed!
   
    
 
@@ -327,7 +311,6 @@ class Radiation {
   
   double NuNuXSection(double ProjMass, double TargetMass);
 
-  vector<double> CalculateEpsilons(double Tp);
   
   vector<vector<double> > GetProtonVector() {
     return ProtonVector;
@@ -546,7 +529,6 @@ class Radiation {
   double GetMaximumGammaEnergy(double Tp);
   double GetMinimumGammaEnergy(double Tp);
   double Epilabmax(double Tp);
-  //double NuclearEnhancementFactor(double Tp);
   double InelasticPPXSectionKaf(double Tp);
   double InclusivePPXSection(double Tp);
 /*  void SetObserverOffsetAngle(double phi, double theta) {*/

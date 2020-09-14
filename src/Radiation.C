@@ -230,7 +230,6 @@ void Radiation::CalculateDifferentialGammaEmission(double e, int particletype) {
     current_mass_number = 1.0;
     radiationMechanism = "ppEmission";
     current_Hadron_lookup = ProtonLookup;
-    EpsilonLookup = ProtonEpsilonLookup;
     ldiffpp = DifferentialEmissionComponent(e, p);
     fdiffpp = lumtoflux * ldiffpp;
   } else if (particletype == 2) {
@@ -240,7 +239,6 @@ void Radiation::CalculateDifferentialGammaEmission(double e, int particletype) {
         ParticleVector = HadronSpectra[i];
         current_mass_number = HadronMasses[i];
         current_Hadron_lookup = HadronSpectraLookups[i];
-        EpsilonLookup = EpsilonLookups[i];
         ldiffhadr = DifferentialEmissionComponent(e, p);
         fdiffhadr.push_back(lumtoflux * ldiffhadr);
     }
@@ -1263,18 +1261,16 @@ double Radiation::PPEmissivity(double x, void *par) {
   /* pi0 decay photon energy */
   double Eg = pow(10.,*(double *)par);
   if (EP <= m_p) return 0.;
-  double Tp = sqrt(EP * EP - m_p * m_p);  // DANGER: This might be wrong for arbitrary nuclei -> Check that!!
-  double Tpth = 0.2797 * GeV_to_erg;      //TODO: Change that!
+  double Tp = sqrt(EP * EP - m_p * m_p); 
+  double Tpth = 0.2797 * GeV_to_erg; 
   if (Tp <= Tpth) return 0.;
   if (Eg <= GetMinimumGammaEnergy(Tp)) return 0.;
   if (Eg >= GetMaximumGammaEnergy(Tp)) return 0.;
-  //cout << "  " << log10(EP);
+
   double N = DiffPPXSection(Tp, Eg);
 
   double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
                                       acc,__func__,__LINE__);
-  //double logprotons = fUtils->EvalSpline(log10(EP),ProtonLookup,
-  //                                    acc,__func__,__LINE__);
   return c_speed * N * pow(10., logprotons) * ln10 * EP;
 }
 
@@ -1282,14 +1278,9 @@ double Radiation::PPEmissivity(double x, void *par) {
  *  (Eq. 8)
  */
 double Radiation::DiffPPXSection(double Tp, double Eg) {
-  //cout << log10(Tp) << "\n";
-  //double NuclearEnhancement = fUtils->EvalSpline(log10(Tp),EpsilonLookup,acc,__func__,__LINE__);
   double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
-  //cout << "Epsilon = " << NuclearEnhancement << "\n";
   double dsigmadE =
-      //NuclearEnhancementFactor(Tp) * Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
       NuclearEnhancement *Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
-      //Amax(Tp) * F(Tp, Eg) / GeV_to_erg;
   
   return dsigmadE;
 }
@@ -1444,47 +1435,6 @@ double Radiation::Epilabmax(double Tp) {
 
 
 
-
-/** correction factor that accounts for the abundance of heavier nuclei in
- *  the medium.(Eq. 24 in Kafexhiu et al. 2014)
- */
-/*
-double Radiation::NuclearEnhancementFactor(double Tp) {
-  double Tp0 = 1.e3 * GeV_to_erg;
-  double G;
-  double sigmaTp = InelasticPPXSectionKaf(Tp);
-  double sigmaTp0 = InelasticPPXSectionKaf(Tp0);*/
-  /* Eq. 19 */
-  /*
-  (sigmaTp / sigmaTp0 > 1.) ? (G = 1. + log(sigmaTp / sigmaTp0)) : G = 1.;
-  double sigmaRpp = 31.4e-27; /*
-  /* these values are derived from local galactic ISM values, see Kafexhiu paper
-   * p.13*/
-  /*
-  double epsilon = 0.0;
-  vector<double> epsilons;
-  if(DEFAULT_HADRON_COMPOSITION){
-    epsilonc = 1.37;
-    epsilon1 = 0.29;
-    epsilon2 = 0.1;
-  }
-  else if(MedRelativeHadronAbundancesVector.empty() && ProjRelativeHadronsAbunancesVector.empty()){
-      return 1;
-  }
-  else{
-    if(!EpsilonLookups.size()) CalculateEpsilonLookups();
-    epsilons.clear();
-    epsilons = CalculateEpsilons(Tp);
-    epsilonc = epsilons[0];
-    epsilon1 = epsilons[1];
-    epsilon2 = epsilons[2];
-  }
-  epsilon = epsilonc + (epsilon1 + epsilon2) * (sigmaRpp * G) / sigmaTp;
-  return epsilon;
-}
-*/
-
-
 /** get the alpha beta and gamma parameters used in Eq. 11, Kafexhiu 2014
  *  this is basically an implementation of Table V in the paper.
  *  is lambda right for Tp<1GeV? in the paper, a dash is listed...
@@ -1564,7 +1514,7 @@ void Radiation::GetBParams(double Tp, double &b1, double &b2, double &b3) {
  * 
  * \param PARTICLES = a vector of tuples (E; dN/dE)
  * \param type = 0 for electrons; 1 for protons
- * 
+ * NOTE: Does not work for othe hadrons, use the function AddHadrons() instead
  */
 void Radiation::SetParticles(vector<vector<double> > PARTICLES, int type) {
   if (type && type != 1) {
@@ -1713,21 +1663,6 @@ double Radiation::TestHadronLookup(int i, double e){
                                       acc,__func__,__LINE__);
  return value;
 }
- 
- 
- // TEST: Only for testing purposes of the lookups for Epsilon values
-double Radiation::TestEpsilonLookup(int i, double e){
- double value = fUtils->EvalSpline(e,EpsilonLookups[i],
-                                      acc,__func__,__LINE__);
- return value;
-}
- 
-// TEST: Only for testing purposes for epsilon lookup of protons
-double Radiation::TestProtonEpsilonLookup(double e){
- double value = fUtils->EvalSpline(e,ProtonEpsilonLookup,
-                                      acc,__func__,__LINE__);
- return value;
-}
 
 
  
@@ -1780,165 +1715,7 @@ vector<vector<double> > Radiation::GetAmbientMediumComposition(void){
 }
 
 
-/************************************************************************************
- * The next functions are used for the hadronic interactions of nuclei, not just
- * protons. They are used in the NuclearEnhancementFactor-Function by which the
- * resulting gamma-ray emission is multiplied.
- ***********************************************************************************/
-vector<double>  Radiation::CalculateEpsilons(double Tp) {
-  vector<double> epsilons;
-  if(!EpsilonLookups.size()) {
-    cout << "CalculateEpsilonLookups: epsilon"
-            " lookups not filled. Exiting empty vector after doing nothing." << endl;
-    return epsilons;
-  }
-  epsilons.resize(EpsilonLookups.size());
-  for (unsigned int i=0; i<EpsilonLookups.size(); i++){
-    double logTp = log10(Tp);
-    if(logTp < EpsilonLookupsRanges[i][0] || 
-       logTp > EpsilonLookupsRanges[i][1]) 
-       epsilons[i] = 0.;
-    else
-       epsilons[i] = fUtils->EvalSpline(logTp,
-                          EpsilonLookups[i],
-                          EpsilonLookupsAcc[i],__func__,__LINE__);
-  }   
-  
-  return epsilons;
 
-}
-
-
-
-/*******************************************************************
- * Function to calculate the lookups for the nuclear enhancement
- * factor epsilon for each hadronic component and the proton vector
- * if defined. Equ. 20 of Kafexhiu et al. 2014
- ******************************************************************/
-void Radiation::CalculateEpsilonLookups(void){
-    EpsilonLookups.clear();
-    int bins = 0;
-    double e_min, e_max, logTp_min, logTp_max, deltaTp;
-    
-    if(!QUIETMODE){
-        cout << "_________________________________________________________" << endl;
-        cout << ">> CALCULATING LOOKUPS FOR THE NUCLEAR ENHANCEMENT FACTOR " << endl;
-    }
-    gsl_spline *EpsilonLookuptemp;
-    vector<vector<double> > temp;
-    if(ProtonVector.size()){
-        
-        if(AmbientMediumComposition.size()){
-        // Calculate the proton vector lookup
-            int length = ProtonVector.size();
-            bins = length*2;
-            if ( bins < 100 ) bins = 100;
-            
-            // Setup the energyvalues
-            e_min = ProtonVector[0][0]; e_max = ProtonVector[ProtonVector.size()-1][0];
-            logTp_min = log10(sqrt(e_min*e_min - m_p*m_p));
-            logTp_max = log10(sqrt(e_max*e_max - m_p*m_p));  
-            deltaTp = (logTp_max-logTp_min)/bins;
-            
-            double x[bins +2];
-            double y[bins +2];
-
-            temp.clear();
-            for( int j = 0; j < bins+2; j++ ){
-                //cout << j << "\n";
-                double log_evalue = logTp_min + j*deltaTp;
-                //temp.push_back({log_evalue, CalculateEpsilon(pow(10,log_evalue), 1.0)});
-                //cout << log_evalue << "\n";
-                x[j] = log_evalue;
-                y[j] = CalculateEpsilon(pow(10,log_evalue), 1.0);
-                //cout << x[j] << "   " << y[j] << "\n";
-            }
-            //ProtonEpsilonLookup = fUtils->GSLsplineFromTwoDVector(temp);
-            //cout << "We are here now.";
-            ProtonEpsilonLookup = gsl_spline_alloc(gsl_interp_linear, bins+2);
-            //cout << "This worked also.";
-            gsl_spline_init(ProtonEpsilonLookup, x, y, bins+2);
-            
-            
-        } else {
-            //cout << "we are in the else condition";
-            bins = 3;
-            double x2[3];
-            double y2[3];
-            logTp_min = log10(ProtonVector[0][0]);
-            logTp_max = log10(ProtonVector[ProtonVector.size()-1][0]);  
-            deltaTp = (logTp_max-logTp_min)/2.0;
-            for ( int j = 0; j<3; j++ ) {
-                x2[j] = logTp_min + j*deltaTp;
-                y2[j] = 1.0;
-            }
-            
-            EpsilonLookuptemp = gsl_spline_alloc(gsl_interp_linear, 3);
-            gsl_spline_init(EpsilonLookuptemp, x2, y2, 3);
-            ProtonEpsilonLookup = EpsilonLookuptemp;
-        }
-    }
-    
-    if ( HadronSpectra.size() ){
-        int size = (int)HadronSpectra.size();
-        vector<vector<double> > temp;
-        // Loop over all hadronic contributions
-        for (int i = 0; i < size; i++) {
-            if (QUIETMODE == false) {
-                cout << "\r";
-                cout << "    "
-                    << i+1 << " / " << size
-                    << " lookups calculated" << std::flush;
-            }
-
-            int length = HadronSpectra[i].size();
-            bins = length*2;
-            if ( bins < 100 ) bins = 100;
-            
-            // Setup the energyvalues
-            e_min = HadronSpectra[i][0][0]; e_max = HadronSpectra[i][HadronSpectra[i].size()-1][0];
-            
-            if (e_min*e_min - m_p*m_p < 0.0) {
-                cout << "In Radiation::CalculateEpsilonLookups: Energy values for Hadron species " << i << " smaller than rest mass of the particle.";
-                cout << " Epsilon lookup calculation not possible, please adapt your input spectrum.";
-                return;
-            }
-            logTp_min = log10(sqrt(e_min*e_min - m_p*m_p));
-            logTp_max = log10(sqrt(e_max*e_max - m_p*m_p));  
-            deltaTp = (logTp_max-logTp_min)/bins;
-            
-            
-            temp.clear();
-            double x[bins +2];
-            double y[bins +2];
-            for( int j = 0; j < bins+2; j++ ){
-                //double log_evalue = logTp_min + j*deltaTp;
-                //temp.push_back({log_evalue, CalculateEpsilon(pow(log_evalue,10), HadronMasses[i])});
-                //cout << logTp_min + j*deltaTp << "\n";
-                double log_evalue = logTp_min + j*deltaTp;
-                //temp.push_back({log_evalue, CalculateEpsilon(pow(10,log_evalue), 1.0)});
-                x[j] = log_evalue;
-                y[j] = CalculateEpsilon(pow(10,log_evalue), HadronMasses[i]);
-            }
-            
-            //gsl_spline *EpsilonLookuptemp = fUtils->GSLsplineFromTwoDVector(temp);
-            EpsilonLookuptemp = gsl_spline_alloc(gsl_interp_linear, bins+2);
-            gsl_spline_init(EpsilonLookuptemp, x, y, bins+2);
-            EpsilonLookups.push_back(EpsilonLookuptemp);
-            //EpsilonLookups.push_back(fUtils->GSLsplineFromTwoDVector(temp));
-        }
-    }
-    
-        if (QUIETMODE == false) {
-            cout << endl;
-            cout << "    -> DONE!   " << endl;
-            cout << endl;
-            cout << ">> LOOKUP CALCULATIONS DONE." << endl;
-            cout << endl;
-        }
-    
-  return;
-}
 
 
 /***********************************************************
@@ -1975,9 +1752,9 @@ double Radiation::CalculateEpsilon(double Tp, double Mass){
         epsilon_component = density * (Mass*sigma1 + ambient_mass_number * sigma2);
         epsilon += epsilon_component;
     }
-    //cout << G << " " << sigma1 << " " << sigma2 << " " << epsilon << " " << sigmaTp;
+    
     epsilon = epsilon/(2.*sigmaTp);
-    //cout << epsilon << "\n";
+
     return epsilon;
 }
 
@@ -1989,8 +1766,8 @@ double Radiation::CalculateEpsilon(double Tp, double Mass){
  * This function calculates the nucleus-nucleus reaction cross section (equation 17 in Kafexhiu et al. 2014)
  * It is valid for projectile energies > 0.2 GeV for a proton projectile and > 0.1 GeV/nucleon for a nuclei
  * projectile different than a proton.
- * The function is used by CalculateEpsilonc, CalculateEpsilon1 and CalculateEpsilon2 where just the case for
- * a projectile proton is needed. Therefore, an if decision was neglected.
+ * The function is only needed for the case where the projectile is a proton.used by 
+ * Therefore, an if decision was neglected.
  * Input parameters:    - Projectile mass number
  *                      - Target mass number
  * 
@@ -2003,20 +1780,7 @@ double Radiation::NuNuXSection(double ProjMass, double TargetMass){
   double sigma_r = sigma_r0*pow((pow(ProjMass,1.0/3.)+pow(TargetMass,1.0/3.)-beta0*(pow(ProjMass,-1.0/3.)+pow(TargetMass,-1.0/3.))),2.0); // equation 17
   return sigma_r;
 }
-// Function was double checked by Mischa, bugs were fixed
 
-
-
-
-/**
- * Setting the default Hadronic contribution used in Kafexhiu et al. 2014 page 13.
- * In consequence the values epsilonc = 1.37, epsilon1 = 0.29 and epsilon2 = 0.1
- * are used in the nuclear enhancement factor in the function
- * NuclearEnhancementFactor.
- **/
-void Radiation::SetDefaultHadronicComposition(void){
-  DEFAULT_HADRON_COMPOSITION = true;
-}
 
 /****** End of Functions for hadronic interactions of nuclei *****************/
 
@@ -2784,6 +2548,7 @@ void Radiation::CalculateDifferentialPhotonSpectrum(int steps, double emin,
  *  These points have to be in units of 'erg'!
  *  They are stored in the 2D 'diffspec' vector and can be accessed via the
  *  Radiation::ReturnDifferentialSpectrum() member function.
+ * TODO: Are the values Emin and Emax used at all, or just a relic from Joachim? If not, delete them.
  */
 void Radiation::CalculateDifferentialPhotonSpectrum(vector<double> points) {
   if (!points.size()) {
@@ -2807,7 +2572,6 @@ void Radiation::CalculateDifferentialPhotonSpectrum(vector<double> points) {
       else { vector<vector<double> > temp = {{1.0, n}};
       SetAmbientMediumComposition(temp);}
   }
-  if (AmbientMediumComposition.size() || HadronSpectra.size()) CalculateEpsilonLookups();
   
   if (!QUIETMODE) {
     cout << "_________________________________________" << endl;
@@ -2825,7 +2589,7 @@ void Radiation::CalculateDifferentialPhotonSpectrum(vector<double> points) {
   } else if (!ElectronVector.size()) {
     Emax = ProtonVector[ProtonVector.size() - 1][0];
     Emin = ProtonVector[0][0] * 1.e-6;      //DANGER: Does not include Hadrons!!!
-  } else {                  //TODO: Adjust this to take into account all Hadron crontributions!!!
+  } else {                  //TODO: Adjust this to take into account all Hadron crontributions!!! -> but this might be not necessary, if Emin and Emax are not used somewhere else
     (ElectronVector[ElectronVector.size() - 1][0] >
      ProtonVector[ProtonVector.size() - 1][0])
         ? (Emax = ElectronVector[ElectronVector.size() - 1][0])
