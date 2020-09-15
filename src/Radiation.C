@@ -1528,8 +1528,11 @@ void Radiation::GetBParams(double Tp, double &b1, double &b2, double &b3) {
 
 /*---- Calculation of neutrinos following Kelner et al 2006 --- */
 
-
-
+/*************************************************************************
+ * Calculation of the Neutrino spectrum. It fills the vectors
+ * MuonNeutrinoVector, ElectronNeutrinoVector and TotalNeutrinoVector.
+ * Input:   - Energy points where to calculate the spectrum in [erg]
+ * **********************************************************************/
 void Radiation::CalculateNeutrinoSpectrum(vector<double> points){
   if (MuonNeutrinoVector.size()) fUtils->Clear2DVector(MuonNeutrinoVector);
   if (ElectronNeutrinoVector.size()) fUtils->Clear2DVector(ElectronNeutrinoVector);
@@ -1572,12 +1575,13 @@ void Radiation::CalculateNeutrinoSpectrum(vector<double> points){
 
 
 
-/*  Integrates and returns the result
-*   Input:  - Energy of the neutrinos (or electrons) in [erg]
-            - leptontype: '0' for electron/muon neutrinos from decay of muons and '1' 
-                for muons from direct charged pion decay
-    Output: - Flux
-*/
+/*****************************************************************************************
+ *  Integrates and returns the result, used by the function CalculateNeutrinoSpectrum
+ *   Input:  - Energy of the neutrinos (or electrons) in [erg]
+ *           - leptontype: '0' for electron/muon neutrinos from decay of muons and '1' 
+ *              for muons from direct charged pion decay
+ *  Output: - Flux
+ ****************************************************************************************/
 double Radiation::CalculateNeutrinoFlux(double energy, int leptontype) {
     if (!n) {
         if(!QUIETMODE) cout << "Radiation::CalculateNeutrinoFlux: "
@@ -1595,8 +1599,7 @@ double Radiation::CalculateNeutrinoFlux(double energy, int leptontype) {
 
     // Contains the energy of the muon
     double integralinput[1];
-    integralinput[0] = energy;
-    
+    integralinput[0] = energy;    
     
     // Convert everything to logarithmic values
     double emin_log = log10(emin);
@@ -1626,6 +1629,16 @@ double Radiation::CalculateNeutrinoFlux(double energy, int leptontype) {
 }
 
 
+
+/**********************************************************************
+ * Function to be integrated to get the neutrino emission for
+ * electron- and muon-Neutrino produced in the muon decay,
+ * as well as the electron spectrum.
+ * Input:   - Energy of the proton in [erg]
+ *          - energy of the muon/electron as a parameter in [erg]
+ * Output:  - The integrand (see e.g. equ. 71 or 72 in Kelner et al.
+ *              2006
+ *********************************************************************/
 double Radiation::NeutrinoFlux1(double energy_proton, void *par) {
     double *p = (double *)par;
     double energy_nu = p[0];
@@ -1644,6 +1657,15 @@ double Radiation::NeutrinoFlux1(double energy_proton, void *par) {
 }
 
 
+
+/**********************************************************************
+ * Function to be integrated to get the muon-neutrino emission produced
+ * in the pion decay.
+ * Input:   - Energy of the proton in [erg]
+ *          - energy of the muon as a parameter in [erg]
+ * Output:  - The integrand (see e.g. equ. 71 or 72 in Kelner et al.
+ *              2006
+ *********************************************************************/
 double Radiation::NeutrinoFlux2(double energy_proton, void *par) {
     double *p = (double *)par;
     double energy_nu = p[0];
@@ -1661,15 +1683,16 @@ double Radiation::NeutrinoFlux2(double energy_proton, void *par) {
 }
 
 
-// function for electrons and muon neutrinos from pion and muon decay
-// Equations 62 to 65 from Kelner et al 2006
-/*  Input:
-        - Energy of electrons or neutrinos, where the flux should
-            be calculated in [erg]
-        - Energy of protons in [erg]
-    Output:
-        - Flux
-*/
+/********************************************************************************* 
+ * Function for electrons and muon neutrinos from pion and muon decay
+ * Equations 62 to 65 from Kelner et al 2006
+ * Input:
+ *       - Energy of electrons or neutrinos, where the flux should
+ *           be calculated in [erg]
+ *       - Energy of protons in [erg]
+ *   Output:
+ *       - Flux
+ ********************************************************************************/
 double Radiation::Felectron(double Ee_erg, double Ep_erg) 
 {
 
@@ -1697,7 +1720,16 @@ double Radiation::Felectron(double Ee_erg, double Ep_erg)
   return p1*p2*p3;
 }
 
-// Eq. 66 - 69 in Kelner
+/********************************************************************************* 
+ * Function for muon neutrinos from pion decay
+ * Equations 66 to 69 from Kelner et al 2006
+ * Input:
+ *       - Energy of neutrinos, where the flux should
+ *           be calculated in [erg]
+ *       - Energy of protons in [erg]
+ *   Output:
+ *       - Flux
+ ********************************************************************************/
 double Radiation::Fnumu(double Enu_erg, double Ep_erg)
 {
 
@@ -1725,7 +1757,7 @@ double Radiation::Fnumu(double Enu_erg, double Ep_erg)
   return p1*p2*p3;
 } 
 
-
+/******** END of Neutrino calculations *******************************/
 
 
 
