@@ -19,6 +19,7 @@ extra_link_args = pkgconfig.libs('gsl').split()
 
 extra_compile_args = pkgconfig.cflags('gsl').split()
 extra_compile_args.append('-m64')
+extra_compile_args.append('-std=c++11')
 
 extension_mod = Extension(
     "_gappa",

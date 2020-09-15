@@ -12,7 +12,7 @@ GSLCFLAGS := $(shell gsl-config --cflags)
 GSLLIBS := $(shell gsl-config --libs)
 
 # define additional switches to be passed to the compiler
-CXXFLAGS := $(GSLCFLAGS) -m64
+CXXFLAGS := $(GSLCFLAGS) -m64 -std=c++11
 
 # define additional switches to be passed to the linker
 LDFLAGS := $(GSLLIBS)

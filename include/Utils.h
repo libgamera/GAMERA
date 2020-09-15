@@ -43,7 +43,7 @@
 /* electron mass in erg */
 #define m_e 8.187e-7
 /* electron mass in g */
-#define m_e_g = 9.1093837015e-28
+#define m_e_g 9.1093837015e-28
 /* boltzmann constant (erg/K) */
 #define kb 1.380658e-16
 /* proton mass in erg */
