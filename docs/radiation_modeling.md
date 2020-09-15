@@ -118,9 +118,14 @@ it is `field=0`, for the second `field=1` and so on).
 is the natural 'counterpart' to the Radiation class. It allows, among other things, 
 for time-dependent modeling. Tutorials how to use it are available, too.
 
-
 ![particles](particle_spectra.png) 
 
 ![SEDs](radiation_SEDs.png) 
+
+More on the emission of hadronic origin
+----------------------------------------
+The current version of GAMERA includes the effect of heavier nuclei in the computation of the π⁰- and η-Decay.
+In [this](hadronic_components.md) tutorial, it is described how to use the new functionalities.
+
 
 [(one page up)](tutorials_main.md)
