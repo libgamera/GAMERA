@@ -13,6 +13,8 @@ NEWS
 - integrated flux now easier to get (basic Radiation tutorial updated)
 - no more random drawings of GAMERA on your console ;)
 - directly set up radiation fields in the Particles class now! (updated static modeling Particles tutorial) 
+- implemented the gamma-gamma absorption effect (absorption only, no secondaries)
+- implemented the nuclear enhancement factor for pi0 emission
 
 Documentation & Tutorials
 =========================
