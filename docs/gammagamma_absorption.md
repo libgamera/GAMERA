@@ -49,7 +49,7 @@ where `field` is the number of the photon field and `dependency` is a vector of 
 in which the first element is the distance from the source (given in pc) and the second element is 
 the fraction of the energy density that was given when setting up the photon field.
 
-If you have more complicated cases, you can always do the spatial integration directlz in your code by calculating the absorption coefficient
+If you have more complicated cases, you can always do the spatial integration directly in your code by calculating the absorption coefficient
 for the field via `fr.ComputeAbsCoeff(energy, field)` which takes the energy of the gamma-ray and the field index as arguments, returning the 
 absorption coefficient in units of `1/cm`.
 
