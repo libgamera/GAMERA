@@ -30,6 +30,8 @@
 #define pc_to_cm 3.0857e18
 /* kiloparsec to cm */
 #define kpc_to_cm 3.0857e21
+/* AU to cm*/
+#define AU_to_cm 1.496e13
 /* proton mass in g */
 #define m_p_g 1.6726e-24
 /* year in seconds */
@@ -40,6 +42,8 @@
 #define sigma_T 6.6524e-25
 /* electron mass in erg */
 #define m_e 8.187e-7
+/* electron mass in g */
+#define m_e_g = 9.1093837015e-28
 /* boltzmann constant (erg/K) */
 #define kb 1.380658e-16
 /* proton mass in erg */
@@ -133,7 +137,8 @@ class Utils {
                                                  int column);
   void TwoDVectorPushBack(double x, double y, vector< vector<double> > &v);
   void TwoDVectorPushBack(double x, double y, double z, vector< vector<double> > &v);
-
+  vector< vector<double> > ZipTwoOneDVectors(vector<double> x, 
+                                                vector<double> y);
   double EvalSpline(double x, gsl_spline *s, gsl_interp_accel *a,
                     const char* t, int l);
   void SetInterpolationMethod(string intermeth);
@@ -186,5 +191,6 @@ class Utils {
   vector<double> RotateVector(vector<double> v, vector<double> p1, vector<double> p2);
   double Gaussian1D(double x, double sigma, double mu=0., double norm=0.);
   double LogisticsFunction(double z, double h, double w);
+  double Norm(vector<double> v);
 };
 #endif
