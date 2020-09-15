@@ -41,10 +41,22 @@ where the argument is the array with the index of the photon fields we are takin
 This can be useful in case a user would like to consider a certain photon field for the scattering,
 but not for the absoption and viceversa.
 
-**CAVEAT 1:** At the moment it is not implement a spatial dependency of the photon fields.
-To take this into account, you could implement it in the scripting step, through the creation multiple fields with intensities
-following a certain spatial function.
+It is also possible to define a certain spatial dependency of the photon field through the function
+```python
+fr.SetTargetFieldSpatialDep(field, dependency)
+```
+where `field` is the number of the photon field and `dependency` is a vector of tuples 
+in which the first element is the distance from the source (given in pc) and the second element is 
+the fraction of the energy density that was given when setting up the photon field.
 
-**CAVEAT 2:** No effect of the secondaries on the radiation spectrum is implemented.
+If you have more complicated cases, you can always do the spatial integration directlz in your code by calculating the absorption coefficient
+for the field via `fr.ComputeAbsCoeff(energy, field)` which takes the energy of the gamma-ray and the field index as arguments, returning the 
+absorption coefficient in units of `1/cm`.
+
+<!-- **CAVEAT 1:** At the moment it is not implement a spatial dependency of the photon fields.
+To take this into account, you could implement it in the scripting step, through the creation multiple fields with intensities
+following a certain spatial function. -->
+
+**CAVEAT:** No effect of the secondaries on the radiation spectrum is implemented.
 
 
