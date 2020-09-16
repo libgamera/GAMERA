@@ -551,16 +551,43 @@ class Radiation {
   /// Returns IC SED for target field \a i
   vector<vector<double> > GetICSED(unsigned int i, double emin = 0., double emax = 0.);
 
-  /// Return pi0 decay spectrum from hadronic component i
-  vector<vector<double> > GetHadronSpectrum(unsigned int i, double emin = 0., double emax = 0.);
-  /// Return pi0 decay SED from hadronic component i
-  vector<vector<double> > GetHadronSED(unsigned int i, double emin = 0., double emax = 0.);
-  vector<vector<double> > GetNeutrinoSpectrum(void); /// Return the neutrino spectrum
-  vector<vector<double> > GetNeutrinoSED(void); /// Return the neutrino SED
-  vector<vector<double> > GetNeutrinoSpectrumMuon(void);
-  vector<vector<double> > GetNeutrinoSpectrumElectron(void);
-  vector<vector<double> > GetNeutrinoSEDMuon(void);
-  vector<vector<double> > GetNeutrinoSEDElectron(void);
+
+  vector<vector<double> > GetHadronSpectrum(unsigned int i, double emin = 0., double emax = 0.); ///< return Hadron spectrum from component i
+  vector<vector<double> > GetHadronSED(unsigned int i, double emin = 0., double emax = 0.); ///< return Hadron SED from component i 
+  
+  
+  vector<vector<double> > ReturnNeutrinoSpectrum(vector<vector<double> > vec);
+  vector<vector<double> > ReturnNeutrinoSED(vector<vector<double> > vec);
+  vector<vector<double> > ReturnHadronNeutrinoSpectrum(int i, vector<vector<vector<double> > > vec);
+  vector<vector<double> > ReturnHadronNeutrinoSED(int i, vector<vector<vector<double> > > vec);
+  
+  
+  vector<vector<double> > GetNeutrinoSpectrum(void) { return ReturnNeutrinoSpectrum(TotalNeutrinoVector);}; /// Return the neutrino spectrum
+  vector<vector<double> > GetNeutrinoSED(void) {return ReturnNeutrinoSED(TotalNeutrinoVector);}; /// Return the neutrino SED
+  vector<vector<double> > GetNeutrinoSpectrumMuon(void) { return ReturnNeutrinoSpectrum(MuonNeutrinoVector);};
+  vector<vector<double> > GetNeutrinoSpectrumElectron(void) { return ReturnNeutrinoSpectrum(ElectronNeutrinoVector);};
+  vector<vector<double> > GetNeutrinoSEDMuon(void) {return ReturnNeutrinoSED(MuonNeutrinoVector);};
+  vector<vector<double> > GetNeutrinoSEDElectron(void) {return ReturnNeutrinoSED(ElectronNeutrinoVector);};
+  
+
+  vector<vector<double> > GetProtonNeutrinoSpectrum(void) { return ReturnNeutrinoSpectrum(ProtonTotalNeutrinoVector);}; /// Return the neutrino spectrum
+  vector<vector<double> > GetProtonNeutrinoSED(void) {return ReturnNeutrinoSED(ProtonTotalNeutrinoVector);}; /// Return the neutrino SED
+  vector<vector<double> > GetProtonNeutrinoSpectrumMuon(void) { return ReturnNeutrinoSpectrum(ProtonMuonNeutrinoVector);};
+  vector<vector<double> > GetProtonNeutrinoSpectrumElectron(void) { return ReturnNeutrinoSpectrum(ProtonElectronNeutrinoVector);};
+  vector<vector<double> > GetProtonNeutrinoSEDMuon(void) {return ReturnNeutrinoSED(ProtonMuonNeutrinoVector);};
+  vector<vector<double> > GetProtonNeutrinoSEDElectron(void) {return ReturnNeutrinoSED(ProtonElectronNeutrinoVector);};
+
+
+  
+  vector<vector<double> > GetHadronNeutrinoSpectrum(int i) { return ReturnHadronNeutrinoSpectrum(i, HadronicTotalNeutrinoVectors);}; /// Return the neutrino spectrum
+  vector<vector<double> > GetHadronNeutrinoSED(int i) {return ReturnHadronNeutrinoSED(i, HadronicTotalNeutrinoVectors);}; /// Return the neutrino SED
+  vector<vector<double> > GetHadronNeutrinoSpectrumMuon(int i) { return ReturnHadronNeutrinoSpectrum(i, HadronicMuonNeutrinoVectors);};
+  vector<vector<double> > GetHadronNeutrinoSpectrumElectron(int i) { return ReturnHadronNeutrinoSpectrum(i, HadronicElectronNeutrinoVectors);};
+  vector<vector<double> > GetHadronNeutrinoSEDMuon(int i) {return ReturnHadronNeutrinoSED(i, HadronicMuonNeutrinoVectors);};
+  vector<vector<double> > GetHadronNeutrinoSEDElectron(int i) {return ReturnHadronNeutrinoSED(i, HadronicElectronNeutrinoVectors);};  
+  
+  
+  
   
   Radiation *Clone() { return this; }
   void SetPPEmissionModel(int PIMODEL) {
