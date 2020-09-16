@@ -62,6 +62,20 @@ Radiation::Radiation() {
   AmbientMediumComposition.clear();
   diffSpecHadronComponents.clear();
   
+  // This are the vectors used for the neutrino calculations
+  HadronicMuonNeutrinoVectors.clear();
+  HadronicElectronNeutrinoVectors.clear();
+  HadronicTotalNeutrinoVectors.clear();
+  
+  ProtonMuonNeutrinoVector.clear();
+  ProtonElectronNeutrinoVector.clear();
+  ProtonTotalNeutrinoVector.clear();
+  
+  MuonNeutrinoVector.clear();
+  ElectronNeutrinoVector.clear();
+  TotalNeutrinoVector.clear();
+  
+  
   for(unsigned int i=0;i<RADFIELDS_MAX;i++) {
     fdiffics[i] = NAN;
     TargetPhotonEdensities[i] = 0.;
@@ -1537,8 +1551,17 @@ void Radiation::CalculateNeutrinoSpectrum(vector<double> points){
   if (MuonNeutrinoVector.size()) fUtils->Clear2DVector(MuonNeutrinoVector);
   if (ElectronNeutrinoVector.size()) fUtils->Clear2DVector(ElectronNeutrinoVector);
   if (TotalNeutrinoVector.size()) fUtils->Clear2DVector(TotalNeutrinoVector);
-  if (!ProtonVector.size()) {
-    cout << "Radiation::CalculateNeutrinoSpectrum: No proton spectrum filled "
+  
+  if (ProtonMuonNeutrinoVector.size()) fUtils->Clear2DVector(ProtonMuonNeutrinoVector);
+  if (ProtonElectronNeutrinoVector.size()) fUtils->Clear2DVector(ProtonElectronNeutrinoVector);
+  if (ProtonTotalNeutrinoVector.size()) fUtils->Clear2DVector(ProtonTotalNeutrinoVector);
+  
+  if (HadronicMuonNeutrinoVectors.size()) fUtils->Clear3DVector(HadronicMuonNeutrinoVectors);
+  if (HadronicElectronNeutrinoVectors.size()) fUtils->Clear3DVector(HadronicElectronNeutrinoVectors);
+  if (HadronicTotalNeutrinoVectors.size()) fUtils->Clear3DVector(HadronicTotalNeutrinoVectors);
+  
+  if (!ProtonVector.size() && !HadronSpectra.size()) {
+    cout << "Radiation::CalculateNeutrinoSpectrum: No proton or hadron spectra filled "
             "-> No neutrino spectra to calculate. Exiting..." << endl;
     return;
   }
@@ -1549,6 +1572,10 @@ void Radiation::CalculateNeutrinoSpectrum(vector<double> points){
       vector<vector<double> > temp;
       if (!n) { temp0[0] = 1.0; temp0[1] = 0.0;
           temp.push_back(temp0);
+          if(!QUIETMODE) cout << "Warning in Radiation::CalculateNeutrinoSpectrum: "
+                             "No ambient medium defined "
+                             "for p-p scattering. Values will be zero." << endl;
+          
       }
       else { temp0[0] = 1.0; temp0[1] = n;
           temp.push_back(temp0);
@@ -1604,10 +1631,9 @@ void Radiation::CalculateNeutrinoSpectrum(vector<double> points){
  ****************************************************************************************/
 double Radiation::CalculateNeutrinoFlux(double energy, int leptontype) {
     if (!n) {
-        if(!QUIETMODE) cout << "Radiation::CalculateNeutrinoFlux: "
-                             "No ambient density value set "
-                             "for p-p scattering. Returning zero value." << endl;
+        if ((AmbientMediumComposition.size() == 1) && (AmbientMediumComposition[0][1] == 0.0)) {
         return 0.;
+        }
     }
     double integral = 0;
     const double ethresh = 1.22e-3 * TeV_to_erg;  // Threshold for pion production
@@ -1643,8 +1669,7 @@ double Radiation::CalculateNeutrinoFlux(double energy, int leptontype) {
         cout << "Radiation::CalculateNeutrinoFlux: No valid lepton type specified.";
         return 0.;
     }
-    //double constant = c_speed * n;  // n is the ambient density of protons in [cm-3]
-    //double result = constant * integral * ln10;
+
     double result = c_speed * integral * ln10;
     return result;
 }

@@ -878,6 +878,15 @@ void Utils::Clear2DVector(vector< vector<double> > &v) {
 }
 
 
+void Utils::Clear3DVector(vector< vector< vector<double> > > &v) {
+  for (unsigned int i = 0; i < v.size(); i++) {
+      for (unsigned int j = 0; j < v[i].size(); j++) v[i][j].clear();
+      v[i].clear();
+  }
+  v.clear();
+}
+
+
 vector< vector<double> > Utils::MeshgridToTwoDVector(vector<double> x, vector<double> y, 
                                                      vector< vector<double> > mesh) {
                              

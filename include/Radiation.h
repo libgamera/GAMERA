@@ -130,6 +130,7 @@ class Radiation {
   vector<vector<double> > SSCTargetPhotons;  ///< 2D-vector object holding the
                                              ///SSC target photon spectrum  {
                                              ///E(erg) - Edens(erg cm^-3) }
+                                             
   vector<vector<double> > MuonNeutrinoVector; /// Vector containing muon neutrinos from
                                             /// first decay of charged pions
   vector<vector<double> > ElectronNeutrinoVector; /// Vector containing electron/muon Neutrinos from
@@ -137,6 +138,23 @@ class Radiation {
                                             /// charged pions
   vector<vector<double> > TotalNeutrinoVector; /// Vector containing the total neutrino emission from
                                             /// pp-collisions.
+                                            
+  vector<vector<double> > ProtonMuonNeutrinoVector; /// Vector containing muon neutrinos from
+                                            /// first decay of charged pions for protons
+  vector<vector<double> > ProtonElectronNeutrinoVector; /// Vector containing electron/muon Neutrinos from
+                                            /// decay of muon into an electron after decay of 
+                                            /// charged pions for protons
+  vector<vector<double> > ProtonTotalNeutrinoVector; /// Vector containing the total neutrino emission from
+                                            /// pp-collisions for protons.    
+                                            
+  vector<vector<vector<double> > > HadronicMuonNeutrinoVectors; /// Vector containing muon neutrinos from
+                                            /// first decay of charged pions
+  vector<vector<vector<double> >  > HadronicElectronNeutrinoVectors; /// Vector containing electron/muon Neutrinos from
+                                            /// decay of muon into an electron after decay of 
+                                            /// charged pions
+  vector<vector<vector<double> > > HadronicTotalNeutrinoVectors; /// Vector containing the total neutrino emission from
+                                            /// pp-collisions.                                            
+                                            
   double n;  ///< ambient density for Bremsstrahlung and inelastic p-p emission
              ///mechanisms (cm^-3)
   double fdiffbrems;  ///< differential flux at specified energy E (in
