@@ -361,10 +361,10 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
     
     IntFunc = &Radiation::ICEmissivityRadFieldIntegrated;
   } else if (!radiationMechanism.compare("ppEmission")) {
-    if (!n && !AmbientMediumComposition) {
+    if (!n && AmbientMediumComposition.size()) {
       if(!QUIETMODE) cout << "Radiation::DifferentialEmissionComponent:"
                              "No ambient density value set for "
-                             "p-p scattering. Returning zero value." << endl; //TODO: fix it
+                             "p-p scattering. Returning zero value." << endl;
       return 0.;
     }
     if(PiModel<0 || PiModel>3)  {
@@ -380,6 +380,12 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
     }
     IntFunc = &Radiation::PPEmissivity;
   } else if (!radiationMechanism.compare("hadronicEmission")) {
+	  if (!n && AmbientMediumComposition.size()) {
+	    if(!QUIETMODE) cout << "Radiation::DifferentialEmissionComponent:"
+	                           "No ambient density value set for "
+	                           "p-p scattering. Returning zero value." << endl;
+	    return 0.;
+	  }
     IntFunc = &Radiation::PPEmissivity;
       
       
