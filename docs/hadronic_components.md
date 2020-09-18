@@ -86,6 +86,7 @@ composition = fr.GetAmbientMediumComposition()    # This returns the list define
 ```
 
 **Get the Gamma-ray spectra**
+
 One can retrieve the Gamma-ray spectra and SEDs from each hadronic species defined with the function `AddHadrons`. But first, the emission has to be calculated, which is done with the same function as usually:
 ```python
 e_values = np.logspace(-1,4,50)*gp.TeV_to_erg
