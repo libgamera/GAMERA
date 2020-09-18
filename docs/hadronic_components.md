@@ -73,6 +73,39 @@ where `composition` is a list of tuples of the form (mass number, density in cm-
 Be aware that calling `SetAmbientMediumComposition` will overwrite `SetAmbientDensity` and viceversa.
 So these two functions should not be used together.
 
+**Get back the previously defined hadronic spectra, mass numbers and the composition of the ISM**
+
+The extract the previously defined hadronic spectra, the mass numbers and the composition of the ambient medium the following functions can be used:
+
+```python
+i = 0
+hadron_spectrum_i = fr.GetHadrons(i)    # This returns the spectrum of the first hadron species defined with the AddHadrons-function.
+                                        # i=1 will return the spectrum of the second species and so on.
+hadron_masses = fr.GetHadronMasses()    # This returns a list with the masses of all previously defined hadron species
+composition = fr.GetAmbientMediumComposition()    # This returns the list defined with the function SetAmbientMediumComposition(composition)
+```
+
+**Get the Gamma-ray spectra**
+One can retrieve the Gamma-ray spectra and SEDs from each hadronic species defined with the function `AddHadrons`. But first, the emission has to be calculated, which is done with the same function as usually:
+```python
+e_values = np.logspace(-1,4,50)*gp.TeV_to_erg
+fr.CalculateDifferentialPhotonSpectrum(e_values)
+```
+The total spectrum and the total SED, which can be retrieved as in other tutorials with
+```python
+total_spectrum = fr.GetTotalSpectrum()  # Returns the total spectrum
+total_SED = fr.GetTotalSED()            # Returns the total SED
+```
+already contains the contributions from all hadron species. To get the contribution from individual species, one can use the following function:
+
+```python
+i = 0
+Spectrum = fr.GetHadronSpectrum(i)    # To get the spectrum from hadron species number i
+SED = fr.GetHadronSED(i)              # To get the SED from hadron species number i
+```
+
+
+
 **Caveat**
 
 The densities that are being set up with `SetAmbientMediumComposition` will affect only the pi0 emission.
