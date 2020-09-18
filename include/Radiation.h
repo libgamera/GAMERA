@@ -320,12 +320,10 @@ class Radiation {
   vector<vector<double> > GetElectronVector() {
     return ElectronVector;
   }  ///< return electron spectrum return format: 2D vector
-  void SetAmbientDensity(double N) {
-    n = N;
-  }  ///< set ambient number density (cm^-3)
+  void SetAmbientDensity(double N);  ///< set ambient number density (cm^-3). Assumes protons and 10% Helium
   double GetAmbientDensity() {
     return n;
-  }  ///< get ambient number density (cm^-3)
+  }  ///< get ambient number density (cm^-3). Assumes protons and 10% Helium
   void CalculateDifferentialGammaEmission(double e, int particletype);
   void CalculateDifferentialPhotonSpectrum(int steps = 100, double emin = 0.,
                                            double emax = 0.);
