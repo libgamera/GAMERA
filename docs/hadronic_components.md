@@ -54,6 +54,11 @@ so the function takes 2 arguments, the differential spectrum of the particles an
 This function can be called multiple times and will keep add species to the flux.
 When called with mass number one, it has exactly the same effect of `SetProtons`, so be careful not to double
 accidentally the proton flux when using both functions.
+It is possible to delete all previously added hadronic species with the function below:
+
+```python
+fr.ClearHadrons()
+```
 
 **Set arbitrary composition of the ISM**
 
