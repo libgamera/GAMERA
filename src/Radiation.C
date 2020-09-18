@@ -145,8 +145,6 @@ void Radiation::ClearHadrons() {
 }
 
 
-
-
 /**
  * Calculates the differential photon emission at energy 'e' [erg]. This results
  *  in
@@ -1668,8 +1666,6 @@ void Radiation::AddHadrons(vector<vector<double> > Spectrum, double Mass_number)
 }
 
 
-
- 
 // TEST: Only for testing purposes of the lookups for Hadrons
 double Radiation::TestHadronLookup(int i, double e){
  double value = fUtils->EvalSpline(e,HadronSpectraLookups[i],
@@ -1678,6 +1674,17 @@ double Radiation::TestHadronLookup(int i, double e){
 }
 
 
+/*
+ * Set the default ambient composition with simply protons and 10% Helium.
+ * This is for consistency with Bremsstrahlung and ionization processes
+ * which use this default values for the composition of the ISM.
+ * Input: proton number density in [cm^-3].
+ */
+void Radiation::SetAmbientDensity(double N){
+	n = N; // number density for the protons
+	vector<vector<double>> default_comps = {{1., n},{4.,0.1*n}};
+	AmbientMediumComposition = default_comps;
+}
  
  
  /****************************************************************************
