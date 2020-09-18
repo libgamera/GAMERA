@@ -1790,9 +1790,6 @@ double Radiation::CalculateEpsilon(double Tp, double Mass){
  * This function calculates the nucleus-nucleus reaction cross section (equation 17 in Kafexhiu et al. 2014)
  * It is valid for projectile energies > 0.2 GeV for a proton projectile and > 0.1 GeV/nucleon for a nuclei
  * projectile different than a proton.
- * TODO: Edit this comment
- * The function is only needed for the case where the projectile is a proton.used by 
- * Therefore, an if decision was neglected.
  * Input parameters:    - Projectile mass number
  *                      - Target mass number
  * 
