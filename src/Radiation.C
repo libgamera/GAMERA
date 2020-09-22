@@ -216,9 +216,9 @@ void Radiation::CalculateDifferentialGammaEmission(double e, int particletype) {
                 // cout << "Filling field number: "<<i<<endl;
                 ldiffic = DifferentialEmissionComponent(e, p);
                 fdiffics[i] = lumtoflux * ldiffic;
-                for (int k=0;k<3;k++){
-                    cout<<"fdiffics["<<k<<"]: "<<fdiffics[k]<<endl;
-                }
+                // for (int k=0;k<3;k++){
+                //     cout<<"fdiffics["<<k<<"]: "<<fdiffics[k]<<endl;
+                // 	}
                 ldiffic_sum += ldiffic;
             }
         }
@@ -2084,7 +2084,7 @@ void Radiation::ResetWithSSCTargetPhotons(int i,double R, int steps) {
 void Radiation::SetSSCTargetPhotons(double R, int steps, int i) {
   if (R <= 0.) {
     cout
-        << "Radiation::SetSSCTargetPhotons: Souce extension is <= 0... exiting!"
+        << "Radiation::SetSSCTargetPhotons: Source extension is <= 0... exiting!"
         << endl;
     return;
   }
@@ -2713,7 +2713,7 @@ vector<vector<double> > Radiation::GetICSpectrum(unsigned int i, double emin, do
         FASTMODE_IC=true;
     }
     return ReturnDifferentialPhotonSpectrum(i+1, emin, emax, diffSpecICComponents);
-}  ///< return pi0 decay spectrum
+}  ///< return Inverse Compton spectrum
 
 
 vector<vector<double> > Radiation::GetICSED(unsigned int i, double emin, double emax) {
