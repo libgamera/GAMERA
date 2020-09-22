@@ -126,8 +126,8 @@ The Synchrotron Self Compton (SSC) process happens when the electrons the synchr
 itself a target photon field for inverse Compton processes. This type of process can become important in certain astrophysical scenarios like
 AGNs and gamma-ray bursts.
 
-In GAMERA the emission from this process is taken into account in the radiation class (there is a tentative implementation also to account for it
-also in the time evolution of the particles, but it is not covered here yet).
+*In GAMERA the emission from this process is taken into account in the radiation class (there is a tentative implementation to account for it
+in the time evolution of the particles, but it is not covered here yet. It will come in a seprate tutorial).*
 
 To compute the contribution of SSC to the total gamma ray spectrum, we have to add the synchrotron radiation as a target field and there is a set of
 functions that can do this. Before going into the details of how to do this in GAMERA, we need clarify the assumptions that go into the calculations.
