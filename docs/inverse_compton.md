@@ -122,7 +122,61 @@ At the moment the code does not allow to switch back from an isotropic distribut
 Synchrotron Self Compton process
 --------------------------------
 
-### Under Construction
+The Synchrotron Self Compton (SSC) process happens when the electrons the synchrotron radiation produced by the electron distribution becomes
+itself a target photon field for inverse Compton processes. This type of process can become important in certain astrophysical scenarios like
+AGNs and gamma-ray bursts.
+
+In GAMERA the emission from this process is taken into account in the radiation class (there is a tentative implementation also to account for it
+also in the time evolution of the particles, but it is not covered here yet).
+
+To compute the contribution of SSC to the total gamma ray spectrum, we have to add the synchrotron radiation as a target field and there is a set of
+functions that can do this. Before going into the details of how to do this in GAMERA, we need clarify the assumptions that go into the calculations.
+To correctly compute the SSC component, we need to know the number of upscattered photons. Given that GAMERA routines output a flux (or a luminosity)
+for the synchrotron emission, it is needed to assume a certain volume of the emission region in order to know the number density of the target radiation.
+In GAMERA the assumption is that of a homogeneous sphere with radius `R` (user-defined).
+
+```C++
+N = DifferentialEmissionComponent(E, p) * U / (4. * pi * R * R * c_speed);
+```
+where `DifferentialEmissionComponent(E, p)` is the synchrotron spectrum and `U` is a correction number arising from the fact that the entire volume
+of the sphere contributes to the production of synchrotron radiation (see equations 15-17 of 
+[this](https://ui.adsabs.harvard.edu/abs/1996MNRAS.278..525A/abstract) paper).
+
+**SSC in GAMERA in practice**
+
+Assuming you are using the python interface, obtaining the SSC spectrum is quite simple, but requires being careful with the order of the statements.
+A basic example can be [this](radiation_sed_SSC.py) one (you can download a working script). In the following we illustrate the most important aspects:
+
+```python
+# Initialize the radiation class
+fr = gp.Radiation() 
+fr.SetBField(b_field)
+fr.AddThermalTargetPhotons(t_1,edens_1)  # add a thermal field
+fr.SetDistance(distance)
+fr.SetElectrons(elLogPsp)  # set the electrons (logparabola shape)
+e = np.logspace(-6,15,200) * gp.eV_to_erg  # energy range of the gamma-ray emission
+fr.CalculateDifferentialPhotonSpectrum(e)  # do a first calculation of the radiation
+```
+In this first step, we run GAMERA as ususal and after the set up of the particle spectrum, magnetic field and a thermal target photon,
+we compute the radiation output. The new part comes next:
+```python
+fr.AddSSCTargetPhotons(1.)
+fr.CalculateDifferentialPhotonSpectrum(e)
+```
+The function `Radiation::AddSSCTargetPhotons(double R, int steps = 200)` adds the synchrotron radiation that has been just calculated
+to the list of the target photons, assuming a radius of the emission region of 1 parsec (values are for illustration purposes). After this,
+we need to recompute the photon spectrum with `CalculateDifferentialPhotonSpectrum`.
+
+The resulting spectum coming from the script linked before is here
+
+![ssc_spectrum](SED_electrons_SSC.png) 
+
+where you can see both inverse compton contributions.
+
+Another function that can be used is `Radiation::ResetWithSSCTargetPhotons(int i, double R, int steps = 200)`. This function allows the user to
+replace the thermal field `i` with the Synchrotron field. As for the general case, the SSC specific functions must be called after a first computation
+of the photon spectrum (the synchrotron radiation has to be computed).
+
 
 [(one page up)](tutorials_main.md)
 
