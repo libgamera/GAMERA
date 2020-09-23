@@ -543,7 +543,7 @@ double Particles::EnergyLossRate(double E) {
   double beta=sqrt(1-1/gamma2);
   double p = sqrt(gamma2 - 1.);
   /* S-parameter. This is only the case in a pure hydrogen gas environment. For
-   * more comlex mixture,
+   * more complex mixture,
    * nuclear charge of the different gas species become important. See Haug2004
    */
   double S = N;
@@ -1764,7 +1764,7 @@ vector< vector<double> > Particles::GetQuantityVector(vector<double> epoints,
 
 
 /**
- * Funtion under construction! Use at own peril!
+ * Function under construction! Use at own peril!
  */
 vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
   if (TminExternal) Tmin = TminExternal;
