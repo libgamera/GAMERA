@@ -903,7 +903,7 @@ void Radiation::CreateICLossLookup(int bins) {
  * a given energy of the electron and stores the results in Radiation::ICLossVectorCurrent
  * 
  * \param i = index of the photon field
- * \param bins = number of bins for the electon energy range
+ * \param bins = number of bins for the electron energy range
  * 
  */
 void Radiation::CreateICLossLookupIndividual(int i, int bins) {

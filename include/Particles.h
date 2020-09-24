@@ -309,11 +309,13 @@ struct timespec time0, time1, time2, time3;
   void ComputeGridInTimeInterval(double T1, double T2, string type, int bins,
                                  bool ICRESET);
                                               ///< wrapper function to calculate
-                                              ///the grid only in a specified
-                                              ///time interval dT = T2-T2 (yrs)
+                                              /// the grid only in a specified
+                                              /// time interval dT = T2-T2 (yrs)
   vector< vector<double> > GetEnergyLossRateVector(vector<double> epoints,
                                                    string type, double age, 
-                                                        bool TIMESCALE);
+                                                        bool TIMESCALE); ///< Returns either
+                                                                         /// energy loss rate or
+                                                                         /// cooling time
   vector< vector<double> > GetInjectionSpectrumVector(vector<double> epoints,
                                                       double age, bool SED);
   void CalculateParticleSpectrum(string type = "electrons", int bins = 100,
@@ -632,6 +634,7 @@ struct timespec time0, time1, time2, time3;
   vector<double> CalculateSSCEquilibrium(double tolerance = 5e-2, int bins = 100);
   void SetFastIteration() {FASTMODE = true;}
   void SetPreciseIteration() {FASTMODE = false;}
+  int GetTargetFieldCount(){ return fRadiation->GetTargetFieldCount();}
   /*********************************************************/
   /* DEPRECATED FUNCTIONS KEPT FOR BACKWARDS COMPATIBILITY */
   void SetEmin(double EMIN, bool ONLYFORNORMALISATION =

@@ -524,8 +524,14 @@ void Particles::ExtendLookup(vector<vector<double> > v, string LookupType) {
   return;
 }
 
-/** calculates the energy loss rate at a given time t from the shock dynamics,
+/**
+ * Calculates the energy loss rate at a given time t from the shock dynamics,
  * ambient photon and B-fields.
+ *
+ * Arguments:
+ *   double E : energy of the particle [erg]
+ * Returns:
+ *   double loss_rate (in seconds)
  */
 double Particles::EnergyLossRate(double E) {
   synchl = icl = adl = bremsl = ppcol = ionization = 0.;
@@ -1651,13 +1657,20 @@ void Particles::ClearTargetPhotons() {
 //  SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
 //}
 
+
 void Particles::CheckSanityOfTargetPhotonLookup() {
   fRadiation->CheckSanityOfTargetPhotonLookup();
 }
 
+
 vector<vector<double> > Particles::GetTargetPhotons(int i) {
   return fRadiation->GetTargetPhotons(i);
 }
+
+/*
+ * Returns the energy loss rate of a particle with energy E depending on
+ * the loss process. Energy is given in erg.
+ */
 double Particles::GetEnergyLossRate(double E, string type, double age) {
     
     if(age) {
@@ -1680,6 +1693,20 @@ double Particles::GetEnergyLossRate(double E, string type, double age) {
     }
 }
 
+/*
+ * Computes and returns either the energy loss rate of the particle or the
+ * cooling time via setting the \a TIMESCALE boolean to false or true
+ * respectively
+ *
+ * Arguments:
+ * vector<double> epoints : vector of energies of the particle
+ *            string type : process for which you want the information
+ *             double age : age at which you want to compute
+ *         bool TIMESCALE : 1 for cooling time; 0 for energy loss rate
+ *
+ * Returns:
+ * vector< vector<double>> of tuples (energy, value)
+ */
 vector< vector<double> > Particles::GetEnergyLossRateVector(vector<double> epoints,
                                                         string type, double age, 
                                                                bool TIMESCALE) {
@@ -1765,6 +1792,8 @@ vector< vector<double> > Particles::GetQuantityVector(vector<double> epoints,
 
 /**
  * Function under construction! Use at own peril!
+ * TODO: The handling of the SSC field should be done better. Not sure all the cases
+ * are correctly taken into account
  */
 vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
   if (TminExternal) Tmin = TminExternal;
@@ -1800,7 +1829,7 @@ vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
     }
     R = pow(10.,log_r);
     if (log_r == log10(r_start)) AddSSCTargetPhotons();
-    else ResetWithSSCTargetPhotons(target_field_count);
+    else ResetWithSSCTargetPhotons(target_field_count-1);
     CalculateElectronSpectrum(bins);
     e_p = GetParticleEnergyContent();
     iter.push_back(e_p);
@@ -1810,7 +1839,7 @@ vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
     cout << "   -> precision reached / goal:     " << endl;  
   R = r_orig;
   while(1){
-    ResetWithSSCTargetPhotons(target_field_count);
+    ResetWithSSCTargetPhotons(target_field_count-1);
     SetMembers(Age);
     CalculateElectronSpectrum(bins);
     e_p = GetParticleEnergyContent();
