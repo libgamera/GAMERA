@@ -148,7 +148,8 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   } else if (!type.compare("protons")) {
     Type = 1;
   } else {
-    cout << "Particles::CalculateParticleSpectrum: What the fuck! Specify "
+    cout << "Particles::CalculateParticleSpectrum: Particle type not "
+    		"recognized. Please specify "
             "supported particle species! " << endl;
   }
   if (!QUIETMODE) {
@@ -164,16 +165,13 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
     return;
   }
     
-
   if (VVector.size() && !RVector.size()) {
     cout << "Particles::CalculateParticleSpectrum: You set a velocity time "
          << "lookup but no radius time lookup. Both need to be set via "
          << "Particles::SetRadiusLookup() and Particles::SetVelocityLookup(), "  
          << "otherwise I exit! Exiting. "<<endl;
     exit(1);
-
   }
-
 
   if(!LumVector.size() && std::isnan(LumConstant) 
      && CustomInjectionSpectrum == NULL 
@@ -182,6 +180,7 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
          << endl;
     return;
   }
+
   /* reset Particle Lookup */
   fUtils->Clear2DVector(ParticleSpectrum);
 
@@ -221,7 +220,6 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   else
     eMax = DetermineEmax(Tmin);
 
-
   /* apply a safe margin to the upper energy boundary
    * in order to prevent numerical effects at the upper end of the spectrum.
    */
@@ -236,11 +234,10 @@ void Particles::CalculateParticleSpectrum(string type, int bins, bool onlyprepar
   }
 
   if (!METHOD) {
-  
     PrepareAndRunNumericalSolver(ParticleSpectrum, onlyprepare, dontinitialise);
-    
   }
   else if (METHOD==1) {
+	// semi-analytical
     CalculateEnergyTrajectory();
     CalcSpecSemiAnalyticConstELoss();
   }
@@ -349,8 +346,7 @@ double Particles::PowerLawInjectionSpectrum(double e, double ecut,
   /* calculate the normalisation */
   double SourceSpectrumNorm = Lum / integral;
   double J = 0.;
-  /* Broken power-law. If both SpectralIndex2 and a break energy was specified
-   */
+  /* Broken power-law. If both SpectralIndex2 and a break energy was specified */
   if (SpectralIndex2 && eBreak) {
     if (e > eBreak)
       J = SourceSpectrumNorm * pow(e / eBreak, -SpectralIndex) *
@@ -590,8 +586,8 @@ double Particles::EnergyLossRate(double E) {
       N * bremsl_eef * (p * (gamma - 1.) / gamma) * (log(2. * gamma) - 1. / 3.);
   bremsl = bremsl_ep + bremsl_ee;
 
-  /* in case of protons, only take adiabatic losses into account */
-  // TODO: for protons, define analogon to loss rate from (catastrophic) 
+  /* in case of protons, take adiabatic and ionization losses into account */
+  // TODO: for protons, define analog to loss rate from (catastrophic)
   // proton-proton interaction time scale?
   if (Type) {
     synchl = 0.;
@@ -622,7 +618,7 @@ double Particles::EnergyLossRate(double E) {
 }
 
 /** Prepare axes for the numerical solver (and if onlyprepare==false) call the
- * solver
+ *  solver
  */
 void Particles::PrepareAndRunNumericalSolver(
     vector<vector<double> > &particlespectrum, bool onlyprepare,
@@ -657,7 +653,7 @@ void Particles::GetAxis(double min, double max, int steps, vector<double> &Axis,
   } 
 
   steps = int(quot * steps);
-  double binsize = (max - min) / steps; //FIXME: replacec by ebins!
+  double binsize = (max - min) / steps; //FIXME: replace by ebins!
   ebins = steps +1;
   Axis.resize(steps+1);
   for (unsigned int i = 0; i < Axis.size(); i++) {
@@ -949,8 +945,10 @@ void Particles::ComputeGrid(vector<double> EnergyAxis, double startTime,
         double lw = 0.5*quot*(LaxWendroffSlope(i,ebin,i0)*ElossRate_e1*(ebin-deltaE1)-LaxWendroffSlope(i+1,ebin,i0)*ElossRate_e2*(ebin-deltaE2));
         value -= lw;*/
         
-        /* Comment the next lines until the curly bracket if the
-         * Lax-Wendroff slope limiter is used.                   */
+        /*
+         * Comment the next lines until the curly bracket if the
+         * Lax-Wendroff slope limiter is used.
+         */
         mm =  0.5*quot * (GetMinModSlope(i, ebin, i0) * ElossRate_e1 *
                                  (ebin - deltaE1) -
                              GetMinModSlope(i + 1, ebin, i0) * ElossRate_e2 *
@@ -995,7 +993,7 @@ void Particles::ComputeGrid(vector<double> EnergyAxis, double startTime,
   }
 
   /* Fill the final lookup, holding the time evolved spectrum at time = Age.
-   * Also, forego edge bins in order to avoid artefacts.
+   * Also, forego edge bins in order to avoid artifacts.
    */
   TIterationStart = 0.;
   fUtils->Clear2DVector(ParticleSpectrum);
@@ -1272,8 +1270,9 @@ void Particles::SetType(string type) {
   else if (!type.compare("protons"))
     Type = 1;
   else
-    cout << "Particles::SetType: What the f***! Specify supported particle "
-            "species! " << endl;
+    cout << "Particles::SetType: Particle type not recognized! "
+    		"Please specify supported particle "
+            "species! (electrons or protons)" << endl;
   return;
 }
 
@@ -1729,6 +1728,18 @@ vector< vector<double> > Particles::GetEnergyLossRateVector(vector<double> epoin
     return v;
 }
 
+/**
+ * Returns the injection spectrum:
+ * Arguments:
+ *   vector<double> epoints : vector of energies to return the spectrum (erg units)
+ *               double age : age at which to return the spectrum (if age not
+ *                            given, then computes as the injection)
+ *                 bool SED : true if the particle spectrum should be returned
+ *                            as E^2dN/dE
+ * Returns:
+ *   vector< vector<double>> v : vector of tuples (Energy, spectrum)
+ *                               energy returned in TeV.
+ */
 vector< vector<double> > Particles::GetInjectionSpectrumVector(
                                                       vector<double> epoints,
                                                       double age, bool SED) {
@@ -1752,6 +1763,9 @@ vector< vector<double> > Particles::GetInjectionSpectrumVector(
     return v;
 }
 
+/**
+ * Wrapper around other get functions
+ */
 vector< vector<double> > Particles::GetQuantityVector(vector<double> epoints,
                                                       double age, string mode) {
     if(!epoints.size()) {
@@ -1793,7 +1807,8 @@ vector< vector<double> > Particles::GetQuantityVector(vector<double> epoints,
 /**
  * Function under construction! Use at own peril!
  * TODO: The handling of the SSC field should be done better. Not sure all the cases
- * are correctly taken into account
+ * are correctly taken into account.
+ * To work the SSC must be the last target field added to list.
  */
 vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
   if (TminExternal) Tmin = TminExternal;
@@ -1802,6 +1817,7 @@ vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
   int steps = 10;
   double delta_log_r = (log10(r_start) - log10(r_orig)) / steps;
   double delta_t = (Age-Tmin) / steps;
+  // returns Radiation::RADFIELD_COUNTER
   double target_field_count = fRadiation->GetTargetFieldCount();
   double e_p = 0.;
   double e_p_0 = 0.;
@@ -1829,14 +1845,15 @@ vector<double> Particles::CalculateSSCEquilibrium(double tolerance, int bins) {
     }
     R = pow(10.,log_r);
     if (log_r == log10(r_start)) AddSSCTargetPhotons();
+    // -1 because the counter starts from 1, while the indexing of the target
+    // fields starts from 0
     else ResetWithSSCTargetPhotons(target_field_count-1);
     CalculateElectronSpectrum(bins);
     e_p = GetParticleEnergyContent();
     iter.push_back(e_p);
     e_p_0 = e_p;
   }   
-
-    cout << "   -> precision reached / goal:     " << endl;  
+  cout << "   -> precision reached / goal:     " << endl;
   R = r_orig;
   while(1){
     ResetWithSSCTargetPhotons(target_field_count-1);

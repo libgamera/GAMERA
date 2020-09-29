@@ -298,7 +298,7 @@ struct timespec time0, time1, time2, time3;
   int gslmemory; ///< memory of the GSL workspace when integrating.
                  /// Default = 5000
   int kronrodrule;
-  vector<double> Constants;
+  vector<double> Constants;  ///< Auxiliary vector for speed-up
   vector<gsl_spline *> splines;
   vector<gsl_interp_accel *> accs;
   vector<double *> vals;
