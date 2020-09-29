@@ -288,7 +288,7 @@ struct timespec time0, time1, time2, time3;
                                                   ///specified, returns a broken
                                                   ///power law.
   double InverseLossRate(double *x, double *par);
-  void SetLookup(vector<vector<double> > v, string LookupType);  ///<
+  void SetLookup(vector<vector<double> > v, string LookupType);  ///<Sets lookup for evolution
   void ExtendLookup(vector<vector<double> > v, string LookupType);
   double SemiAnalyticConstELossIntegrand(double T, void *par);
   double SourceSpectrumWrapper(double E, void *par);

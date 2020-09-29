@@ -652,6 +652,10 @@ vector< vector<double> > Utils::SortTwoDVector(vector< vector<double> > v,
   return v;
 }
 
+/**
+ * Transform the quantity in the \a column column of vector v in a logarithmic
+ * quantity (log in base 10)
+ */
 vector< vector<double> > Utils::VectorAxisLogarithm(vector< vector<double> > v,
                                                     unsigned int column) {
   if(!v.size()) {

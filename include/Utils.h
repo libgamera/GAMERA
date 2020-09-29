@@ -144,7 +144,7 @@ class Utils {
   void SetInterpolationMethod(string intermeth);
   void Clear2DVector(vector< vector<double> > &v);
   vector< vector<double> > VectorAxisLogarithm(vector< vector<double> > v,
-                                               unsigned int column);
+                                               unsigned int column); ///< Make log10 of column
 
   vector< vector<double> > VectorAxisPow10(vector< vector<double> > v,
                                                     int column);

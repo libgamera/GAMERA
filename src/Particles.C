@@ -123,7 +123,9 @@ void Particles::CalculateConstants() {
   bremsl_epf = 3. * fineStructConst * sigma_T * c_speed * m_e / pi;
   bremsl_eef = (3. * fineStructConst * sigma_T * c_speed * m_e / (2. * pi));
   if(!Type && (fRadiation->GetICLossLookup()).size()) {
-        SetLookup(fRadiation->GetICLossLookup(), "ICLoss");}
+	// Take the lookup of the IC losses from the Radiation class
+    SetLookup(fRadiation->GetICLossLookup(), "ICLoss");
+  }
   return;
 }
 
@@ -307,8 +309,9 @@ double Particles::EscapeTime(double e, double t) {
   else return 0.;
 }
 
-// this is perhaps outdated, as custom injection functions also cover this 
+// This is perhaps outdated, as custom injection functions also cover this
 // special case. FIXME: Remove this?
+// *Advised to use the Particles::CustomInjectionSpectrum function*
 double Particles::PowerLawInjectionSpectrum(double e, double ecut,
                                             double emax) {
 
@@ -319,7 +322,6 @@ double Particles::PowerLawInjectionSpectrum(double e, double ecut,
   /* Broken power-law. Used, if both SpectralIndex2 and a break energy are
    * specified */
   // FIXME: special case SpectralIndex,SpectralIndex2 = 2
-
   if (SpectralIndex2 && eBreak) {
     if (SpectralIndex != 2. && SpectralIndex2 != 2.) {
       integral = eBreakS2 * (eBreak2mS2 - emin2mS2) * fS2;
@@ -329,7 +331,9 @@ double Particles::PowerLawInjectionSpectrum(double e, double ecut,
             (pow(emax / eBreak, 2. - SpectralIndex2) - emineBreak2mS2) * fS2;
       }
     } else {
-      cout << "Particles::PowerLawInjectionSpectrum: todo!" << endl;
+      cout << "Particles::PowerLawInjectionSpectrum: "
+    		  "SpectralIndex,SpectralIndex2 = 2 case not implemented!"
+    		  << endl;
     }
   }
   /* else, a single power-law is used in the integrated flux (introduces a small
@@ -368,7 +372,8 @@ double Particles::PowerLawInjectionSpectrum(double e, double ecut,
 }
 
 /** 
- *Set important class members to values at time t.
+ * Set important class members to values at time t.
+ * Time in years
  */
 void Particles::SetMembers(double t) {
   if (t < TminInternal || t > TmaxInternal) {
@@ -433,6 +438,11 @@ void Particles::SetMembers(double t) {
   return;
 }
 
+/**
+ * Sets up lookup for the changed of various quantities:
+ * "ICLoss", "Luminosity", "AmbientDensity", "BField",
+   "Emax", "Radius","Speed","EscapeTimeTdep"
+ */
 void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
   int size = (int)v.size();
   if (!size) {
@@ -442,7 +452,7 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
   vector< vector< double > > lookup;
   if (!LookupType.compare("Luminosity") || !LookupType.compare("Emax")
       || !LookupType.compare("EscapeTimeTdep")) {
-    lookup = fUtils->VectorAxisLogarithm(v,1);
+    lookup = fUtils->VectorAxisLogarithm(v,1);  //transforms in log10
   }
   else {
     lookup = v;
@@ -468,7 +478,6 @@ void Particles::SetLookup(vector<vector<double> > v, string LookupType) {
       *spl[i] = ImportLookup;
       *vs[i] = lookup;   
       DetermineLookupTimeBoundaries();
-      
       return;
     }
   }
@@ -571,10 +580,13 @@ double Particles::EnergyLossRate(double E) {
   /* adiabatic losses (adlossCoeff = V/R) */
   adl = adLossCoeff * E;
 
-  /* Bremsstrahlung losses Haug+2004 */
+  /** Bremsstrahlung losses Haug+2004 */
   /* electron-proton bremsstrahlung */
-  /* TODO: to be super self-consistent, calculate losses in a lookup, analogue
-   * to the IC lookup */
+  /* TODO: to be super self-consistent, calculate losses in a lookup, analog
+   * to the IC lookup.
+   * TODO: This function does not account for losses due to different
+   * atomic species in the environment.
+   */
   bremsl_ep = ((2. * gamma2 / 9. - 19. * gamma * p * p / 675. -
                 0.06 * p * p * p * p / gamma) *
                    p * p * p / (gamma * gamma * gamma * gamma * gamma * gamma) +
@@ -1592,7 +1604,7 @@ void Particles::AddArbitraryTargetPhotons(vector<vector<double> > PhotonArray) {
   fRadiation->AddArbitraryTargetPhotons(PhotonArray);
 }
 
-/** Reset photon target field i by a an arbitray distribution of target photons,
+/** Reset photon target field i by a an arbitrary distribution of target photons,
  * which is used in the
  * IC cooling process in this class.
  */
