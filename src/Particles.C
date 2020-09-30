@@ -27,6 +27,7 @@ Particles::Particles() {
   DEBUG = false;
   FASTMODE = false;
   ESCTIME = false;
+  IONIZATION = false;
   ICLossLookup = NULL;
   iclosslookupbins = 200;
   LumLookup = NULL;
@@ -553,23 +554,15 @@ double Particles::EnergyLossRate(double E) {
   double gamma2 = gamma * gamma;
   double beta=sqrt(1-1/gamma2);
   double p = sqrt(gamma2 - 1.);
-  /* S-parameter. This is only the case in a pure hydrogen gas environment. For
-   * more complex mixture,
-   * nuclear charge of the different gas species become important. See Haug2004
+  /* S-parameter. See Haug2004 (eq.2)
+   * Here assumed as default hydrogen and 10% Helium
+   * TODO: use the new formulation in the Radiation class
+   * to allow different compositions.
    */
-  double S = N;
+  double S = N * 1.4;
   /* synchrotron losses */
   synchl = (4. / 3.) * sigma_T * c_speed * BField * BField * gamma * gamma /
            (8. * pi);
-  /* ionization losses */
-  //Mean value in the interstellar medium if you consider 10% He
-  double z=1.2;
-  //The ions are the protons
-  double Z=1;  
-  double I=15*eV_to_erg; //erg
-  
-  ionization=N*z*4.*pi*pow(el_charge,4)*(Z*Z)/(m_e*beta/c_speed)*(log((2*m_e*pow(beta,2)/I)*gamma2)-pow(beta,2));
-  
   
   if(!ICLossVector.size()) icl=0.;
   else {
@@ -584,8 +577,6 @@ double Particles::EnergyLossRate(double E) {
   /* electron-proton bremsstrahlung */
   /* TODO: to be super self-consistent, calculate losses in a lookup, analog
    * to the IC lookup.
-   * TODO: This function does not account for losses due to different
-   * atomic species in the environment.
    */
   bremsl_ep = ((2. * gamma2 / 9. - 19. * gamma * p * p / 675. -
                 0.06 * p * p * p * p / gamma) *
@@ -593,9 +584,12 @@ double Particles::EnergyLossRate(double E) {
                gamma * log(gamma + p) - p / 3.) *
               bremsl_epf * S * gamma2 / (gamma2 + p * p);
 
-  /* electron-electron bremsstrahlung */
+  /*
+   * Electron-electron bremsstrahlung
+   * Assuming also here the 10% Helium
+   */
   bremsl_ee =
-      N * bremsl_eef * (p * (gamma - 1.) / gamma) * (log(2. * gamma) - 1. / 3.);
+      N * (1.2) * bremsl_eef * (p * (gamma - 1.) / gamma) * (log(2. * gamma) - 1. / 3.);
   bremsl = bremsl_ep + bremsl_ee;
 
   /* in case of protons, take adiabatic and ionization losses into account */
@@ -620,6 +614,17 @@ double Particles::EnergyLossRate(double E) {
     else {
       ppcol=0;
       }
+    /* ionization losses */
+    // Mean value in the interstellar medium if you consider 10% He
+    if (IONIZATION) {
+      double z=1.2;  // Includes the effect of 10% Helium in the target.
+      double Z=1;    // The ions are the protons
+      double I=15*eV_to_erg; //erg
+      // Ionization should not play a role if the plasma is fully ionized!
+      // If you want to apply these losses, then need to activate the IONIZATION flag
+      // Ionization computed here is valid only for protons
+      ionization=N*z*4.*pi*pow(el_charge,4)*(Z*Z)/(m_e*beta/c_speed)*(log((2*m_e*pow(beta,2)/I)*gamma2)-pow(beta,2));
+    }
   }
   if (DEBUG == true) {
     synchl = 0.;

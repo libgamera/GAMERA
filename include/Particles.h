@@ -161,6 +161,7 @@ struct timespec time0, time1, time2, time3;
 
   double synchl,icl,adl,bremsl,ionization,ppcol; ///< loss rates for synchrotron, IC, adiabatic exp.,
                                                  /// bremsstrahlug and ionizarion and pp collision for protons
+  bool IONIZATION;  ///< Boolean to decide if to compute or not the ionization losses.
 
   bool logarithmicCRLumLookupTimeBins;  ///< boolean indicating that time steps
                                         ///in CRLumLookup are logarithmic. In
@@ -338,8 +339,15 @@ struct timespec time0, time1, time2, time3;
                                                int bins = 100, bool ICRESET=false) {
     ComputeGridInTimeInterval(T1,T2,"electrons",bins,ICRESET);}
   void CalculateElectronSpectrumInTimeInterval(int bins = 100) {CalculateParticleSpectrum("electrons",bins);}
-  void SetType(string type);
+  void SetType(string type);  ///< Set the particle type ("protons" or "electrons")
   double EnergyLossRate(double E);  ///< total energy loss rate of particles
+  void SetIonization() {
+	  IONIZATION = true;
+  }  ///< Set the calculation of the ionization. This is because normally we consider fully ionized plasma
+     /// if you really want to compute ionization losses, call this function
+  void UnsetIonization() {
+	  IONIZATION = false;
+  }  ///< Unset accounting for ionization losses.
   void SetAge(double age) {
     Age = age;
     SetMembers(Age);
