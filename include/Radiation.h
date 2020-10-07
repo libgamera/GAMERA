@@ -285,6 +285,8 @@ class Radiation {
   bool SPATIALDEP_CURRENT; ///< boolean state if the absorption target field has a homogeneous density or not
   vector <bool> SPATIALDEP; ///< vector of booleans to state which photon field has a spatial dependency
 
+  double AtomicNumber(double mass_number);  ///< Returns the average atomic number for a given mass number
+
 
  public:
   Radiation();                                       ///< standard constructor

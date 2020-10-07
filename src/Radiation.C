@@ -1176,13 +1176,21 @@ double Radiation::BremsEmissivity(double x, void *par) {
   /* equation (A1) */
   double sigma_e = (sigma1(g, e) + sigma2(g, e)) * A(g, e);
   /* 1.4 correction factor for 10% Helium */
-  double S = n * 1.4;
+  // double S = n * 1.4; // OLD STUFF
+  double S = 0;
+  double Se = 0;
+  for (int i=0;i<AmbientMediumComposition.size();i++){
+     S += AmbientMediumComposition[i][1] * AtomicNumber(AmbientMediumComposition[i][0]) * AtomicNumber(AmbientMediumComposition[i][0]);
+     Se += AmbientMediumComposition[i][1] * AtomicNumber(AmbientMediumComposition[i][0]);
+  }
   /* emissivity assuming a fully ionised plasma (n_e = S), Eq. (27) */
   double N;
   if (EI < 2.e-3 * GeV_to_erg)
-    N = c_speed * b * S * (sigma1(g, e) + sigmaNR(g, e));
+    //N = c_speed * b * S * (sigma1(g, e) + sigmaNR(g, e));
+	N = c_speed * b * (S * sigma1(g, e) + Se * sigmaNR(g, e));
   else
-    N = c_speed * b * S * (sigma1(g, e) + sigma_e);
+    //N = c_speed * b * S * (sigma1(g, e) + sigma_e);
+	N = c_speed * b * (S * sigma1(g, e) + Se * sigma_e);
   double electrons = fUtils->EvalSpline(log10(EI),ElectronLookup,
                                         acc,__func__,__LINE__);
   return N * pow(10., electrons) / m_e * ln10 * EI;
@@ -1662,23 +1670,23 @@ void Radiation::SetAmbientDensity(double N){
 }
  
  
- /****************************************************************************
-  * Function to set the composition and the abundances of the ambient medium.
-  * Input:  - Vector of tuples containing the mass number (first entry) and
-  *             the density in [1/cm^3]
-  * Output: - Nothing
-  ***************************************************************************/
+/****************************************************************************
+ * Function to set the composition and the abundances of the ambient medium.
+ * Input:  - Vector of tuples containing the mass number (first entry) and
+ *             the density in [1/cm^3]
+ * Output: - Nothing
+ ***************************************************************************/
 void Radiation::SetAmbientMediumComposition(vector<vector< double > > composition){
- AmbientMediumComposition = composition;
- return;
+    AmbientMediumComposition = composition;
+    return;
 }
  
  
- /********************************************************************
-  * Function to return the Hadron spectrum number i.
-  * Input:  - Number of the hadron component
-  * Output: - Spectrum, energy in [erg] and dN/dE in [1/(erg*cm^3)]
-  *******************************************************************/
+/********************************************************************
+ * Function to return the Hadron spectrum number i.
+ * Input:  - Number of the hadron component
+ * Output: - Spectrum, energy in [erg] and dN/dE in [1/(erg*cm^3)]
+ *******************************************************************/
 vector<vector< double > > Radiation::GetHadrons(int i){ 
   vector<vector<double> > tempvec;
   if (i  >= (int)HadronSpectra.size()){
@@ -1767,6 +1775,20 @@ double Radiation::NuNuXSection(double ProjMass, double TargetMass){
   return sigma_r;
 }
 
+/*
+ * Function to return the average atomic number corresponding to
+ * a certain mass number.
+ * This is the semi-empirical formula (least square coefficients)
+ * The relation is an approximation!
+ */
+double Radiation::AtomicNumber(double mass_number){
+	if (mass_number < 3) {return 1;}
+	if (mass_number == 4) {return 2;}
+	double aC = 0.714;
+	double aA = 23.2;
+	double Z = mass_number / (2 + (aC/(2*aA)) * pow(mass_number,2/3));
+	return Z;
+}
 
 /****** End of Functions for hadronic interactions of nuclei *****************/
 
