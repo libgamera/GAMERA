@@ -1179,7 +1179,7 @@ double Radiation::BremsEmissivity(double x, void *par) {
   // double S = n * 1.4; // OLD STUFF
   double S = 0;
   double Se = 0;
-  for (int i=0;i<AmbientMediumComposition.size();i++){
+  for (unsigned int i=0;i<AmbientMediumComposition.size();i++){
      S += AmbientMediumComposition[i][1] * AtomicNumber(AmbientMediumComposition[i][0]) * AtomicNumber(AmbientMediumComposition[i][0]);
      Se += AmbientMediumComposition[i][1] * AtomicNumber(AmbientMediumComposition[i][0]);
   }

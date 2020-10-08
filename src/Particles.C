@@ -373,8 +373,10 @@ double Particles::PowerLawInjectionSpectrum(double e, double ecut,
 }
 
 /** 
- * Set important class members to values at time t.
- * Time in years
+ * Set the values for the class variables and lookups like:
+ * Bfield, Luminosity, Maximum energy, density.
+ *
+ * @param time to be given in units of years
  */
 void Particles::SetMembers(double t) {
   if (t < TminInternal || t > TmaxInternal) {
@@ -1377,8 +1379,8 @@ void Particles::DetermineLookupTimeBoundaries() {
   return;
 }
 
-/**
- * Return a particle SED dN/dE vs E (erg vs TeV)
+/*
+ * Return a particle SED E vs E^2dN/dE (TeV vs erg)
  */
 vector<vector<double> > Particles::GetParticleSED() {
   vector<vector<double> > v;
@@ -1392,8 +1394,8 @@ vector<vector<double> > Particles::GetParticleSED() {
   return v;
 }
 
-/**
- * Return total energy in particles. Input energy bounds in TeV
+/*
+ * Return total energy in particles. Input energy bounds in erg!
  * FIXME:This function sucks, have to think of something better!
  */
 double Particles::GetParticleEnergyContent(double E1, double E2) {
@@ -1430,7 +1432,8 @@ void Particles::SetIntegratorMemory(string mode) {
   }
   return;
 }
-/**
+
+/*
  * Integration function using the GSL QAG functionality
  *
  */
@@ -1460,7 +1463,7 @@ double Particles::Integrate(fPointer f, double *x, double emin, double emax,
   else return integral;
 }
 
-/**
+/*
  * Set a custom injection spectrum. Input is a 2D vector with 2 colums, first
  * column holds energy in erg. 
  * mode = 0 -> custom injection spectrum lookup:
@@ -1517,7 +1520,7 @@ void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
   return;    
 }
 
-/**
+/*
  * Set a custom injection spectrum or escape time. Input is a 2D vector with 3 colums.
  * mode 0 = custom injection spectrum: first column holds time in yrs, second 
  * energy in erg, third holds differential rate in 
@@ -1688,7 +1691,7 @@ vector<vector<double> > Particles::GetTargetPhotons(int i) {
  * the loss process. Energy is given in erg.
  */
 double Particles::GetEnergyLossRate(double E, string type, double age) {
-    
+
     if(age) {
         SetMembers(age);
     }
@@ -1709,19 +1712,17 @@ double Particles::GetEnergyLossRate(double E, string type, double age) {
     }
 }
 
-/*
+/**
  * Computes and returns either the energy loss rate of the particle or the
  * cooling time via setting the \a TIMESCALE boolean to false or true
  * respectively
  *
- * Arguments:
- * vector<double> epoints : vector of energies of the particle
- *            string type : process for which you want the information
- *             double age : age at which you want to compute
- *         bool TIMESCALE : 1 for cooling time; 0 for energy loss rate
+ * @param epoints : vector of energies of the particle
+ * @param type : process for which you want the information
+ * @param age : age at which you want to compute
+ * @param TIMESCALE : 1 for cooling time; 0 for energy loss rate
  *
- * Returns:
- * vector< vector<double>> of tuples (energy, value)
+ * @return v as a vector of tuples (energy, value)
  */
 vector< vector<double> > Particles::GetEnergyLossRateVector(vector<double> epoints,
                                                         string type, double age, 
