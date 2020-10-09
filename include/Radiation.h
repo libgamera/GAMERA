@@ -289,15 +289,22 @@ class Radiation {
 
 
  public:
-  Radiation();                                       ///< standard constructor
-  ~Radiation();                                      ///< standard destructor
-  void SetProtons(vector<vector<double> > PROTONS);  ///< Set Protons
-  void SetElectrons(vector<vector<double> > ELECTRONS);  ///< Set Electrons
-  void SetElectronsIsotropic(void);    ///<Setting isotropic electrons variable to true for anisotropic IC scattering
+  /// standard constructor
+  Radiation();
+  /// standard destructor
+  ~Radiation();
+  /// Set Protons
+  void SetProtons(vector<vector<double> > PROTONS);
+  /// Set Electrons
+  void SetElectrons(vector<vector<double> > ELECTRONS);
+  /// Setting isotropic electrons variable to true for anisotropic IC scattering
+  void SetElectronsIsotropic(void);
   
-  
+  /// Add hadronic species
   void AddHadrons(vector<vector<double> > Spectrum, double Mass_number);
+  /// Return hadron spectrum number \a i
   vector <vector <double> > GetHadrons(int i);
+  /// Return vector with the atomic masses of the injected hadrons
   vector< double > GetHadronMasses(void);
   void SetAmbientMediumComposition(vector<vector< double > > composition);
   vector<vector<double> > GetAmbientMediumComposition(void);
@@ -306,101 +313,111 @@ class Radiation {
   
   double TestHadronLookup(int i, double e); // TEST: Function exists only for
                                                         // testing purposes of lookups
-  
-  
-   
-
-
+  /// Calculate epsilon factor for hadronic interactions
   double CalculateEpsilon(double Tp, double Mass);
-  
+  /// Calculates the nucleus-nucleus reaction cross section
   double NuNuXSection(double ProjMass, double TargetMass);
-
-  
+  /// return proton spectrum return format: 2D vector
   vector<vector<double> > GetProtonVector() {
     return ProtonVector;
-  }  ///< return proton spectrum return format: 2D vector
+  }
+  /// return electron spectrum return format: 2D vector
   vector<vector<double> > GetElectronVector() {
     return ElectronVector;
-  }  ///< return electron spectrum return format: 2D vector
-  void SetAmbientDensity(double N);  ///< set ambient number density (cm^-3). Assumes protons and 10% Helium
+  }
+  /// Set ambient number density (cm^-3). Assumes protons and 10% Helium
+  void SetAmbientDensity(double N);
+  /// get ambient number density (cm^-3). Assumes protons and 10% Helium
   double GetAmbientDensity() {
     return n;
-  }  ///< get ambient number density (cm^-3). Assumes protons and 10% Helium
+  }
+  /// Calculates the differential photon emission at energy 'e' [erg]
   void CalculateDifferentialGammaEmission(double e, int particletype);
+  /// Calculate differential photon spectrum between emin and emax
   void CalculateDifferentialPhotonSpectrum(int steps = 100, double emin = 0.,
                                            double emax = 0.);
+  /// Calculate differential photon spectrum at given \a points
   void CalculateDifferentialPhotonSpectrum(vector<double> points);
+  /**
+   * Return the differential photon spectra
+   * dN/dE [number of photons/(erg*s*cm^2)] vs E [erg] in a 2D-Vector
+   * */
   vector<vector<double> > ReturnDifferentialPhotonSpectrum(int i,
                                                            double emin,
                                                            double emax,
                                                   vector< vector<double> > vec);
+  /// returns SED for emission component \a i as 2D vector
   vector<vector<double> > ReturnSED(int i, double emin,double emax, 
-                                      vector< vector<double> > vec);  ///< returns SED for
-                                                        ///emission component i
-                                                        ///as 2D vector
+                                      vector< vector<double> > vec);
+  /// set the source B-Field (G)
   void SetBField(double BFIELD) {
     BField = BFIELD;
-  }  ///< set the source B-Field (G)
+  }
+  /// Return B field [G]
   double GetBField() {return BField;}
+  /// set the distance to the source (\a d to be given in units of parsecs)
   void SetDistance(double d) {
     distance = d*pc_to_cm;
-  }  ///< set the distance to the source (\a d to be given in units of parsecs)
+  }
+  /**
+   * Get Radiation::fdiffIC.
+   *  \a i to retrieve different components. With \a i = -1 (DEFAULT),
+   *  returns the total IC components
+   */
   double GetDifferentialICFlux(int i=-1) { 
     if(i<-1) return 0.;
     else if(i==-1) return fdiffic;
-    else return fdiffics[i]; }        ///< get Radiation::fdiffIC. \a i to retrieve different components. With \a i = -1 (DEFAULT), returns the total IC components
-  double GetDifferentialSynchFlux() { return fdiffsynch; }  ///< get Radiation::fdiffsynch
-  double GetDifferentialBremsFlux() { return fdiffbrems; }  ///< get Radiation::fdiffbrems
-  double GetDifferentialPPFlux() { return fdiffpp; }        ///< get Radiation::fdiffpp
-  vector<double> GetDifferentialHadronFlux() { return fdiffhadr; } ///< get Radiation::fdiffhadr
+    else return fdiffics[i]; }
+  /// Get Radiation::fdiffsynch
+  double GetDifferentialSynchFlux() { return fdiffsynch; }
+  /// Get Radiation::fdiffbrems
+  double GetDifferentialBremsFlux() { return fdiffbrems; }
+  /// get Radiation::fdiffpp
+  double GetDifferentialPPFlux() { return fdiffpp; }
+  /// get Radiation::fdiffhadr
+  vector<double> GetDifferentialHadronFlux() { return fdiffhadr; }
+  /**
+   * Get integrated gamma-ray flux between emin and emax (erg)
+   * summed over all radiation processes. Using Radiation::GetIntegratedFlux
+   */
   double GetIntegralTotalFlux(double emin, double emax) {  
-    return GetIntegratedFlux(1,emin,emax); }               ///< get integrated gamma-ray flux between
-                                                           ///< emin and emax (erg) 
-                                                           ///< summed over all 
-                                                           ///< radiation processes
-                                                           ///< Using Radiation::GetIntegratedFlux
-                                                         
+    return GetIntegratedFlux(1,emin,emax); }
+  /**
+   * get integrated gamma-ray flux between emin and emax (erg) from
+   * proton-proton interaction Using Radiation::GetIntegratedFlux
+   */
   double GetIntegralPPFlux(double emin, double emax) {  
-    return GetIntegratedFlux(2,emin,emax); }           ///< get integrated gamma-ray flux between
-                                                       ///< emin and emax (erg) 
-                                                       ///< from proton-proton
-                                                       ///< interaction
-                                                       ///< Using Radiation::GetIntegratedFlux
-                                                         
+    return GetIntegratedFlux(2,emin,emax); }
+  /**
+   * get integrated gamma-ray flux between emin and emax (erg) from
+   * IC-mechanism Using Radiation::GetIntegratedFlux
+   */
   double GetIntegralICFlux(double emin, double emax) { 
-    return GetIntegratedFlux(3,emin,emax); }           ///< get integrated gamma-ray flux between
-                                                       ///< emin and emax (erg) 
-                                                       ///< from IC-mechanism
-                                                       ///< Using Radiation::GetIntegratedFlux
-                                                         
+    return GetIntegratedFlux(3,emin,emax); }
+  /**
+   * get integrated gamma-ray flux between emin and emax (erg) from
+   * Bremsstrahlung Using Radiation::GetIntegratedFlux
+   */
   double GetIntegralBremsstrahlungFlux(double emin, double emax) { 
-    return GetIntegratedFlux(4,emin,emax); }             ///< get integrated 
-                                                         ///< gamma-ray flux between
-                                                         ///< emin and emax (erg) 
-                                                         ///< from Bremsstrahlung
-                                                         ///< Using Radiation::GetIntegratedFlux
-                                                         
+    return GetIntegratedFlux(4,emin,emax); }
+  /**
+   * get integrated gamma-ray flux between emin and emax (erg) from
+   * synchrotron Using Radiation::GetIntegratedFlux
+   */
   double GetIntegralSynchrotronFlux(double emin, double emax) { 
-    return GetIntegratedFlux(5,emin,emax); }               ///< get integrated 
-                                                           ///< flux between
-                                                           ///< emin and emax (erg) 
-                                                           ///< from synchrotron
-                                                           ///< process.
-                                                           ///< Using Radiation::GetIntegratedFlux
-                                                         
+    return GetIntegratedFlux(5,emin,emax); }
+  /**
+   * get integrated gamma-ray flux between emin and emax (erg) summed over all
+   * radiation processes Using Radiation::GetIntegratedFlux
+   */
   double GetIntegralTotalEnergyFlux(double emin, double emax) { 
-    return GetIntegratedFlux(1,emin,emax,true); }        ///< get integrated energy flux between
-                                                         ///< emin and emax (erg) 
-                                                         ///< summed over all 
-                                                         ///< radiation processes
-                                                         ///< Using Radiation::GetIntegratedFlux
-                                                         
+    return GetIntegratedFlux(1,emin,emax,true); }
+  /**
+   * get integrated energy flux between emin and emax (erg) from proton-proton
+   * processes Using Radiation::GetIntegratedFlux
+   */
   double GetIntegralPPEnergyFlux(double emin, double emax) { 
-    return GetIntegratedFlux(2,emin,emax,true); }        ///< get integrated energy flux between
-                                                         ///< emin and emax (erg) 
-                                                         ///< from proton-proton
-                                                         ///< interaction
-                                                         ///< Using Radiation::GetIntegratedFlux
+    return GetIntegratedFlux(2,emin,emax,true); }
                                                          
   double GetIntegralICEnergyFlux(double emin, double emax) { 
     return GetIntegratedFlux(3,emin,emax,true); }        ///< get integrated energy flux between
@@ -509,19 +526,27 @@ class Radiation {
     return SynchModel;
   }  ///< return the parameterisation of the synchrotron emission model. See Radiation::SynchModel docu for options.
   void CheckSanityOfTargetPhotonLookup();
+  /// Return proton SED See: Radiation::GetPaticleSED
   vector< vector<double> > GetProtonSED() {return GetParticleSED("protons");}
+  /// Return electron SED See: Radiation::GetPaticleSED
   vector< vector<double> > GetElectronSED() {return GetParticleSED("electrons");}
   Utils *fUtils;
+  /// Set up anisotropy for target photon \a i accounting for observation angle
   void SetTargetPhotonAnisotropy(int i, vector<double> obs_angle, 
                                  vector<double> phi, vector<double> theta, 
                                  vector< vector<double> > mesh);
+  /// Set up anisotropy for target photon \a i
   void SetTargetPhotonAnisotropy(int i, vector<double> phi, vector<double> theta, 
                                           vector< vector<double> > mesh);
+  /// Return Anysotropy vector for target photon \a i
   vector< vector<double> > GetTargetPhotonAnisotropy(int i, 
                                      vector<double> phi, vector<double> theta);
+  /// Set the pitch angle for the synchrotron emission [rad]
   void SetSynchrotronPitchAngle(double synchangle) {SynchAngle = synchangle;}
+  /// Set the interpolation method. See Utils::SetInterpolationMethod
   void SetInterpolationMethod(string intermeth)
     {fUtils->SetInterpolationMethod(intermeth);}
+  /// Return differential pp cross section
   double DiffPPXSection(double Tp, double Eg);
   double MeanMultiplicity(double Tp);
   double Amax(double Tp);
@@ -544,25 +569,33 @@ class Radiation {
   bool GetQuietMode() {return QUIETMODE;}
   void ToggleVerboseMode() { VERBOSEMODE = VERBOSEMODE == true ? false : true; }  ///< enable verbose mode (more cout output)
   bool GetVerboseMode() {return VERBOSEMODE;}
+  /// Wrapper around Radiation::ICEmissivity
   double ICEmissivityWrapper(double e_ph, double e_e, double e_g);
+  /// Wrapper around Radiation::ICEmissivityAnisotropic
   double ICEmissivityAnisotropicWrapper(double e_ph, double e_e, double e_g);
 /*  vector< vector<double> > GetTargetPhotonFieldVector(unsigned int i){*/
 /*    vector< vector<double> >v = fUtils->VectorAxisPow10(TargetPhotonVectors[i],-1);*/
 /*    return v;}*/
+  /// Return emergy density of target field \a i. See Radiation::TargetPhotonEdensities
   double GetTargetPhotonFieldEnergyDensity(unsigned int i) {
     return TargetPhotonEdensities[i];
   }
+  /// Return target field \a i anisotropy map. See Radiation::TargetPhotonAngularDistrsVectors
   vector< vector<double> > GetTargetFieldAnisotropyMap(int i) {
     if (i>(int)RADFIELDS_MAX) cout<<"Radiation::GetTargetFieldAnisotropyMap: invalid index "<<i<<". Returning"
           "empty vector." <<endl;
     return TargetPhotonAngularDistrsVectors[i];}
 
   void ClearTargetPhotonField(int i); ///< reset values for target photon field component i
+  /// Remove the last target field that has been added
   void RemoveLastICTargetPhotonComponent() {
     ClearTargetPhotonField(--RADFIELD_COUNTER);
   }
+  /// Return sum of the isotropic target photon field
   vector< vector<double> > SumTargetFields(int bins,bool ISO=true);
+  /// Fill
   void SumTargetFieldsAll(int bins=1000);
+  /// Fill
   void SumTargetFieldsIsotropic(int bins=1000);
 
   unsigned int GetTargetFieldCount(){return RADFIELD_COUNTER;}
@@ -577,30 +610,37 @@ class Radiation {
   double GetSizePhotonField(int i);
   void SetTargetFieldSpatialDep(int i, vector< vector<double> > SpatialDep); ///< Set the spatial dependence for the Target field
   vector< vector<double> > GetTargetFieldSPatialDep(int i);  ///< Return the spatial dependency of the photon field (space in cm)
-  double AverageSigmaGammaGamma(double Eph1, double Eph2);             // Average cross section for isotropic and homogeneous case
-  double SigmaGammaGamma(double Eph1, double Eph2, double costheta);      // Full gamma-gamma cross section
+  double AverageSigmaGammaGamma(double Eph1, double Eph2);             ///< Average cross section for isotropic and homogeneous case
+  double SigmaGammaGamma(double Eph1, double Eph2, double costheta);      ///< Full gamma-gamma cross section
   double ComputeAbsCoeff(double Egamma, int target);  ///< Auxiliary function to compute only the absorption coefficient, no spatial integration
   double ComputeOptDepth(double Egamma, int target, double phsize);
-  double ComputeOptDepthIsotropic(double Egamma, int target, double phsize); // Computation of the optical depth parameter isotropic only
+  double ComputeOptDepthIsotropic(double Egamma, int target, double phsize); ///< Computation of the optical depth parameter isotropic only
+  /// Wrapper around function Radiation::ReturnSED to return the gamma-gamma absorbed values
   vector< vector<double> > ReturnAbsorbedSEDonFields(double emin, double emax, 
-                                                         vector <int> fields, vector <double> size); // Wrapper around function ReturnSED to return the gamma-gamma absorbed values
+                                                         vector <int> fields, vector <double> size);
+  /// Wrapper around function Radiation::ReturnDifferentialPhotonSpectrum to return the gamma-gamma absorbed values
   vector< vector<double> > ReturnAbsorbedSpectrumOnFields(double emin, double emax, 
-                                                         vector <int> fields, vector <double> size); // Wrapper around function ReturnDifferentialPhotonSpectrum to return the gamma-gamma absorbed values
+                                                         vector <int> fields, vector <double> size);
+  /// Return SED absorbed by gamma gamma on fields \a i
   vector<vector<double> > GetTotalAbsorbedSpectrum(vector <int> fields, double emin = 0., double emax = 0.) {
     return ReturnAbsorbedSpectrumOnFields(emin, emax, fields, sizephfield);
   }
+  /// return total absorbed SED on selected fields, default behaviour should be to use all of them. TODO
   vector<vector<double> > GetTotalAbsorbedSED(vector <int> fields, double emin = 0., double emax = 0.) {
     return ReturnAbsorbedSEDonFields(emin, emax, fields, sizephfield);
-  }  ///< return total absorbed SED on selected fields, default behaviour should be to use all of them. TODO
+  }
+  /// Returns the absorbed integrated flux.
   double ReturnAbsorbedIntergratedFlux(double emin, double emax, bool ENERGYFLUX,vector <int> fields, vector <double> size);
   
-  double GetIntegralTotalAbsEnergyFlux(double emin, double emax, vector <int> fields) { ///< get integrated 
-    return ReturnAbsorbedIntergratedFlux(emin,emax,true,fields,sizephfield); }                      /// absorbed energy flux between
+  double GetIntegralTotalAbsEnergyFlux(double emin, double emax, vector <int> fields) {
+    return ReturnAbsorbedIntergratedFlux(emin,emax,true,fields,sizephfield); }            ///< get integrated
+                                                                                          /// absorbed energy flux between
                                                                                           /// emin and emax (erg) 
                                                                                           /// summed over all 
                                                                                           /// radiation processes
-  double GetIntegralTotalAbsFlux(double emin, double emax, vector <int> fields) { ///< get integrated 
-    return ReturnAbsorbedIntergratedFlux(emin,emax,false,fields,sizephfield); }                      /// absorbed energy flux between
+  double GetIntegralTotalAbsFlux(double emin, double emax, vector <int> fields) {
+    return ReturnAbsorbedIntergratedFlux(emin,emax,false,fields,sizephfield); }           ///< get integrated
+                                                                                          /// absorbed energy flux between
                                                                                           /// emin and emax (erg) 
                                                                                           /// summed over all 
                                                                                           /// radiation processes

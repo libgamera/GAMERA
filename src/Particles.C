@@ -285,7 +285,11 @@ double Particles::SourceSpectrum(double e) {
 }
 
 /**
- * Escape time at energy e (erg) and time t (yrs).
+ * Escape time at energy \a e (erg) and time \a t (yrs).
+ *
+ * @param e : energy of the particle [erg]
+ * @param t : time [yr]
+ * @return escape time of the particle in yr
  */
 double Particles::EscapeTime(double e, double t) {
   // energy and time dependent escape -> 2D intepolation in t,e lookup
@@ -310,9 +314,15 @@ double Particles::EscapeTime(double e, double t) {
   else return 0.;
 }
 
-// This is perhaps outdated, as custom injection functions also cover this
-// special case. FIXME: Remove this?
-// *Advised to use the Particles::CustomInjectionSpectrum function*
+/**
+ * Power law injection spectrum. If eBreak and SpectralIndex2 are specified,
+ * returns a broken power law.
+ *
+ * This is perhaps outdated, as custom injection functions also cover this
+ * special case. FIXME: Remove this?
+ * Advised to use the Particles::CustomInjectionSpectrum function*
+ *
+ */
 double Particles::PowerLawInjectionSpectrum(double e, double ecut,
                                             double emax) {
 
@@ -636,8 +646,14 @@ double Particles::EnergyLossRate(double E) {
   return synchl + icl + adl + bremsl + ionization + ppcol;
 }
 
-/** Prepare axes for the numerical solver (and if onlyprepare==false) call the
- *  solver
+/**
+ * Prepare axes for the numerical solver (and if onlyprepare==false) call the
+ * solver
+ *
+ * @param particlespectrum : spectrum of the particles
+ * @param onlyprepare : if false, calls the solver and initialise
+ *                      the grid (default false)
+ * @param dontinitialise : if false, sets the initial conditions (default false)
  */
 void Particles::PrepareAndRunNumericalSolver(
     vector<vector<double> > &particlespectrum, bool onlyprepare,
@@ -655,7 +671,9 @@ void Particles::PrepareAndRunNumericalSolver(
   return;
 }
 
-/** create an axis that attributes each bin with a real value. */
+/**
+ * create an axis that attributes each bin with a real value. (e.g. time axis, energy axis).
+ */
 void Particles::GetAxis(double min, double max, int steps, vector<double> &Axis,
                         bool logarithmic) {
 
@@ -682,7 +700,8 @@ void Particles::GetAxis(double min, double max, int steps, vector<double> &Axis,
   return;
 }
 
-/** create the propagation grid out of 2 1D-vectors
+/**
+ * create the propagation grid out of 2 1D-vectors
  * energy in x-direction, time in y-direction
  */
 void Particles::CreateGrid() {
@@ -694,10 +713,15 @@ void Particles::CreateGrid() {
   return;
 }
 
-/** determine the minimum time from where to start
+/**
+ * Determine the minimum time from where to start
  * the calculation. Electrons before that time are injected as
  * a single 'blob'. This time is derived from the requirement
  * that the blob has slid down to energies e.g. E<1GeV(EMIN) at t=Age.
+ *
+ * @param emin : lost energy at time t=age
+ * @param tmin : pointer to the time
+ *
  */
 void Particles::DetermineTMin(double emin, double &tmin) {
   double logt, logtmin, logtmax, logdt, logsteps, TMIN;
@@ -724,7 +748,8 @@ void Particles::DetermineTMin(double emin, double &tmin) {
   return;
 }
 
-/** Determine the maximum energy of particles between tmin and Age.
+/**
+ * Determine the maximum energy of particles between tmin and Age.
  * This energy is then used as upper boundary for the energy dimension of the
  * grid.
  */
@@ -1084,7 +1109,8 @@ double Particles::MinMod(double a, double b) {
     return 0.;
 }
 
-/** wrapper function to calculate the grid only in a specified time interval dT
+/**
+ * Wrapper function to calculate the grid only in a specified time interval dT
  * = T2-T2
  * This is especially useful for the creation of time-series of spectra and
  * necessary
@@ -1206,6 +1232,9 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
 /**
  * Integrand of the time-integration of the semi-analytical solution. 
  * This is an integration over the time energy trajectory of the electron.
+ *
+ * @param T : time
+ * @param par : additional parameters (energy)
  */ 
 double Particles::SemiAnalyticConstELossIntegrand(double T, void *par) {
   if (energyTrajectoryInverse == NULL || energyTrajectory == NULL) {
@@ -1748,14 +1777,13 @@ vector< vector<double> > Particles::GetEnergyLossRateVector(vector<double> epoin
 
 /**
  * Returns the injection spectrum:
- * Arguments:
- *   vector<double> epoints : vector of energies to return the spectrum (erg units)
- *               double age : age at which to return the spectrum (if age not
+ *
+ * @param epoints : vector of energies to return the spectrum (erg units)
+ * @param age : age at which to return the spectrum (if age not
  *                            given, then computes as the injection)
- *                 bool SED : true if the particle spectrum should be returned
+ * @param SED : true if the particle spectrum should be returned
  *                            as E^2dN/dE
- * Returns:
- *   vector< vector<double>> v : vector of tuples (Energy, spectrum)
+ * @return v : vector of tuples (Energy, spectrum)
  *                               energy returned in TeV.
  */
 vector< vector<double> > Particles::GetInjectionSpectrumVector(
@@ -1822,7 +1850,7 @@ vector< vector<double> > Particles::GetQuantityVector(vector<double> epoints,
 
 
 
-/**
+/*
  * Function under construction! Use at own peril!
  * TODO: The handling of the SSC field should be done better. Not sure all the cases
  * are correctly taken into account.
