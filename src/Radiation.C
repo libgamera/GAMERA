@@ -361,7 +361,7 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
     
     IntFunc = &Radiation::ICEmissivityRadFieldIntegrated;
   } else if (!radiationMechanism.compare("ppEmission")) {
-    if (!n && AmbientMediumComposition.size()) {
+    if (!n && !AmbientMediumComposition.size()) {
       if(!QUIETMODE) cout << "Radiation::DifferentialEmissionComponent:"
                              "No ambient density value set for "
                              "p-p scattering. Returning zero value." << endl;
@@ -380,7 +380,7 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
     }
     IntFunc = &Radiation::PPEmissivity;
   } else if (!radiationMechanism.compare("hadronicEmission")) {
-	  if (!n && AmbientMediumComposition.size()) {
+	  if (!n && !AmbientMediumComposition.size()) {
 	    if(!QUIETMODE) cout << "Radiation::DifferentialEmissionComponent:"
 	                           "No ambient density value set for "
 	                           "p-p scattering. Returning zero value." << endl;
@@ -1582,6 +1582,8 @@ void Radiation::SetElectrons(vector<vector<double> > ELECTRONS) {
  * but also arbitrary spectra).
  * 
  * \param PROTONS = vector of tuples (E[erg],N[erg^-1])
+ *
+ * TODO: This function is not really consistent with the AddHadrons
 */
 void Radiation::SetProtons(vector<vector<double> > PROTONS) {
   vector<vector<double> > *pradr = &ProtonVector;
@@ -1673,7 +1675,8 @@ double Radiation::TestHadronLookup(int i, double e){
  * Set the default ambient composition with simply protons and 10% Helium.
  * This is for consistency with Bremsstrahlung and ionization processes
  * which use this default values for the composition of the ISM.
- * Input: proton number density in [cm^-3].
+ *
+ * @param N : proton number density in [cm^-3].
  */
 void Radiation::SetAmbientDensity(double N){
 	n = N; // number density for the protons
@@ -1695,7 +1698,7 @@ void Radiation::SetAmbientMediumComposition(vector<vector< double > > compositio
  
  
 /**
- * Function to return the Hadron spectrum number i.
+ * Function to return the Hadron spectrum number \a i.
  *
  * @param i : Number of the hadron component
  *
