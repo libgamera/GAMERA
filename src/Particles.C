@@ -386,7 +386,7 @@ double Particles::PowerLawInjectionSpectrum(double e, double ecut,
  * Set the values for the class variables and lookups like:
  * Bfield, Luminosity, Maximum energy, density.
  *
- * @param time to be given in units of years
+ * @param t : time to be given in units of years
  */
 void Particles::SetMembers(double t) {
   if (t < TminInternal || t > TmaxInternal) {

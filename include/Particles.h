@@ -577,7 +577,7 @@ struct timespec time0, time1, time2, time3;
   /**
    * @short Set the luminosity evolution lookup
    *
-   * @param vector of 2D tuples (time, luminosity) [yr] and [erg/s]
+   * @param LUMLOOKUP : vector of 2D tuples (time, luminosity) [yr] and [erg/s]
    */
   void SetLuminosity(vector<vector<double> > LUMLOOKUP) {
     LumConstant = NAN;
@@ -1174,7 +1174,7 @@ struct timespec time0, time1, time2, time3;
     return fRadiation->GetICLossLookup(i);
   };
   /**
-   * @short Returns the energy density of the \i target photon field
+   * @short Returns the energy density of the \a i target photon field
    *
    * @param i : index of photon field.
    *

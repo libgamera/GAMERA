@@ -458,58 +458,61 @@ class Radiation {
   void Reset();  ///< reset ParticleLookup, Electrons, Protons, fintbrems,
                  ///lintbrems, fintpp, lintpp, fintic, lintic
   vector<vector<double> > GetICLossLookup(int i=-1);///< return TotalTargetPhotonVector
+  /// Returns distance of the source in pc
   double GetDistance() {return distance/pc_to_cm;}
   vector<vector<double> > GetTotalSpectrum(double emin = 0., double emax = 0.) {
     return ReturnDifferentialPhotonSpectrum(1, emin, emax, diffSpec);
-  }  ///< return total spectrum
+  }  ///< return total spectrum between emin and emax (in erg)
   vector<vector<double> > GetPPSpectrum(double emin = 0., double emax = 0.) {
     return ReturnDifferentialPhotonSpectrum(2, emin, emax, diffSpec);
-  }  ///< return pi0 decay spectrum
+  }  ///< return pi0 decay spectrum between emin and emax (in erg) - protons + helium only
   vector<vector<double> > GetICSpectrum(double emin = 0., double emax = 0.) {
     return ReturnDifferentialPhotonSpectrum(3, emin, emax, diffSpec);
-  }  ///< return total Inverse-Compton spectrum
+  }  ///< return total Inverse-Compton spectrum between emin and emax (in erg)
   vector<vector<double> > GetBremsstrahlungSpectrum(double emin = 0.,
                                                     double emax = 0.) {
     return ReturnDifferentialPhotonSpectrum(4, emin, emax, diffSpec);
-  }  ///< return Bremsstrahlung spectrum
+  }  ///< return Bremsstrahlung spectrum between emin and emax (in erg)
   vector<vector<double> > GetSynchrotronSpectrum(double emin = 0.,
                                                  double emax = 0.) {
     return ReturnDifferentialPhotonSpectrum(5, emin, emax, diffSpec);
-  }  ///< return Synchrotron spectrum
+  }  ///< return Synchrotron spectrum between emin and emax (in erg)
   vector<vector<double> > GetHadronSpectrum(double emin = 0.,
                                                 double emax = 0.) {
     return ReturnDifferentialPhotonSpectrum(6, emin, emax, diffSpec);
-  }  ///< return Hadron spectrum                                            
+  }  ///< Return total pi0 decay (from more hadronic species) spectrum between emin and emax (in erg)
                                             
   vector<vector<double> > GetTotalSED(double emin = 0., double emax = 0.) {
     return ReturnSED(1, emin, emax, diffSpec);
-  }  ///< return total SED
+  }  ///< Return total SED between emin and emax (in TeV)
   vector<vector<double> > GetPPSED(double emin = 0., double emax = 0.) {
     return ReturnSED(2, emin, emax, diffSpec);
-  }  ///< return pi0 decay SED
+  }  ///< Return pi0 decay SED between emin and emax (in TeV) - protons + helium only
   vector<vector<double> > GetICSED(double emin = 0., double emax = 0.) {
     return ReturnSED(3, emin, emax, diffSpec);
-  }  ///< return Inverse Compton SED
+  }  ///< Return Inverse Compton SED between emin and emax (in TeV)
   vector<vector<double> > GetBremsstrahlungSED(double emin = 0.,
                                                double emax = 0.) {
     return ReturnSED(4, emin, emax, diffSpec);
-  }  ///< return Bremsstrahlung SED
+  }  ///< Return Bremsstrahlung SED between emin and emax (in TeV)
   vector<vector<double> > GetSynchrotronSED(double emin = 0.,
                                             double emax = 0.) {
     return ReturnSED(5, emin, emax, diffSpec);
-  }  ///< return Synchrotron SED
+  }  ///< Return Synchrotron SED between emin and emax (in TeV)
   vector<vector<double> > GetHadronSED(double emin = 0.,
                                             double emax = 0.) {
     return ReturnSED(6, emin, emax, diffSpec);
-  }  ///< return Hadron SED
+  }  ///< Return total pi0 decay (from more hadronic species) SED between emin and emax (in TeV)
 
-  
-  vector<vector<double> > GetICSpectrum(unsigned int i, double emin = 0., double emax = 0.); ///< return Inverse Compton spectrum
-  vector<vector<double> > GetICSED(unsigned int i, double emin = 0., double emax = 0.); ///< return Inverse Compton SED
+  /// Returns IC spectrum for target field \a i
+  vector<vector<double> > GetICSpectrum(unsigned int i, double emin = 0., double emax = 0.);
+  /// Returns IC SED for target field \a i
+  vector<vector<double> > GetICSED(unsigned int i, double emin = 0., double emax = 0.);
 
-
-  vector<vector<double> > GetHadronSpectrum(unsigned int i, double emin = 0., double emax = 0.); ///< return Hadron spectrum from component i
-  vector<vector<double> > GetHadronSED(unsigned int i, double emin = 0., double emax = 0.); ///< return Hadron SED from component i 
+  /// Return pi0 decay spectrum from hadronic component i
+  vector<vector<double> > GetHadronSpectrum(unsigned int i, double emin = 0., double emax = 0.);
+  /// Return pi0 decay SED from hadronic component i
+  vector<vector<double> > GetHadronSED(unsigned int i, double emin = 0., double emax = 0.);
   
   
   Radiation *Clone() { return this; }
@@ -518,7 +521,7 @@ class Radiation {
   }  ///< externally switch the parameterisation of the pp emission model. See Radiation::PiModel documentation for options.
   int GetPPEmissionModel() {
     return PiModel;
-  }  ///< return the parameterisation of the pp emission model. See Radiation::PiModel docu for options.
+  }  ///< return the parametrisation of the pp emission model. See Radiation::PiModel docu for options.
   void SetSynchrotronEmissionModel(int SYNCHMODEL) {
     SynchModel = SYNCHMODEL;
   }  ///< externally switch the parameterisation of the synchrotron emission model. See Radiation::SynchModel docu for options.
@@ -547,7 +550,7 @@ class Radiation {
   void SetInterpolationMethod(string intermeth)
     {fUtils->SetInterpolationMethod(intermeth);}
   /// Return differential pp cross section
-  double DiffPPXSection(double Tp, double Eg);
+  double DiffPPXSection(double Tp, double Eg); // bring all these in private?
   double MeanMultiplicity(double Tp);
   double Amax(double Tp);
   double F(double Tp, double Eg);
@@ -566,9 +569,9 @@ class Radiation {
 /*    cos_theta_e = cos(theta_e);*/
 /*    return;}*/
   void ToggleQuietMode() { QUIETMODE = QUIETMODE == true ? false : true; }  ///< enable quiet mode (very little cout output)
-  bool GetQuietMode() {return QUIETMODE;}
+  bool GetQuietMode() {return QUIETMODE;} ///< Return quitemode status
   void ToggleVerboseMode() { VERBOSEMODE = VERBOSEMODE == true ? false : true; }  ///< enable verbose mode (more cout output)
-  bool GetVerboseMode() {return VERBOSEMODE;}
+  bool GetVerboseMode() {return VERBOSEMODE;} ///< Return verbosemode status
   /// Wrapper around Radiation::ICEmissivity
   double ICEmissivityWrapper(double e_ph, double e_e, double e_g);
   /// Wrapper around Radiation::ICEmissivityAnisotropic
@@ -576,11 +579,18 @@ class Radiation {
 /*  vector< vector<double> > GetTargetPhotonFieldVector(unsigned int i){*/
 /*    vector< vector<double> >v = fUtils->VectorAxisPow10(TargetPhotonVectors[i],-1);*/
 /*    return v;}*/
-  /// Return emergy density of target field \a i. See Radiation::TargetPhotonEdensities
+  /// Return energy density of target field \a i. See Radiation::TargetPhotonEdensities
   double GetTargetPhotonFieldEnergyDensity(unsigned int i) {
     return TargetPhotonEdensities[i];
   }
-  /// Return target field \a i anisotropy map. See Radiation::TargetPhotonAngularDistrsVectors
+  /**
+   * @short Return target field \a i anisotropy map. See Radiation::TargetPhotonAngularDistrsVectors
+   *
+   * @param i : index of the target photon field to consider
+   * @return 2D vector with the value of the anisotropy distribution. The corresponfing angular values
+   * are in Radiation::TargetPhotonAngularPhiVectors and Radiation::TargetPhotonAngularThetaVectors
+   * (first and second coordinate respectively).
+   */
   vector< vector<double> > GetTargetFieldAnisotropyMap(int i) {
     if (i>(int)RADFIELDS_MAX) cout<<"Radiation::GetTargetFieldAnisotropyMap: invalid index "<<i<<". Returning"
           "empty vector." <<endl;
@@ -591,22 +601,28 @@ class Radiation {
   void RemoveLastICTargetPhotonComponent() {
     ClearTargetPhotonField(--RADFIELD_COUNTER);
   }
+
+  // these functions should be private!
   /// Return sum of the isotropic target photon field
   vector< vector<double> > SumTargetFields(int bins,bool ISO=true);
-  /// Fill
+  /// Sum all the target fields and pushes them in Radiation::SetTargetPhotonVectorLookup
   void SumTargetFieldsAll(int bins=1000);
-  /// Fill
+  /// Sum all the isotropic target fields and pushes them in Radiation::SetTargetPhotonVectorLookup
   void SumTargetFieldsIsotropic(int bins=1000);
 
+  /// Return the counter of number of target radiation fields. See Radiation::RADFIELD_COUNTER
   unsigned int GetTargetFieldCount(){return RADFIELD_COUNTER;}
+  /// Set up fast calculation of Inverse Compton. See Radiation::FASTMODE_IC
   void SetICFastMode() {FASTMODE_IC = true;}
+  /// Unset up fast calculation of Inverse Compton. See Radiation::FASTMODE_IC
   void UnsetICFastMode() {FASTMODE_IC = false;}
-  
+  /// Set the spatial size of the photon field \a i
   void SetSizePhotonField(int i, double size);
-  
+  /// Clear all the sizes of the target photon fields
   void ClearPhotonFieldSize();
-  
-  vector <double> GetSizePhotonField(); //get the photon field
+  /// Get the vector of photon field sizes
+  vector <double> GetSizePhotonField();
+  /// Return the size of the photon field \a i
   double GetSizePhotonField(int i);
   void SetTargetFieldSpatialDep(int i, vector< vector<double> > SpatialDep); ///< Set the spatial dependence for the Target field
   vector< vector<double> > GetTargetFieldSPatialDep(int i);  ///< Return the spatial dependency of the photon field (space in cm)
