@@ -27,6 +27,7 @@ Particles::Particles() {
   DEBUG = false;
   FASTMODE = false;
   ESCTIME = false;
+  IONIZATION = false;
   ICLossLookup = NULL;
   iclosslookupbins = 200;
   LumLookup = NULL;
@@ -284,7 +285,11 @@ double Particles::SourceSpectrum(double e) {
 }
 
 /**
- * Escape time at energy e (erg) and time t (yrs).
+ * Escape time at energy \a e (erg) and time \a t (yrs).
+ *
+ * @param e : energy of the particle [erg]
+ * @param t : time [yr]
+ * @return escape time of the particle in yr
  */
 double Particles::EscapeTime(double e, double t) {
   // energy and time dependent escape -> 2D intepolation in t,e lookup
@@ -309,9 +314,15 @@ double Particles::EscapeTime(double e, double t) {
   else return 0.;
 }
 
-// This is perhaps outdated, as custom injection functions also cover this
-// special case. FIXME: Remove this?
-// *Advised to use the Particles::CustomInjectionSpectrum function*
+/**
+ * Power law injection spectrum. If eBreak and SpectralIndex2 are specified,
+ * returns a broken power law.
+ *
+ * This is perhaps outdated, as custom injection functions also cover this
+ * special case. FIXME: Remove this?
+ * Advised to use the Particles::CustomInjectionSpectrum function*
+ *
+ */
 double Particles::PowerLawInjectionSpectrum(double e, double ecut,
                                             double emax) {
 
@@ -372,8 +383,10 @@ double Particles::PowerLawInjectionSpectrum(double e, double ecut,
 }
 
 /** 
- * Set important class members to values at time t.
- * Time in years
+ * Set the values for the class variables and lookups like:
+ * Bfield, Luminosity, Maximum energy, density.
+ *
+ * @param t : time to be given in units of years
  */
 void Particles::SetMembers(double t) {
   if (t < TminInternal || t > TmaxInternal) {
@@ -553,23 +566,15 @@ double Particles::EnergyLossRate(double E) {
   double gamma2 = gamma * gamma;
   double beta=sqrt(1-1/gamma2);
   double p = sqrt(gamma2 - 1.);
-  /* S-parameter. This is only the case in a pure hydrogen gas environment. For
-   * more complex mixture,
-   * nuclear charge of the different gas species become important. See Haug2004
+  /* S-parameter. See Haug2004 (eq.2)
+   * Here assumed as default hydrogen and 10% Helium
+   * TODO: use the new formulation in the Radiation class
+   * to allow different compositions.
    */
-  double S = N;
+  double S = N * 1.4;
   /* synchrotron losses */
   synchl = (4. / 3.) * sigma_T * c_speed * BField * BField * gamma * gamma /
            (8. * pi);
-  /* ionization losses */
-  //Mean value in the interstellar medium if you consider 10% He
-  double z=1.2;
-  //The ions are the protons
-  double Z=1;  
-  double I=15*eV_to_erg; //erg
-  
-  ionization=N*z*4.*pi*pow(el_charge,4)*(Z*Z)/(m_e*beta/c_speed)*(log((2*m_e*pow(beta,2)/I)*gamma2)-pow(beta,2));
-  
   
   if(!ICLossVector.size()) icl=0.;
   else {
@@ -584,8 +589,6 @@ double Particles::EnergyLossRate(double E) {
   /* electron-proton bremsstrahlung */
   /* TODO: to be super self-consistent, calculate losses in a lookup, analog
    * to the IC lookup.
-   * TODO: This function does not account for losses due to different
-   * atomic species in the environment.
    */
   bremsl_ep = ((2. * gamma2 / 9. - 19. * gamma * p * p / 675. -
                 0.06 * p * p * p * p / gamma) *
@@ -593,9 +596,12 @@ double Particles::EnergyLossRate(double E) {
                gamma * log(gamma + p) - p / 3.) *
               bremsl_epf * S * gamma2 / (gamma2 + p * p);
 
-  /* electron-electron bremsstrahlung */
+  /*
+   * Electron-electron bremsstrahlung
+   * Assuming also here the 10% Helium
+   */
   bremsl_ee =
-      N * bremsl_eef * (p * (gamma - 1.) / gamma) * (log(2. * gamma) - 1. / 3.);
+      N * (1.2) * bremsl_eef * (p * (gamma - 1.) / gamma) * (log(2. * gamma) - 1. / 3.);
   bremsl = bremsl_ep + bremsl_ee;
 
   /* in case of protons, take adiabatic and ionization losses into account */
@@ -620,6 +626,17 @@ double Particles::EnergyLossRate(double E) {
     else {
       ppcol=0;
       }
+    /* ionization losses */
+    // Mean value in the interstellar medium if you consider 10% He
+    if (IONIZATION) {
+      double z=1.2;  // Includes the effect of 10% Helium in the target.
+      double Z=1;    // The ions are the protons
+      double I=15*eV_to_erg; //erg
+      // Ionization should not play a role if the plasma is fully ionized!
+      // If you want to apply these losses, then need to activate the IONIZATION flag
+      // Ionization computed here is valid only for protons
+      ionization=N*z*4.*pi*pow(el_charge,4)*(Z*Z)/(m_e*beta/c_speed)*(log((2*m_e*pow(beta,2)/I)*gamma2)-pow(beta,2));
+    }
   }
   if (DEBUG == true) {
     synchl = 0.;
@@ -629,8 +646,14 @@ double Particles::EnergyLossRate(double E) {
   return synchl + icl + adl + bremsl + ionization + ppcol;
 }
 
-/** Prepare axes for the numerical solver (and if onlyprepare==false) call the
- *  solver
+/**
+ * Prepare axes for the numerical solver (and if onlyprepare==false) call the
+ * solver
+ *
+ * @param particlespectrum : spectrum of the particles
+ * @param onlyprepare : if false, calls the solver and initialise
+ *                      the grid (default false)
+ * @param dontinitialise : if false, sets the initial conditions (default false)
  */
 void Particles::PrepareAndRunNumericalSolver(
     vector<vector<double> > &particlespectrum, bool onlyprepare,
@@ -648,7 +671,9 @@ void Particles::PrepareAndRunNumericalSolver(
   return;
 }
 
-/** create an axis that attributes each bin with a real value. */
+/**
+ * create an axis that attributes each bin with a real value. (e.g. time axis, energy axis).
+ */
 void Particles::GetAxis(double min, double max, int steps, vector<double> &Axis,
                         bool logarithmic) {
 
@@ -675,7 +700,8 @@ void Particles::GetAxis(double min, double max, int steps, vector<double> &Axis,
   return;
 }
 
-/** create the propagation grid out of 2 1D-vectors
+/**
+ * create the propagation grid out of 2 1D-vectors
  * energy in x-direction, time in y-direction
  */
 void Particles::CreateGrid() {
@@ -687,10 +713,15 @@ void Particles::CreateGrid() {
   return;
 }
 
-/** determine the minimum time from where to start
+/**
+ * Determine the minimum time from where to start
  * the calculation. Electrons before that time are injected as
  * a single 'blob'. This time is derived from the requirement
  * that the blob has slid down to energies e.g. E<1GeV(EMIN) at t=Age.
+ *
+ * @param emin : lost energy at time t=age
+ * @param tmin : pointer to the time
+ *
  */
 void Particles::DetermineTMin(double emin, double &tmin) {
   double logt, logtmin, logtmax, logdt, logsteps, TMIN;
@@ -717,7 +748,8 @@ void Particles::DetermineTMin(double emin, double &tmin) {
   return;
 }
 
-/** Determine the maximum energy of particles between tmin and Age.
+/**
+ * Determine the maximum energy of particles between tmin and Age.
  * This energy is then used as upper boundary for the energy dimension of the
  * grid.
  */
@@ -1077,7 +1109,8 @@ double Particles::MinMod(double a, double b) {
     return 0.;
 }
 
-/** wrapper function to calculate the grid only in a specified time interval dT
+/**
+ * Wrapper function to calculate the grid only in a specified time interval dT
  * = T2-T2
  * This is especially useful for the creation of time-series of spectra and
  * necessary
@@ -1199,6 +1232,9 @@ void Particles::CalcSpecSemiAnalyticConstELoss() {
 /**
  * Integrand of the time-integration of the semi-analytical solution. 
  * This is an integration over the time energy trajectory of the electron.
+ *
+ * @param T : time
+ * @param par : additional parameters (energy)
  */ 
 double Particles::SemiAnalyticConstELossIntegrand(double T, void *par) {
   if (energyTrajectoryInverse == NULL || energyTrajectory == NULL) {
@@ -1372,8 +1408,8 @@ void Particles::DetermineLookupTimeBoundaries() {
   return;
 }
 
-/**
- * Return a particle SED dN/dE vs E (erg vs TeV)
+/*
+ * Return a particle SED E vs E^2dN/dE (TeV vs erg)
  */
 vector<vector<double> > Particles::GetParticleSED() {
   vector<vector<double> > v;
@@ -1387,8 +1423,8 @@ vector<vector<double> > Particles::GetParticleSED() {
   return v;
 }
 
-/**
- * Return total energy in particles. Input energy bounds in TeV
+/*
+ * Return total energy in particles. Input energy bounds in erg!
  * FIXME:This function sucks, have to think of something better!
  */
 double Particles::GetParticleEnergyContent(double E1, double E2) {
@@ -1425,7 +1461,8 @@ void Particles::SetIntegratorMemory(string mode) {
   }
   return;
 }
-/**
+
+/*
  * Integration function using the GSL QAG functionality
  *
  */
@@ -1455,7 +1492,7 @@ double Particles::Integrate(fPointer f, double *x, double emin, double emax,
   else return integral;
 }
 
-/**
+/*
  * Set a custom injection spectrum. Input is a 2D vector with 2 colums, first
  * column holds energy in erg. 
  * mode = 0 -> custom injection spectrum lookup:
@@ -1512,7 +1549,7 @@ void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
   return;    
 }
 
-/**
+/*
  * Set a custom injection spectrum or escape time. Input is a 2D vector with 3 colums.
  * mode 0 = custom injection spectrum: first column holds time in yrs, second 
  * energy in erg, third holds differential rate in 
@@ -1683,7 +1720,7 @@ vector<vector<double> > Particles::GetTargetPhotons(int i) {
  * the loss process. Energy is given in erg.
  */
 double Particles::GetEnergyLossRate(double E, string type, double age) {
-    
+
     if(age) {
         SetMembers(age);
     }
@@ -1704,19 +1741,17 @@ double Particles::GetEnergyLossRate(double E, string type, double age) {
     }
 }
 
-/*
+/**
  * Computes and returns either the energy loss rate of the particle or the
  * cooling time via setting the \a TIMESCALE boolean to false or true
  * respectively
  *
- * Arguments:
- * vector<double> epoints : vector of energies of the particle
- *            string type : process for which you want the information
- *             double age : age at which you want to compute
- *         bool TIMESCALE : 1 for cooling time; 0 for energy loss rate
+ * @param epoints : vector of energies of the particle
+ * @param type : process for which you want the information
+ * @param age : age at which you want to compute
+ * @param TIMESCALE : 1 for cooling time; 0 for energy loss rate
  *
- * Returns:
- * vector< vector<double>> of tuples (energy, value)
+ * @return v as a vector of tuples (energy, value)
  */
 vector< vector<double> > Particles::GetEnergyLossRateVector(vector<double> epoints,
                                                         string type, double age, 
@@ -1742,14 +1777,13 @@ vector< vector<double> > Particles::GetEnergyLossRateVector(vector<double> epoin
 
 /**
  * Returns the injection spectrum:
- * Arguments:
- *   vector<double> epoints : vector of energies to return the spectrum (erg units)
- *               double age : age at which to return the spectrum (if age not
+ *
+ * @param epoints : vector of energies to return the spectrum (erg units)
+ * @param age : age at which to return the spectrum (if age not
  *                            given, then computes as the injection)
- *                 bool SED : true if the particle spectrum should be returned
+ * @param SED : true if the particle spectrum should be returned
  *                            as E^2dN/dE
- * Returns:
- *   vector< vector<double>> v : vector of tuples (Energy, spectrum)
+ * @return v : vector of tuples (Energy, spectrum)
  *                               energy returned in TeV.
  */
 vector< vector<double> > Particles::GetInjectionSpectrumVector(
@@ -1816,7 +1850,7 @@ vector< vector<double> > Particles::GetQuantityVector(vector<double> epoints,
 
 
 
-/**
+/*
  * Function under construction! Use at own peril!
  * TODO: The handling of the SSC field should be done better. Not sure all the cases
  * are correctly taken into account.

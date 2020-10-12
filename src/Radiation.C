@@ -361,7 +361,7 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
     
     IntFunc = &Radiation::ICEmissivityRadFieldIntegrated;
   } else if (!radiationMechanism.compare("ppEmission")) {
-    if (!n && AmbientMediumComposition.size()) {
+    if (!n && !AmbientMediumComposition.size()) {
       if(!QUIETMODE) cout << "Radiation::DifferentialEmissionComponent:"
                              "No ambient density value set for "
                              "p-p scattering. Returning zero value." << endl;
@@ -380,7 +380,7 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
     }
     IntFunc = &Radiation::PPEmissivity;
   } else if (!radiationMechanism.compare("hadronicEmission")) {
-	  if (!n && AmbientMediumComposition.size()) {
+	  if (!n && !AmbientMediumComposition.size()) {
 	    if(!QUIETMODE) cout << "Radiation::DifferentialEmissionComponent:"
 	                           "No ambient density value set for "
 	                           "p-p scattering. Returning zero value." << endl;
@@ -817,7 +817,7 @@ double Radiation::ICAnisotropicAuxFunc(double phi_p, double theta_p,
  * 
  * \param bins : number of bins in logarithmic energy
  * 
- * Priduces a lookup table with format E[erg] ; -1.*LossrateIC [erg/s]
+ * Produces a lookup table with format E[erg] ; -1.*LossrateIC [erg/s]
  * 
  * It fills the Radiation::ICLossLookupSumIso lookup for all the isotropic fields
  * and and single lookups for each of the anisotropic ones with Radiation::ICLossLookups
@@ -899,6 +899,8 @@ void Radiation::CreateICLossLookup(int bins) {
  * The format of the lookup is: { Energy(erg) - Energy Loss Rate
  * from IC scattering(erg/s) }
  * 
+ * The values are returned as the log10.
+ *
  * The function integrates Radiation::ICEmissivityRadFieldIntegrated for
  * a given energy of the electron and stores the results in Radiation::ICLossVectorCurrent
  * 
@@ -1025,6 +1027,13 @@ void Radiation::CreateICLossLookupIndividual(int i, int bins) {
   return;
 }
 
+/**
+ * Returns the Inverse Compton lookup for losses for the field \a i
+ *
+ * @param i : index of the
+ * @return vector of 2Dtuple with the energy loss for each energy
+ *         log10(E/[erg]) and log10(-dE/dt / [erg/s])
+ */
 vector<vector<double> > Radiation::GetICLossLookup(int i) {
     vector< vector<double> > v;
     if(!RADFIELD_COUNTER) return v;
@@ -1176,13 +1185,21 @@ double Radiation::BremsEmissivity(double x, void *par) {
   /* equation (A1) */
   double sigma_e = (sigma1(g, e) + sigma2(g, e)) * A(g, e);
   /* 1.4 correction factor for 10% Helium */
-  double S = n * 1.4;
+  // double S = n * 1.4; // OLD STUFF
+  double S = 0;
+  double Se = 0;
+  for (unsigned int i=0;i<AmbientMediumComposition.size();i++){
+     S += AmbientMediumComposition[i][1] * AtomicNumber(AmbientMediumComposition[i][0]) * AtomicNumber(AmbientMediumComposition[i][0]);
+     Se += AmbientMediumComposition[i][1] * AtomicNumber(AmbientMediumComposition[i][0]);
+  }
   /* emissivity assuming a fully ionised plasma (n_e = S), Eq. (27) */
   double N;
   if (EI < 2.e-3 * GeV_to_erg)
-    N = c_speed * b * S * (sigma1(g, e) + sigmaNR(g, e));
+    //N = c_speed * b * S * (sigma1(g, e) + sigmaNR(g, e));
+	N = c_speed * b * (S * sigma1(g, e) + Se * sigmaNR(g, e));
   else
-    N = c_speed * b * S * (sigma1(g, e) + sigma_e);
+    //N = c_speed * b * S * (sigma1(g, e) + sigma_e);
+	N = c_speed * b * (S * sigma1(g, e) + Se * sigma_e);
   double electrons = fUtils->EvalSpline(log10(EI),ElectronLookup,
                                         acc,__func__,__LINE__);
   return N * pow(10., electrons) / m_e * ln10 * EI;
@@ -1263,8 +1280,9 @@ double Radiation::PPEmissivity(double x, void *par) {
   return c_speed * N * pow(10., logprotons) * ln10 * EP;
 }
 
-/** differential cross section following Kafexhiu 2014
- *  (Eq. 8)
+/**
+ * differential cross section following Kafexhiu 2014
+ * (Eq. 8)
  */
 double Radiation::DiffPPXSection(double Tp, double Eg) {
   double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
@@ -1504,7 +1522,8 @@ void Radiation::GetBParams(double Tp, double &b1, double &b2, double &b3) {
  * 
  * \param PARTICLES = a vector of tuples (E; dN/dE)
  * \param type = 0 for electrons; 1 for protons
- * NOTE: Does not work for othe hadrons, use the function AddHadrons() instead
+ *
+ * NOTE: Does not work for the hadrons, use the function AddHadrons() instead
  */
 void Radiation::SetParticles(vector<vector<double> > PARTICLES, int type) {
   if (type && type != 1) {
@@ -1549,7 +1568,7 @@ void Radiation::SetParticles(vector<vector<double> > PARTICLES, int type) {
  * set the Electron spectrum (e.g. calculated in the "Particles" class,
  * but also arbitrary spectra).
  * 
- * \param PROTONS = vector of tuples (E[erg],N[erg^-1])
+ * \param ELECTRONS = vector of tuples (E[erg],N[erg^-1])
 */
 void Radiation::SetElectrons(vector<vector<double> > ELECTRONS) {
   vector<vector<double> > *eladr = &ElectronVector;
@@ -1563,6 +1582,8 @@ void Radiation::SetElectrons(vector<vector<double> > ELECTRONS) {
  * but also arbitrary spectra).
  * 
  * \param PROTONS = vector of tuples (E[erg],N[erg^-1])
+ *
+ * TODO: This function is not really consistent with the AddHadrons
 */
 void Radiation::SetProtons(vector<vector<double> > PROTONS) {
   vector<vector<double> > *pradr = &ProtonVector;
@@ -1574,13 +1595,14 @@ void Radiation::SetProtons(vector<vector<double> > PROTONS) {
 
 
 
-/*******************************************************************************
+/**
  * Function to add a spectrum of hadrons with a specific mass number. It also
  * calculates and saves a lookup for the spectrum.
- * Input:  - Spectrum of the hadrons
- *         - Mass number of the hadrons (number of the nucleons)
- * Output: Nothing
- *******************************************************************************/
+ *
+ * @param Spectrum : spectrum of the hadrons (as vector of 2D-tuples (E,dN/dE) ([erg],[erg^-1]))
+ * @param Mass_number : mass number of the hadrons (number of the nucleons)
+ *
+ */
 void Radiation::AddHadrons(vector<vector<double> > Spectrum, double Mass_number){
   HadronMasses.push_back(Mass_number);
   // The energy used in the equations is the energy per nucleon. Therefore we divide with the Mass_number
@@ -1649,11 +1671,12 @@ double Radiation::TestHadronLookup(int i, double e){
 }
 
 
-/*
+/**
  * Set the default ambient composition with simply protons and 10% Helium.
  * This is for consistency with Bremsstrahlung and ionization processes
  * which use this default values for the composition of the ISM.
- * Input: proton number density in [cm^-3].
+ *
+ * @param N : proton number density in [cm^-3].
  */
 void Radiation::SetAmbientDensity(double N){
 	n = N; // number density for the protons
@@ -1662,23 +1685,25 @@ void Radiation::SetAmbientDensity(double N){
 }
  
  
- /****************************************************************************
-  * Function to set the composition and the abundances of the ambient medium.
-  * Input:  - Vector of tuples containing the mass number (first entry) and
-  *             the density in [1/cm^3]
-  * Output: - Nothing
-  ***************************************************************************/
+/**
+ * Function to set the composition and the abundances of the ambient medium.
+ *
+ * @param composition : Vector of tuples containing the mass number (first entry) and
+ *                      the density in [1/cm^3]
+ */
 void Radiation::SetAmbientMediumComposition(vector<vector< double > > composition){
- AmbientMediumComposition = composition;
- return;
+    AmbientMediumComposition = composition;
+    return;
 }
  
  
- /********************************************************************
-  * Function to return the Hadron spectrum number i.
-  * Input:  - Number of the hadron component
-  * Output: - Spectrum, energy in [erg] and dN/dE in [1/(erg*cm^3)]
-  *******************************************************************/
+/**
+ * Function to return the Hadron spectrum number \a i.
+ *
+ * @param i : Number of the hadron component
+ *
+ * @return Spectrum, energy in [erg] and dN/dE in [1/(erg*cm^3)]
+ */
 vector<vector< double > > Radiation::GetHadrons(int i){ 
   vector<vector<double> > tempvec;
   if (i  >= (int)HadronSpectra.size()){
@@ -1693,33 +1718,34 @@ vector<vector< double > > Radiation::GetHadrons(int i){
   return tempvec;
 }
 
-/*****************************************************************
+/**
  * Function to return the mass numbers of the nuclei.
- * Input:   - Nothing
- * Output:  - Vector with the hadron masses
- ****************************************************************/
+ *
+ * @return Vector with the hadron masses in atomic units
+ */
 vector< double > Radiation::GetHadronMasses(void){
     return HadronMasses;
 }
 
-/**********************************************************************
+/**
  * Function to get back the composition and abundances of the ambient
  * medium.
- * Input:   - Nothing
- * Output:  - Vector of tuples containing the mass number (first entry)
- *              and the corresponding density
- *********************************************************************/
+ *
+ * @return Vector of tuples containing the mass number (first entry)
+ *         and the corresponding density in cm^-3
+ */
 vector<vector<double> > Radiation::GetAmbientMediumComposition(void){
     return AmbientMediumComposition;
 }
 
-/***********************************************************
+/**
  * Implementation of equation 20 in Kafexhiu et al. 2014
  * for one projectile species with mass number 'Mass'.
- * Input:   - Energy [erg]
- *          - Mass number of the projectile
- * Output:  - Epsilon factor
- **********************************************************/
+ * @param Tp : Energy [erg]
+ * @param Mass : mass number of the projectile
+ *
+ * @return Epsilon factor
+ */
 double Radiation::CalculateEpsilon(double Tp, double Mass){
     double epsilon = 0.;
     double density = 0.;
@@ -1750,15 +1776,16 @@ double Radiation::CalculateEpsilon(double Tp, double Mass){
     return epsilon;
 }
 
-/*
- * This function calculates the nucleus-nucleus reaction cross section (equation 17 in Kafexhiu et al. 2014)
+/**
+ * Calculates the nucleus-nucleus reaction cross section (equation 17 in Kafexhiu et al. 2014)
  * It is valid for projectile energies > 0.2 GeV for a proton projectile and > 0.1 GeV/nucleon for a nuclei
  * projectile different than a proton.
- * Input parameters:    - Projectile mass number
- *                      - Target mass number
+ *
+ * @param ProjMass : Projectile mass number
+ * @param TargetMass : Target mass number
  * 
- * Output:              - Cross section in [mb]
- * */
+ * @return Cross section in [mb]
+ */
 double Radiation::NuNuXSection(double ProjMass, double TargetMass){
   double sigma_r0 = 58.1*1.0e-27; //mb to cm
   double beta0 = 2.247 - 0.915*(1.0+pow(TargetMass,-1.0/3.)); //projectile is a proton
@@ -1767,6 +1794,22 @@ double Radiation::NuNuXSection(double ProjMass, double TargetMass){
   return sigma_r;
 }
 
+/**
+ * Function to return the average atomic number corresponding to
+ * a certain mass number.
+ * This is the semi-empirical formula (least square coefficients)
+ * The relation is an approximation!
+ *
+ * @param mass_number : mass number of the atomic species
+ */
+double Radiation::AtomicNumber(double mass_number){
+	if (mass_number < 3) {return 1;}
+	if (mass_number == 4) {return 2;}
+	double aC = 0.714;
+	double aA = 23.2;
+	double Z = mass_number / (2 + (aC/(2*aA)) * pow(mass_number,2/3));
+	return Z;
+}
 
 /****** End of Functions for hadronic interactions of nuclei *****************/
 
@@ -2116,6 +2159,18 @@ void Radiation::SetSSCTargetPhotons(double R, int steps, int i) {
   return;
 }
 
+/**
+ * Returns the sum of the target photon fields as vector of 2D tuples
+ * (log10(E/(1 erg)), log10((dN/dE)/(erg-1/cm-3)))
+ *
+ * @param bins : bins for sampling the photon target field
+ * @param ISO : true to account only for the isotropic fields. false
+ *              to account for all the fields.
+ *
+ * @return vector of 2D tuple with the sum of the fields
+ *
+ * NOTE: this function could be private
+ */
 vector< vector<double> > Radiation::SumTargetFields(int bins, bool ISO) {
     vector< vector<double> > vec;
     double eph_min = 100;
@@ -2281,7 +2336,7 @@ void Radiation::CheckSanityOfTargetPhotonLookup() {
   return;
 }
 
-/** remove the latest component in
+/* remove the latest component in
  * TotalTargetPhotonVector and recompute
  * the total target photon spectrum
  */
@@ -2291,7 +2346,23 @@ void Radiation::CheckSanityOfTargetPhotonLookup() {
 //  return;
 //}
 
-
+/**
+ * Set anisotropy for photon field \a i. The anisotropy is passed can be passed
+ * as a python mesh grid. This function assumes that the electrons have a certain angle
+ * with respect to the observer.
+ *
+ * See http://libgamera.github.io/GAMERA/docs/inverse_compton.html for a schematic
+ * view of the geometry
+ *
+ * @param i : index of the target field
+ * @param obs_angle : angle between the electron beam and x axis (observer)
+ *                    as a vector of coordinate (phi, theta)
+ * @param phi : vector of the phi coordinate of the anisotropy mesh grid of
+ *              the target photon field
+ * @param theta : vector of the theta coordinates of the anisotropy mesh grid
+ *                of the target photon field
+ * @param mesh : mesh grid of the anisotropy distribution of the target field
+ */
 void Radiation::SetTargetPhotonAnisotropy(int i, vector<double> obs_angle, 
                                           vector<double> phi, vector<double> theta, 
                                           vector< vector<double> > mesh) {
@@ -2354,7 +2425,22 @@ void Radiation::SetTargetPhotonAnisotropy(int i, vector<double> obs_angle,
     return;
 }
 
-
+/**
+ * Set anisotropy for photon field \a i. The anisotropy is passed can be passed
+ * as a python mesh grid. This function assumes that the electrons have a
+ * isotropic distribution. This function sets Radiation::ISOTROPIC_ELECTRONS
+ * to true. This setting is not reversible. Do not mix isotropic and anisotropic
+ * distribuition of electrons.
+ *
+ * See http://libgamera.github.io/GAMERA/docs/inverse_compton.html for details.
+ *
+ * @param i : index of the target field
+ * @param phi : vector of the phi coordinate of the anisotropy mesh grid of
+ *              the target photon field
+ * @param theta : vector of the theta coordinates of the anisotropy mesh grid
+ *                of the target photon field
+ * @param mesh : mesh grid of the anisotropy distribution of the target field
+ */
 void Radiation::SetTargetPhotonAnisotropy(int i, 
                                           vector<double> phi, vector<double> theta, 
                                           vector< vector<double> > mesh) {
@@ -2417,13 +2503,26 @@ void Radiation::SetTargetPhotonAnisotropy(int i,
 }
 
 
-/* Function to set an isotropic electron distribution for the case of   *
- * anisotropic inverse Compton scattering                               */
+/**
+ *  Function to set an isotropic electron distribution for the case of
+ *  anisotropic inverse Compton scattering
+ */
 void Radiation::SetElectronsIsotropic(void){
     ISOTROPIC_ELECTRONS = true;
 }
 
-
+/**
+ * Returns the anisotropy map for the target photon \a i in the phormat of a
+ * mash grid, given the vectors of angular coordinates phi and theta.
+ *
+ * See http://libgamera.github.io/GAMERA/docs/inverse_compton.html for details.
+ *
+ * @param i : index of target field
+ * @param phi : vector phi coordinates
+ * @param theta : vector phi coordinates
+ *
+ * @return mesh grid style 2D array given the arrays of phi and theta
+ */
 vector< vector<double> > Radiation::GetTargetPhotonAnisotropy(int i, 
                                      vector<double> phi, vector<double> theta) { 
 
@@ -2502,7 +2601,8 @@ void Radiation::CalculateDifferentialPhotonSpectrum(int steps, double emin,
 
 }
 
-/** Calculate differential photon spectra for the different radiation processes.
+/**
+ * Calculate differential photon spectra for the different radiation processes.
  *  Spectral points will be calculated for energy points given in 'points'.
  *  These points have to be in units of 'erg'!
  *  They are stored in the 2D 'diffspec' vector and can be accessed via the
@@ -2646,13 +2746,16 @@ void Radiation::CalculateDifferentialPhotonSpectrum(vector<double> points) {
 /**
  * Return the differential photon spectra dN/dE [number of photons/(erg*s*cm^2)]
  * vs E [erg] in a 2D-Vector
- * between the energies #emin and #emax. The argument #i determines the spectral
+ * between the energies \a emin and \a emax. The argument \a i determines the spectral
  * component to return:
  * - i = 1 : total spectrum
  * - i = 2 : pi0 decay
  * - i = 3 : IC scattering
  * - i = 4 : Bremsstrahlung
  * - i = 5 : Synchrotron radiation
+ * - i - 6 : hadronic spectrum
+ *
+ * TODO: might need to be private. Needs the spectral lookup as argument
  */
 vector<vector<double> > Radiation::ReturnDifferentialPhotonSpectrum(
               int i, double emin, double emax ,vector< vector<double> > vec) {
@@ -2676,12 +2779,16 @@ vector<vector<double> > Radiation::ReturnDifferentialPhotonSpectrum(
   return tempVec;
 }
 
-/** Return the photon SED (EdN/dE (erg/s/cm^2) vs E (TeV) in a 2D-Vector of
+/**
+ * Return the photon SED (EdN/dE (erg/s/cm^2) vs E (TeV) in a 2D-Vector of
  *  i = 1 : total spectrum
  *  i = 2 : pi0 decay
  *  i = 3 : IC scattering
  *  i = 4 : Bremsstrahlung
  *  i = 5 : Synchrotron radiation
+ *  i = 6 : hadronic spectrum
+ *
+ *  TODO: might need to be private. Needs the spectral lookup as argument
  */
 vector<vector<double> > Radiation::ReturnSED(int i, double emin, double emax, 
                                                 vector< vector<double> > vec) {
@@ -2705,6 +2812,17 @@ vector<vector<double> > Radiation::ReturnSED(int i, double emin, double emax,
   return tempVec;
 }
 
+/**
+ * Returns the Inverse Compton spectrum for target field \a i
+ * as vector of 2D tuples (E, dN/dE) in units of erg vs (1/cm2/s/erg)
+ *
+ * @param i : index of the target field for which to return the IC component
+ * @param emin : minimum energy in erg
+ * @param emax : maximum energy in erg
+ * @return Inverse compton differential spectrum
+ *
+ * Wrapped around Radiation::ReturnDifferentialPhotonSpectrum
+ */
 vector<vector<double> > Radiation::GetICSpectrum(unsigned int i, double emin, double emax) {
 
     if(IC_CALCULATED && FASTMODE_IC==true && epoints_temp.size()) {
@@ -2713,9 +2831,19 @@ vector<vector<double> > Radiation::GetICSpectrum(unsigned int i, double emin, do
         FASTMODE_IC=true;
     }
     return ReturnDifferentialPhotonSpectrum(i+1, emin, emax, diffSpecICComponents);
-}  ///< return Inverse Compton spectrum
+}
 
-
+/**
+ * Returns the Inverse Compton SED for target field \a i
+ * as vector of 2D tuples (E, E^2dN/dE) in units of TeV vs (erg/cm2/s)
+ *
+ * @param i : index of the target field for which to return the IC component
+ * @param emin : minimum energy in TeV
+ * @param emax : maximum energy in erg
+ * @return Inverse compton SED
+ *
+ * Wrapped around Radiation::ReturnSED
+ */
 vector<vector<double> > Radiation::GetICSED(unsigned int i, double emin, double emax) {
     if(IC_CALCULATED && FASTMODE_IC==true && epoints_temp.size()) {
         FASTMODE_IC=false;
@@ -2723,28 +2851,48 @@ vector<vector<double> > Radiation::GetICSED(unsigned int i, double emin, double 
         FASTMODE_IC=true;
     }
     return ReturnSED(i+1, emin, emax, diffSpecICComponents);
-  }  ///< return pi0 decay spectrum
+  }
 
-  
+/**
+ * Return pi0 decay spectrum from Hadron component \a i
+ *
+ * @param i : index of hadronic component
+ * @param emin : minimum energy in erg
+ * @param emax : maximum energy in erg
+ *
+ * @return Differential spectrum as vector of tuple E,dN/dE (erg, 1/erg/cm2/s)
+ *
+ * Wrapped around Radiation::ReturnDifferentialPhotonSpectrum
+ */
 vector<vector<double> > Radiation::GetHadronSpectrum(unsigned int i, double emin, double emax) {
     return ReturnDifferentialPhotonSpectrum(i+1, emin, emax, diffSpecHadronComponents);
-}  ///< return pi0 decay spectrum from Hadron component i
+}
 
-
+/**
+ * Return pi0 decay SED from Hadron component \a i
+ *
+ * @param i : index of hadronic component
+ * @param emin : minimum energy in TeV
+ * @param emax : maximum energy in TeV
+ *
+ * @return Differential spectrum as vector of tuple E,E^2dN/dE (TeV, 1/erg/cm2/s)
+ *
+ * Wrapped around Radiation::ReturnSED
+ */
 vector<vector<double> > Radiation::GetHadronSED(unsigned int i, double emin, double emax) {
     return ReturnSED(i+1, emin, emax, diffSpecHadronComponents);
-  }  ///< return pi0 decay spectrum from Hadron component i
-  
+  }
   
   
 /**
- * \brief Return a particle SED dN/dE vs E (erg vs TeV)
+ * \brief Return a particle SED E^2dN/dE vs E (erg vs TeV)
  * 
  * The particle vector is the one given by
  * Radiation::ElectronVector or Radiation::ProtonVector
  * 
- * Argument:
- * \arg \a type = "electron" or "proton"
+ * @param type = "electron" or "proton"
+ *
+ * @return vector of 2D tuple (E, E^2dN/dE) ([TeV], [erg])
  */
 vector<vector<double> > Radiation::GetParticleSED(string type) {
   vector<vector<double> > v;
@@ -2856,6 +3004,7 @@ double Radiation::Integrate(fPointer f, double *x, double emin, double emax,
   else return integral;
 }
 
+
 vector<vector<double> > Radiation::GetTargetPhotons(int i) {
 	// Now throws error when the field has not been specified
 	// Otherwise crash without explanation given
@@ -2922,8 +3071,9 @@ vector <double> Radiation::GetSizePhotonField(){
 /**
  * Return size photon field only for the i-th field.
  *
- * Arguments:
- *   - i = target photon fiels
+ * @param i : target photon fiels
+ *
+ * @return size of the photon field \a i [cm]
  */
 double Radiation::GetSizePhotonField(int i){
 	if (sizephfield[i]==0.){
@@ -2953,12 +3103,14 @@ void Radiation::ClearPhotonFieldSize(){
  * The user provides a vector of tuples composed of 2 elements:
  *  * distance from source along the line of sight (in parsecs)
  *  * fractional value of the intensity value given when setting the photon field
- *  Arguments:
- *      - int i = index of the target photon index
- *      - vector < vector<double> > SpDp = Vector of the spatial dependency
+ *
+ *  @param i = index of the target photon index
+ *  @param SpDp = Vector of the spatial dependency
+ *
  *  The function sets the boolean variable of the spatial dependency to true
  *  So to properly compute the integral of the absorption coefficient along
  *  the line of sight.
+ *
  *  The function converts the spatial quantity given in parsec to a quantity in cm
  */
 void Radiation::SetTargetFieldSpatialDep(int i,vector< vector<double> > SpDp){
@@ -2976,15 +3128,14 @@ void Radiation::SetTargetFieldSpatialDep(int i,vector< vector<double> > SpDp){
 
 
 /**
- *  Return the spatial dependence of the target field i
+ *  Return the spatial dependence of the target field \a i
  *  The return gives the spatial size in cm
  *  If the target does not exist or has no spatial dependency
  *  returns an empty vector
  *
- *  Arguments:
- *     - i = target photon field
- *  Returns:
- *     - Spatial dependency array ( r,normalization(r) ) distance in units of cm
+ *  @param i = target photon field
+ *
+ *  @return Spatial dependency array ( r,normalization(r) ) distance in units of cm
 */
 vector< vector<double> > Radiation::GetTargetFieldSPatialDep(int i){
 	if (SpatialDep[i].size()){
@@ -3000,11 +3151,10 @@ vector< vector<double> > Radiation::GetTargetFieldSPatialDep(int i){
  * Eq. 5 from (Eungwanichayapant & Aharonian, 2009) https://arxiv.org/pdf/0907.2971.pdf
  * This is approximated and good within 3%
  * 
- * Arguments:
- *     - Eph1 = energy of the first photon (in ergs)
- *     - Eph2 = energy of the second photon (in ergs)
- * Returns:
- *     - the averaged gamma-gamma cross section
+ * @param Eph1 = energy of the first photon (in ergs)
+ * @param Eph2 = energy of the second photon (in ergs)
+ *
+ * @return the averaged gamma-gamma cross section [cm^2]
  * 
  */
 double Radiation::AverageSigmaGammaGamma(double Eph1, double Eph2) {
@@ -3022,12 +3172,11 @@ double Radiation::AverageSigmaGammaGamma(double Eph1, double Eph2) {
  * Function for the full gamma gamma absorption cross section
  * Eq. 1 from Vernetto&Lipari 2016 (https://arxiv.org/pdf/1608.01587v2.pdf)
  * 
- * Arguments:
- *     - Eph1 = energy of the first photon (in ergs)
- *     - Eph2 = energy of the second photon (in ergs)
- *     - costheta= cosine of scattering angle  (in radiands)
- * Returns:
- *     - the gamma-gamma cross section
+ * @param Eph1 : energy of the first photon (in ergs)
+ * @param Eph2 : energy of the second photon (in ergs)
+ * @param costheta : cosine of scattering angle  (in radiands)
+ *
+ * @return gamma-gamma cross section [cm^2]
  */
 double Radiation::SigmaGammaGamma(double Eph1,double Eph2, double costheta) {
 	double CMene = 2.*Eph1*Eph2*(1-costheta)/(4.*m_e*m_e);  // Centre Mass energy
@@ -3048,11 +3197,11 @@ double Radiation::SigmaGammaGamma(double Eph1,double Eph2, double costheta) {
  * The function takes into account the angular anisotropy of the photon field
  * through interpolation of the mesh grid of the angular dependencies.
  * Angular integration is a simple rectangular integration.
- * Arguments:
- *      - double Egamma = energy of the gamma-ray photon (in erg)
- *      - int target = target photon field to compute the absorption
- * Returns:
- *      - Absorption coefficient. Units of 1/cm
+ *
+ * @param Egamma : energy of the gamma-ray photon (in erg)
+ * @param target : target photon field to compute the absorption
+ *
+ * @return Absorption coefficient. Units of 1/cm
  */
 double Radiation::ComputeAbsCoeff(double Egamma, int target) {
 	vector< vector<double> > targets = Radiation::GetTargetPhotons(target);
@@ -3104,6 +3253,14 @@ double Radiation::ComputeAbsCoeff(double Egamma, int target) {
  * Functions for the calculation of the optical depth
  * Takes as argument just the energy f the gamma ray photon and computes the optical
  * depth for the chosen target photon
+ *
+ * @param Egamma : energy of the gamma ray [erg]
+ * @param target : index of the photon field target
+ * @param phsize : patial size of the photon field [cm]
+ *
+ * For the non-homogeneous field case, it assumes that Radiation::SpatialDep
+ * has been initialized via Radiation::SetTargetFieldSpatialDep
+ *
  * !!! CAREFUL UNDER CONSTRUCTION !!!
  * !!! Implemented simple spatial variability of the target photons
  * !!! The SpatialDep array is a scaling relation.
@@ -3133,6 +3290,10 @@ double Radiation::ComputeOptDepth(double Egamma, int target, double phsize){
  * Takes as argument just the energy f the gamma ray photon and computes the optical
  * depth for the sum of the target photons that are present
  * At the moment it works only for isotropic and homogeneous case
+ *
+ * @param Egamma : energy of the gamma ray [erg]
+ * @param target : index of the photon field target
+ * @param phsize : spatial size of the photon field [cm]
  */
 double Radiation::ComputeOptDepthIsotropic(double Egamma, int target, double phsize){
     double tauval=0;
@@ -3152,16 +3313,15 @@ double Radiation::ComputeOptDepthIsotropic(double Egamma, int target, double phs
 
 /**
  * Return the total absorbed differential spectrum (for the moment using the homogeneous and isotropic case)
- * This is a wrapper around the function ReturnSED to which it was added the distance
+ * This is a wrapper around the function ReturnDifferentialPhotonSpectrum to which it was added the distance
  * parameter needed to compute the right absorption and the target photon field for the absorption
  * 
- * Parameters:
- *  - double emin = minimum energy
- *  - double emax = maximum energy
- *  - int k = vector photon field counter to be used in the order the fields were added
- *  - size = size of the photon field integration
- * Returns:
- *  - Absorbed Spectrum
+ * @param emin : minimum energy [erg]
+ * @param emax : maximum energy [erg]
+ * @param fields : vector photon field counter to be used in the order the fields were added
+ * @param size : size of the photon field integration [cm]
+ *
+ * @return Absorbed Spectrum : vector of 2D tuple (E, dN/dE) ([erg],[1/erg-1/cm2/s])
  */
 vector< vector<double> > Radiation::ReturnAbsorbedSpectrumOnFields(double emin, double emax, vector <int> fields, vector <double> size) {
     double tauval=0;
@@ -3201,14 +3361,12 @@ vector< vector<double> > Radiation::ReturnAbsorbedSpectrumOnFields(double emin, 
  * This is a wrapper around the function ReturnSED to which it was added the distance
  * parameter needed to compute the right absoption and the target photon field for the absorption
  * 
- * Parameters:
- *  - double emin = minimum energy
- *  - double emax = maximum energy
- *  - int k = vector photon field counter to be used in the order the fields were added
- *  - size = size of the photon field integration
+ * @param emin : minimum energy [erg]
+ * @param emax : maximum energy [erg]
+ * @param fields : vector photon field counter to be used in the order the fields were added
+ * @param size : size of the photon field integration [cm]
  *
- * Returns:
- *  - Absorbed SED
+ * @return Absorbed SED : vector of 2D tuple (E, dN/dE) ([erg],[erg/cm2/s])
  */
 vector< vector<double> > Radiation::ReturnAbsorbedSEDonFields(double emin, double emax,
                                                         vector <int> fields, vector <double> size){
@@ -3246,6 +3404,14 @@ vector< vector<double> > Radiation::ReturnAbsorbedSEDonFields(double emin, doubl
 /**
  * Returns the absorbed integrated flux. The absorption is computed using all the photon fields that enter in the
  * absorption calculation
+ *
+ * @param emin : minimum energy for the integration [erg]
+ * @param emax : maximum energy for the integration [erg]
+ * @param ENERGYFLUX : if true intgrates Edn/dE if false dn/dE
+ * @param fields : vector of indices of fields used to compute the absorption
+ * @param size : vector of sizes of the fields used to compute absorption (sizes in cm)
+ *
+ * @return val : integral flux (1/cm2/s) or integral energy flux (erg/cm2/s)
  */
 double Radiation::ReturnAbsorbedIntergratedFlux(double emin, double emax, bool ENERGYFLUX, vector <int> fields, vector <double > size){
     if (!diffSpec.size()){

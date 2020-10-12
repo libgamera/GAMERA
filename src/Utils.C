@@ -95,6 +95,12 @@ int Utils::ReadParameterFile(string inputname, vector<string> parameter_names,
   return 0;
 }
 
+/**
+ * Write spectrum \a sp on file
+ *
+ * @param sp : vector of 2D tuples to be written
+ * @param outname : file name (including extension)
+ */
 void Utils::WriteOut(vector<vector<double> > sp, string outname) {
 
   ofstream output_file(outname.c_str());
@@ -111,6 +117,12 @@ void Utils::WriteOut(vector<vector<double> > sp, string outname) {
   output_file.close();
 }
 
+/**
+ * Read spectrum \a sp from file
+ *
+ * @param inname : file name (including extension)
+ * @param sp : vector of 2D tuples where to store the input
+ */
 void Utils::ReadIn(string inname, vector< vector<double> > &sp) {
   sp.clear();
   ifstream input_file(inname.c_str());
@@ -243,8 +255,13 @@ double Utils::Random() {
 }
 
 /**
-* get n uniform random numbers in [x_min,x_max)
-*/
+ * Get n uniform random numbers in [x_min,x_max)
+ *
+ * @param x_min : minimum value
+ * @param x_max : maximum value
+ * @param n : number of element requested
+ * @return vector of random numbers uniformly distributed
+ */
 vector<double> Utils::UniformRandom(double x_min, double x_max,int n) {
   vector<double> v;
   for(int i=0;i<n;i++) v.push_back(x_min + (x_max-x_min)*gsl_rng_uniform(r));
@@ -252,8 +269,14 @@ vector<double> Utils::UniformRandom(double x_min, double x_max,int n) {
 }
 
 /**
-* get linearly distributed variates
-*/
+ * Get linearly distributed variates between [x_min, x_max) given a slope
+ *
+ * @param slope : angular coefficient of the line between x_min and x_max
+ * @param x_min : minimum value
+ * @param x_max : minimum value
+ * @param n : number of requested values
+ * @return vector of random numbers linearly distributed
+ */
 vector<double> Utils::LinearRandom(double slope, double x_min,
                                    double x_max, int n) {
   vector<double> v;
@@ -270,8 +293,16 @@ vector<double> Utils::LinearRandom(double slope, double x_min,
 }
 
 /**
-* get power-law distributed variates TODO: Index == 1
-*/
+ * get power-law distributed variates between [x_min, x_max) given a slope
+ *
+ * @param index : power law index
+ * @param x_min : minimum value
+ * @param x_max : minimum value
+ * @param n : number of requested values
+ * @return vector of random numbers distributed as a power law
+ *
+ * TODO: Index == 1 not included!!!
+ */
 vector<double> Utils::PowerLawRandom(double index, double x_min,
                                      double x_max, int n) {
   vector<double> v;
@@ -461,15 +492,17 @@ vector< vector<double> > Utils::CustomFunctionRandom2D(vector< vector<double> > 
 
 
 
-/***********************************************************************
+/**
  * Function to calculate the total energy of a spectrum between a
- * maximum nd a minimum energy.
- * Input:   - vector containing the energy and dN/dE as tuples.
- *              The energy and dN/dE should have the same energy unit.
- *          - Minimum energy
- *          - Maximum energy
- * Output:  - Energy in units of the input energy
- **********************************************************************/
+ * maximum and a minimum energy.
+ *
+ * @param f : vector containing the energy and dN/dE as tuples.
+ *            The energy and dN/dE should have the same energy unit.
+ * @param emin : Minimum energy
+ * @param emax : Maximum energy
+ *
+ * @return Energy in units of the input energy
+ */
 double Utils::EnergyContent(vector< vector<double> > f, double emin, double emax) {
   if(!f.size()) {
     cout << "Utils::EnergyContent: spectrum vector empty! "
@@ -488,7 +521,7 @@ double Utils::EnergyContentFast(vector< vector<double> > f) {
 }
 
 
-///**
+//
 // * get Poissonian variate (just wrapped from TRandom))
 // */
 // int Utils::PoissonianRandom(double mean) {
@@ -679,6 +712,10 @@ vector< vector<double> > Utils::VectorAxisLogarithm(vector< vector<double> > v,
   return v;
 }
 
+/**
+ * Transform the quantity in the \a column column of vector v in a base 10 exponential
+ * quantity
+ */
 vector< vector<double> > Utils::VectorAxisPow10(vector< vector<double> > v,
                                                     int column) {
   for(unsigned int i = 0; i < v.size() ; i++) {
