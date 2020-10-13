@@ -195,6 +195,16 @@ class Astro  {
     double GetHIFWHM(double R);///< TODO:COMMENT
     double GetH2FWHM(double R);///< TODO:COMMENT
     double ModulateGasDensityWithSpirals(double n, double x, double y, double z);
+    
+    // Functions for the milky way hydrogen density according to Ferriere 1998 and 2007
+    double GetTotalHDensityFerriere(vector< double > xyz);
+    double GetH2DensityFerriere(vector< double > xyz); 
+    double GetCMDensityFerriere(vector< double > xyz);
+    double GetWNMDensityFerriere(vector< double > xyz);
+    double GetWIMDensityFerriere(vector< double > xyz);
+    double GetHIMDensityFerriere(vector< double > xyz);
+    
+    
     //double CalculateGasColumnDensity(vector<double> xyzReference,vector<double> GLGB,string gascomponent,double modulate,double range,double steps);///< calculate gas column densities
 /*    double nRadial(double *x, double *pars);///< TODO:COMMENT*/
     vector<double> GetCartesian(vector<double> lbr, vector<double> xyzobs);///< Galactic coordinates (GL,GB,R) ->Cartesian

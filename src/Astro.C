@@ -1296,6 +1296,137 @@ double Astro::ModulateGasDensityWithSpirals(double n, double x, double y, double
 //  return n;
 //}
 
+
+
+
+/************************************************************************************
+ * Functions for the galactic density model from Ferriere 1998 for
+ * the outer galaxy, and Ferriere et al. 2007 for R < 3 kpc.
+ *********************************************************************************/
+
+
+/***********************************************************
+ * Function to return the total H density according to
+ * Ferriere 1998 and 2997.
+ * Input:   - Position in [kpc]
+ * Output:  - Number density in [cm^-3]
+ * ********************************************************/
+double Astro::GetTotalHDensityFerriere(vector< double > xyz){
+    return (GetH2DensityFerriere(xyz) + GetCMDensityFerriere(xyz) + GetWNMDensityFerriere(xyz)
+            + GetWIMDensityFerriere(xyz) + GetHIMDensityFerriere(xyz));
+}
+
+/***********************************************************
+ * Function to return the density of molecular hydrogen,
+ * equation 2 and 3 in Ferriere 1998.
+ * Input:   - Position in [kpc]
+ * Output:  - Number density in [cm^-3]
+ * ********************************************************/
+double Astro::GetH2DensityFerriere(vector< double > xyz){
+    double z = xyz[2];
+    double R = sqrt(xyz[0]*xyz[0] + xyz[1]*xyz[1]);
+    double R_sun = 8.5;     // position of the sun in [kpc]
+    
+    double Hm = 81.0* pow(R/R_sun, 0.58) * 1.0e-3;  // in kpc 
+    
+    double result = 0.58 * exp(-((R-4.5)*(R-4.5) - (R_sun - 4.5)*(R_sun - 4.5))/(2.9*2.9))
+                    * pow(R/R_sun, 0.58) * exp(-(z*z/(Hm*Hm)));
+    return result;
+}
+
+/****************************************************************
+ * Function to return the density of the neutral cold Hydrogen,
+ * equation 6 in Ferriere 1998.
+ * Input:   - Position in [kpc]
+ * Output:  - Number density in [cm^-3]
+ * **************************************************************/  
+double Astro::GetCMDensityFerriere(vector< double > xyz){
+    double z = xyz[2]*1.0e3;    // Now in [pc]
+    double R = sqrt(xyz[0]*xyz[0] + xyz[1]*xyz[1]);
+    double R_sun = 8.5;
+    
+    double alpha;
+    if ((3.5 <= R) && (R <= R_sun)) alpha = 1.0;
+    else alpha = R/R_sun;
+
+    double H1 = 127.0*alpha;
+    double H2 = 318.0*alpha;
+    double H3 = 403.0*alpha;
+    
+    double nc = 0.34/(alpha*alpha) * (0.859*exp(-z*z/(H1*H1)) + 0.047*exp(-z*z/(H2*H2)) + 0.094*exp(-abs(z)/H3));
+    
+    return nc;
+}
+
+/***********************************************************************
+ * Function to return the density of the warm neutral Hydrogen medium,
+ * equation 7 in Ferriere 1998.
+ * Input:   - Position in [kpc]
+ * Output:  - Number density in [cm^-3]
+ * ********************************************************************/  
+double Astro::GetWNMDensityFerriere(vector< double > xyz){
+    double z = xyz[2]*1.0e3;    // Now in [pc]
+    double R = sqrt(xyz[0]*xyz[0] + xyz[1]*xyz[1]);
+    double R_sun = 8.5;
+    
+    double alpha;
+    if ((3.5 <= R) && (R <= R_sun)) alpha = 1.0;
+    else alpha = R/R_sun;
+
+    double H1 = 127.0*alpha;
+    double H2 = 318.0*alpha;
+    double H3 = 403.0*alpha;
+    
+    double nc = 0.226/alpha* ((1.745 - 1.289/alpha)*exp(-z*z/(H1*H1)) 
+                                    + (0.473 - 0.07/alpha)*exp(-z*z/(H2*H2)) 
+                                    + (0.283 - 0.142/alpha)*exp(-abs(z)/H3));
+    
+    return nc;
+}
+
+/***********************************************************************
+ * Function to return the density of the warm ionized Hydrogen medium,
+ * equation 9 in Ferriere 1998.
+ * Input:   - Position in [kpc]
+ * Output:  - Number density in [cm^-3]
+ * ********************************************************************/  
+double Astro::GetWIMDensityFerriere(vector< double > xyz){
+    double z = xyz[2]*1.0e3;    // Now in [pc]
+    double R = sqrt(xyz[0]*xyz[0] + xyz[1]*xyz[1]);
+    double R_sun = 8.5;  // in [kpc]
+    
+    double result = 0.0237* exp(-(R*R - R_sun*R_sun)/1369.0) * exp(-abs(z)/1.0e3)
+                    + 0.0013 * exp(-((R - 4.0)*(R - 4.0) - (R_sun - 4.0)*(R_sun - 4.0))/4.0)
+                    * exp(-abs(z)/150.0);
+    return result;
+}
+
+/***********************************************************************
+ * Function to return the density of the hot medium hydrogen,
+ * equation 12 and 52 in Ferriere 1998.
+ * Input:   - Position in [kpc]
+ * Output:  - Number density in [cm^-3]
+ * ********************************************************************/  
+double Astro::GetHIMDensityFerriere(vector< double > xyz){
+    double z = xyz[2];
+    double R = sqrt(xyz[0]*xyz[0] + xyz[1]*xyz[1]);
+    double R_sun = 8.5;  // in [kpc]
+    
+    double Hh = 1.5 * pow(R/R_sun, 1.65);   // Equ. 52 in Ferriere
+    
+    double result = 4.8e-4*(0.12 * exp(-(R-R_sun)/4.9)
+                    + 0.88*exp(-((R - 4.5)*(R - 4.5) - (R_sun - 4.5)*(R_sun - 4.5))/8.41))
+                    * pow(R/R_sun, -1.65) * exp(-abs(z)/Hh);
+    return result;
+}
+
+
+
+
+
+
+
+
 /*    ------            Galactic Structure stuff              ------    */
 
 /**

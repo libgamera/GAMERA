@@ -15,7 +15,8 @@ Radiation::Radiation() {
   ANISOTROPY_CURRENT = false;
   ISOTROPIC_ELECTRONS = false;  //If true, calculate anisotropic IC scattering with isotropic electrons
   SPATIALDEP_CURRENT = false;
-  DEFAULT_HADRON_COMPOSITION = false;
+  DEFAULT_HADRON_COMPOSITION = false; //TODO: Check if it is still needed, otherwise delete it
+  USE_KELNER = false;
   lumtoflux = 0.;
   ldiffbrems = fdiffbrems = ldiffsynch = fdiffsynch = 0.;
   ldiffic = fdiffic = ldiffpp = fdiffpp = 0.;
@@ -407,7 +408,8 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
       cout << "Set it via the SetPPEmissionModel(<OPTION>) method. " << endl;
       return 0.;
     }
-    IntFunc = &Radiation::PPEmissivity;
+    if(USE_KELNER) {IntFunc = &Radiation::PPEmissivityKelner;}
+    else {IntFunc = &Radiation::PPEmissivity;}
   } else if (!radiationMechanism.compare("hadronicEmission")) {
 	  if (!n && !AmbientMediumComposition.size()) {
 	    if(!QUIETMODE) cout << "Radiation::DifferentialEmissionComponent:"
@@ -1540,6 +1542,75 @@ void Radiation::GetBParams(double Tp, double &b1, double &b2, double &b3) {
 
 
 
+
+
+/******************************************************************
+ * With this function one can set the parametrization of
+ * pp and hadronic collisions to the one by Kelner et al. 2006
+ * Input:   - Boolean, if true Kelner 2006 par. will be used
+ ******************************************************************/
+void Radiation::UseKelner(bool kelner){
+    USE_KELNER = kelner;
+    return;
+}
+
+
+/**************************************************************
+ * PP emissivity according to Kelner et al. 2006
+ * ***********************************************************/
+double Radiation::PPEmissivityKelner(double x, void *par) {
+  /* proton energy */
+  double EP = pow(10.,x);
+  /* pi0 decay photon energy */
+  double Eg = pow(10.,*(double *)par);
+  if (EP <= m_p) return 0.;
+  double Tp = sqrt(EP * EP - m_p * m_p); 
+  double Tpth = 0.2797 * GeV_to_erg; 
+  if (Tp <= Tpth) return 0.;
+  //if (Eg <= GetMinimumGammaEnergy(Tp)) return 0.;
+  //if (Eg >= GetMaximumGammaEnergy(Tp)) return 0.;
+
+  double N = Fgamma(Eg, EP);    // TODO: Check, if Kelner uses the total or kinetic proton energy
+
+  double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
+    
+  double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
+  //double L = log(EP*erg_to_TeV);
+  //double sigma = (34.3 + 1.88*L + 0.25*L*L) * 1.0e-27; // This is the corss-seciotn from Kelner
+  
+  
+  double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
+                                      acc,__func__,__LINE__);
+  //return c_speed * N * pow(10., logprotons) * ln10;
+  return (c_speed *  NuclearEnhancement * sigma * pow(10., logprotons) * N * ln10);
+}
+
+
+/*******************************************************
+ * Equations 58 to 61 in Kelner et al. 2006
+ * Input:   - Energy of the gamma ray in [erg]
+ *          - Energy of the proton in [erg]
+ ******************************************************/
+double Radiation::Fgamma(double Egamma, double Eproton){
+    double x = Egamma/Eproton;
+    double L = log(Eproton*erg_to_TeV);
+    
+    double Bgamma = 1.30 + 0.14*L + 0.011*L*L;
+    double betagamma = 1.0/(1.79 + 0.11*L + 0.008*L*L);
+    double kgamma = 1.0/(0.801 + 0.049*L + 0.014*L*L);
+    
+    double xbeta = pow(x, betagamma);
+    double Fg = Bgamma * log(x)/x * pow(((1.0-xbeta)/(1.0 + kgamma*xbeta*(1.0-xbeta))),4)
+                *( 1.0/log(x) - 4.0*betagamma*xbeta/(1.0-xbeta) - 
+                4.0*kgamma*betagamma*xbeta*(1.0-2.0*xbeta) / (1.0 + kgamma*xbeta*(1.0-xbeta)));
+    
+    
+    
+    return Fg;
+}
+
+
+
 /*---- Calculation of neutrinos following Kelner et al 2006 --- */
 
 /*************************************************************************
@@ -1788,7 +1859,7 @@ double Radiation::NeutrinoFlux2(double energy_proton, void *par) {
 double Radiation::Felectron(double Ee_erg, double Ep_erg) 
 {
 
-  double Ee = Ee_erg*erg_to_TeV;    // Elektron/neutrino energy in TeV
+  double Ee = Ee_erg*erg_to_TeV;    // Electron/neutrino energy in TeV
   double Ep = Ep_erg*erg_to_TeV;
 
 
