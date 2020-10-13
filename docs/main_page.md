@@ -5,16 +5,11 @@
 
 NEWS
 ====
-- low energy cut-offs in particle injection spectra are now properly and automatically accounted for in particle spectrum evolution
-- if you use python, you can now use numpy meshgrids to set injection- and particle escape-spectra that change with time
-- overhauled particle escape time functionality. Check out the new tutorials!
-- unified naming of get and set functions in Particles class
-- new and easy way to get cooling time scale and cooling rate
-- integrated flux now easier to get (basic Radiation tutorial updated)
-- no more random drawings of GAMERA on your console ;)
-- directly set up radiation fields in the Particles class now! (updated static modeling Particles tutorial) 
+**13-10-2020**
 - implemented the gamma-gamma absorption effect (absorption only, no secondaries)
 - implemented the nuclear enhancement factor for pi0 emission
+- ensured internal consistency between pi0 and bremsstrahlung emission when using custom ambient compositions
+- ionization losses made optional
 
 Documentation & Tutorials
 =========================
