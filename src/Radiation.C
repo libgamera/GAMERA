@@ -1823,6 +1823,15 @@ double Radiation::AtomicNumber(double mass_number){
  * final, total radiation field in the IC process.
  */
 
+/**
+ * Remove the target field \a i cleaning all the related lookups.
+ * Including those related to the sum of the fields.
+ *
+ * To be used with care because this function does not touch the
+ * total counter of fields Radiation::RADFIELD_COUNTER
+ *
+ * @param i : index of target photon to be cleared
+ */
 void Radiation::ClearTargetPhotonField(int i) {
     if(i==-2) {
         if (VERBOSEMODE == true) {
@@ -2037,6 +2046,17 @@ void Radiation::ImportTargetPhotonsFromFile(const char *phFile) {
     return;
 }
 
+/**
+ * @short Reset photon field \a i with one imported from file
+ *
+ * Format of the file is:
+ *  - E(eV) vs. photon_density(eV^-1cm^-3)
+ *
+ * See also Radiation::SetTargetPhotonsFromFile
+ *
+ * @param i : index of the field to replace
+ * @param phFile : input file
+ */
 void Radiation::ResetWithTargetPhotonsFromFile(int i,const char *phFile) {
     if (i<0 || i>=(int)RADFIELDS_MAX) {
       cout<<"Radiation::ResetWithTargetPhotonsFromFile: Invalid index "<<i<<
@@ -2089,11 +2109,6 @@ void Radiation::SetTargetPhotonsFromFile(const char *phFile, int i) {
 /** 
  * This function calls the Synchrotron code in this class.
  * The photons will be added to Radiation::TotalTargetPhotonVector
- * If 'UPDATE' is 'true'
- * then recalculate the synchroton target field and
- * replace the previous one by this updated field.
- * DANGER: for the 'UPDATE' option to work, the SSC field
- * must be the last entry in the 'TargetPhotonGraphs' vector!
  * It uses Atoyan&Aharonian1996: MNRAS, Volume 278, Issue 2, pp. 525-541
  * 
  * The function calls the private method Radiation::SetSSCTargetPhotons
@@ -2109,6 +2124,13 @@ void Radiation::AddSSCTargetPhotons(double R, int steps) {
     return;
 }
 
+/**
+ * Replace photon field \a i with the SSC field. See Radiation::AddSSCTargetPhotons
+ *
+ * @param i : index of the photon field to replace
+ * @param R : size of the emission region (in units of parsecs)
+ * @param steps : steps in the energy domain for the synchrotron spectrum
+ */
 void Radiation::ResetWithSSCTargetPhotons(int i,double R, int steps) {
     if (i<0 || i>=(int)RADFIELDS_MAX) {
       cout<<"Radiation::ResetWithSSCTargetPhotons: Invalid index "<<i<<
@@ -2124,6 +2146,18 @@ void Radiation::ResetWithSSCTargetPhotons(int i,double R, int steps) {
     return;
 }
 
+/**
+ * Set the target photon to be the Synchrotron photons produced
+ * in the interaction with the magnetic field.
+ *
+ * Simple assumption that
+ * the producing the synchrotron radiation does not affect too much
+ * the particle spectrum so that the SSC uses the same electron distribution
+ *
+ * @param R : size of the emission regio (units of parsec)
+ * @param steps : number of steps to sample the synchrotron spectrum
+ * @param i : field number
+ */
 void Radiation::SetSSCTargetPhotons(double R, int steps, int i) {
   if (R <= 0.) {
     cout

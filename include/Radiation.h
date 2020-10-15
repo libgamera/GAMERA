@@ -452,7 +452,7 @@ class Radiation {
   void ImportTargetPhotonsFromFile(const char *phFile);  ///< Add photon field from file
   void ResetWithTargetPhotonsFromFile(int i,const char *phFile);  ///< Reset field i with field from file
   void AddSSCTargetPhotons(double R, int steps = 200);  ///< Add target photons resulting from Synchrotron radiation
-  void ResetWithSSCTargetPhotons(int i, double R, int steps = 200); 
+  void ResetWithSSCTargetPhotons(int i, double R, int steps = 200);  ///< Reset photon field i with SSC field
   vector<vector<double> > GetTargetPhotons(int i=-1);///< return TotalTargetPhotonVector
   void ClearTargetPhotons(); ///< remove all previously set IC target photons
   void Reset();  ///< reset ParticleLookup, Electrons, Protons, fintbrems,
