@@ -43,6 +43,7 @@ class Radiation {
                              ///< isotropic target fields individually but only sum
   bool IC_LOSSLOOK_CALCULATED;  ///< Store if the Inverse Compton Lookup has been computed
   bool USE_KELNER; ///< Use the parametrization of Kelner et al. 2006 for PP interactions
+  bool USE_KAMAE; ///< Use the parametrization of Kamae et al. 2006 for PP interactions
   double DifferentialEmissionComponent(double e, void *par); ///< Calculates the differential photon rate
   double GreyBody(double ephoton, double temp, double edens); ///< Thermal grey body
   double ICEmissivityRadFieldIntegrated(double x, void *par); ///< IC emission from electrons integrated over the target photon population.
@@ -244,13 +245,14 @@ class Radiation {
    * (DEFAULT angle 90 degrees)
    */
   int SynchModel;  
-
-  
-  
-  
-  
-  
+  double PPEmissivity(double x, void *par);  ///< Compute pi0 emissivity
+  double PPEmissivityKelner(double x, void *par); ///< pi0 emissivity according to Kelner et al. 2006
   double Fgamma(double Tp, double EP);  /// Function for the Kelner 2006 calculations
+  
+  
+  double PPEmissivityKamae(double x, void *par);
+  double FndKamae(double x, double a0, double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8);
+  double FndklKamae(double x, double Wndl, double Wndh, double Lmin, double Lmax);
   
   
   void GetABGParams(double Tp, double &alpha, double &beta, double &gamma,
@@ -363,6 +365,7 @@ class Radiation {
   
    void UseKelner(bool kelner);  // Use parametrization of Kelner et al. 2006 for pp emission
 
+   void UseKamae(bool kamae); // Use parametrization of Kamae et al. 2006 for pp emission
 
   /// Calculate epsilon factor for hadronic interactions
   double CalculateEpsilon(double Tp, double Mass);
@@ -781,11 +784,8 @@ class Radiation {
   double GetIntegralTotalAbsFlux(double emin, double emax, vector <int> fields) { ///< get integrated 
     return ReturnAbsorbedIntergratedFlux(emin,emax,false,fields,sizephfield); }                      /// absorbed energy flux between
                                                                                           /// emin and emax (erg) 
-                                                                                          /// summed over all 
+  double PPEmissivity2(double x, double par);  ///< Compute pi0 emissivity
+  double PPEmissivityKelner2(double x, double par); ///< pi0 emissivity according to Kelner et al. 2006                                                                                        /// summed over all 
                                                                                           /// radiation processes
-                                                                                          
-                                                                                          
-  double PPEmissivity(double x, void *par);  ///< Compute pi0 emissivity
-  double PPEmissivityKelner(double x, void *par); ///< pi0 enissivity according to Kelner et al. 2006
 };
 #endif

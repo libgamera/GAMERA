@@ -17,6 +17,7 @@ Radiation::Radiation() {
   SPATIALDEP_CURRENT = false;
   DEFAULT_HADRON_COMPOSITION = false; //TODO: Check if it is still needed, otherwise delete it
   USE_KELNER = false;
+  USE_KAMAE = false;
   lumtoflux = 0.;
   ldiffbrems = fdiffbrems = ldiffsynch = fdiffsynch = 0.;
   ldiffic = fdiffic = ldiffpp = fdiffpp = 0.;
@@ -1290,7 +1291,7 @@ double Radiation::Fbr(double x, double g) {
 
 
 /* ---      pi0 decay     --- */
-
+//TODO: double check it!
 double Radiation::PPEmissivity(double x, void *par) {
   /* proton energy */
   double EP = pow(10.,x);
@@ -1402,11 +1403,14 @@ double Radiation::SigmaOnePi(double Tp) {
   return SigmaOnePi * 1.e-27;
 }
 
-/** Eq. 2 Kafexhiu 2014, needed for lowest energies
+/** Eq. 5 Kafexhiu 2014, needed for lowest energies
  */
 double Radiation::SigmaTwoPi(double Tp) {
+  if ((Tp / GeV_to_erg) < 0.56) { return 0.0;}
+  else {
   double SigmaTwoPi = 5.7 / (1. + exp(-9.3 * (Tp / GeV_to_erg - 1.4)));
   return SigmaTwoPi * 1.e-27;
+  }
 }
 
 /** X-section normalisation following Eq. 12 in Kafexhiu 2014
@@ -1542,15 +1546,170 @@ void Radiation::GetBParams(double Tp, double &b1, double &b2, double &b3) {
 
 
 
+/******************************************************************
+ * With this function one can set the parametrization of
+ * pp and hadronic collisions to the one by Kamae et al. 2006
+ * \par  - Boolean, if true Kamae 2006 par. will be used
+ ******************************************************************/
+void Radiation::UseKamae(bool kamae){
+    if (kamae) {
+     USE_KELNER = false;
+     USE_KAMAE = kamae;
+    }
+    else {
+     USE_KAMAE = kamae;   
+    }
+    return;
+}
+
+
+
+
+//double Radiation::PPEmissivityKamae(double x, void *par){
+  /* proton energy */
+//  double EP = pow(10.,x);
+  /* pi0 decay photon energy */
+/*  double Eg = pow(10.,*(double *)par);
+  if (EP <= m_p) return 0.;
+  double Tp = sqrt(EP * EP - m_p * m_p); 
+  double Tpth = 0.2797 * GeV_to_erg; 
+  if (Tp <= Tpth) return 0.;
+  
+  
+  // Calculation of the parameters in table 3 in Kamae et al. 2006
+  double y = log(Tp * erg_to_TeV);
+  
+  double a0 = -0.51187*(y + 3.3) + 7.6179*(y + 3.3)*(y + 3.3) - 2.1332*pow(y + 3.3, 3) + 0.22184*pow(y + 3.3, 4);
+  double a1 = -1.2592e-5 + 1.4439e-5 * exp(-0.29360 * ( y + 3.4)) + 5.9363e-5/( y + 4.1485) + 2.2640e-6 * y - 3.3723e-7 * y*y;
+  double a2 = -1.0*(174.83 + 152.78) * log(1.5682 * ( y + 3.4)) -  808.74/(y + 4.6157);
+  double a3 = 0.81177 + 0.56385*y + 0.0040031*y*y - 0.0057658*y*y*y + 0.00012057*pow(y,4);
+  double a4 = 0.68631*( y + 3.32) + 10.145* pow( y + 3.32 , 2) - 4.6176*pow( y + 3.32 , 3) + 0.86824*pow( y + 3.32 , 4) - 0.053741*pow( y + 3.32 , 5);
+  double a5 = 9.0466e-7 + 1.4539e-6 * log(0.015204*( y + 3.4)) + 1.3253e-4/((y + 4.7171)*(y + 4.7171)) - 4.1228e-7 * y + 2.2036e-7 *y*y;
+  double a6 = -1.0*(339.45 + 618.73) *  log(0.31595*( y + 3.9)) + 250.20/(( y + 4.4395)*( y + 4.4395));
+  double a7 = -35.105 + 36.167*y - 9.3575*y*y + 0.33717*y*y*y;
+  double a8 = 0.17554 + 0.37300*y - 0.014938*y*y + 0.0032314*y*y*y + 0.0025579*pow(y, 4);
+  if (Tp/GeV_to_erg <= 1.95){
+   double rr = 3.05*exp( -107.0*pow((y + 3.25)/(1.0 + 8.08*(y + 3.25)), 2));   
+  }
+  else double r = 1.01;
+    
+  double b0 = 60.142 * tanh(-0.37555*( y + 2.2)) - 5.9564*(y + 0.59913)*(y + 0.59913) + 6.0162e-3 *pow(y + 9.4773,4);
+  double b1 = 35.322 + 3.8026 * tanh(-2.5979*(y + 1.9)) - 2.1870e-4 * (y + 369.13)*(y + 369.13);
+  double b2 = -15.732 - 0.082064 * tanh(-1.9621*(y + 2.1)) + 2.3355e-4 * (y + 252.43) *(y + 252.43);
+  double b3 = -0.086827 + 0.37646 * exp(-0.53053*pow(((y + 1.0444)/(1.0 + 0.27437*(y + 1.0444))),2));
+  double b4 = 2.5982 + 0.39131*(y + 2.95)*(y + 2.95) - 0.0049693*pow( y + 2.95, 4) + 0.94131 * exp(-24.347*pow(y + 2.45 - 0.19717*(y + 2.45)*(y + 2.45),2));
+  double b5 = 0.11198 - 0.64582*y + 0.16114*y*y + 2.2853 * exp(-0.0032432*pow(( y - 0.83562)/(1.0 + 0.33933*( y - 0.83562)),2) );
+  double b6 = 1.7843 + 0.91914*y + 0.050118*y*y + 0.038096*y*y*y - 0.027334*pow(y, 4) - 0.0035556*pow(y, 5) + 0.0025742*pow(y, 6);
+  double b7 = -0.19870 - 0.071003*y + 0.019328*y*y - 0.28321 * exp(-6.0516*(y + 1.8441)*(y + 1.8441));
+  
+  double c0 = 2.4316 * exp(-69.484*pow((y + 3.1301)/(1.0 + 1.24921*(y + 3.1301)),2)) - 6.3003 - 9.5349/y + 0.38121*y*y;
+  double c1 = 56.872 + 40.627*y + 7.7528*y*y;
+  double c2 = -5.4918 - 6.7872 * tanh(4.7128*(y + 2.1)) + 0.68048*y;
+  double c3 = -0.36414 + 0.039777*y;
+  double c4 = -0.72807 - 0.48828*y - 0.092876*y*y;
+  
+  double d0 = 3.2433 * exp(-57.133*pow((y + 2.9507)/(1.0 + 1.2912*(y + 2.9507)),2)) - 1.0640 - 0.43925*y;
+  double d1 = 16.901 + 5.9539*y - 2.1257*y*y - 0.92057*y*y*y;
+  double d2 = -6.6638 - 7.5010 * tanh(30.322*(y + 2.1)) + 0.54662*y;
+  double d3 = -1.50648 - 0.87211*y - 0.17097*y*y;
+  double d4 = 0.42795 + 0.55136*y + 0.20707*y*y + 0.027552*y*y*y;
+
+
+  double Wndl = 15.0;
+  double Wndh = 44.0;
+  double Lmax = 0.96*log(Tp/GeV_to_erg);
+  
+  double X = log(Eg/GeV_to_erg);
+  
+  double Fnd = FndKamae(X, a0, a1, a2, a3, a4, a5, a6, a7, a8) * FndklKamae(X,Wndl, Wndh, Lmax)*r;
+  
+  double Fdiff = FdiffKamae(X, b0,b1,b2,b3,b4,b5,b6) * FklKamae(X, Tp/GeV_to_erg);
+  
+  double FresDelta = FresKamae(X,c0,c1,c2,c3,c4) * FklKamae(X, Tp/GeV_to_erg);
+  double Fres1600 = FresKamae(X,d0,d1,d2,d3,d4) * FklKamae(X, Tp/GeV_to_erg);
+  
+  double N = Fnd + Fdiff + FresDelta + Fres1600;
+  
+  double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
+                                      acc,__func__,__LINE__);
+  return c_speed * N * pow(10., logprotons) * ln10 * EP;
+  
+  
+  return 0.0;
+
+    
+    
+}*/
+
+
+
+
+/**************************************************************
+ * Equation 6 from Kamae et al. 2006 for the non-diffractive
+ * channel
+ * ***********************************************************/
+/*double Radiation::FndKamae(double x, double a0, double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8){
+    double result = a0 * exp(-a1* pow(x-a3 + a2*(x-a3)*(x-a3),2))
+                    + a4 * exp(-a5* pow(x-a8 + a6*(x-a8)*(x-a8)+ a7*pow(x-a8,3) , 2));
+    return result;
+}
+*/
+/**************************************************************
+ * Equation 7 from Kamae et al. 2006 for the non-diffractive
+ * channel
+ * ***********************************************************/
+/*double Radiation::FndklKamae(double x, double Wndl, double Wndh, double Lmax){
+    double Lmin = -2.6;
+    double result = 1.0/(exp(Wndl*(Lmin - x)) + 1.0) * 1.0/(exp(Wndh*(x - Lmax)) + 1.0);
+    
+    return result;
+}*/
+
+
+/**************************************************************
+ * Equation 9 from Kamae et al. 2006 for the non-diffractive
+ * channel
+ * ***********************************************************/
+/*double Radiation::FdiffKamae(double x, double b0, double b1, double b2, double b3, double b4, double b5, double b6){
+    double result = b0 * exp(-1.0*b1 * pow((x-b2)/(1.0 + b3*(x-b2)),2))
+                    + b4*exp(-1.0*b5*pow((x-b6)/(1.0+b7*(x-b6)),2)); //DANGER: There is a typo in Kamae in equ. 9
+}
+
+// Equation 10 in Kamae
+double Radiation::FklKamae(double x, double Tp){
+    double Lmax = log(Tp);
+    double Wdiff = 75.0;
+    double result = 1.0/(exp(Wdiff*(x-Lmax)) + 1.0);
+    return result;
+}
+
+
+// Equation 12 in Kamae
+double Radiation::FresKamae(double x, double c0, double c1, double c2, double c3, double c4){
+    double result = c0*exp(-1.0*c1* pow(((x-c2)/(1.0 + c3*(x-c2) + c4*(x-c2)*(x-c2))),2));
+    return result;
+}
+*/
+
+
+
+
+
 
 
 /******************************************************************
  * With this function one can set the parametrization of
  * pp and hadronic collisions to the one by Kelner et al. 2006
- * Input:   - Boolean, if true Kelner 2006 par. will be used
+ * \par  - Boolean, if true Kelner 2006 par. will be used
  ******************************************************************/
 void Radiation::UseKelner(bool kelner){
-    USE_KELNER = kelner;
+    if (kelner) {
+     USE_KAMAE = false;
+     USE_KELNER = kelner;
+    }
+    else {
+     USE_KELNER = kelner;   
+    }
     return;
 }
 
@@ -1574,16 +1733,45 @@ double Radiation::PPEmissivityKelner(double x, void *par) {
 
   double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
     
-  double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
-  //double L = log(EP*erg_to_TeV);
-  //double sigma = (34.3 + 1.88*L + 0.25*L*L) * 1.0e-27; // This is the corss-seciotn from Kelner
+  //double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
+  double L = log(EP*erg_to_TeV);
+  double sigma = (34.3 + 1.88*L + 0.25*L*L) * 1.0e-27; // This is the cross-section from Kelner
   
   
   double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
                                       acc,__func__,__LINE__);
   //return c_speed * N * pow(10., logprotons) * ln10;
-  return (c_speed *  NuclearEnhancement * sigma * pow(10., logprotons) * N * ln10);
+  return (c_speed * NuclearEnhancement * sigma * pow(10., logprotons) * N * ln10);
 }
+
+
+double Radiation::PPEmissivityKelner2(double x, double par) {
+  /* proton energy */
+  double EP = pow(10.,x);
+  /* pi0 decay photon energy */
+  double Eg = pow(10.,par);
+  if (EP <= m_p) return 0.;
+  double Tp = sqrt(EP * EP - m_p * m_p); 
+  double Tpth = 0.2797 * GeV_to_erg; 
+  if (Tp <= Tpth) return 0.;
+  //if (Eg <= GetMinimumGammaEnergy(Tp)) return 0.;
+  //if (Eg >= GetMaximumGammaEnergy(Tp)) return 0.;
+
+  double N = Fgamma(Eg, EP);    // TODO: Check, if Kelner uses the total or kinetic proton energy
+
+  double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
+    
+  //double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
+  double L = log(EP*erg_to_TeV);
+  double sigma = (34.3 + 1.88*L + 0.25*L*L) * 1.0e-27; // This is the corss-seciotn from Kelner
+  
+  
+  double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
+                                      acc,__func__,__LINE__);
+  //return c_speed * N * pow(10., logprotons) * ln10;
+  return (c_speed * sigma * NuclearEnhancement * pow(10., logprotons) * N * ln10);
+}
+
 
 
 /*******************************************************
