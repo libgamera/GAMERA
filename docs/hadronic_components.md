@@ -97,10 +97,13 @@ The total spectrum and the total SED, which can be retrieved as in other tutoria
 total_spectrum = fr.GetTotalSpectrum()  # Returns the total spectrum
 total_SED = fr.GetTotalSED()            # Returns the total SED
 ```
-already contains the contributions from all hadron species. To get the contribution from individual species, one can use the following function:
+It already contains the contributions from all hadron species. To get the contribution from individual species, one can use the following function:
 
 ```python
 i = 0
+total_hadron_spectrum = fr.GetHadronSpectrum()  # To get the total spectrum from all hadron species
+total_hadron_SED = fr.GetHadronSED()            # To get the total SED from all hadron species
+
 Spectrum = fr.GetHadronSpectrum(i)    # To get the spectrum from hadron species number i
 SED = fr.GetHadronSED(i)              # To get the SED from hadron species number i
 ```
