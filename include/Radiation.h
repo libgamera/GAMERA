@@ -252,7 +252,14 @@ class Radiation {
   
   double PPEmissivityKamae(double x, void *par);
   double FndKamae(double x, double a0, double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8);
-  double FndklKamae(double x, double Wndl, double Wndh, double Lmin, double Lmax);
+  double FndklKamae(double x, double Wndl, double Wndh, double Lmax);
+  double FdiffKamae(double x, double b0, double b1, double b2, double b3, double b4, double b5, double b6, double b7);
+  double FklKamae(double x, double Tp);
+  double FresKamae(double x, double c0, double c1, double c2, double c3, double c4);
+  double SigmaNdKamae(double Tp);
+  double SigmaDiffKamae(double Tp);
+  double SigmaDeltaKamae(double Tp);
+  double SigmaResKamae(double Tp);
   
   
   void GetABGParams(double Tp, double &alpha, double &beta, double &gamma,

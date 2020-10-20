@@ -410,8 +410,12 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
       return 0.;
     }
     if(USE_KELNER) {IntFunc = &Radiation::PPEmissivityKelner;}
+    else if (USE_KAMAE) {IntFunc = &Radiation::PPEmissivityKamae;}
     else {IntFunc = &Radiation::PPEmissivity;}
   } else if (!radiationMechanism.compare("hadronicEmission")) {
+    if(USE_KELNER) { IntFunc = &Radiation::PPEmissivityKelner;}
+    else if (USE_KAMAE) {IntFunc = &Radiation::PPEmissivityKamae;}
+    else {IntFunc = &Radiation::PPEmissivity;}
 	  if (!n && !AmbientMediumComposition.size()) {
 	    if(!QUIETMODE) cout << "Radiation::DifferentialEmissionComponent:"
 	                           "No ambient density value set for "
@@ -1291,7 +1295,6 @@ double Radiation::Fbr(double x, double g) {
 
 
 /* ---      pi0 decay     --- */
-//TODO: double check it!
 double Radiation::PPEmissivity(double x, void *par) {
   /* proton energy */
   double EP = pow(10.,x);
@@ -1565,11 +1568,11 @@ void Radiation::UseKamae(bool kamae){
 
 
 
-//double Radiation::PPEmissivityKamae(double x, void *par){
+double Radiation::PPEmissivityKamae(double x, void *par){
   /* proton energy */
-//  double EP = pow(10.,x);
+  double EP = pow(10.,x);
   /* pi0 decay photon energy */
-/*  double Eg = pow(10.,*(double *)par);
+  double Eg = pow(10.,*(double *)par);
   if (EP <= m_p) return 0.;
   double Tp = sqrt(EP * EP - m_p * m_p); 
   double Tpth = 0.2797 * GeV_to_erg; 
@@ -1588,10 +1591,10 @@ void Radiation::UseKamae(bool kamae){
   double a6 = -1.0*(339.45 + 618.73) *  log(0.31595*( y + 3.9)) + 250.20/(( y + 4.4395)*( y + 4.4395));
   double a7 = -35.105 + 36.167*y - 9.3575*y*y + 0.33717*y*y*y;
   double a8 = 0.17554 + 0.37300*y - 0.014938*y*y + 0.0032314*y*y*y + 0.0025579*pow(y, 4);
+  double r = 1.01;
   if (Tp/GeV_to_erg <= 1.95){
-   double rr = 3.05*exp( -107.0*pow((y + 3.25)/(1.0 + 8.08*(y + 3.25)), 2));   
+   r = 3.05*exp( -107.0*pow((y + 3.25)/(1.0 + 8.08*(y + 3.25)), 2));   
   }
-  else double r = 1.01;
     
   double b0 = 60.142 * tanh(-0.37555*( y + 2.2)) - 5.9564*(y + 0.59913)*(y + 0.59913) + 6.0162e-3 *pow(y + 9.4773,4);
   double b1 = 35.322 + 3.8026 * tanh(-2.5979*(y + 1.9)) - 2.1870e-4 * (y + 369.13)*(y + 369.13);
@@ -1621,25 +1624,24 @@ void Radiation::UseKamae(bool kamae){
   
   double X = log(Eg/GeV_to_erg);
   
+  
   double Fnd = FndKamae(X, a0, a1, a2, a3, a4, a5, a6, a7, a8) * FndklKamae(X,Wndl, Wndh, Lmax)*r;
   
-  double Fdiff = FdiffKamae(X, b0,b1,b2,b3,b4,b5,b6) * FklKamae(X, Tp/GeV_to_erg);
+  double Fdiff = FdiffKamae(X, b0,b1,b2,b3,b4,b5,b6,b7) * FklKamae(X, Tp/GeV_to_erg);
   
   double FresDelta = FresKamae(X,c0,c1,c2,c3,c4) * FklKamae(X, Tp/GeV_to_erg);
   double Fres1600 = FresKamae(X,d0,d1,d2,d3,d4) * FklKamae(X, Tp/GeV_to_erg);
   
-  double N = Fnd + Fdiff + FresDelta + Fres1600;
+  double N = Fnd * SigmaNdKamae(Tp) + Fdiff * SigmaDiffKamae(Tp) + FresDelta * SigmaDeltaKamae(Tp) + Fres1600 * SigmaResKamae(Tp);
+  
+  double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
   
   double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
                                       acc,__func__,__LINE__);
-  return c_speed * N * pow(10., logprotons) * ln10 * EP;
-  
-  
-  return 0.0;
+  return c_speed * NuclearEnhancement * N * pow(10., logprotons) * ln10 * EP * Eg;
 
     
-    
-}*/
+}
 
 
 
@@ -1648,48 +1650,135 @@ void Radiation::UseKamae(bool kamae){
  * Equation 6 from Kamae et al. 2006 for the non-diffractive
  * channel
  * ***********************************************************/
-/*double Radiation::FndKamae(double x, double a0, double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8){
-    double result = a0 * exp(-a1* pow(x-a3 + a2*(x-a3)*(x-a3),2))
-                    + a4 * exp(-a5* pow(x-a8 + a6*(x-a8)*(x-a8)+ a7*pow(x-a8,3) , 2));
-    return result;
+double Radiation::FndKamae(double x, double a0, double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8){
+    //return 0.0;
+    //cout << " a0: " << a0 << " a1: " << a1 << " a5: " << a5 << " arg_exp1: " << -a1* pow((x-a3 + a2*(x-a3)*(x-a3)),2.0) << " arg_exp2: " << -a5* pow((x-a8 + a6*(x-a8)*(x-a8)+ a7*pow((x-a8),3.0)) , 2.0);
+    double result = a0 * exp(-a1* pow((x-a3 + a2*(x-a3)*(x-a3)),2.0))
+                    + a4 * exp(-a5* pow((x-a8 + a6*(x-a8)*(x-a8)+ a7*pow((x-a8),3.0)) , 2.0));
+    //cout << result << "\n";
+    if (not isinf(result)) return result;
+    else return 0.0;
 }
-*/
+
 /**************************************************************
  * Equation 7 from Kamae et al. 2006 for the non-diffractive
  * channel
  * ***********************************************************/
-/*double Radiation::FndklKamae(double x, double Wndl, double Wndh, double Lmax){
+double Radiation::FndklKamae(double x, double Wndl, double Wndh, double Lmax){
+    //cout << "In FndklKamae\n";
+    //return 0.0;
     double Lmin = -2.6;
     double result = 1.0/(exp(Wndl*(Lmin - x)) + 1.0) * 1.0/(exp(Wndh*(x - Lmax)) + 1.0);
     
     return result;
-}*/
+}
 
 
 /**************************************************************
  * Equation 9 from Kamae et al. 2006 for the non-diffractive
  * channel
  * ***********************************************************/
-/*double Radiation::FdiffKamae(double x, double b0, double b1, double b2, double b3, double b4, double b5, double b6){
+double Radiation::FdiffKamae(double x, double b0, double b1, double b2, double b3, double b4, double b5, double b6, double b7){
     double result = b0 * exp(-1.0*b1 * pow((x-b2)/(1.0 + b3*(x-b2)),2))
                     + b4*exp(-1.0*b5*pow((x-b6)/(1.0+b7*(x-b6)),2)); //DANGER: There is a typo in Kamae in equ. 9
+    if (not isinf(result)) return result;
+    else return 0.0;
 }
-
 // Equation 10 in Kamae
 double Radiation::FklKamae(double x, double Tp){
+    //cout << "In FklKamae\n";
+    //return 0.0;
     double Lmax = log(Tp);
     double Wdiff = 75.0;
     double result = 1.0/(exp(Wdiff*(x-Lmax)) + 1.0);
+    //if (not isinf(result)) return result;
     return result;
 }
-
 
 // Equation 12 in Kamae
 double Radiation::FresKamae(double x, double c0, double c1, double c2, double c3, double c4){
+    //cout << "In FresKamae\n";
+    //return 0.0;
     double result = c0*exp(-1.0*c1* pow(((x-c2)/(1.0 + c3*(x-c2) + c4*(x-c2)*(x-c2))),2));
     return result;
 }
-*/
+
+
+/*Cross sections for Kamae. NOTE: There is an erratum to the original paper, the equations
+ were taken from the erratum. */
+// Equation 1
+double Radiation::SigmaNdKamae(double Tp){
+    //cout << "In SigmaNdKamae\n";
+    //return 0.0;
+    double x = log( Tp/GeV_to_erg/c_speed );
+    double a0 = 0.1176, a1 = 0.3829, a2 = 23.10, a3 = 6.454, a4 = -5.764, a5 = -23.63, a6 = 94.75, a7 = 0.02667;
+    double b0 = 11.34, b1 = 23.72;
+    double c0 = 28.5, c1 = -6.133, c2 = 1.464;
+    
+    double sigma;
+    if (x < 1.0) sigma = 0.0;
+    else if (x < 1.3) sigma = 0.57*pow(x/a0,1.2)*(a2 + a3*x*x + a4*x*x*x + a5*exp(-a6*(x+a7)*(x+a7)));
+    else if (x < 2.4) sigma = (b0*abs(a1-x) + b1*abs(a0-x) - x)/(a1-a0);
+    else if (x < 10.0) sigma = a2 + a3*x*x + a4*x*x*x + a5*exp(-a6*(x+a7)*(x+a7));
+    else sigma = c0 + c1*x + c2*x*x;
+        
+    return sigma*1.0e-27;
+}
+
+//Equation 2
+double Radiation::SigmaDiffKamae(double Tp){
+    //cout << "In SigmaDiffKamae\n";
+    //return 0.0;
+    double x = log( Tp/GeV_to_erg/c_speed );
+    double d0 = 0.3522, d1 = 0.1530, d2 = 1.498, d3 = 2.0, d4 = 30.0, d5 = 3.155, d6 = 1.042;
+    double e0 = 5.922, e1 = 1.632;
+    
+    double sigma;
+    if (x<2.25) sigma = 0.0;
+    else if (x< 3.2) sigma = sqrt((x-d0)/d1) * (d2 + d3*log(d4*(x-0.25)) + d5*x*x - d6*x*x*x);
+    else if(x < 100.0) sigma = d2 + d3 * log(d4*(x-0.25)) + d5*x*x - d6*x*x*x;
+    else sigma = e0 + e1*x;
+    
+    
+    return sigma*1.0e-27;
+}
+
+// Equation 3
+double Radiation::SigmaDeltaKamae(double Tp){
+    //cout << "In SigmaDeltaKamae\n";
+    //return 0.0;
+    double Ep = sqrt(Tp*Tp + m_p*m_p)/GeV_to_erg;
+    double f0 = 0.0834, f1 = 9.5, f2 = -5.5, f3 = 1.68, f4 = 3134.0;
+    
+    double sigma;
+    if (Ep < 1.4) sigma = 0.0;
+    else if (Ep < 1.6) sigma = f0 * pow(Ep,10);
+    else if (Ep < 1.8) sigma = f1*exp(-f2*(Ep - f3)*(Ep - f3));
+    else if (Ep < 10.0) sigma = f4* pow(Ep, -10);
+    else sigma = 0.0;
+    
+    return sigma*1.0e-27;
+}
+
+// Equation 4
+double Radiation::SigmaResKamae(double Tp){
+    //cout << "In SigmaResKamae\n";
+    //return 0.0;
+    double Ep = sqrt(Tp*Tp + m_p*m_p)/GeV_to_erg;
+    double g0 = 0.0004257, g1 = 4.5, g2 = -7.0, g3 = 2.1, g4 = 503.5;
+    
+    double sigma;
+    if (Ep < 1.6) sigma = 0.0;
+    else if (Ep < 1.9) sigma = g0* pow(Ep,14);
+    else if (Ep < 2.3) sigma = g1 * exp(-g2*(Ep - g3)*(Ep - g3));
+    else if (Ep < 20.0) sigma = g4 * pow(Ep, -6);
+    else sigma = 0.0;
+    
+    return sigma*1.0e-27;
+}
+
+
+
 
 
 
@@ -1733,9 +1822,9 @@ double Radiation::PPEmissivityKelner(double x, void *par) {
 
   double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
     
-  //double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
-  double L = log(EP*erg_to_TeV);
-  double sigma = (34.3 + 1.88*L + 0.25*L*L) * 1.0e-27; // This is the cross-section from Kelner
+  double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
+  //double L = log(EP*erg_to_TeV);
+  //double sigma = (34.3 + 1.88*L + 0.25*L*L) * 1.0e-27; // This is the cross-section from Kelner
   
   
   double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
@@ -1788,7 +1877,7 @@ double Radiation::Fgamma(double Egamma, double Eproton){
     double kgamma = 1.0/(0.801 + 0.049*L + 0.014*L*L);
     
     double xbeta = pow(x, betagamma);
-    double Fg = Bgamma * log(x)/x * pow(((1.0-xbeta)/(1.0 + kgamma*xbeta*(1.0-xbeta))),4)
+    double Fg = Bgamma * log(x)/x * pow(((1.0-xbeta)/(1.0 + kgamma*xbeta*(1.0-xbeta))),4.0)
                 *( 1.0/log(x) - 4.0*betagamma*xbeta/(1.0-xbeta) - 
                 4.0*kgamma*betagamma*xbeta*(1.0-2.0*xbeta) / (1.0 + kgamma*xbeta*(1.0-xbeta)));
     
