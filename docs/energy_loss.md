@@ -14,11 +14,9 @@ By default, when creating the Particles class, it is assumed that you want elect
 Depending on the environment we are setting up, the following losses are available:
  - adiabatic losses (if expansion velocity is given)
  - synchrotron losses (if magnetic field is given)
- - Bremsstrahlung losses (if density of the ISM is given. _Assumes proton only composition!!!_)
+ - Bremsstrahlung losses (if density of the ISM is given. _Assumes proton and 10% Helium!!!_)
  - Ionization losses (if density of the ISM is given. _Assumes protons and 10% Helium!!!_)
  - Inverse Compton losses (if at least one target radiation field is given)
- 
-Note: We are aware of some inconsistencies that are present at the moment and they will be fixed (also wrt the treatment in the Radiation class).
 
 ```
 import gappa as gp
@@ -53,7 +51,7 @@ at time `t` too, e.g.:
 fp.GetCoolingTimeScale(e,"synchrotron",t)
 ```
 
-This [script](loss_times.py) will create the following
+This [script](loss_times.py) (NOTE: to be edited!) will create the following 
 plot:
 
 ![loss_times](loss_times.png)
@@ -70,4 +68,6 @@ In this case though the only losses that are accounted for are:
  - adiabatic losses
  - pp cooling (assuming only pp interactions)
  - ionization losses (assuming hydrogen and a 10% of helium)
+ 
+To compute the ionization losses we need to activate them first. This is done via the function `fp.SetIonization()` (they are not available by default).
 
