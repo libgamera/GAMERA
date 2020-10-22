@@ -203,6 +203,15 @@ class Astro  {
     double GetWNMDensityFerriere(vector< double > xyz);
     double GetWIMDensityFerriere(vector< double > xyz);
     double GetHIMDensityFerriere(vector< double > xyz);
+    double GetH2DensityCMZFerriere(vector< double > xyz);
+    double GetH2DensityDiskFerriere(vector< double > xyz);
+    double GetHIDensityCMZFerriere(vector< double > xyz);
+    double GetHIDensityDiskFerriere(vector< double > xyz);
+    double GetHIIDensityWIMFerriere(vector< double > xyz);
+    double GetHIIDensityHIMFerriere(vector< double > xyz);
+    double GetHIIDensityVHIMFerriere(vector < double > xyz);
+    double phi_RZ(double r, double z);
+    
     
     
     //double CalculateGasColumnDensity(vector<double> xyzReference,vector<double> GLGB,string gascomponent,double modulate,double range,double steps);///< calculate gas column densities

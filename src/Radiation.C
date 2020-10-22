@@ -1552,7 +1552,7 @@ void Radiation::GetBParams(double Tp, double &b1, double &b2, double &b3) {
 /******************************************************************
  * With this function one can set the parametrization of
  * pp and hadronic collisions to the one by Kamae et al. 2006
- * \par  - Boolean, if true Kamae 2006 par. will be used
+ * \param kamae = Boolean, if true Kamae 2006 par. will be used
  ******************************************************************/
 void Radiation::UseKamae(bool kamae){
     if (kamae) {

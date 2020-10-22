@@ -1312,8 +1312,20 @@ double Astro::ModulateGasDensityWithSpirals(double n, double x, double y, double
  * Output:  - Number density in [cm^-3]
  * ********************************************************/
 double Astro::GetTotalHDensityFerriere(vector< double > xyz){
-    return (GetH2DensityFerriere(xyz) + GetCMDensityFerriere(xyz) + GetWNMDensityFerriere(xyz)
+    double R = sqrt(xyz[0]*xyz[0] + xyz[1]*xyz[1]);
+    
+    if (R >= 3.0) {
+        return (GetH2DensityFerriere(xyz) + GetCMDensityFerriere(xyz) + GetWNMDensityFerriere(xyz)
             + GetWIMDensityFerriere(xyz) + GetHIMDensityFerriere(xyz));
+    }
+    
+    else {
+        double nH2 = GetH2DensityCMZFerriere(xyz) + GetH2DensityDiskFerriere(xyz);
+        double nHI = GetHIDensityCMZFerriere(xyz) + GetHIDensityDiskFerriere(xyz);
+        double nHII = GetHIIDensityWIMFerriere(xyz) + GetHIIDensityHIMFerriere(xyz) + GetHIIDensityVHIMFerriere(xyz);
+        
+        return (2.0*nH2 + nHI + nHII);
+    }
 }
 
 /***********************************************************
@@ -1419,6 +1431,179 @@ double Astro::GetHIMDensityFerriere(vector< double > xyz){
                     * pow(R/R_sun, -1.65) * exp(-abs(z)/Hh);
     return result;
 }
+
+
+/********************************************************
+ * H2 density in the central molecular zone (CMZ) from
+ * the model of Ferriere et al. 2007, equation 18
+ * \param xyz = position vector
+ * *****************************************************/
+double Astro::GetH2DensityCMZFerriere(vector< double > xyz){
+    double x_old = xyz[0]*1.0e3;
+    double y_old = xyz[1]*1.0e3;
+    double z = xyz[2]*1.0e3;
+    
+    // Transform to CMZ coordinates, equation 15 in Ferriere 2007
+    double thetac = 70.0*pi/180.0, xc = -50.0, yc = 50.0;
+    double x = (x_old - xc)*cos(thetac) + (y_old - yc) * sin(thetac);
+    double y = -1.0*(x_old - xc) * sin(thetac) + (y_old - yc) * cos(thetac);
+    
+    double Xc = 125.0, Lc = 137.0, Hc = 18.0;
+    double result = 150.0* exp(-1.0*pow((sqrt(x*x + 2.5*2.5*y*y) - Xc)/Lc , 4.0))
+                    * exp(-1.0*z*z/(Hc*Hc));
+    return result;
+}
+
+
+/********************************************************
+ * H2 density in the GB disk from
+ * the model of Ferriere et al. 2007, equation 23
+ * \param xyz = position vector
+ * *****************************************************/
+double Astro::GetH2DensityDiskFerriere(vector< double > xyz){
+    double x_old = xyz[0]*1.0e3;
+    double y_old = xyz[1]*1.0e3;
+    double z_old = xyz[2]*1.0e3;
+    
+    // Transform to disk coordinates, equation 20 in Ferriere 2007
+    double alpha = 13.5*pi/180.0, beta=20.0*pi/180.0, thetad = 48.5*pi/180.0;
+    double x = x_old * cos(beta)*cos(thetad)
+                - y_old * (sin(alpha)*sin(beta)*cos(thetad) - cos(alpha)*sin(thetad))
+                - z_old * (cos(alpha)*sin(beta)*cos(thetad) + sin(alpha)*sin(thetad));
+    double y = -1.0*x_old*cos(beta)*sin(thetad)
+                + y_old * (sin(alpha)*sin(beta)*sin(thetad) + cos(alpha)*cos(thetad))
+                + z_old * (cos(alpha)*sin(beta)*sin(thetad) - sin(alpha)*cos(thetad));
+    double z = x_old*sin(beta)
+                + y_old*sin(alpha)*cos(beta)
+                + z_old*cos(alpha)*cos(beta);
+                
+    
+    double Xd = 1.2e3, Ld = 438.0, Hd = 42.0;
+    double result = 4.8* exp(-1.0*pow((sqrt(x*x + 1.3*1.3*y*y) - Xd)/Ld , 4.0))
+                    * exp(-1.0*z*z/(Hd*Hd));
+    return result;
+}
+
+
+double Astro::GetHIDensityCMZFerriere(vector< double > xyz){
+    double x_old = xyz[0]*1.0e3;
+    double y_old = xyz[1]*1.0e3;
+    double z = xyz[2]*1.0e3;
+    
+    // Transform to CMZ coordinates
+    double thetac = 70.0*pi/180.0, xc = -50.0, yc = 50.0;
+    double x = (x_old - xc)*cos(thetac) + (y_old - yc) * sin(thetac);
+    double y = -1.0*(x_old - xc) * sin(thetac) + (y_old - yc) * cos(thetac);
+    
+    double Xc = 125.0, Lc = 137.0, Hc = 54.0;
+    double result = 8.8* exp(-1.0*pow((sqrt(x*x + 2.5*2.5*y*y) - Xc)/Lc , 4.0))
+                    * exp(-1.0*z*z/(Hc*Hc));
+    return result;
+}
+
+double Astro::GetHIDensityDiskFerriere(vector< double > xyz){
+    double x_old = xyz[0]*1.0e3;
+    double y_old = xyz[1]*1.0e3;
+    double z_old = xyz[2]*1.0e3;
+    
+    // Transform to disk coordinates, equation 20 in Ferriere 2007
+    double alpha = 13.5*pi/180.0, beta=20.0*pi/180.0, thetad = 48.5*pi/180.0;
+    double x = x_old * cos(beta)*cos(thetad)
+                - y_old * (sin(alpha)*sin(beta)*cos(thetad) - cos(alpha)*sin(thetad))
+                - z_old * (cos(alpha)*sin(beta)*cos(thetad) + sin(alpha)*sin(thetad));
+    double y = -1.0*x_old*cos(beta)*sin(thetad)
+                + y_old * (sin(alpha)*sin(beta)*sin(thetad) + cos(alpha)*cos(thetad))
+                + z_old * (cos(alpha)*sin(beta)*sin(thetad) - sin(alpha)*cos(thetad));
+    double z = x_old*sin(beta)
+                + y_old*sin(alpha)*cos(beta)
+                + z_old*cos(alpha)*cos(beta);
+    
+    double Xd = 1.2e3, Ld = 438.0, Hd = 120.0;
+    double result = 0.34* exp(-1.0*pow((sqrt(x*x + 1.3*1.3*y*y) - Xd)/Ld , 4.0))
+                    * exp(-1.0*z*z/(Hd*Hd));
+    return result;
+}
+
+
+
+
+/********************************************************
+ * HII density of the warm ionized medium from
+ * the model of Ferriere et al. 2007, equation 25
+ * \param xyz = position vector in [kpc]
+ * *****************************************************/
+double Astro::GetHIIDensityWIMFerriere(vector< double > xyz){
+    double x = xyz[0]*1.0e3;
+    double y = xyz[1]*1.0e3;
+    double z = xyz[2]*1.0e3;
+    double r = sqrt(x*x + y*y);
+    double y3 = -10.0, z3 = -20.0, L3 = 145.0, H3 = 26.0, L2 = 3.7e3, H2 = 140.0, L1 = 17.0e3, H1 = 950.0;
+    
+    double u;
+    if (L1 < r) u = 0.0;
+    else u = 1.0;
+    
+    double result = 8.0 * (exp(-1.0*(x*x + (y-y3)*(y-y3))/(L3*L3)) * exp(-1.0*(z-z3)*(z-z3)/(H3*H3))
+    + 0.009*exp(-1.0*(r-L2)*(r-L2)/(L2/2.0 * L2/2.0)) * 1.0/(cosh(z/H2)*cosh(z/H2))
+    + 0.005*( cos(pi*r/(2.0*L1)) * u ) * 1.0/(cosh(z/H1)*cosh(z/H1)));
+    
+    return result;
+}
+
+
+// Equation 26
+double Astro::GetHIIDensityHIMFerriere(vector< double > xyz){
+    double x = xyz[0];
+    double y = xyz[1];
+    double z = xyz[2];
+    double r = sqrt(x*x + y*y);
+
+    // In the next line we need the factor of 1.0e10 to convert to 
+    double result = pow(pow(0.009, 2.0/3.0) - 1.54e-17 * 1.0e10 * (phi_RZ(r,z) - phi_RZ(0.0,0.0)), 1.5);
+    
+    return result;
+}
+
+
+// Equation 28
+double Astro::GetHIIDensityVHIMFerriere(vector < double > xyz){
+    double x = xyz[0]*1.0e3;
+    double y = xyz[1]*1.0e3;
+    double z = xyz[2]*1.0e3;
+    
+    double alphavh = 21.0*pi/180.0;
+    double eta = y * cos(alphavh) + z * sin(alphavh);
+    double zeta = -1.0*y * sin(alphavh) + z * cos(alphavh);
+    
+    double Lvh = 162.0, Hvh = 90.0;
+    
+    double result = 0.29 * exp(-1.0 * ((x*x + eta*eta)/(Lvh*Lvh) + zeta*zeta/(Hvh*Hvh)));
+    
+    return result;
+}
+
+
+/**********************************************************
+ * Gravitational potential according to Wolfire et al. 1995,
+ * used for desity calculations of the HIM in Ferriere et
+ * al. 2007
+ * \param r = galactic radius in [kpc]
+ * \param z = galactic height in [kpc]
+ * *******************************************************/
+double Astro::phi_RZ(double r, double z){
+    double C1 = 8.887, a1 = 6.5, b1 = 0.26, C2 = 3.0, a2 = 0.70, C3 = 0.325, a3 = 12.0, rh = 210.0;
+    
+    double result = -225.0*225.0 * ( C1/(sqrt(r*r + (a1+sqrt(z*z+b1*b1))*(a1+sqrt(z*z+b1*b1))))
+                    + C2/(a2 + sqrt(r*r + z*z))
+                    - C3 * log( (sqrt(1.0 + (a3*a3+r*r+z*z)/(rh*rh)) - 1.0) / (sqrt(1.0 + (a3*a3+r*r+z*z)/(rh*rh)) + 1.0)));
+    return result;
+}
+
+
+
+
+
+
 
 
 
