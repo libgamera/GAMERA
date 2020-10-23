@@ -1330,21 +1330,67 @@ double Astro::GetTotalHDensityFerriere(vector< double > xyz){
 
 /***********************************************************
  * Function to return the density of molecular hydrogen,
- * equation 2 and 3 in Ferriere 1998.
+ * equation 2 and 3 in Ferriere 1998, and the solution from
+ * Ferriere et al. 2007 for R < 3 kpc.
  * Input:   - Position in [kpc]
  * Output:  - Number density in [cm^-3]
  * ********************************************************/
 double Astro::GetH2DensityFerriere(vector< double > xyz){
     double z = xyz[2];
     double R = sqrt(xyz[0]*xyz[0] + xyz[1]*xyz[1]);
-    double R_sun = 8.5;     // position of the sun in [kpc]
     
-    double Hm = 81.0* pow(R/R_sun, 0.58) * 1.0e-3;  // in kpc 
+    if (R >= 3.0){
+        double R_sun = 8.5;     // position of the sun in [kpc]
     
-    double result = 0.58 * exp(-((R-4.5)*(R-4.5) - (R_sun - 4.5)*(R_sun - 4.5))/(2.9*2.9))
+        double Hm = 81.0* pow(R/R_sun, 0.58) * 1.0e-3;  // in kpc 
+    
+        double result = 0.58 * exp(-((R-4.5)*(R-4.5) - (R_sun - 4.5)*(R_sun - 4.5))/(2.9*2.9))
                     * pow(R/R_sun, 0.58) * exp(-(z*z/(Hm*Hm)));
-    return result;
+        return result;
+    }
+    else {
+        double result = 2.0*(GetH2DensityCMZFerriere(xyz) + GetH2DensityDiskFerriere(xyz));
+        return result;
+    }
 }
+
+
+/***********************************************************
+ * Function to return the density of neutral hydrogen
+ * ********************************************************/
+double Astro::GetNeutralHDensityFerriere(vector< double > xyz){
+    double R = sqrt(xyz[0]*xyz[0] + xyz[1]*xyz[1]);
+    
+    if (R>= 3.0){
+        return (GetCMDensityFerriere(xyz) + GetWNMDensityFerriere(xyz)); 
+    }
+    else {
+        return (GetHIDensityCMZFerriere(xyz) + GetHIDensityDiskFerriere(xyz));
+    }
+    
+}
+
+
+
+/***********************************************************
+ * Function to return the density of neutral hydrogen
+ * \param xyz = position vector [kpc]
+ * ********************************************************/
+double Astro::GetHIIDensityFerriere(vector< double > xyz){
+    double R = sqrt(xyz[0]*xyz[0] + xyz[1]*xyz[1]);
+    
+    if (R >= 3.0){
+        return (GetWIMDensityFerriere(xyz) + GetHIMDensityFerriere(xyz));
+    }
+    else {
+        return (GetHIIDensityWIMFerriere(xyz) + GetHIIDensityHIMFerriere(xyz) + GetHIIDensityVHIMFerriere(xyz));
+    }
+    
+}
+
+
+
+
 
 /****************************************************************
  * Function to return the density of the neutral cold Hydrogen,
@@ -1355,6 +1401,7 @@ double Astro::GetH2DensityFerriere(vector< double > xyz){
 double Astro::GetCMDensityFerriere(vector< double > xyz){
     double z = xyz[2]*1.0e3;    // Now in [pc]
     double R = sqrt(xyz[0]*xyz[0] + xyz[1]*xyz[1]);
+    
     double R_sun = 8.5;
     
     double alpha;

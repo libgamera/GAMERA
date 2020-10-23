@@ -199,6 +199,9 @@ class Astro  {
     // Functions for the milky way hydrogen density according to Ferriere 1998 and 2007
     double GetTotalHDensityFerriere(vector< double > xyz);
     double GetH2DensityFerriere(vector< double > xyz); 
+    double GetNeutralHDensityFerriere(vector< double > xyz);
+    double GetHIIDensityFerriere(vector< double > xyz);
+    
     double GetCMDensityFerriere(vector< double > xyz);
     double GetWNMDensityFerriere(vector< double > xyz);
     double GetWIMDensityFerriere(vector< double > xyz);
