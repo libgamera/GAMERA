@@ -693,8 +693,14 @@ vector<double> Astro::CalculateBField(vector<double> xyz, int component) {
 }
 
 
-
-
+/*******************************************************************
+ * Function to calculate the B-field strength of the different
+ * B-field components: Regular field, random field, and random
+ * striated field.
+ * Input:   - Position vector in [kpc]
+ * Output:  - Vector containing (B_regular, B_random, B_striated)
+ *              absolute field strength in micro Gauss.
+ * ****************************************************************/
 vector<double> Astro::CalculateBFieldStrengthComposition(vector<double> xyz) {
   double beta = 1.36;
   
@@ -720,6 +726,12 @@ vector<double> Astro::CalculateBFieldStrengthComposition(vector<double> xyz) {
 }
 
 
+
+/***********************************************************************
+ * Function to calculate the absolute large scale B-field value.
+ * Input:   - Position vector in [kpc]
+ * Output:  - B-field strength in micro Gauss
+ * ********************************************************************/
 double Astro::CalculateBFieldStrength(vector<double> xyz) {
  vector<double> components = CalculateBFieldStrengthComposition(xyz); 
  double result = fUtils->Norm(components);
