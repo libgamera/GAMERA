@@ -794,5 +794,7 @@ class Radiation {
   double PPEmissivity2(double x, double par);  ///< Compute pi0 emissivity
   double PPEmissivityKelner2(double x, double par); ///< pi0 emissivity according to Kelner et al. 2006                                                                                        /// summed over all 
                                                                                           /// radiation processes
+  void UseLocalAmbientMediumComposition(double density);
+  void AddLocalCosmicRayModel(bool extragalactic=true);
 };
 #endif

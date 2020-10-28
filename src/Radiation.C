@@ -4323,3 +4323,100 @@ vector <vector <double> > Radiation::RetAbsSED(double emin, double emax){
     return TempVect;
 }
 */
+
+
+
+
+
+/*********************************************************************************************
+ * Function to set the ambient medium composition to the one in the local galactic ISM
+ * composition. It uses the same relative abundances as in Kafexhiu et al. 2014
+ * 
+ * \param density: Density of hydrogen in 1/cm^3
+ * ******************************************************************************************/
+void Radiation::UseLocalAmbientMediumComposition(double density){
+    vector < double > mass_numbers = {1.0,4.0,12.0,14.0,16.0,20.0,24.0,28.0,32.0,56.0};
+    vector < double > abundances = {1.0*density, 9.59e-2*density, 4.65e-4*density,8.3e-5*density, 8.3e-4*density,1.2e-4*density, 3.87e-5*density, 3.69e-5*density, 1.59e-5*density,3.25e-5*density};
+    
+    
+    vector< vector <double> > zipped_vector = fUtils->ZipTwoOneDVectors(mass_numbers, abundances);
+    SetAmbientMediumComposition(zipped_vector);
+    
+    return;
+}
+
+
+
+
+
+/******************************************************************************************
+ * Function to use the local cosmic ray model above 10 TeV by ... TODO: Add paper reference when it is published
+ * 
+ * \param extragalactic (optional): Boolean, if true use the extragalctic component,
+ *                                  if false not.
+ * ***************************************************************************************/
+void Radiation::AddLocalCosmicRayModel(bool extragalactic){
+    double N_H=1.0e-4, N_He=1.22e-4, N_C=2.45e-5, N_O=3.5e-5, N_Mg=0.87e-5, N_Si=1.2e-5, N_Fe=2.17e-5, alpha=2.65, ecut=3.0e6, alpha2=2.4, N_downscale=1.8e-2, ecut2 = 70.0e6, N_extragal = 2.5e-8, ecut_extragal = 0.45e11, alpha_extragal = 2.3;
+    
+    double Ns[] = {N_H, N_He, N_C, N_O, N_Mg, N_Si, N_Fe};
+    double mass_numbers_CR[] = {1.0,4.0,12.0, 16.0, 24.0, 28.0, 56.0, 1.0};
+    double charges[] = {1.0,2.0,6.0,8.0,12.0,14.0,26.0};
+    double ecuts[] = {1.0*ecut,2.0*ecut,6.0*ecut,8.0*ecut,12.0*ecut,14.0*ecut,26.0*ecut};
+    
+    vector < double > e_values;
+    e_values.push_back(2.0);                    // These values are log10(E/GeV)
+    double difference = (11.5 - 2.0)/300.0;
+    for (int i = 0; i < 300; i++) {
+        e_values.push_back(e_values[i] + difference);
+    }
+    
+    //for(int i = 0; i < (int) e_values.size(); i++) cout << e_values[i] << "\n";
+    
+    double conversion = 4.0*pi/1.0e4/c_speed;
+    
+    // Here, the Hadron species of the first galactic component are initialized
+    double N, mass, charge, ecut_value, e;
+    vector < vector<double> > tempvec;
+    for (int i = 0; i<7; i++) {
+        tempvec.clear();
+        N = Ns[i]; mass = mass_numbers_CR[i]; charge = charges[i]; ecut_value = ecuts[i];
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N*pow(e/1.0e3, -1.0*alpha) * exp(-e/ecut_value)/GeV_to_erg * conversion, tempvec);
+            cout << tempvec[j][0] << "  " << tempvec[j][1] << "\n";
+        }
+        
+        AddHadrons(tempvec, mass);
+    }
+    
+    
+    // Here, the Hadron species of the second galactic component are initialized
+    for (int i = 0; i<7; i++) {
+        tempvec.clear();
+        N = Ns[i]; mass = mass_numbers_CR[i]; charge = charges[i]; ecut_value = charge*ecut2;
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N*N_downscale*pow(e/1.0e3, -1.0*alpha2) * exp(-e/ecut_value)/GeV_to_erg*conversion, tempvec);
+        }
+        AddHadrons(tempvec, mass);
+    }
+    
+    
+    // If needed, add the extragalactic component. It is assumed, they are solely protons
+    if(extragalactic) {
+        tempvec.clear();
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N_extragal*pow(e/1.0e3, -1.0*alpha_extragal) * exp(-e/ecut_extragal)/GeV_to_erg * conversion, tempvec);
+        }
+        AddHadrons(tempvec, 1.0);
+    }
+    
+    return;
+}
+
+
+
+
+
+
