@@ -4334,7 +4334,7 @@ vector <vector <double> > Radiation::RetAbsSED(double emin, double emax){
  * 
  * \param density: Density of hydrogen in 1/cm^3
  * ******************************************************************************************/
-void Radiation::UseLocalAmbientMediumComposition(double density){
+void Radiation::SetLocalAmbientMediumComposition(double density){
     vector < double > mass_numbers = {1.0,4.0,12.0,14.0,16.0,20.0,24.0,28.0,32.0,56.0};
     vector < double > abundances = {1.0*density, 9.59e-2*density, 4.65e-4*density,8.3e-5*density, 8.3e-4*density,1.2e-4*density, 3.87e-5*density, 3.69e-5*density, 1.59e-5*density,3.25e-5*density};
     
@@ -4370,7 +4370,6 @@ void Radiation::AddLocalCosmicRayModel(bool extragalactic){
         e_values.push_back(e_values[i] + difference);
     }
     
-    //for(int i = 0; i < (int) e_values.size(); i++) cout << e_values[i] << "\n";
     
     double conversion = 4.0*pi/1.0e4/c_speed;
     
@@ -4383,7 +4382,6 @@ void Radiation::AddLocalCosmicRayModel(bool extragalactic){
         for (int j = 0; j< (int) e_values.size(); j++){
             e = pow(10.0,e_values[j]);
             fUtils->TwoDVectorPushBack(e*GeV_to_erg, N*pow(e/1.0e3, -1.0*alpha) * exp(-e/ecut_value)/GeV_to_erg * conversion, tempvec);
-            cout << tempvec[j][0] << "  " << tempvec[j][1] << "\n";
         }
         
         AddHadrons(tempvec, mass);
