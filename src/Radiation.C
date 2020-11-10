@@ -1314,6 +1314,30 @@ double Radiation::PPEmissivity(double x, void *par) {
   return c_speed * N * pow(10., logprotons) * ln10 * EP;
 }
 
+
+//NOTE: Only for testing purposes, whould be deleted later!
+double Radiation::PPEmissivity2(double x, double par) {
+  /* proton energy */
+  double EP = pow(10.,x);
+  /* pi0 decay photon energy */
+  double Eg = pow(10.,par);
+  if (EP <= m_p) return 0.;
+  double Tp = sqrt(EP * EP - m_p * m_p); 
+  double Tpth = 0.2797 * GeV_to_erg; 
+  if (Tp <= Tpth) return 0.;
+  if (Eg <= GetMinimumGammaEnergy(Tp)) return 0.;
+  if (Eg >= GetMaximumGammaEnergy(Tp)) return 0.;
+
+  double N = DiffPPXSection(Tp, Eg);
+
+  double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
+                                      acc,__func__,__LINE__);
+  //return c_speed * N * pow(10., logprotons) * ln10 * EP;
+  return c_speed * N;
+}
+
+
+
 /**
  * differential cross section following Kafexhiu 2014
  * (Eq. 8)
@@ -1344,6 +1368,7 @@ double Radiation::InclusivePPXSection(double Tp) {
 double Radiation::InelasticPPXSectionKaf(double Tp) {
   double Tpth = 0.2797 * GeV_to_erg;
   double L = Tp / Tpth;
+  if (L < 1.0) return 0.0;   // Return 0 if we are below the threshold
   double logL = log(L);
   double sigma =
       (30.7 - 0.96 * logL + 0.18 * logL * logL) * pow(1. - pow(L, -1.9), 3.);
@@ -1388,6 +1413,8 @@ double Radiation::MeanMultiplicity(double Tp) {
 /** Eq. 2 Kafexhiu 2014, needed for lowest energies
  */
 double Radiation::SigmaOnePi(double Tp) {
+  if ( Tp/GeV_to_erg < 0.2797) return 0.0;
+  if (Tp/GeV_to_erg > 2.0) return 0.0;
   double sigma0 = 7.66e-3;
   double s = 2. * m_p * (Tp + 2. * m_p);
   double Mres = 1.1883 * GeV_to_erg;
@@ -1445,6 +1472,7 @@ double Radiation::F(double Tp, double Eg) {
   double Xg = (Yg - m_pi) / (Ygmax - m_pi);
   double C = lambda * m_pi / Ygmax;
   double f = pow(1. - pow(Xg, alpha), beta) / pow(1. + Xg / C, gamma);
+  if (Xg > 1.0) return 0.0;
   return f;
 }
 
@@ -1818,18 +1846,17 @@ double Radiation::PPEmissivityKelner(double x, void *par) {
   //if (Eg <= GetMinimumGammaEnergy(Tp)) return 0.;
   //if (Eg >= GetMaximumGammaEnergy(Tp)) return 0.;
 
-  double N = Fgamma(Eg, EP);    // TODO: Check, if Kelner uses the total or kinetic proton energy
+  double N = Fgamma(Eg, EP); 
 
   double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
     
-  double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
-  //double L = log(EP*erg_to_TeV);
-  //double sigma = (34.3 + 1.88*L + 0.25*L*L) * 1.0e-27; // This is the cross-section from Kelner
-  
+  //double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
+  double sigma = InelasticPPXSectionKelner(EP);  // Here, the cross section from Kelner is used
+
   
   double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
                                       acc,__func__,__LINE__);
-  //return c_speed * N * pow(10., logprotons) * ln10;
+  
   return (c_speed * NuclearEnhancement * sigma * pow(10., logprotons) * N * ln10);
 }
 
@@ -1846,19 +1873,34 @@ double Radiation::PPEmissivityKelner2(double x, double par) {
   //if (Eg <= GetMinimumGammaEnergy(Tp)) return 0.;
   //if (Eg >= GetMaximumGammaEnergy(Tp)) return 0.;
 
-  double N = Fgamma(Eg, EP);    // TODO: Check, if Kelner uses the total or kinetic proton energy
+  double N = Fgamma(Eg, EP);
 
   double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
     
   //double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
-  double L = log(EP*erg_to_TeV);
-  double sigma = (34.3 + 1.88*L + 0.25*L*L) * 1.0e-27; // This is the corss-seciotn from Kelner
+  double sigma = InelasticPPXSectionKelner(EP);  // Here, the cross section from Kelner is used
   
   
   double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
                                       acc,__func__,__LINE__);
-  //return c_speed * N * pow(10., logprotons) * ln10;
+  
   return (c_speed * sigma * NuclearEnhancement * pow(10., logprotons) * N * ln10);
+}
+
+
+
+
+/**
+ * Inelastic PP interaction corss section according to Kelner et al. 2006.
+ * \param EP = Total proton energy in [erg]
+ * \return Cross section in [barn]
+ * */
+double Radiation::InelasticPPXSectionKelner(double EP){
+  double L = log(EP*erg_to_TeV);
+  double Eth = 1.22*GeV_to_erg;
+  double sigma = (34.3 + 1.88*L + 0.25*L*L) * (1.0 - Eth*Eth*Eth*Eth/(EP*EP*EP*EP))*(1.0 - Eth*Eth*Eth*Eth/(EP*EP*EP*EP)) * 1.0e-27;
+  
+  return sigma;
 }
 
 
@@ -1937,6 +1979,17 @@ void Radiation::CalculateNeutrinoSpectrum(vector<double> points){
     HadronicTotalNeutrinoVectors.resize(HadronSpectra.size());
   }
 
+  double distance_normalisation;
+  if (!distance) {
+        cout << "### Radiation::CalculateNeutrinoSpectrum: Distance to "
+                "particles not specified -> Flux equals now the luminosity! ###"
+             << endl;
+      distance_normalisation = 1.;
+    } else
+      distance_normalisation = 1. / (4. * pi * distance * distance);
+  
+  
+  
   if (!QUIETMODE) {
     cout << "___________________________________________________________" << endl;
     cout << ">> CALCULATING NEUTRINO SED FROM PARENT PROTONS AND HADRONS " << endl;
@@ -1963,8 +2016,8 @@ void Radiation::CalculateNeutrinoSpectrum(vector<double> points){
          ParticleVector = ProtonVector;
         current_Hadron_lookup = ProtonLookup;
         current_mass_number = 1.0;
-        nu1_protons = CalculateNeutrinoFlux(E, 1);
-        nu2_protons = CalculateNeutrinoFlux(E, 0);
+        nu1_protons = CalculateNeutrinoFlux(E, 1)*distance_normalisation;
+        nu2_protons = CalculateNeutrinoFlux(E, 0)*distance_normalisation;
         total_flux_protons = nu1_protons + 2.*nu2_protons;
         fUtils->TwoDVectorPushBack(E, nu1_protons, ProtonMuonNeutrinoVector);
         fUtils->TwoDVectorPushBack(E, nu2_protons, ProtonElectronNeutrinoVector);
@@ -1978,8 +2031,8 @@ void Radiation::CalculateNeutrinoSpectrum(vector<double> points){
              ParticleVector = HadronSpectra[j];
              current_Hadron_lookup = HadronSpectraLookups[j];
              current_mass_number = HadronMasses[j];
-             nu1 = CalculateNeutrinoFlux(E, 1);
-             nu2 = CalculateNeutrinoFlux(E, 0);
+             nu1 = CalculateNeutrinoFlux(E, 1)*distance_normalisation;
+             nu2 = CalculateNeutrinoFlux(E, 0)*distance_normalisation;
              total_flux = nu1 + 2.*nu2;
              fUtils->TwoDVectorPushBack(E, nu1, HadronicMuonNeutrinoVectors[j]);
              fUtils->TwoDVectorPushBack(E, nu2, HadronicElectronNeutrinoVectors[j]);
@@ -2029,6 +2082,7 @@ double Radiation::CalculateNeutrinoFlux(double energy, int leptontype) {
     const double ethresh = 1.22e-3 * TeV_to_erg;  // Threshold for pion production
     double emax = ParticleVector[ParticleVector.size() - 1][0];
     double emin = energy;
+    if (emin < ParticleVector[0][0]) emin = ParticleVector[0][0];
     if (emin < ethresh) emin = ethresh; // Don't start integration below the threshold
     if (emin >= emax) return 0.; // We can not produce neutrinos more energetic than the protons
     
@@ -2083,11 +2137,13 @@ double Radiation::NeutrinoFlux1(double energy_proton, void *par) {
                                       acc,__func__,__LINE__);
     double Jp = pow(10, logprotons);   // Proton flux, Jp in Kelner 2006
     
-    double NuclearEnhancement = CalculateEpsilon(energy_proton, current_mass_number);
-    
     // Convert the energy to the real value again
-    energy_proton = pow(10, energy_proton);
-    double sigma = InelasticPPXSectionKaf(energy_proton);   // calculate the cross section
+    energy_proton = pow(10, energy_proton);        
+    double Tp = sqrt(energy_proton * energy_proton - m_p * m_p);
+    double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
+    
+    //double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
+    double sigma = InelasticPPXSectionKelner(energy_proton); // Cross section from Kelner
     double Fnu = Felectron(energy_nu, energy_proton);
     
     double result = sigma*Jp*Fnu*NuclearEnhancement;
@@ -2112,11 +2168,16 @@ double Radiation::NeutrinoFlux2(double energy_proton, void *par) {
     double logprotons = fUtils->EvalSpline(energy_proton,current_Hadron_lookup,
                                       acc,__func__,__LINE__);
     double Jp = pow(10, logprotons);   // Proton flux, Jp in Kelner 2006
-    energy_proton = pow(10, energy_proton);
-    double sigma = InelasticPPXSectionKaf(energy_proton);   // calculate the cross section
+    
+    // Convert the energy to the real value again
+    energy_proton = pow(10, energy_proton);        
+    double Tp = sqrt(energy_proton * energy_proton - m_p * m_p);
+    
+    //double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
+    double sigma = InelasticPPXSectionKelner(energy_proton);  // Cross section from Kelner
     double Fnu = Fnumu(energy_nu, energy_proton);
     
-    double NuclearEnhancement = CalculateEpsilon(energy_proton, current_mass_number);
+    double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
     
     double result = sigma*Jp*Fnu*NuclearEnhancement;
     return result;
@@ -2149,7 +2210,7 @@ double Radiation::Felectron(double Ee_erg, double Ep_erg)
   double L2 = L*L; 
   double B = 1.0/(69.5 + 2.65*L + 0.3*L2);
   double beta = 1.0/pow(0.201 + 0.062*L+0.00042*L2,0.25); 
-  double kappa = (0.279 + 0.141*L + 0.0172*L2)/(0.3 + pow(2.3 + L,2));
+  double kappa = (0.279 + 0.141*L + 0.0172*L2)/(0.3 + pow(2.3 + L,2.0));
   
   double xb = pow(x,beta);
 
@@ -2178,7 +2239,7 @@ double Radiation::Fnumu(double Enu_erg, double Ep_erg)
 
   double x = Enu/Ep;
   double y = x/0.427;
-  //if (x > 0.427) return 0.0;
+  if (x > 0.427) return 0.0;
 
   double L = log(Ep);
   double L2 = L * L; 
@@ -4328,12 +4389,12 @@ vector <vector <double> > Radiation::RetAbsSED(double emin, double emax){
 
 
 
-/*********************************************************************************************
+/*************************************************************************
  * Function to set the ambient medium composition to the one in the local galactic ISM
  * composition. It uses the same relative abundances as in Kafexhiu et al. 2014
  * 
  * \param density: Density of hydrogen in 1/cm^3
- * ******************************************************************************************/
+ * ***********************************************************************/
 void Radiation::SetLocalAmbientMediumComposition(double density){
     vector < double > mass_numbers = {1.0,4.0,12.0,14.0,16.0,20.0,24.0,28.0,32.0,56.0};
     vector < double > abundances = {1.0*density, 9.59e-2*density, 4.65e-4*density,8.3e-5*density, 8.3e-4*density,1.2e-4*density, 3.87e-5*density, 3.69e-5*density, 1.59e-5*density,3.25e-5*density};
