@@ -18,8 +18,8 @@ if __name__ == "__main__":
     
     # Set the electron spectrum
     elLogP = el_energy_in_erg_pl**-(alpha_pl_el+beta_el*np.log10((el_energy_in_erg_pl/e_ref)))
-    elLogP *= e_total_pl/fu.Integrate(zip(el_energy_in_erg_pl,elLogP*el_energy_in_erg_pl))
-    elLogPsp = np.array(zip(el_energy_in_erg_pl,elLogP))
+    elLogP *= e_total_pl/fu.Integrate(list(zip(el_energy_in_erg_pl,elLogP*el_energy_in_erg_pl)))
+    elLogPsp = np.array(list(zip(el_energy_in_erg_pl,elLogP)))
     
     # Set other ambient parameters
     b_field = 1e-6  #Gauss
