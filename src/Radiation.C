@@ -131,9 +131,11 @@ void Radiation::ClearTargetPhotons() {
     return;
 }
 
-/************************************************
- * Remove all previously defined hadrons
-************************************************/
+/**
+ * Remove all previously defined hadrons via clearing the mass
+ * vector, the spectral vector and the associated lookup.
+ *
+ */
 void Radiation::ClearHadrons() {
     HadronMasses.clear();
     HadronSpectra.clear();
@@ -1599,6 +1601,13 @@ void Radiation::SetProtons(vector<vector<double> > PROTONS) {
  * Function to add a spectrum of hadrons with a specific mass number. It also
  * calculates and saves a lookup for the spectrum.
  *
+ * Inner functioning:
+ *  - The energy used in the equations is the energy per nucleon.
+ * Therefore in the function, the passed energy is divided by the
+ * mass Mass_number before creating the lookup and saving the spectrum.
+ * Furthermore, because we are dealing with a dN/dE quantity, we
+ * multiply the dN/dE value that was given again for the Mass_number.
+ *
  * @param Spectrum : spectrum of the hadrons (as vector of 2D-tuples (E,dN/dE) ([erg],[erg^-1]))
  * @param Mass_number : mass number of the hadrons (number of the nucleons)
  *
@@ -1663,7 +1672,16 @@ void Radiation::AddHadrons(vector<vector<double> > Spectrum, double Mass_number)
 }
 
 
-// TEST: Only for testing purposes of the lookups for Hadrons
+
+/**
+ * Test the hadron lookup to see if the spectral returned is correct
+ *
+ * @param i : index of the hadron spectrum to consider
+ * @param e : energy per nucleon at which test the lookup (erg)
+ * @return : value of the spectrum as 1/(erg*cm^3)
+ *
+ * TODO: make private?
+ */
 double Radiation::TestHadronLookup(int i, double e){
  double value = fUtils->EvalSpline(e,HadronSpectraLookups[i],
                                       acc,__func__,__LINE__);
@@ -1686,7 +1704,8 @@ void Radiation::SetAmbientDensity(double N){
  
  
 /**
- * Function to set the composition and the abundances of the ambient medium.
+ * Set the composition and the abundances of the ambient medium through a list of
+ * mass numbers and number densities.
  *
  * @param composition : Vector of tuples containing the mass number (first entry) and
  *                      the density in [1/cm^3]
@@ -1707,7 +1726,9 @@ void Radiation::SetAmbientMediumComposition(vector<vector< double > > compositio
 vector<vector< double > > Radiation::GetHadrons(int i){ 
   vector<vector<double> > tempvec;
   if (i  >= (int)HadronSpectra.size()){
-      cout << "In Radiation::GetHadrons: The hadron spectrum for i=" << i << " does not exist, " << HadronSpectra.size() << " different hadrons are defined so far. Returning empty vector. ";
+      cout << "In Radiation::GetHadrons: The hadron spectrum for i="
+    		  << i << " does not exist, " << HadronSpectra.size()
+			  << " different hadrons are defined so far. Returning empty vector. ";
       return tempvec;
   }
   tempvec = HadronSpectra[i];
@@ -3227,7 +3248,9 @@ double Radiation::SigmaGammaGamma(double Eph1,double Eph2, double costheta) {
 
 
 /**
- * Computation of the absorption coefficient.
+ * Auxiliary function to compute only the absorption coefficient,
+ * no spatial integration.
+ *
  * The function takes into account the angular anisotropy of the photon field
  * through interpolation of the mesh grid of the angular dependencies.
  * Angular integration is a simple rectangular integration.

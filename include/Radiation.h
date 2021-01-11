@@ -25,6 +25,7 @@ class Radiation {
   static Radiation *_radPtr;
 
  private:
+  // this function does not exist
   void CalculateLuminosityAndFlux(string mechanism, double e, double &l,
                                   double &f);
 
@@ -306,13 +307,15 @@ class Radiation {
   vector <vector <double> > GetHadrons(int i);
   /// Return vector with the atomic masses of the injected hadrons
   vector< double > GetHadronMasses(void);
+  /// Set the composition and the abundances of the ambient medium.
   void SetAmbientMediumComposition(vector<vector< double > > composition);
+  /// Get the ambient medium composition
   vector<vector<double> > GetAmbientMediumComposition(void);
-  
-  void ClearHadrons(void);  // Delete all previously defined hadron spectra
-  
-  double TestHadronLookup(int i, double e); // TEST: Function exists only for
-                                                        // testing purposes of lookups
+  /// Delete all previously defined hadron spectra
+  void ClearHadrons(void);
+  /// Test the hadron lookup
+  double TestHadronLookup(int i, double e);
+
   /// Calculate epsilon factor for hadronic interactions
   double CalculateEpsilon(double Tp, double Mass);
   /// Calculates the nucleus-nucleus reaction cross section
@@ -595,8 +598,8 @@ class Radiation {
     if (i>(int)RADFIELDS_MAX) cout<<"Radiation::GetTargetFieldAnisotropyMap: invalid index "<<i<<". Returning"
           "empty vector." <<endl;
     return TargetPhotonAngularDistrsVectors[i];}
-
-  void ClearTargetPhotonField(int i); ///< reset values for target photon field component i
+  /// Reset values for target photon field component i
+  void ClearTargetPhotonField(int i);
   /// Remove the last target field that has been added
   void RemoveLastICTargetPhotonComponent() {
     ClearTargetPhotonField(--RADFIELD_COUNTER);
@@ -624,13 +627,20 @@ class Radiation {
   vector <double> GetSizePhotonField();
   /// Return the size of the photon field \a i
   double GetSizePhotonField(int i);
-  void SetTargetFieldSpatialDep(int i, vector< vector<double> > SpatialDep); ///< Set the spatial dependence for the Target field
-  vector< vector<double> > GetTargetFieldSPatialDep(int i);  ///< Return the spatial dependency of the photon field (space in cm)
-  double AverageSigmaGammaGamma(double Eph1, double Eph2);             ///< Average cross section for isotropic and homogeneous case
-  double SigmaGammaGamma(double Eph1, double Eph2, double costheta);      ///< Full gamma-gamma cross section
-  double ComputeAbsCoeff(double Egamma, int target);  ///< Auxiliary function to compute only the absorption coefficient, no spatial integration
+  /// Set the spatial dependence for the Target field
+  void SetTargetFieldSpatialDep(int i, vector< vector<double> > SpatialDep);
+  /// Return the spatial dependency of the photon field (space in cm)
+  vector< vector<double> > GetTargetFieldSPatialDep(int i);
+  /// Average cross section for isotropic and homogeneous case
+  double AverageSigmaGammaGamma(double Eph1, double Eph2);
+  /// Full gamma-gamma cross section
+  double SigmaGammaGamma(double Eph1, double Eph2, double costheta);
+  /// Compute the absorption coefficient [1/cm].
+  double ComputeAbsCoeff(double Egamma, int target);
+  /// Compute the optical depth
   double ComputeOptDepth(double Egamma, int target, double phsize);
-  double ComputeOptDepthIsotropic(double Egamma, int target, double phsize); ///< Computation of the optical depth parameter isotropic only
+  /// Computation of the optical depth parameter only for the isotropic case
+  double ComputeOptDepthIsotropic(double Egamma, int target, double phsize);
   /// Wrapper around function Radiation::ReturnSED to return the gamma-gamma absorbed values
   vector< vector<double> > ReturnAbsorbedSEDonFields(double emin, double emax, 
                                                          vector <int> fields, vector <double> size);
@@ -647,18 +657,11 @@ class Radiation {
   }
   /// Returns the absorbed integrated flux.
   double ReturnAbsorbedIntergratedFlux(double emin, double emax, bool ENERGYFLUX,vector <int> fields, vector <double> size);
-  
+  /// Get integrated absorbed energy flux between emin and emax (erg) summed over all radiation processes
   double GetIntegralTotalAbsEnergyFlux(double emin, double emax, vector <int> fields) {
-    return ReturnAbsorbedIntergratedFlux(emin,emax,true,fields,sizephfield); }            ///< get integrated
-                                                                                          /// absorbed energy flux between
-                                                                                          /// emin and emax (erg) 
-                                                                                          /// summed over all 
-                                                                                          /// radiation processes
+    return ReturnAbsorbedIntergratedFlux(emin,emax,true,fields,sizephfield); }
+  /// Get integrated absorbed energy flux between emin and emax (erg) summed over all radiation processes
   double GetIntegralTotalAbsFlux(double emin, double emax, vector <int> fields) {
-    return ReturnAbsorbedIntergratedFlux(emin,emax,false,fields,sizephfield); }           ///< get integrated
-                                                                                          /// absorbed energy flux between
-                                                                                          /// emin and emax (erg) 
-                                                                                          /// summed over all 
-                                                                                          /// radiation processes
+    return ReturnAbsorbedIntergratedFlux(emin,emax,false,fields,sizephfield); }
 };
 #endif
