@@ -3,7 +3,8 @@
 General info
 ============
 
-`GAMERA` is a project launched by the [Max Planck Institute for Nuclear Physics (MPIK)](https://www.mpi-hd.mpg.de/mpi/en/), a`C++` library for modeling in high energy astrophysics. It is also
+`GAMERA` is a project launched by the [Max Planck Institute for Nuclear Physics (MPIK)](https://www.mpi-hd.mpg.de/mpi/en/),
+a`C++` library for modeling in high energy astrophysics. It is also
 available as a `swig`-wrapped `python` module (which is internally called `gappa`).
 
 Here is a list of what you can do with it:
@@ -15,8 +16,8 @@ Here is a list of what you can do with it:
 - access 3D Galactic gas, magnetic field and spiral arm models, as well as hydrodynamical
   Supernova Remnant models from accepted and peer reviewed publications
 
-And here are some things that you can't do at the moment:
-- fitting
+And here are some things that you can't do directly with `GAMERA` at the moment:
+- fitting. But you can still write your model with `GAMERA` and use python packages for fitting, described in [this tutorial](fitting_data.md)
 - spatial evolution of particles. However, it is possible to approximate by using
   different zones of particles
 
