@@ -62,8 +62,8 @@ class Radiation {
   double ICEmissivityAnisotropicIsotropicElectronsAharonianFirstIntegral(double x, void *par);
   double NeutrinoFlux2(double energy_proton, void *par);
   double NeutrinoFlux1(double energy_proton, void *par);
-  double Felectron(double Ee_erg, double Ep_erg);
-  double Fnumu(double Enu_erg, double Ep_erg);
+  
+  
   double CalculateNeutrinoFlux(double energy, int leptontype);
   
   double K(double nu, double x);             ///< modified Bessel function
@@ -249,7 +249,6 @@ class Radiation {
   int SynchModel;  
   double PPEmissivity(double x, void *par);  ///< Compute pi0 emissivity
   double PPEmissivityKelner(double x, void *par); ///< pi0 emissivity according to Kelner et al. 2006
-  double Fgamma(double Tp, double EP);  /// Function for the Kelner 2006 calculations
   
   
   double PPEmissivityKamae(double x, void *par);
@@ -796,6 +795,16 @@ class Radiation {
   double PPEmissivity2(double x, double par);  ///< Compute pi0 emissivity
   double PPEmissivityKelner2(double x, double par); ///< pi0 emissivity according to Kelner et al. 2006                                                                                        /// summed over all 
                                                                                           /// radiation processes
+  double Fgamma(double Tp, double EP);  /// Function for the Kelner 2006 calculations
+  double Fnumu(double Enu_erg, double Ep_erg);
+  double Felectron(double Ee_erg, double Ep_erg);
+  double NeutrinoFlux2Test(double energy_proton, double energy);
+  double NeutrinoFlux1Test(double energy_proton, double energy);
+  
+  
+  double x2integration(double start, double end);
+  double x2(double x, void *par);
+  
   void SetLocalAmbientMediumComposition(double density);
   void AddLocalCosmicRayModel(bool extragalactic=true);
 };
