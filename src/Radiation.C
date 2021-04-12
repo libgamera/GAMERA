@@ -4493,10 +4493,46 @@ vector <vector <double> > Radiation::RetAbsSED(double emin, double emax){
  * 
  * \param density: Density of hydrogen in 1/cm^3
  * **/
-void Radiation::SetLocalAmbientMediumComposition(double density){
+void Radiation::SetLocalAmbientMediumComposition(double density, string norm){
     vector < double > mass_numbers = {1.0,4.0,12.0,14.0,16.0,20.0,24.0,28.0,32.0,56.0};
-    vector < double > abundances = {1.0*density, 9.59e-2*density, 4.65e-4*density,8.3e-5*density, 8.3e-4*density,1.2e-4*density, 3.87e-5*density, 3.69e-5*density, 1.59e-5*density,3.25e-5*density};
+    double normalisation;
+    vector < double > abundances = {1.0, 9.59e-2, 4.65e-4,8.3e-5, 8.3e-4,1.2e-4, 3.87e-5, 3.69e-5, 1.59e-5,3.25e-5};
+    if (norm == "Hydrogen" || norm == "hydrogen"){
+        //vector < double > abundances = {1.0*density, 9.59e-2*density, 4.65e-4*density,8.3e-5*density, 8.3e-4*density,1.2e-4*density, 3.87e-5*density, 3.69e-5*density, 1.59e-5*density,3.25e-5*density};
+        normalisation = 1.0;
+        //for(int i=0;i<abundances.size(); i++){
+        //    abundances[i] *= density;
+        //}
+    }
     
+    else if (norm == "number density"){
+        normalisation = 0.0;
+        for(unsigned int i=0;i<abundances.size(); i++){
+            normalisation += abundances[i];
+        }
+    }
+    
+    else if (norm == "mass density"){
+        normalisation = 0.0;
+        for(unsigned int i=0;i<abundances.size(); i++){
+            normalisation += (abundances[i]*mass_numbers[i]);
+        }        
+    }
+    
+    else{
+     cout << "In function Radiation::SetLocalAmbientMediumComposition: ";
+     cout << "No valid input string for parameter 'norm'.\n";
+     cout << "Options are:  'hydrogen' (default)\n";
+     cout << "              'number density'\n";
+     cout << "              'mass density'\n";
+     cout << "Exiting without setting the ambient medium composition.\n";
+     return;
+    }
+    
+    double density_normed = density/normalisation;
+    for(unsigned int i=0;i<abundances.size(); i++){
+        abundances[i] *= density_normed;
+    }
     
     vector< vector <double> > zipped_vector = fUtils->ZipTwoOneDVectors(mass_numbers, abundances);
     SetAmbientMediumComposition(zipped_vector);
