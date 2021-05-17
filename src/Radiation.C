@@ -4550,8 +4550,10 @@ void Radiation::SetLocalAmbientMediumComposition(double density, string norm){
  * \param extragalactic (optional): Boolean, if true use the extragalctic component,
  *                                  if false not.
  * **/
-void Radiation::AddLocalCosmicRayModel(bool extragalactic){
+void Radiation::AddLocalCosmicRayModel(bool extragalactic, double slope){
     double N_H=1.0e-4, N_He=1.22e-4, N_C=2.45e-5, N_O=3.5e-5, N_Mg=0.87e-5, N_Si=1.2e-5, N_Fe=2.17e-5, alpha=2.65, ecut=3.0e6, alpha2=2.4, N_downscale=1.8e-2, ecut2 = 70.0e6, N_extragal = 2.5e-8, ecut_extragal = 0.45e11, alpha_extragal = 2.3;
+    
+    alpha = slope;
     
     double Ns[] = {N_H, N_He, N_C, N_O, N_Mg, N_Si, N_Fe};
     double mass_numbers_CR[] = {1.0,4.0,12.0, 16.0, 24.0, 28.0, 56.0, 1.0};
