@@ -121,7 +121,9 @@ Radiation::Radiation() {
 /**
  * Standard destructor.
  */
-Radiation::~Radiation() {}
+Radiation::~Radiation() {
+    delete fUtils;
+}
 
 //FIXME make me a nice function!
 void Radiation::Reset() {
@@ -1315,28 +1317,6 @@ double Radiation::PPEmissivity(double x, void *par) {
 }
 
 
-//NOTE: Only for testing purposes, whould be deleted later!
-double Radiation::PPEmissivity2(double x, double par) {
-  /* proton energy */
-  double EP = pow(10.,x);
-  /* pi0 decay photon energy */
-  double Eg = pow(10.,par);
-  if (EP <= m_p) return 0.;
-  double Tp = sqrt(EP * EP - m_p * m_p); 
-  double Tpth = 0.2797 * GeV_to_erg; 
-  if (Tp <= Tpth) return 0.;
-  if (Eg <= GetMinimumGammaEnergy(Tp)) return 0.;
-  if (Eg >= GetMaximumGammaEnergy(Tp)) return 0.;
-
-  double N = DiffPPXSection(Tp, Eg);
-
-  double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
-                                      acc,__func__,__LINE__);
-  //return c_speed * N * pow(10., logprotons) * ln10 * EP;
-  return c_speed * N;
-}
-
-
 
 /**
  * differential cross section following Kafexhiu 2014
@@ -1861,34 +1841,6 @@ double Radiation::PPEmissivityKelner(double x, void *par) {
 }
 
 
-double Radiation::PPEmissivityKelner2(double x, double par) {
-  /* proton energy */
-  double EP = pow(10.,x);
-  /* pi0 decay photon energy */
-  double Eg = pow(10.,par);
-  if (EP <= m_p) return 0.;
-  double Tp = sqrt(EP * EP - m_p * m_p); 
-  double Tpth = 0.2797 * GeV_to_erg; 
-  if (Tp <= Tpth) return 0.;
-  //if (Eg <= GetMinimumGammaEnergy(Tp)) return 0.;
-  //if (Eg >= GetMaximumGammaEnergy(Tp)) return 0.;
-
-  double N = Fgamma(Eg, EP);
-
-  double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
-    
-  double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
-  //double sigma = InelasticPPXSectionKelner(EP);  // Here, the cross section from Kelner is used
-  
-  
-  double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
-                                      acc,__func__,__LINE__);
-  
-  return (c_speed * sigma * NuclearEnhancement * pow(10., logprotons) * N * ln10);
-}
-
-
-
 
 /**
  * Inelastic PP interaction corss section according to Kelner et al. 2006.
@@ -2120,32 +2072,6 @@ double Radiation::CalculateNeutrinoFlux(double energy, int leptontype) {
 
 
 
-double Radiation::x2integration(double start, double end){
-    double anfang = log10(start);
-    double ende = log10(end);
-    double integralinput[1];
-    integralinput[0] = 0.0;
-    
-    double integral = 0.0;
-    fPointer F = &Radiation::x2;
-    integral = Integrate(F, integralinput, anfang, ende,integratorTolerance*5., integratorKronrodRule);
-    
-    return integral*ln10;
-    
-}
-
-
-
-double Radiation::x2(double x, void *par){
-    x = pow(10.0,x);
-    
-    double result = x*x*x;
-    
-    return result;
-}
-
-
-
 /**********************************************************************
  * Function to be integrated to get the neutrino emission for
  * electron- and muon-Neutrino produced in the muon decay,
@@ -2208,77 +2134,6 @@ double Radiation::NeutrinoFlux2(double energy_proton, void *par) {
     double result = sigma*Jp*Fnu*NuclearEnhancement;
     return result;
 }
-
-
-
-
-
-
-/**********************************************************************
- * Function to be integrated to get the neutrino emission for
- * electron- and muon-Neutrino produced in the muon decay,
- * as well as the electron spectrum.
- * Input:   - Energy of the proton (or hadron) in [erg]
- *          - energy of the muon/electron as a parameter in [erg]
- * Output:  - The integrand (see e.g. equ. 71 or 72 in Kelner et al.
- *              2006
- *********************************************************************/
-double Radiation::NeutrinoFlux1Test(double energy_proton, double energy) {
-    double energy_nu = energy;
-    
-    double logprotons = fUtils->EvalSpline(energy_proton,current_Hadron_lookup,
-                                      acc,__func__,__LINE__);
-    double Jp = pow(10, logprotons);   // Proton flux, Jp in Kelner 2006
-    
-    // Convert the energy to the real value again
-    energy_proton = pow(10, energy_proton);        
-    double Tp = sqrt(energy_proton * energy_proton - m_p * m_p);
-    double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
-    
-    double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
-    //double sigma = InelasticPPXSectionKelner(energy_proton); // Cross section from Kelner
-    double Fnu = Felectron(energy_nu, energy_proton);
-    
-    double result = sigma*Jp*Fnu*NuclearEnhancement;
-    return result;
-}
-
-
-
-/**********************************************************************
- * Function to be integrated to get the muon-neutrino emission produced
- * in the pion decay.
- * Input:   - Energy of the proton in [erg]
- *          - energy of the muon as a parameter in [erg]
- * Output:  - The integrand (see e.g. equ. 71 or 72 in Kelner et al.
- *              2006
- *********************************************************************/
-double Radiation::NeutrinoFlux2Test(double energy_proton, double energy) {
-    double energy_nu = energy;
-    
-    
-    double logprotons = fUtils->EvalSpline(energy_proton,current_Hadron_lookup,
-                                      acc,__func__,__LINE__);
-    double Jp = pow(10, logprotons);   // Proton flux, Jp in Kelner 2006
-    
-    // Convert the energy to the real value again
-    energy_proton = pow(10, energy_proton);        
-    double Tp = sqrt(energy_proton * energy_proton - m_p * m_p);
-    
-    double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
-    //double sigma = InelasticPPXSectionKelner(energy_proton);  // Cross section from Kelner
-    double Fnu = Fnumu(energy_nu, energy_proton);
-    
-    double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
-    
-    double result = sigma*Jp*Fnu*NuclearEnhancement;
-    return result;
-}
-
-
-
-
-
 
 
 

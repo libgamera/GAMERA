@@ -132,7 +132,9 @@ Astro::Astro() {
 
 }
 
-Astro::~Astro() {}
+Astro::~Astro() {
+    delete fUtils;
+}
 
 
 void Astro::SetGalacticReferencePoint(vector<double> xyz_ref) {

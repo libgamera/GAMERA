@@ -249,7 +249,9 @@ class Radiation {
   int SynchModel;  
   double PPEmissivity(double x, void *par);  ///< Compute pi0 emissivity
   double PPEmissivityKelner(double x, void *par); ///< pi0 emissivity according to Kelner et al. 2006
-  
+  double Fgamma(double Tp, double EP);  /// Function for the Kelner 2006 calculations
+  double Fnumu(double Enu_erg, double Ep_erg);
+  double Felectron(double Ee_erg, double Ep_erg);  
   
   double PPEmissivityKamae(double x, void *par);
   double FndKamae(double x, double a0, double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8);
@@ -792,18 +794,6 @@ class Radiation {
   double GetIntegralTotalAbsFlux(double emin, double emax, vector <int> fields) { ///< get integrated 
     return ReturnAbsorbedIntergratedFlux(emin,emax,false,fields,sizephfield); }                      /// absorbed energy flux between
                                                                                           /// emin and emax (erg) 
-  double PPEmissivity2(double x, double par);  ///< Compute pi0 emissivity
-  double PPEmissivityKelner2(double x, double par); ///< pi0 emissivity according to Kelner et al. 2006                                                                                        /// summed over all 
-                                                                                          /// radiation processes
-  double Fgamma(double Tp, double EP);  /// Function for the Kelner 2006 calculations
-  double Fnumu(double Enu_erg, double Ep_erg);
-  double Felectron(double Ee_erg, double Ep_erg);
-  double NeutrinoFlux2Test(double energy_proton, double energy);
-  double NeutrinoFlux1Test(double energy_proton, double energy);
-  
-  
-  double x2integration(double start, double end);
-  double x2(double x, void *par);
   
   void SetLocalAmbientMediumComposition(double density, string norm="hydrogen");
   void AddLocalCosmicRayModel(bool extragalactic=true, double slope=2.65);
