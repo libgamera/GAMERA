@@ -40,7 +40,8 @@ many repositories provide `gsl` and `swig`, for example [homebrew](https://brew.
 ```
 $ brew install gsl swig
 ```
-on some MacOS systems, issues are encountered in the compilation phase. These can be fixed by adding 2 lines to the file \<GAMERA-path\>/python/setup.py
+It might also be required to install [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/). Installation instructions can be found e.g. [here](http://macappstore.org/pkg-config/).
+On some MacOS systems, issues are encountered in the compilation phase. These can be fixed by adding 2 lines to the file \<GAMERA-path\>/python/setup.py
 
 after line 20 add:
 ```
