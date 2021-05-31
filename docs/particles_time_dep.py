@@ -81,7 +81,7 @@ if __name__ == "__main__":
     '''
     alphas = np.linspace(0.2,1,9)
     f = plt.figure(figsize=(5,5))
-    for s,t,a in list(zip(p_seds,np.logspace(1,np.log10(age),10),alphas)):
+    for s,t,a in list(zip(p_seds,np.logspace(1,np.log10(age),9),alphas)):
         plt.loglog(s[:,0],s[:,1],c=mpik_green,alpha=a,label=str(int(t)))
     plt.xlabel("E (TeV)")
     plt.ylabel("E"+r"$^2$"+"dN/dE (erg)")
