@@ -2,7 +2,7 @@ from distutils.core import setup, Extension
 import distutils.sysconfig
 import os
 import sys
-
+import platform
 
 # Use the bundeled pkgconfig
 here = os.path.dirname(os.path.realpath(__file__))
@@ -18,6 +18,9 @@ for key,value in cfg_vars.items():
 extra_link_args = pkgconfig.libs('gsl').split()
 
 extra_compile_args = pkgconfig.cflags('gsl').split()
+if platform.system() == 'Darwin':
+    extra_compile_args.append("-stdlib=libc++")
+    extra_link_args.append("-stdlib=libc++")
 extra_compile_args.append('-m64')
 extra_compile_args.append('-std=c++11')
 
