@@ -797,5 +797,6 @@ class Radiation {
   
   void SetLocalAmbientMediumComposition(double density, string norm="hydrogen");
   void AddLocalCosmicRayModel(bool extragalactic=true, double slope=2.65);
+  void AddCRModel(bool extragalactic = true, bool CREAM = false);
 };
 #endif

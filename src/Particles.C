@@ -125,6 +125,22 @@ Particles::~Particles() {
 
   delete fUtils;
   delete fRadiation;
+  gsl_interp_accel_free(accIC);
+  gsl_interp_accel_free(accLum);
+  gsl_interp_accel_free(accN);
+  gsl_interp_accel_free(accBField);
+  gsl_interp_accel_free(acceMax);
+  gsl_interp_accel_free(accescapeTimeEdep);
+  gsl_interp_accel_free(accescapeTimeTdep);
+  gsl_interp_accel_free(accR);
+  gsl_interp_accel_free(accV);
+  gsl_interp_accel_free(accTr);
+  gsl_interp_accel_free(accTrInv);
+  gsl_interp_accel_free(accCustInj);
+  gsl_interp_accel_free(taccsp);
+  gsl_interp_accel_free(eaccsp);
+  gsl_interp_accel_free(taccesc);
+  gsl_interp_accel_free(eaccesc);
 }
 
 

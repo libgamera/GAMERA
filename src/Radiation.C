@@ -119,10 +119,64 @@ Radiation::Radiation() {
 }
 
 /**
- * Standard destructor.
+ * Destructor. All allocated space has to be freed.
  */
 Radiation::~Radiation() {
     delete fUtils;
+    gsl_interp_accel_free(acc);
+    gsl_interp_accel_free(acciso);
+    //if (accall != NULL){ gsl_interp_accel_free(accall);}
+    gsl_interp_accel_free(ICLossLookupAccIso);
+    gsl_interp_accel_free(ICLossLookupAccAll);
+    gsl_interp_accel_free(loraccesc);
+    gsl_interp_accel_free(edaccesc);
+    
+    //gsl_spline_free(ICLossLookupSumAll);
+    //gsl_spline_free(ICLossLookupSumIso);
+    //gsl_spline_free(ElectronLookup);
+    //gsl_spline_free(ProtonLookup);
+    
+    //gsl_spline_free(TargetPhotonLookupSumAll);
+    //gsl_spline_free(TargetPhotonLookupSumIso);
+    
+    for (int i = 0; i < (int)TargetPhotonLookups.size(); i++){
+        gsl_spline_free(TargetPhotonLookups[i]);
+    }
+    for (int i = 0; i < (int)TargetPhotonAccs.size(); i++){
+        gsl_interp_accel_free(TargetPhotonAccs[i]);
+    }
+    
+    for (int i = 0; i < (int)ICLossLookups.size(); i++){
+        gsl_spline_free(ICLossLookups[i]);
+    }
+    for (int i = 0; i < (int)ICLossLookupAccs.size(); i++){
+        gsl_interp_accel_free(ICLossLookupAccs[i]);
+    }
+    
+    for (int i = 0; i < (int)phiaccescs.size();i++){
+        gsl_interp_accel_free(phiaccescs[i]);
+    }
+    for (int i = 0; i < (int)thetaaccescs.size();i++){
+        gsl_interp_accel_free(thetaaccescs[i]);
+    }
+    for (int i = 0; i < (int)phiaccesc_zetas.size();i++){
+        gsl_interp_accel_free(phiaccesc_zetas[i]);
+    }
+    for (int i = 0; i < (int)thetaaccesc_zetas.size();i++){
+        gsl_interp_accel_free(thetaaccesc_zetas[i]);
+    }
+    for (int i=0; i< (int)CosZetaLookups.size(); i++){
+        interp2d_spline_free(CosZetaLookups[i]);
+    }
+    
+    for (int i = 0; i< (int)TargetPhotonAngularDistrs.size(); i++){
+        interp2d_spline_free(TargetPhotonAngularDistrs[i]);
+    }
+    
+    for (int i = 0; i< (int)HadronSpectraLookups.size(); i++){
+        gsl_spline_free(HadronSpectraLookups[i]);
+    }
+    
 }
 
 //FIXME make me a nice function!
@@ -155,6 +209,9 @@ void Radiation::ClearTargetPhotons() {
 void Radiation::ClearHadrons() {
     HadronMasses.clear();
     HadronSpectra.clear();
+    for (int i = 0; i< (int)HadronSpectraLookups.size(); i++){
+        gsl_spline_free(HadronSpectraLookups[i]);
+    }
     HadronSpectraLookups.clear();
     return;
 }
@@ -4466,7 +4523,126 @@ void Radiation::AddLocalCosmicRayModel(bool extragalactic, double slope){
 }
 
 
-
+void Radiation::AddCRModel(bool extragalactic, bool CREAM){
+    
+    
+    double mass_numbers_CR[] = {1.0,4.0,12.0, 16.0, 24.0, 28.0, 56.0, 1.0};
+    double charges[] = {1.0,2.0,6.0,8.0,12.0,14.0,26.0};
+    
+    vector < double > e_values;
+    e_values.push_back(2.0);                    // These values are log10(E/GeV)
+    double difference = (11.5 - 2.0)/300.0;
+    for (int i = 0; i < 300; i++) {
+        e_values.push_back(e_values[i] + difference);
+    }
+    
+    double conversion = 4.0*pi/1.0e4/c_speed;
+    
+    double N, mass, charge, ecut_value, e;
+    vector < vector<double> > tempvec;
+    
+    double N0_H = 28.2, E1_H = 2.0e3, alpha1_H = 2.815, alpha2_H = 2.45, alpha3_H = 2.72, E2_H = 2.5e4, ecut_H = 9.0e6;
+    if( CREAM) { N0_H = 28.2; E1_H = 2.0e3; alpha1_H = 2.815; alpha2_H = 2.4; alpha3_H = 3.0; E2_H = 1.5e4; ecut_H = 9.0e6;}
+    
+    double N0_He = 16.0, E1_He = 4.0e3, alpha1_He = 2.71, alpha2_He = 2.32, alpha3_He = 2.66, E2_He = 4.0e4, ecut_He = 5.0e6;
+    if( CREAM ){ N0_He = 16.0; E1_He = 3.0e3; alpha1_He = 2.71; alpha2_He = 2.2; alpha3_He = 2.87; E2_He = 9.0e3; ecut_He = 5.0e6;}
+    
+    // Parameters only needed for H and He because of the double break spectrum:
+    double alpha3s[] = {alpha3_H, alpha3_He};
+    double E2s[] = {E2_H, E2_He};
+    
+    // Parameters used for all species:
+    double N0_C = 3.5, E1_C = 7.0e3, alpha1_C = 2.7, alpha2_C = 2.45, ecut_C = 3.0e6*3.0;
+    double N0_O = 6.0, E1_O = 7.0e3, alpha1_O = 2.7, alpha2_O = 2.5, ecut_O = 3.0e6*2.0;
+    double N0_Mg = 3.0, E1_Mg = 1.0e4, alpha1_Mg = 2.75, alpha2_Mg = 2.55, ecut_Mg = 3.0e6*14.0;
+    double N0_Si = 2.5, E1_Si = 1.0e4, alpha1_Si = 2.7, alpha2_Si = 2.5, ecut_Si = 3.0e6*13.0;
+    double N0_Fe = 10.0, E1_Fe = 1.0e4, alpha1_Fe = 2.8, alpha2_Fe = 2.55, ecut_Fe = 3.0e6*12.0;
+    
+    double N0s[] = {N0_H, N0_He, N0_C, N0_O, N0_Mg, N0_Si, N0_Fe};
+    double E1s[] = {E1_H, E1_He, E1_C, E1_O, E1_Mg, E1_Si, E1_Fe};
+    double alpha1s[] = {alpha1_H, alpha1_He, alpha1_C, alpha1_O, alpha1_Mg, alpha1_Si, alpha1_Fe};
+    double alpha2s[] = {alpha2_H, alpha2_He, alpha2_C, alpha2_O, alpha2_Mg, alpha2_Si, alpha2_Fe};
+    double ecuts[] = {ecut_H, ecut_He, ecut_C, ecut_O, ecut_Mg, ecut_Si, ecut_Fe};
+    
+    
+    //******************************************************************
+    // First component for H and He
+    double E0 = 10.0, w = 0.5;
+    double alpha1, alpha2, alpha3, E1, E2;
+    
+    
+        for (int i = 0; i<2; i++) {
+        tempvec.clear();
+        N = N0s[i]; mass = mass_numbers_CR[i]; charge = charges[i]; ecut_value = ecuts[i]; alpha1 = alpha1s[i]; alpha2 = alpha2s[i]; E1 = E1s[i];
+        alpha3 = alpha3s[i]; E2 = E2s[i];
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N * pow((e/E0), -alpha1) * pow((1.0 + (e*e/(E1*E1))), (-(alpha2-alpha1)*w)) * pow((1.0 + (e*e/(E2*E2))),(-(alpha3-alpha2)*w)) * exp(-e/ecut_value)/GeV_to_erg*conversion, tempvec);
+        }
+        AddHadrons(tempvec, mass);
+    }
+    
+    
+    
+    //*********************************************************
+    // First component for Carbon until Iron
+    
+    
+    
+    for (int i = 2; i<7; i++) {
+        tempvec.clear();
+        N = N0s[i]; mass = mass_numbers_CR[i]; charge = charges[i]; ecut_value = ecuts[i]; alpha1 = alpha1s[i]; alpha2 = alpha2s[i]; E1 = E1s[i];
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N*pow(e/E0, -1.0*alpha1) *  pow( 1. + (e*e/(E1*E1)), -1.*(alpha2-alpha1)*w) * exp(-e/ecut_value)/GeV_to_erg*conversion, tempvec);
+        }
+        AddHadrons(tempvec, mass);
+    }
+    
+    
+    
+    
+    //**********************************************************
+    // Adding the second galactic component for each species:
+    
+    double alpha_H2 = 2.5, alpha_He2 = 2.5, alpha_C2 = 2.45, alpha_O2 = 2.45, alpha_Mg2 = 2.45, alpha_Si2 = 2.45, alpha_Fe2 = 2.4;
+    double N_H2 = 6.0e-6, N_He2 = 4.0e-6, N_C2 = 6.0e-7, N_O2 = 6.0e-7, N_Mg2 = 5.0e-7, N_Si2 = 3.0e-7, N_Fe2 = 8.0e-7;
+    double ecut_H2 = 70.0e6, ecut_He2 = 70.0e6*2.0, ecut_C2 = 70.0e6*6.0, ecut_O2 = 70.0e6*8.0, ecut_Mg2 = 70.0e6*12.0, ecut_Si2 = 70.0e6*14.0, ecut_Fe2 = 70.0e6*12.0;
+    
+    double alphas2[] = {alpha_H2, alpha_He2, alpha_C2, alpha_O2, alpha_Mg2, alpha_Si2, alpha_Fe2};
+    double Ns2[] = {N_H2, N_He2, N_C2, N_O2, N_Mg2, N_Si2, N_Fe2};
+    double ecuts2[] = {ecut_H2, ecut_He2, ecut_C2, ecut_O2, ecut_Mg2, ecut_Si2, ecut_Fe2};
+    
+    // Here, the Hadron species of the second galactic component are initialized
+    for (int i = 0; i<7; i++) {
+        tempvec.clear();
+        N = Ns2[i]; mass = mass_numbers_CR[i]; charge = charges[i]; ecut_value = ecuts2[i];
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N*pow(e/1.0e3, -1.0*alphas2[i]) * exp(-e/ecut_value)/GeV_to_erg*conversion, tempvec);
+        }
+        AddHadrons(tempvec, mass);
+    }
+    
+    
+    
+    
+        
+    // If needed, add the extragalactic component. It is assumed, they are solely protons
+    double N_extragal = 1.4e-7, alpha_extragal = 2.4, ecut_extragal = 0.45e11;
+    if(extragalactic) {
+        tempvec.clear();
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N_extragal*pow(e/1.0e3, -1.0*alpha_extragal) * exp(-e/ecut_extragal)/GeV_to_erg * conversion, tempvec);
+        }
+        AddHadrons(tempvec, 1.0);
+    }
+    
+    
+    
+    return;
+}
 
 
 
