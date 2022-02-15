@@ -34,6 +34,6 @@ Documentation & Tutorials
 
  
  
-For questions and comments, feel free to write us: `carlo.romoli(at)mpi.hd.mpg.de`, `mischa.breuhaus(at)mpi-hd.mpg.de` or `joachim.hahn(at)mpi-hd.mpg.de`
+For questions and comments, feel free to write us: `mischa.breuhaus(at)mpi-hd.mpg.de`, `carlo.romoli(at)mpi.hd.mpg.de` or `joachim.hahn(at)mpi-hd.mpg.de`
 
 
