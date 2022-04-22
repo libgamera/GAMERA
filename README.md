@@ -8,6 +8,8 @@ For more info and a turorial, see the [GAMERA docu!](http://libgamera.github.io/
 
 GAMERA is written in C++ and can be wrapped to python.
 
+The software is listed in the Astrophysics Source Code Library <a href="https://ascl.net/2203.007"><img src="https://img.shields.io/badge/ascl-2203.007-blue.svg?colorB=262255" alt="ascl:2203.007" /></a>
+
 Quick Start
 ===========
 
