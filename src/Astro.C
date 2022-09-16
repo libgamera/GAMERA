@@ -700,7 +700,7 @@ vector<double> Astro::CalculateBField(vector<double> xyz, int component) {
  * B-field components: Regular field, random field, and random
  * striated field.
  * Input:   - Position vector in [kpc]
- * Output:  - Vector containing (B_regular, B_random, B_striated)
+ * Output:  - Vector containing (B_regular, B_striated, B_random)
  *              absolute field strength in micro Gauss.
  * ****************************************************************/
 vector<double> Astro::CalculateBFieldStrengthComposition(vector<double> xyz) {
@@ -723,7 +723,7 @@ vector<double> Astro::CalculateBFieldStrengthComposition(vector<double> xyz) {
   double Striated = sqrt(beta)*norm;
   
   vector<double> temp;
-  temp.push_back(norm); temp.push_back(Random); temp.push_back(Striated);
+  temp.push_back(norm); temp.push_back(Striated); temp.push_back(Random);
   return temp;
 }
 

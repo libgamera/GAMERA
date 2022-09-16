@@ -399,7 +399,7 @@ void Radiation::SetICLookups(int i) {
  * at energy 'e' [erg] resulting from radiation mechanism
  * 'radiationMechanism' that has been specified before in
  * 'CalculateDifferentialGammaEmission' or 'CalculateIntegralGammaEmission'.
- */  // TODO: the input parameter void *par became useless, it is not used -> delete it to avoid confusion!!
+ */  // TODO: the input parameter void *par became useless? if it is not used -> delete it to avoid confusion!!
 double Radiation::DifferentialEmissionComponent(double e, void *par) {
   if (radiationMechanism.compare("Synchrotron") &&
       radiationMechanism.compare("Bremsstrahlung") &&
