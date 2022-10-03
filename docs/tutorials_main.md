@@ -14,6 +14,7 @@ How to ...
 - [take particle escape into account](particle_escape.md)
 - [display the particle energy loss scales](energy_loss.md)
 - [Take into account gammagamma absorption](gammagamma_absorption.md)
+- [Calculate the emission for arbitrary cosmic ray and ambient medium composition](hadronic_components.md)
 
 
 Please note:
