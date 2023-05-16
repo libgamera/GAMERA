@@ -15,7 +15,7 @@ How to ...
 - [display the particle energy loss scales](energy_loss.md)
 - [Take into account gammagamma absorption](gammagamma_absorption.md)
 - [Calculate the emission for arbitrary cosmic ray and ambient medium composition](hadronic_components.md)
-
+- [Fitting data with GAMERA models](fitting_data.md)
 
 Please note:
 ------------
