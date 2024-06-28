@@ -1,0 +1,14 @@
+[build-system]
+requires = ["scikit-build-core", "swig"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "gappa"
+version = "1.0.0"
+
+[tool.scikit-build]
+cmake.source-dir = "python"
+cmake.args = [
+    "-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON",
+    "-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=ON",
+]
