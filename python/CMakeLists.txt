@@ -38,4 +38,4 @@ else()
 endif()
 target_link_libraries(gappa PRIVATE Python::Module)
 
-install(TARGETS gappa DESTINATION .)
+install(TARGETS gappa DESTINATION . COMPONENT Python)
