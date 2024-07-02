@@ -49,3 +49,40 @@ jobs:
       - name: test
         run: |
           pytest unit_tests --color=yes -v
+
+  cpp:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+          - os: macos-12
+          - os: macos-14
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install dependencies (ubuntu)
+        if : ${{ contains(matrix.os,  'ubuntu') }}
+        run: |
+          sudo apt update
+          sudo apt install -y libgsl-dev swig
+
+      - name: install dependencies (macos)
+        if : ${{ contains(matrix.os, 'macos') }}
+        run: |
+          brew install swig gsl
+
+      - name: build
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_INSTALL_PREFIX=/tmp/gamera
+          cmake --build build
+          cmake --install build
+
+      - name: build and run example
+        run: |
+          cd cpp_example
+          CMAKE_PREFIX_PATH=/tmp/gamera cmake -S . -B build
+          cmake --build build
+          ./build/example
