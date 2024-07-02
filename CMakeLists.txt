@@ -7,7 +7,6 @@ project(
 include(GNUInstallDirs)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-option(PYTHON "Build gappa python bindings" ON)
 find_package(GSL REQUIRED)
 
 add_library(gamera)
