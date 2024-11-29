@@ -2,6 +2,9 @@
 *png
 *.pyc
 __pycache__
+dist/
+build/
+rad_temp.dat
 .idea
 docu/pics/
 
