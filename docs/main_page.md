@@ -34,6 +34,6 @@ Documentation & Tutorials
 
  
  
-For questions and comments, feel free to write to `mischa.breuhaus@mpi-hd.mpg.de`
+For questions and comments, feel free to write to `breuhaus@cppm.in2p3.fr`
 
 
