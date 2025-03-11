@@ -1,7 +1,2 @@
 theme: jekyll-theme-cayman
 show_downloads: false  # Required for nav to appear
-navigation:
-  - text: Home
-    url: /docs/main_page.md
-  - text: Installation
-    url: /docs/download_installation.md
