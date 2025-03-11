@@ -1,3 +1,11 @@
+
+<div style="text-align: justify;">
+  <img src="./docs/gamera.png" alt="Gamera" style="float: left; width: 200px; margin-right: 20px;">
+  <span style="display: inline-block; width: 100%; height: 0; overflow: hidden;"></span>
+  <img src="./docs/gappa.png" alt="Gappa" style="float: right; width: 250px; margin-left: 20px;">
+</div>
+
+
 # GAMERA
 
 is a project launched by the [Max Planck Insitute for Nuclear Physics in Heidelberg (MPIK)](https://www.mpi-hd.mpg.de/mpi/en/),
