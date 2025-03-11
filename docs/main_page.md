@@ -1,3 +1,7 @@
+---
+layout: default
+title: GAMERA
+---
  
 *This document is being updated continuously*
 
