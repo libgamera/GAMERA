@@ -86,7 +86,7 @@ def model(par, synthetic = False):
     age = par[5]  # in log10(1/yr)
     distance = 10 ** par[6]  # pc
 
-    energy_in_erg_pl = np.logspace(-3, 3, 200) * gp.TeV_to_erg  # emin and emax of the PL are fixed
+    energy_in_erg_pl = np.logspace(-3, 4, 200) * gp.TeV_to_erg  # emin and emax of the PL are fixed
     power_law = energy_in_erg_pl ** -alpha_pl
     power_law *= e_total_pl / fu.Integrate(list(zip(energy_in_erg_pl, power_law * energy_in_erg_pl)))
     power_law_spectrum = np.array(list(zip(energy_in_erg_pl, power_law)))
@@ -146,7 +146,7 @@ def model_for_fitting(ene, a, b, c, d, e):
     age = 5  # age of the system in years (logspace) - FIXED
     distance = 1e3  # in pc - FIXED
 
-    energy_in_erg_pl = np.logspace(-3, 3, 75) * gp.TeV_to_erg  # emin and emax of the PL are fixed
+    energy_in_erg_pl = np.logspace(-3, 4, 75) * gp.TeV_to_erg  # emin and emax of the PL are fixed
     power_law = energy_in_erg_pl ** -alpha_pl
     power_law *= e_total_pl / fu.Integrate(list(zip(energy_in_erg_pl, power_law * energy_in_erg_pl)))
     power_law_spectrum = np.array(list(zip(energy_in_erg_pl, power_law)))
@@ -269,9 +269,7 @@ if __name__ == "__main__":
     res = opt.curve_fit(model_for_fitting, x, y, p0=p1, sigma=yerr, absolute_sigma=True)
     print(res)  # print the results
 
-    # Plot the best fit results for some reasons the number of points is not exactly the same, so there is the need
-    # for small adjustment
-    plt.loglog(np.logspace(-19, 3, 100)[:-1],
+    plt.loglog(np.logspace(-19, 3, 100),
                model_for_fitting(np.logspace(-19, 3, 100) * gp.TeV_to_erg, res[0][0], res[0][1], res[0][2], res[0][3],
                                  res[0][4]), 'b-', label='best fit')
     plt.xlabel("Energy [TeV]")
