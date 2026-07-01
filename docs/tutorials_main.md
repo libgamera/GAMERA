@@ -1,3 +1,11 @@
+---
+layout: page
+title: List of Tutorials
+show_sidebar: false
+menubar: menu
+---
+
+
 [(back to main page)](main_page.md)
 
 Tutorials

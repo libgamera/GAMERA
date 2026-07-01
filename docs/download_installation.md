@@ -1,3 +1,10 @@
+---
+layout: page
+title: Download & Installation
+show_sidebar: false
+menubar: menu
+---
+
 [(back to main page)](main_page.md)
 
 Download

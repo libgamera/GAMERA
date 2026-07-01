@@ -1,3 +1,10 @@
+---
+layout: page
+title: Hadronic interaction models
+show_sidebar: false
+menubar: menu
+---
+
 [(one page up)](tutorials_main.md)
 
 # Specifying the hadronic interaction model

@@ -1,3 +1,10 @@
+---
+layout: page
+title: Particle escape
+show_sidebar: false
+menubar: menu
+---
+
 [(one page up)](tutorials_main.md)
 
 # Modeling Particle Escape

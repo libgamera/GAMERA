@@ -1,3 +1,10 @@
+---
+layout: page
+title: Fitting data
+show_sidebar: false
+menubar: menu
+---
+
 [(one page up)](tutorials_main.md)
 
 Fitting data with GAMERA models

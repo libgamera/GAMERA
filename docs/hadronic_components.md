@@ -1,3 +1,11 @@
+---
+layout: page
+title: Different hadronic CR species
+show_sidebar: false
+menubar: menu
+---
+
+
 Effect of heavier nuclei for gamma-ray emission
 ===============================================
 

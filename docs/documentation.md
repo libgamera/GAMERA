@@ -1,3 +1,11 @@
+---
+layout: page
+title: General information
+show_sidebar: false
+menubar: menu
+---
+
+
 [(back to main page)](main_page.md)
 
 General info

@@ -1,3 +1,10 @@
+---
+layout: page
+title: Calculating the Radiation
+show_sidebar: false
+menubar: menu
+---
+
 [(one page up)](tutorials_main.md)
 
 Step-by-step: broad-band radiation spectrum from a parent population of particles

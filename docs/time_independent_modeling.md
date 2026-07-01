@@ -1,3 +1,10 @@
+---
+layout: page
+title: Time-independent Modeling
+show_sidebar: false
+menubar: menu
+---
+
 [(one page up)](tutorials_main.md)
 
 Step-by-step: Time independent modeling of Particle Spectra

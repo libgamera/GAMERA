@@ -1,3 +1,10 @@
+---
+layout: page
+title: Time-dependent Modeling
+show_sidebar: false
+menubar: menu
+---
+
 [(one page up)](tutorials_main.md)
 
 # Time-Dependent Modeling
