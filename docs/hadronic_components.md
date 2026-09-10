@@ -3,6 +3,7 @@ layout: page
 title: Different hadronic CR species
 show_sidebar: false
 menubar: menu
+permalink: /docs/hadronic_components
 ---
 
 

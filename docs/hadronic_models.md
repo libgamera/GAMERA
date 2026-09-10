@@ -3,9 +3,10 @@ layout: page
 title: Hadronic interaction models
 show_sidebar: false
 menubar: menu
+permalink: /docs/hadronic_models
 ---
 
-[(one page up)](tutorials_main.md)
+[(one page up)](/docs/tutorials_main)
 
 # Specifying the hadronic interaction model
 
@@ -31,4 +32,4 @@ fr.SetPPEmissionModel(m) # SET THE EMISSION MODEL; m={0,1,2,3}
 [Here](hadronic_emission_models.py)  is a documented, working python script which will produce the following plot: 
 ![hadronic_emission_models_SEDs](hadronic_emission_models_SEDs.png)
 
-[(one page up)](tutorials_main.md)
+[(one page up)](/docs/tutorials_main)

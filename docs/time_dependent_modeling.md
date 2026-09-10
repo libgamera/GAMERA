@@ -3,14 +3,15 @@ layout: page
 title: Time-dependent Modeling
 show_sidebar: false
 menubar: menu
+permalink: /docs/time_dependent_modeling
 ---
 
-[(one page up)](tutorials_main.md)
+[(one page up)](/docs/tutorials_main)
 
 # Time-Dependent Modeling
 
 Time-dependent modeling, i.e. modeling the spectral evolution of sources while 
-physical parameters like magnetic fields are changing over time, can be performed with `GAMERA` in much the same way as time-independent modeling, described [in a this tutorial](time_independent_modeling.md). If you havent done so already, please go through that one first before proceeding!
+physical parameters like magnetic fields are changing over time, can be performed with `GAMERA` in much the same way as time-independent modeling, described [in this tutorial](/docs/time_independent_modeling). If you havent done so already, please go through that one first before proceeding!
 
 ## Energy-independent parameters
 If you want to model the time-dependency of energy-independent parameters such as the ambient magnetic field or gas density the only difference to the time-independent procedure is to provide 2D-vectors instead of doubles to the corresponding `Setter`-functions you have. 
@@ -46,12 +47,12 @@ fp.SetTimeDependentEscapeTime(t_esc_lookup)
 ## Energy-dependent parameters
 For energy-dependent parameters, the method of applying time-dependency
 is different:
-- If the particle escape time scale depends both on energy and time, also the spectral shape can be made to change with time, see [here](particle_escape.md).
+- If the particle escape time scale depends both on energy and time, also the spectral shape can be made to change with time, see [here](/docs/particle_escape).
 
-- If not only the injection spectrum normalisation (luminosity) but also its spectral shape, this can be modeled [following these steps](tt.md). \(Under Construction\)
+- If not only the injection spectrum normalisation (luminosity) but also its spectral shape, this can be modeled [following these steps](/docs/tt). \(Under Construction\)
 
 - Currently time-dependent radiation fields are only possible via an iterative
-approach. There is an [extra tutorial on iterating](iteration.md). \(Under Construction\)
+approach. There is an [extra tutorial on iterating](/docs/iteration). \(Under Construction\)
 
 A working script can be found [here](particles_time_dep.py), which will output the following plots: 
 
@@ -62,4 +63,4 @@ Temporal evolution of the particle spectrum assuming the following time dependen
 
 ![particle_time_evolution_basic](particle_time_evolution_basic.png)
 
-[(one page up)](tutorials_main.md)
+[(one page up)](/docs/tutorials_main)

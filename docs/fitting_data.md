@@ -3,9 +3,10 @@ layout: page
 title: Fitting data
 show_sidebar: false
 menubar: menu
+permalink: /docs/fitting_data
 ---
 
-[(one page up)](tutorials_main.md)
+[(one page up)](/docs/tutorials_main)
 
 Fitting data with GAMERA models
 ===============================
