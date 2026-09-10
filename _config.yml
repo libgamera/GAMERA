@@ -1,5 +1,6 @@
 #theme: jekyll-theme-cayman
 theme: bulma-clean-theme
 favicon: /favicon.png
-url: "http://127.0.0.1:4000"
-baseurl: ""
+url: "https://MischaBr.github.io"
+baseurl: "/GAMERA"
+fixed_navbar: top

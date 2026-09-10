@@ -1,36 +1,47 @@
- - label: General Information
-   items:
-   - name: News
-     link: /index
-   - name: Overview
-     link: /docs/documentation
+- label: General Information
+  items:
+  - name: News
+    link: /index
+  - name: Overview
+    link: /docs/documentation
 
- - label: Installation
-   items:
-   - name: Downlad & Installation
-     link: /docs/download_installation
+- label: Installation
+  items:
+  - name: Downlad & Installation
+    link: /docs/download_installation
 
- - label: Tutorials
-   items:
-   - name: List of Tutorials
-     link: /docs/tutorials_main
-   - name: Radiation
-     link: /docs/radiation_modeling
-   - name: Time independent modeling
-     link: /docs/time_independent_modeling
-   - name: Time dependent modeling
-     link: /docs/time_dependent_modeling
-   - name: Inverse Compton Radiation Fields
-     link: /docs/inverse_compton
-   - name: Hadronic Interaction Models
-     link: /docs/hadronic_models
-   - name: Particle Escape
-     link: /docs/particle_escape
-   - name: Energy Loss Rates
-     link: /docs/energy_loss
-   - name: Absorption
-     link: /docs/gammagamma_absorption
-   - name: Arbitrary Cosmic Ray Species
-     link: /docs/hadronic_components
-   - name: Fitting Data
-     link: /docs/fitting_data
+- label: Tutorials
+  items:
+  - name: List of Tutorials
+    link: /docs/tutorials_main
+  - name: Radiation
+    link: /docs/radiation_modeling
+  - name: Time independent modeling
+    link: /docs/time_independent_modeling
+  - name: Time dependent modeling
+    link: /docs/time_dependent_modeling
+  - name: Inverse Compton Radiation Fields
+    link: /docs/inverse_compton
+  - name: Hadronic Interaction Models
+    link: /docs/hadronic_models
+  - name: Particle Escape
+    link: /docs/particle_escape
+  - name: Energy Loss Rates
+    link: /docs/energy_loss
+  - name: Absorption
+    link: /docs/gammagamma_absorption
+  - name: Arbitrary Cosmic Ray Species
+    link: /docs/hadronic_components
+  - name: Fitting Data
+    link: /docs/fitting_data
+     
+     
+- label: Miscellaneous
+  items: 
+  - name: Contact and support
+    link: /docs/contact
+  - name: Acknowledging GAMERA
+    link: /docs/acknowledging
+  - name: Licence
+    link: /docs/licence
+    
