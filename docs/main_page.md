@@ -33,6 +33,6 @@ Documentation & Tutorials
 
  
  
-For questions and comments, feel free to write to `breuhaus@cppm.in2p3.fr`
+For questions and comments, feel free to write to `mbreuhaus@mpifr-bonn.mpg.de`
 
 
