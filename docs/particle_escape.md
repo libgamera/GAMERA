@@ -6,7 +6,7 @@ menubar: menu
 permalink: /docs/particle_escape
 ---
 
-[(one page up)](/docs/tutorials_main)
+<!-- [(one page up)](/docs/tutorials_main) -->
 
 # Modeling Particle Escape
 
@@ -156,5 +156,5 @@ and here:
  
 These plots were created with [this script](setup_escape_energy_time_dependent.py).
 
-[(one page up)](/docs/tutorials_main)
+<!-- [(one page up)](/docs/tutorials_main) -->
 

@@ -1,13 +1,13 @@
 - label: General Information
   items:
-  - name: News
+  - name: Start
     link: /index
   - name: Overview
     link: /docs/documentation
 
 - label: Installation
   items:
-  - name: Downlad & Installation
+  - name: Download & Installation
     link: /docs/download_installation
 
 - label: Tutorials

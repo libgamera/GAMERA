@@ -6,7 +6,7 @@ menubar: menu
 permalink: /docs/download_installation
 ---
 
-[(back to main page)](/docs/main_page)
+<!-- [(back to main page)](/docs/main_page) -->
 
 Download
 ========
@@ -111,4 +111,4 @@ $ make clean
 ```
 and re-compile with the commands above.
 
-[(back to main page)](/docs/main_page)
+<!-- [(back to main page)](/docs/main_page) -->

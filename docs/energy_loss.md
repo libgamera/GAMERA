@@ -6,7 +6,7 @@ menubar: menu
 permalink: /docs/energy_loss
 ---
 
-[(one page up)](/docs/tutorials_main)
+<!-- [(one page up)](/docs/tutorials_main) -->
 
 How to View the Time-Scales of the Relevant Cooling Processes
 =============================================================

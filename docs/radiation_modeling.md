@@ -6,7 +6,7 @@ menubar: menu
 permalink: /docs/radiation_modeling
 ---
 
-[(one page up)](/docs/tutorials_main)
+<!-- [(one page up)](/docs/tutorials_main) -->
 
 Step-by-step: broad-band radiation spectrum from a parent population of particles
 =================================================================================
@@ -114,9 +114,9 @@ You can get an idea of the required binning [here](binning.md). -->
 
 - You only have to set the parameters relevant to the radiation process you want to calculate. For example, if you are only interested in Bremsstrahlung, you don't have to specify the B-Field
 
-- For the IC process there are several ways to set up the radiation fields, including for SSC modelling or anisotropy, [see here](/docs/inverse_compton) \(Currently in construction\)
+- For the IC process there are several ways to set up the radiation fields, including for SSC modelling or anisotropy, [see here]({{ '/docs/inverse_compton' | relative_url }}) \(Currently in construction\)
 
-- There are different hadronic interaction models that you can choose from. See [here](/docs/hadronic_models) how to do it!
+- There are different hadronic interaction models that you can choose from. See [here]({{ '/docs/hadronic_models' | relative_url }}) how to do it!
 
 - If you have set up more than one IC target field, you can access the individual contributions to the resulting radiation spectrum via `fr.GetICSpectrum(field)`,
 where `field` is the index of the field (e.g. the for the first field you have set 
@@ -133,7 +133,7 @@ for time-dependent modeling. Tutorials how to use it are available, too.
 More on the emission of hadronic origin
 ----------------------------------------
 The current version of GAMERA includes the effect of heavier nuclei in the computation of the π⁰- and η-Decay.
-In [this](/docs/hadronic_components) tutorial, it is described how to use the new functionalities.
+In [this]({{ '/docs/hadronic_components' | relative_url }}) tutorial, it is described how to use the new functionalities.
 
 
-[(one page up)](/docs/tutorials_main)
+<!-- [(one page up)](/docs/tutorials_main) -->

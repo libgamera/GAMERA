@@ -7,9 +7,9 @@ permalink: /docs/inverse_compton
 ---
 
 
-[(back to main page)](/docs/main_page)
+<!-- [(back to main page)](/docs/main_page)
 
-[(one page up)](/docs/tutorials_main)
+[(one page up)](/docs/tutorials_main) -->
 
 Inverse Compton Tutorial
 ========================
@@ -187,6 +187,6 @@ replace the thermal field `i` with the Synchrotron field. As for the general cas
 of the photon spectrum (the synchrotron radiation has to be computed).
 
 
-[(one page up)](/docs/tutorials_main)
+<!-- [(one page up)](/docs/tutorials_main)
 
-[(back to main page)](/docs/main_page)
+[(back to main page)](/docs/main_page) -->

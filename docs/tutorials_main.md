@@ -7,7 +7,7 @@ permalink: /docs/tutorials_main
 ---
 
 
-[(back to main page)](/docs/main_page)
+<!-- [(back to main page)](/docs/main_page) -->
 
 Tutorials
 =========
@@ -15,16 +15,16 @@ Tutorials
 
 How to ...
 
-- [calculate the broad-band radiation spectrum from a parent population of hadrons or electrons](/docs/radiation_modeling)
-- [evolve a particle population in a time-constant environment](/docs/time_independent_modeling)
-- [evolve a particle population in a changing environment](/docs/time_dependent_modeling)
-- [set up more complicated Inverse-Compton radiation fields (SSC, anisotropy, arbitrary shape)](/docs/inverse_compton)
-- [pick your hadronic interaction model](/docs/hadronic_models)
-- [take particle escape into account](/docs/particle_escape)
-- [display the particle energy loss scales](/docs/energy_loss)
-- [Take into account gammagamma absorption](/docs/gammagamma_absorption)
-- [Calculate the emission for arbitrary cosmic ray and ambient medium composition](/docs/hadronic_components)
-- [Fitting data with GAMERA models](/docs/fitting_data)
+- [calculate the broad-band radiation spectrum from a parent population of hadrons or electrons]({{ '/docs/radiation_modeling' | relative_url }})
+- [evolve a particle population in a time-constant environment]({{ '/docs/time_independent_modeling' | relative_url }})
+- [evolve a particle population in a changing environment]({{ '/docs/time_dependent_modeling' | relative_url }})
+- [set up more complicated Inverse-Compton radiation fields (SSC, anisotropy, arbitrary shape)]({{ '/docs/inverse_compton' | relative_url }})
+- [pick your hadronic interaction model]({{ '/docs/hadronic_models' | relative_url }})
+- [take particle escape into account]({{ '/docs/particle_escape' | relative_url }})
+- [display the particle energy loss scales]({{ '/docs/energy_loss' | relative_url }})
+- [Take into account gammagamma absorption]({{ '/docs/gammagamma_absorption' | relative_url }})
+- [Calculate the emission for arbitrary cosmic ray and ambient medium composition]({{ '/docs/hadronic_components' | relative_url }})
+- [Fitting data with GAMERA models]({{ '/docs/fitting_data' | relative_url }})
 
 Please note:
 ------------
@@ -45,9 +45,9 @@ fRad->SetBField(b);
 [...]
 vector< vector<double> > SED = fRad->GetTotalSED();
 ```
-Please check out the [installation instructions](/docs/download_installation) to learn how to make `GAMERA` work
+Please check out the [installation instructions]({{ '/docs/download_installation' | relative_url }}) to learn how to make `GAMERA` work
 in either language.
 
 ![GAMERA](GAMERA.png) 
 
-[(back to main page)](/docs/main_page)
+<!-- [(back to main page)](/docs/main_page) -->
