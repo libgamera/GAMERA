@@ -144,7 +144,7 @@
         <ul class="menu-list">
             
                 <li>
-                    <a href="/GAMERA/index" class="">News</a>
+                    <a href="/GAMERA/index" class="">Start</a>
                     
                 </li>
             
@@ -159,7 +159,7 @@
         <ul class="menu-list">
             
                 <li>
-                    <a href="/GAMERA/docs/download_installation" class="">Downlad & Installation</a>
+                    <a href="/GAMERA/docs/download_installation" class="">Download & Installation</a>
                     
                 </li>
             
@@ -260,12 +260,12 @@
 
                         
 <div class="content">
-    <p><a href="/docs/tutorials_main">(one page up)</a></p>
+    <!-- [(one page up)](/docs/tutorials_main) -->
 
 <h1 id="time-dependent-modeling">Time-Dependent Modeling</h1>
 
 <p>Time-dependent modeling, i.e. modeling the spectral evolution of sources while 
-physical parameters like magnetic fields are changing over time, can be performed with <code class="language-plaintext highlighter-rouge">GAMERA</code> in much the same way as time-independent modeling, described <a href="/docs/time_independent_modeling">in this tutorial</a>. If you havent done so already, please go through that one first before proceeding!</p>
+physical parameters like magnetic fields are changing over time, can be performed with <code class="language-plaintext highlighter-rouge">GAMERA</code> in much the same way as time-independent modeling, described <a href="/GAMERA/docs/time_independent_modeling">in this tutorial</a>. If you havent done so already, please go through that one first before proceeding!</p>
 
 <h2 id="energy-independent-parameters">Energy-independent parameters</h2>
 <p>If you want to model the time-dependency of energy-independent parameters such as the ambient magnetic field or gas density the only difference to the time-independent procedure is to provide 2D-vectors instead of doubles to the corresponding <code class="language-plaintext highlighter-rouge">Setter</code>-functions you have.</p>
@@ -302,13 +302,13 @@ fp.SetTimeDependentEscapeTime(t_esc_lookup)
 is different:</p>
   </li>
   <li>
-    <p>If the particle escape time scale depends both on energy and time, also the spectral shape can be made to change with time, see <a href="/docs/particle_escape">here</a>.</p>
+    <p>If the particle escape time scale depends both on energy and time, also the spectral shape can be made to change with time, see <a href="/GAMERA/docs/particle_escape">here</a>.</p>
   </li>
   <li>
-    <p>If not only the injection spectrum normalisation (luminosity) but also its spectral shape, this can be modeled <a href="/docs/tt">following these steps</a>. (Under Construction)</p>
+    <p>If not only the injection spectrum normalisation (luminosity) but also its spectral shape, this can be modeled <a href="/GAMERA/docs/tt">following these steps</a>. (Under Construction)</p>
   </li>
   <li>Currently time-dependent radiation fields are only possible via an iterative
-approach. There is an <a href="/docs/iteration">extra tutorial on iterating</a>. (Under Construction)</li>
+approach. There is an <a href="/GAMERA/docs/iteration">extra tutorial on iterating</a>. (Under Construction)</li>
 </ul>
 
 <p>A working script can be found <a href="particles_time_dep.py">here</a>, which will output the following plots:</p>
@@ -320,7 +320,7 @@ approach. There is an <a href="/docs/iteration">extra tutorial on iterating</a>.
 
 <p><img src="particle_time_evolution_basic.png" alt="particle_time_evolution_basic" /></p>
 
-<p><a href="/docs/tutorials_main">(one page up)</a></p>
+<!-- [(one page up)](/docs/tutorials_main) -->
 
 </div>
 

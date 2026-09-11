@@ -144,7 +144,7 @@
         <ul class="menu-list">
             
                 <li>
-                    <a href="/GAMERA/index" class="">News</a>
+                    <a href="/GAMERA/index" class="">Start</a>
                     
                 </li>
             
@@ -159,7 +159,7 @@
         <ul class="menu-list">
             
                 <li>
-                    <a href="/GAMERA/docs/download_installation" class="">Downlad & Installation</a>
+                    <a href="/GAMERA/docs/download_installation" class="">Download & Installation</a>
                     
                 </li>
             
@@ -260,7 +260,7 @@
 
                         
 <div class="content">
-    <p><a href="/docs/tutorials_main">(one page up)</a></p>
+    <!-- [(one page up)](/docs/tutorials_main) -->
 
 <h1 id="step-by-step-time-independent-modeling-of-particle-spectra">Step-by-step: Time independent modeling of Particle Spectra</h1>
 
@@ -299,12 +299,12 @@ fp.AddThermalTargetPhotons(temperature,energy_density) #in K, erg/cm^3.
 </code></pre></div></div>
 <blockquote>
   <p>Note 1: 
-There is a <a href="/docs/inverse_compton">dedicated tutorial</a> on how to set radiation fields for the IC process.</p>
+There is a <a href="/GAMERA/docs/inverse_compton">dedicated tutorial</a> on how to set radiation fields for the IC process.</p>
 </blockquote>
 
 <blockquote>
   <p>Note 2:
-Environmental parameters determine the cooling rate of electrons. Check <a href="/docs/energy_loss">this tutorial</a> on how to visualise this information.</p>
+Environmental parameters determine the cooling rate of electrons. Check <a href="/GAMERA/docs/energy_loss">this tutorial</a> on how to visualise this information.</p>
 </blockquote>
 
 <h2 id="step-4-set-the-source-age">Step 4: Set the source age</h2>
@@ -351,7 +351,7 @@ producing this plot:
 <h3 id="set-up-a-particle-escape-term">Set up a particle escape term</h3>
 <p>there are several options for this. Either a constant, an energy-dependent, a 
 time-dependent or a both energy- and time-dependent escape time can be applied.
-<a href="/docs/particle_escape">Here</a> you can learn how to do this. The easies case, a constant
+<a href="/GAMERA/docs/particle_escape">Here</a> you can learn how to do this. The easies case, a constant
 escape time, is set up like this:</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fp.SetConstantEscapeTime(t_esc) # in seconds
@@ -377,7 +377,7 @@ into account.</p>
 <h3 id="set-solver-method">Set solver method</h3>
 <p>If you are sure that the energy losses are constant in time and you haven’t set 
 particle escape, you can also use a semi-analytical solver to the transport 
-equation (for more infos, see <a href="/docs/documentation">here</a> with the following command:</p>
+equation (for more infos, see <a href="/GAMERA/docs/documentation">here</a> with the following command:</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fp.SetSolverMethod(1)
 </code></pre></div></div>
@@ -387,7 +387,7 @@ losses, like changing B-fields, adiabatic losses etc.!</em></p>
 
 <p>This method is less flexible but more precise in those cases where it is applicable.</p>
 
-<p><a href="/docs/tutorials_main">(one page up)</a></p>
+<!-- [(one page up)](/docs/tutorials_main) -->
 
 
 </div>
