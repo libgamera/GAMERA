@@ -1,3 +1,12 @@
+---
+layout: page
+title: Inverse Compton emission
+show_sidebar: false
+menubar: menu
+permalink: /docs/inverse_compton_temp
+---
+
+
 [(back to main page)](main_page.md)
 
 [(one page up)](tutorials_main.md)

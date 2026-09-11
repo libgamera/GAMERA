@@ -1,4 +1,13 @@
-[(back to main page)](main_page.md)
+---
+layout: page
+title: List of Tutorials
+show_sidebar: false
+menubar: menu
+permalink: /docs/tutorials_main
+---
+
+
+<!-- [(back to main page)](/docs/main_page) -->
 
 Tutorials
 =========
@@ -6,16 +15,16 @@ Tutorials
 
 How to ...
 
-- [calculate the broad-band radiation spectrum from a parent population of hadrons or electrons](radiation_modeling.md)
-- [evolve a particle population in a time-constant environment](time_independent_modeling.md)
-- [evolve a particle population in a changing environment](time_dependent_modeling.md)
-- [set up more complicated Inverse-Compton radiation fields (SSC, anisotropy, arbitrary shape)](inverse_compton.md)
-- [pick your hadronic interaction model](hadronic_models.md)
-- [take particle escape into account](particle_escape.md)
-- [display the particle energy loss scales](energy_loss.md)
-- [Take into account gammagamma absorption](gammagamma_absorption.md)
-- [Calculate the emission for arbitrary cosmic ray and ambient medium composition](hadronic_components.md)
-- [Fitting data with GAMERA models](fitting_data.md)
+- [calculate the broad-band radiation spectrum from a parent population of hadrons or electrons]({{ '/docs/radiation_modeling' | relative_url }})
+- [evolve a particle population in a time-constant environment]({{ '/docs/time_independent_modeling' | relative_url }})
+- [evolve a particle population in a changing environment]({{ '/docs/time_dependent_modeling' | relative_url }})
+- [set up more complicated Inverse-Compton radiation fields (SSC, anisotropy, arbitrary shape)]({{ '/docs/inverse_compton' | relative_url }})
+- [pick your hadronic interaction model]({{ '/docs/hadronic_models' | relative_url }})
+- [take particle escape into account]({{ '/docs/particle_escape' | relative_url }})
+- [display the particle energy loss scales]({{ '/docs/energy_loss' | relative_url }})
+- [Take into account gammagamma absorption]({{ '/docs/gammagamma_absorption' | relative_url }})
+- [Calculate the emission for arbitrary cosmic ray and ambient medium composition]({{ '/docs/hadronic_components' | relative_url }})
+- [Fitting data with GAMERA models]({{ '/docs/fitting_data' | relative_url }})
 
 Please note:
 ------------
@@ -36,9 +45,9 @@ fRad->SetBField(b);
 [...]
 vector< vector<double> > SED = fRad->GetTotalSED();
 ```
-Please check out the [installation instructions](download_installation.md) to learn how to make `GAMERA` work
+Please check out the [installation instructions]({{ '/docs/download_installation' | relative_url }}) to learn how to make `GAMERA` work
 in either language.
 
 ![GAMERA](GAMERA.png) 
 
-[(back to main page)](main_page.md)
+<!-- [(back to main page)](/docs/main_page) -->

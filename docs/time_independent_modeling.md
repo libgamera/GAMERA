@@ -1,4 +1,12 @@
-[(one page up)](tutorials_main.md)
+---
+layout: page
+title: Time-independent Modeling
+show_sidebar: false
+menubar: menu
+permalink: /docs/time_independent_modeling
+---
+
+<!-- [(one page up)](/docs/tutorials_main) -->
 
 Step-by-step: Time independent modeling of Particle Spectra
 ===========================================================
@@ -41,10 +49,10 @@ fp.SetAmbientDensity(density) # in particles/cm^3
 fp.AddThermalTargetPhotons(temperature,energy_density) #in K, erg/cm^3. 
 ```
 >Note 1: 
->There is a [dedicated tutorial](inverse_compton.md) on how to set radiation fields for the IC process.
+>There is a [dedicated tutorial]({{ '/docs/inverse_compton' | relative_url }}) on how to set radiation fields for the IC process.
  
 >Note 2:
->Environmental parameters determine the cooling rate of electrons. Check [this tutorial](energy_loss.md) on how to visualise this information.
+>Environmental parameters determine the cooling rate of electrons. Check [this tutorial]({{ '/docs/energy_loss' | relative_url }}) on how to visualise this information.
 
 
 ## Step 4: Set the source age
@@ -93,7 +101,7 @@ Here are two working scripts incorporating the above steps:
 ### Set up a particle escape term
 there are several options for this. Either a constant, an energy-dependent, a 
 time-dependent or a both energy- and time-dependent escape time can be applied.
-[Here](particle_escape.md) you can learn how to do this. The easies case, a constant
+[Here]({{ '/docs/particle_escape' | relative_url }}) you can learn how to do this. The easies case, a constant
 escape time, is set up like this:
 
 ```
@@ -119,7 +127,7 @@ into account.
 ### Set solver method
 If you are sure that the energy losses are constant in time and you haven't set 
 particle escape, you can also use a semi-analytical solver to the transport 
-equation (for more infos, see [here](documentation.md) with the following command:
+equation (for more infos, see [here]({{ '/docs/documentation' | relative_url }}) with the following command:
 
 ```
 fp.SetSolverMethod(1)
@@ -130,7 +138,7 @@ losses, like changing B-fields, adiabatic losses etc.!_
 
 This method is less flexible but more precise in those cases where it is applicable.
 
-[(one page up)](tutorials_main.md)
+<!-- [(one page up)](/docs/tutorials_main) -->
 
 
 

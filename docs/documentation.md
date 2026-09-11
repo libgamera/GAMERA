@@ -1,4 +1,13 @@
-[(back to main page)](main_page.md)
+---
+layout: page
+title: General information
+show_sidebar: false
+menubar: menu
+permalink: /docs/documentation
+---
+
+
+<!--- [(back to main page)]({{ '/docs/main_page' | relative_url }}) -->
 
 General info
 ============
@@ -17,11 +26,11 @@ Here is a list of what you can do with it:
   Supernova Remnant models from accepted and peer reviewed publications
 
 And here are some things that you can't do directly with `GAMERA` at the moment:
-- fitting. But you can still write your model with `GAMERA` and use python packages for fitting, described in [this tutorial](fitting_data.md)
+- fitting. But you can still write your model with `GAMERA` and use python packages for fitting, described in [this tutorial]({{ '/docs/fitting_data' | relative_url }})
 - spatial evolution of particles. However, it is possible to approximate by using
   different zones of particles
 
-How to use these features is shown in the [tutorials section](tutorials_main.md).
+How to use these features is shown in the [tutorials section]({{ '/docs/tutorials_main' | relative_url }}).
  
 At the time of writing, `python` is quite popular and the tutorials on these pages 
 are provided in that language. However, you can use `GAMERA` also in your `C++` program
@@ -39,7 +48,7 @@ fRad->SetBField(b);
 [...]
 vector< vector<double> > SED = fRad->GetTotalSED();
 ```
-Please check out the [installation instructions](download_installation.md) to learn how to make `GAMERA` work
+Please check out the [installation instructions]({{ '/docs/download_installation' | relative_url }}) to learn how to make `GAMERA` work
 in either language.
 
 
@@ -180,6 +189,6 @@ Libraries
 
 
 
-[(back to main page)](main_page.md)
+<!-- [(back to main page)](/docs/main_page) -->
 
 

@@ -1,0 +1,7 @@
+- name: Overview
+  link: /docs/documentation
+- name: Tutorials
+  link: /docs/tutorials_main
+- name: Github
+  link: https://github.com/libgamera/GAMERA
+

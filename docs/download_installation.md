@@ -1,4 +1,12 @@
-[(back to main page)](main_page.md)
+---
+layout: page
+title: Download & Installation
+show_sidebar: false
+menubar: menu
+permalink: /docs/download_installation
+---
+
+<!-- [(back to main page)](/docs/main_page) -->
 
 Download
 ========
@@ -103,4 +111,4 @@ $ make clean
 ```
 and re-compile with the commands above.
 
-[(back to main page)](main_page.md)
+<!-- [(back to main page)](/docs/main_page) -->

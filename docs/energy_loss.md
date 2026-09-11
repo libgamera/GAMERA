@@ -1,4 +1,12 @@
-[(one page up)](tutorials_main.md)
+---
+layout: page
+title: Energy loss rates
+show_sidebar: false
+menubar: menu
+permalink: /docs/energy_loss
+---
+
+<!-- [(one page up)](/docs/tutorials_main) -->
 
 How to View the Time-Scales of the Relevant Cooling Processes
 =============================================================

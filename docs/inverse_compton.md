@@ -1,6 +1,15 @@
-[(back to main page)](main_page.md)
+---
+layout: page
+title: Inverse Compton Emission
+show_sidebar: false
+menubar: menu
+permalink: /docs/inverse_compton
+---
 
-[(one page up)](tutorials_main.md)
+
+<!-- [(back to main page)](/docs/main_page)
+
+[(one page up)](/docs/tutorials_main) -->
 
 Inverse Compton Tutorial
 ========================
@@ -178,6 +187,6 @@ replace the thermal field `i` with the Synchrotron field. As for the general cas
 of the photon spectrum (the synchrotron radiation has to be computed).
 
 
-[(one page up)](tutorials_main.md)
+<!-- [(one page up)](/docs/tutorials_main)
 
-[(back to main page)](main_page.md)
+[(back to main page)](/docs/main_page) -->

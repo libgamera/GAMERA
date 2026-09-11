@@ -1,6 +1,14 @@
-[(back to main page)](main_page.md)
+---
+layout: page
+title: Gamma-ray absorption
+show_sidebar: false
+menubar: menu
+permalink: /docs/gammagamma_absorption
+---
 
-[(one page up)](tutorials_main.md)
+<!-- [(back to main page)](/docs/main_page)
+
+[(one page up)](/docs/tutorials_main) -->
 
 Gamma-gamma absorption Tutorial
 ===============================
@@ -20,7 +28,7 @@ When setting up the target photon fields for the IC scattering, it is possible t
 absorption on the resulting radiation.
 
 If the photon fiels is not isotropic but has an angular dependency, defined in the same way as done for the IC scattering
-(see the tutorial on [Inverse Compton scattering](inverse_compton.md)), GAMERA can compute the absorbed flux using the full
+see the tutorial on [Inverse Compton scattering]({{ '/docs/inverse_compton' | relative_url }}), GAMERA can compute the absorbed flux using the full
 angular dependent cross section, while it will use the integrated version otherwise.
 
 To make the calculation possible, the photon field must be given a linear size to perform the spatial integration of
