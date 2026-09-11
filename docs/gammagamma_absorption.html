@@ -1,0 +1,342 @@
+<!doctype html>
+
+
+
+
+<html
+    dir="ltr"
+    lang="en"
+    class=" has-navbar-fixed-top  "
+>
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="/GAMERA/assets/css/app.css">
+    <link
+        rel="shortcut icon"
+        type="image/png"
+        
+            href="/GAMERA/favicon.png"
+        
+    >
+    <script defer src="https://unpkg.com/alpinejs@3.9.0/dist/cdn.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"
+    ></script>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    >
+    
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-social@1/bin/bulma-social.min.css">
+    
+    <!-- Begin Jekyll SEO tag v2.9.0 -->
+<title>Gamma-ray absorption</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Gamma-ray absorption" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://mischabr.github.io/GAMERA/docs/gammagamma_absorption" />
+<meta property="og:url" content="https://mischabr.github.io/GAMERA/docs/gammagamma_absorption" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Gamma-ray absorption" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Gamma-ray absorption","url":"https://mischabr.github.io/GAMERA/docs/gammagamma_absorption"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <!-- head scripts -->
+</head>
+
+    <body>
+        <a href="#main-content" class="is-sr-only skip-link"> Skip to main content </a>
+
+        
+        <nav
+    class="navbar is-primary  is-fixed-top "
+    x-data="{ openNav: false }"
+>
+    <div class="container">
+        <div class="navbar-brand">
+            <a href="/GAMERA/" class="navbar-item">
+                
+            </a>
+            <a
+                role="button"
+                class="navbar-burger burger"
+                aria-label="menu"
+                aria-expanded="false"
+                data-target="navMenu"
+                :class="{ 'is-active': openNav }"
+                x-on:click="openNav = !openNav"
+            >
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        <div class="navbar-menu" id="navMenu" :class="{ 'is-active': openNav }">
+            <div class="navbar-start">
+                <a href="/GAMERA/" class="navbar-item ">Home</a>
+                
+                    
+                        
+                            <a
+                                href="/GAMERA/docs/documentation/"
+                                class="navbar-item "
+                            >Overview</a>
+                        
+                    
+                        
+                            <a
+                                href="/GAMERA/docs/tutorials_main"
+                                class="navbar-item "
+                            >Tutorials</a>
+                        
+                    
+                        
+                            <a
+                                href="https://github.com/libgamera/GAMERA"
+                                class="navbar-item "
+                            >Github</a>
+                        
+                    
+                
+            </div>
+
+            <div class="navbar-end">
+                
+            </div>
+        </div>
+    </div>
+</nav>
+
+        
+            <section
+    class="hero  is-medium  is-bold is-primary"
+    
+>
+    <div class="hero-body ">
+        <div class="container">
+            <h1 class="title is-2">Gamma-ray absorption</h1>
+            <p class="subtitle is-3"></p>
+            
+        </div>
+    </div>
+</section>
+
+        
+        
+
+        <section class="section">
+            <div class="container">
+                <div class="columns is-multiline">
+                    
+                        <div class="column is-4-desktop is-4-tablet">
+                            
+
+<aside class="menu">
+    
+        <p class="menu-label">General Information</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/index" class="">News</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/documentation" class="">Overview</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Installation</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/download_installation" class="">Downlad & Installation</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Tutorials</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/tutorials_main" class="">List of Tutorials</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/radiation_modeling" class="">Radiation</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/time_independent_modeling" class="">Time independent modeling</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/time_dependent_modeling" class="">Time dependent modeling</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/inverse_compton" class="">Inverse Compton Radiation Fields</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/hadronic_models" class="">Hadronic Interaction Models</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/particle_escape" class="">Particle Escape</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/energy_loss" class="">Energy Loss Rates</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/gammagamma_absorption" class="is-active">Absorption</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/hadronic_components" class="">Arbitrary Cosmic Ray Species</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/fitting_data" class="">Fitting Data</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Miscellaneous</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/contact" class="">Contact and support</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/acknowledging" class="">Acknowledging GAMERA</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/licence" class="">Licence</a>
+                    
+                </li>
+            
+        </ul>
+    
+</aside>
+
+                        </div>
+                    
+                    <main class="column is-8" id="main-content">
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+<div class="content">
+    <p><a href="/docs/main_page">(back to main page)</a></p>
+
+<p><a href="/docs/tutorials_main">(one page up)</a></p>
+
+<h1 id="gamma-gamma-absorption-tutorial">Gamma-gamma absorption Tutorial</h1>
+
+<h2 id="preliminary">PRELIMINARY</h2>
+<p>This section is still under construction and the documentation will be improved with time.</p>
+
+<p>In this tutorial we explain how to use the latest functionality added to GAMERA: the iclusion of gamma-gamma absorption effects
+on the photon spectra.</p>
+
+<p>All the new functionalities have been implemented in the <code class="language-plaintext highlighter-rouge">Radiation</code> class.</p>
+
+<p>When setting up the target photon fields for the IC scattering, it is possible to compute also the effect of the gamma-gamma
+absorption on the resulting radiation.</p>
+
+<p>If the photon fiels is not isotropic but has an angular dependency, defined in the same way as done for the IC scattering
+(see the tutorial on <a href="/docs/inverse_compton">Inverse Compton scattering</a>), GAMERA can compute the absorbed flux using the full
+angular dependent cross section, while it will use the integrated version otherwise.</p>
+
+<p>To make the calculation possible, the photon field must be given a linear size to perform the spatial integration of
+the absoprtion coefficient so as to obtain the actual value of the optical depth.</p>
+
+<p>The size of the photon field is given with the following function:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fr</span><span class="p">.</span><span class="nc">SetSizePhotonField</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">sizeph</span><span class="p">)</span>
+</code></pre></div></div>
+<p>where the first argument is the photon field counter and the second is the size of the photon field given in parsecs.</p>
+
+<p>Once this is done, you can obtain the absorbed differential spectrum or the absorbed SED through the following functions:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">abs_sed</span> <span class="o">=</span> <span class="n">fr</span><span class="p">.</span><span class="nc">GetTotalAbsorbedSED</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,..])</span>
+<span class="n">abs_spectrum</span> <span class="o">=</span> <span class="n">fr</span><span class="p">.</span><span class="nc">GetTotalAbsorbedSpectrum</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,..])</span>
+</code></pre></div></div>
+<p>where the argument is the array with the index of the photon fields we are taking into account for the absorption
+This can be useful in case a user would like to consider a certain photon field for the scattering,
+but not for the absoption and viceversa.</p>
+
+<p>It is also possible to define a certain spatial dependency of the photon field through the function</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fr</span><span class="p">.</span><span class="nc">SetTargetFieldSpatialDep</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">dependency</span><span class="p">)</span>
+</code></pre></div></div>
+<p>where <code class="language-plaintext highlighter-rouge">field</code> is the number of the photon field and <code class="language-plaintext highlighter-rouge">dependency</code> is a vector of tuples 
+in which the first element is the distance from the source (given in pc) and the second element is 
+the fraction of the energy density that was given when setting up the photon field.</p>
+
+<p>If you have more complicated cases, you can always do the spatial integration directly in your code by calculating the absorption coefficient
+for the field via <code class="language-plaintext highlighter-rouge">fr.ComputeAbsCoeff(energy, field)</code> which takes the energy of the gamma-ray and the field index as arguments, returning the 
+absorption coefficient in units of <code class="language-plaintext highlighter-rouge">1/cm</code>.</p>
+
+<!-- **CAVEAT 1:** At the moment it is not implement a spatial dependency of the photon fields.
+To take this into account, you could implement it in the scripting step, through the creation multiple fields with intensities
+following a certain spatial function. -->
+
+<p><strong>CAVEAT:</strong> No effect of the secondaries on the radiation spectrum is implemented.</p>
+
+
+</div>
+
+                    </main>
+                    
+                </div>
+            </div>
+        </section>
+        
+            <footer class="footer">
+    <div class="container">
+        
+
+        
+
+
+        <div class="content is-small has-text-centered">
+            <p class="">Theme built by <a href="https://www.csrhymes.com">C.S. Rhymes</a></p>
+        </div>
+    </div>
+</footer>
+
+        
+        <script src="/GAMERA/assets/js/app.js" type="text/javascript"></script><!-- footer scripts -->
+</body>
+</html>

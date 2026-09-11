@@ -1,0 +1,417 @@
+<!doctype html>
+
+
+
+
+<html
+    dir="ltr"
+    lang="en"
+    class=" has-navbar-fixed-top  "
+>
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="/GAMERA/assets/css/app.css">
+    <link
+        rel="shortcut icon"
+        type="image/png"
+        
+            href="/GAMERA/favicon.png"
+        
+    >
+    <script defer src="https://unpkg.com/alpinejs@3.9.0/dist/cdn.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"
+    ></script>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    >
+    
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-social@1/bin/bulma-social.min.css">
+    
+    <!-- Begin Jekyll SEO tag v2.9.0 -->
+<title>Time-independent Modeling</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Time-independent Modeling" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://mischabr.github.io/GAMERA/docs/time_independent_modeling" />
+<meta property="og:url" content="https://mischabr.github.io/GAMERA/docs/time_independent_modeling" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Time-independent Modeling" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Time-independent Modeling","url":"https://mischabr.github.io/GAMERA/docs/time_independent_modeling"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <!-- head scripts -->
+</head>
+
+    <body>
+        <a href="#main-content" class="is-sr-only skip-link"> Skip to main content </a>
+
+        
+        <nav
+    class="navbar is-primary  is-fixed-top "
+    x-data="{ openNav: false }"
+>
+    <div class="container">
+        <div class="navbar-brand">
+            <a href="/GAMERA/" class="navbar-item">
+                
+            </a>
+            <a
+                role="button"
+                class="navbar-burger burger"
+                aria-label="menu"
+                aria-expanded="false"
+                data-target="navMenu"
+                :class="{ 'is-active': openNav }"
+                x-on:click="openNav = !openNav"
+            >
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        <div class="navbar-menu" id="navMenu" :class="{ 'is-active': openNav }">
+            <div class="navbar-start">
+                <a href="/GAMERA/" class="navbar-item ">Home</a>
+                
+                    
+                        
+                            <a
+                                href="/GAMERA/docs/documentation/"
+                                class="navbar-item "
+                            >Overview</a>
+                        
+                    
+                        
+                            <a
+                                href="/GAMERA/docs/tutorials_main"
+                                class="navbar-item "
+                            >Tutorials</a>
+                        
+                    
+                        
+                            <a
+                                href="https://github.com/libgamera/GAMERA"
+                                class="navbar-item "
+                            >Github</a>
+                        
+                    
+                
+            </div>
+
+            <div class="navbar-end">
+                
+            </div>
+        </div>
+    </div>
+</nav>
+
+        
+            <section
+    class="hero  is-medium  is-bold is-primary"
+    
+>
+    <div class="hero-body ">
+        <div class="container">
+            <h1 class="title is-2">Time-independent Modeling</h1>
+            <p class="subtitle is-3"></p>
+            
+        </div>
+    </div>
+</section>
+
+        
+        
+
+        <section class="section">
+            <div class="container">
+                <div class="columns is-multiline">
+                    
+                        <div class="column is-4-desktop is-4-tablet">
+                            
+
+<aside class="menu">
+    
+        <p class="menu-label">General Information</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/index" class="">News</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/documentation" class="">Overview</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Installation</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/download_installation" class="">Downlad & Installation</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Tutorials</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/tutorials_main" class="">List of Tutorials</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/radiation_modeling" class="">Radiation</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/time_independent_modeling" class="is-active">Time independent modeling</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/time_dependent_modeling" class="">Time dependent modeling</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/inverse_compton" class="">Inverse Compton Radiation Fields</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/hadronic_models" class="">Hadronic Interaction Models</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/particle_escape" class="">Particle Escape</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/energy_loss" class="">Energy Loss Rates</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/gammagamma_absorption" class="">Absorption</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/hadronic_components" class="">Arbitrary Cosmic Ray Species</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/fitting_data" class="">Fitting Data</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Miscellaneous</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/contact" class="">Contact and support</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/acknowledging" class="">Acknowledging GAMERA</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/licence" class="">Licence</a>
+                    
+                </li>
+            
+        </ul>
+    
+</aside>
+
+                        </div>
+                    
+                    <main class="column is-8" id="main-content">
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+<div class="content">
+    <p><a href="/docs/tutorials_main">(one page up)</a></p>
+
+<h1 id="step-by-step-time-independent-modeling-of-particle-spectra">Step-by-step: Time independent modeling of Particle Spectra</h1>
+
+<p>This tutorial will cover the scenario where a injected population of electron evolves in a static 
+system. By that it is meant that magnetic field and other environmental parameters 
+as well as the injection spectrum don’t change over time.</p>
+
+<h2 id="step-1-create-a-particles-object">Step 1: create a Particles-object</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import gappa as gp
+fp = gp.Particles()
+</code></pre></div></div>
+
+<h2 id="step-2-set-up-the-injection-spectrum">Step 2: Set up the injection spectrum</h2>
+
+<p>Here we will set a power law injection spectrum</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># powerlaw with spectral index = 2, norm = 1e37 erg/s, 
+# e_ref = 1TeV, range between 10MeV and 1PeV
+e = np.logspace(-5,3,bins) * gp.TeV_to_erg 
+power_law = (e/gp.TeV_to_erg)**-2
+
+# renormalise to 1e37 erg/s
+fu = gp.Utils()
+power_law *= 1e37/fu.Integrate(list(zip(e,e*power_law)))
+
+# zip and set it up in the Particles-object
+fp.SetCustomInjectionSpectrum(list(zip(e,power_law)))
+</code></pre></div></div>
+
+<h2 id="step-3-set-up-environmental-parameters">Step 3: Set up environmental parameters</h2>
+
+<p>environmental parameters like B-Field and ambient density are set via <code class="language-plaintext highlighter-rouge">Setter</code>-functions:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fp.SetBField(b_field) # in Gauss
+fp.SetAmbientDensity(density) # in particles/cm^3
+fp.AddThermalTargetPhotons(temperature,energy_density) #in K, erg/cm^3. 
+</code></pre></div></div>
+<blockquote>
+  <p>Note 1: 
+There is a <a href="/docs/inverse_compton">dedicated tutorial</a> on how to set radiation fields for the IC process.</p>
+</blockquote>
+
+<blockquote>
+  <p>Note 2:
+Environmental parameters determine the cooling rate of electrons. Check <a href="/docs/energy_loss">this tutorial</a> on how to visualise this information.</p>
+</blockquote>
+
+<h2 id="step-4-set-the-source-age">Step 4: Set the source age</h2>
+
+<p>the specified system will be evolved to the point in time t = age. You can set
+the age via</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fp.SetAge(age) # in yrs
+</code></pre></div></div>
+
+<h2 id="step-5-compute-the-time-evolution">Step 5: Compute the time evolution</h2>
+
+<p>Finally, the spectrum can be calculated:</p>
+
+<h3 id="electrons">Electrons:</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fp.CalculateElectronSpectrum()
+</code></pre></div></div>
+
+<h3 id="protons">Protons:</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fp.CalculateProtonSpectrum()
+</code></pre></div></div>
+
+<h2 id="step-6-get-the-particle-spectra">Step 6: Get the particle spectra</h2>
+
+<p>You can access the result via two options:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sp  = fp.GetParticleSpectrum() # returns diff. spectrum: E(erg) vs dN/dE (1/erg)
+sed = fp.GetParticleSED()  # returns SED: E(TeV) vs E**2*dN/dE (erg)
+</code></pre></div></div>
+
+<h2 id="results">Results</h2>
+
+<p>Here are two working scripts incorporating the above steps:</p>
+<ul>
+  <li><a href="particles_static.py">spectrum at a given time</a>
+producing this plot:
+<img src="particles_static.png" alt="particles_static" />
+<em>see the optional steps below to learn more about the semi-analytical solution</em></li>
+  <li><a href="particles_static_timeseries.py">time series</a> 
+producing this plot:
+<img src="particles_static_timeseries.png" alt="particles_static" /></li>
+</ul>
+
+<h2 id="optional-steps">Optional Steps</h2>
+<h3 id="set-up-a-particle-escape-term">Set up a particle escape term</h3>
+<p>there are several options for this. Either a constant, an energy-dependent, a 
+time-dependent or a both energy- and time-dependent escape time can be applied.
+<a href="/docs/particle_escape">Here</a> you can learn how to do this. The easies case, a constant
+escape time, is set up like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fp.SetConstantEscapeTime(t_esc) # in seconds
+</code></pre></div></div>
+
+<h3 id="set-starting-point-of-iteration">Set starting point of iteration</h3>
+<p>The program needs to know at which point in time to start the iteration.
+It will then set the initial condition of the system accordingly. 
+Per default, a starting time of tmin = 1yr will be assumed, which is OK for
+sources that evolve on time scales larger than tens of years. 
+If you are interested in modeling sources that develop at a smaller time scale,
+you have to set tmin appropriately:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fp.SetTmin(tmin) # yrs
+</code></pre></div></div>
+
+<blockquote>
+  <p>Note: 
+The initial condition is assumed to be the result of loss-free injection of particles until t = tmin. The spectral shape of the injection up until this point is fixed to the value at t = tmin, i.e. Q(t&lt;=tmin) =  Q(t=tmin). Only at t&gt;tmin will cooling, escape and the actual evolution of Q be taken
+into account.</p>
+</blockquote>
+
+<h3 id="set-solver-method">Set solver method</h3>
+<p>If you are sure that the energy losses are constant in time and you haven’t set 
+particle escape, you can also use a semi-analytical solver to the transport 
+equation (for more infos, see <a href="/docs/documentation">here</a> with the following command:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fp.SetSolverMethod(1)
+</code></pre></div></div>
+
+<p><em>Please note that this will give you <strong>wrong</strong> results if you have time-dependent
+losses, like changing B-fields, adiabatic losses etc.!</em></p>
+
+<p>This method is less flexible but more precise in those cases where it is applicable.</p>
+
+<p><a href="/docs/tutorials_main">(one page up)</a></p>
+
+
+</div>
+
+                    </main>
+                    
+                </div>
+            </div>
+        </section>
+        
+            <footer class="footer">
+    <div class="container">
+        
+
+        
+
+
+        <div class="content is-small has-text-centered">
+            <p class="">Theme built by <a href="https://www.csrhymes.com">C.S. Rhymes</a></p>
+        </div>
+    </div>
+</footer>
+
+        
+        <script src="/GAMERA/assets/js/app.js" type="text/javascript"></script><!-- footer scripts -->
+</body>
+</html>

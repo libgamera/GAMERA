@@ -1,0 +1,404 @@
+<!doctype html>
+
+
+
+
+<html
+    dir="ltr"
+    lang="en"
+    class=" has-navbar-fixed-top  "
+>
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="/GAMERA/assets/css/app.css">
+    <link
+        rel="shortcut icon"
+        type="image/png"
+        
+            href="/GAMERA/favicon.png"
+        
+    >
+    <script defer src="https://unpkg.com/alpinejs@3.9.0/dist/cdn.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"
+    ></script>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    >
+    
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-social@1/bin/bulma-social.min.css">
+    
+    <!-- Begin Jekyll SEO tag v2.9.0 -->
+<title>Inverse Compton emission</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Inverse Compton emission" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://mischabr.github.io/GAMERA/docs/inverse_compton_temp" />
+<meta property="og:url" content="https://mischabr.github.io/GAMERA/docs/inverse_compton_temp" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Inverse Compton emission" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Inverse Compton emission","url":"https://mischabr.github.io/GAMERA/docs/inverse_compton_temp"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <!-- head scripts -->
+</head>
+
+    <body>
+        <a href="#main-content" class="is-sr-only skip-link"> Skip to main content </a>
+
+        
+        <nav
+    class="navbar is-primary  is-fixed-top "
+    x-data="{ openNav: false }"
+>
+    <div class="container">
+        <div class="navbar-brand">
+            <a href="/GAMERA/" class="navbar-item">
+                
+            </a>
+            <a
+                role="button"
+                class="navbar-burger burger"
+                aria-label="menu"
+                aria-expanded="false"
+                data-target="navMenu"
+                :class="{ 'is-active': openNav }"
+                x-on:click="openNav = !openNav"
+            >
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        <div class="navbar-menu" id="navMenu" :class="{ 'is-active': openNav }">
+            <div class="navbar-start">
+                <a href="/GAMERA/" class="navbar-item ">Home</a>
+                
+                    
+                        
+                            <a
+                                href="/GAMERA/docs/documentation/"
+                                class="navbar-item "
+                            >Overview</a>
+                        
+                    
+                        
+                            <a
+                                href="/GAMERA/docs/tutorials_main"
+                                class="navbar-item "
+                            >Tutorials</a>
+                        
+                    
+                        
+                            <a
+                                href="https://github.com/libgamera/GAMERA"
+                                class="navbar-item "
+                            >Github</a>
+                        
+                    
+                
+            </div>
+
+            <div class="navbar-end">
+                
+            </div>
+        </div>
+    </div>
+</nav>
+
+        
+            <section
+    class="hero  is-medium  is-bold is-primary"
+    
+>
+    <div class="hero-body ">
+        <div class="container">
+            <h1 class="title is-2">Inverse Compton emission</h1>
+            <p class="subtitle is-3"></p>
+            
+        </div>
+    </div>
+</section>
+
+        
+        
+
+        <section class="section">
+            <div class="container">
+                <div class="columns is-multiline">
+                    
+                        <div class="column is-4-desktop is-4-tablet">
+                            
+
+<aside class="menu">
+    
+        <p class="menu-label">General Information</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/index" class="">News</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/documentation" class="">Overview</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Installation</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/download_installation" class="">Downlad & Installation</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Tutorials</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/tutorials_main" class="">List of Tutorials</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/radiation_modeling" class="">Radiation</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/time_independent_modeling" class="">Time independent modeling</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/time_dependent_modeling" class="">Time dependent modeling</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/inverse_compton" class="">Inverse Compton Radiation Fields</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/hadronic_models" class="">Hadronic Interaction Models</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/particle_escape" class="">Particle Escape</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/energy_loss" class="">Energy Loss Rates</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/gammagamma_absorption" class="">Absorption</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/hadronic_components" class="">Arbitrary Cosmic Ray Species</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/fitting_data" class="">Fitting Data</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Miscellaneous</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/contact" class="">Contact and support</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/acknowledging" class="">Acknowledging GAMERA</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/licence" class="">Licence</a>
+                    
+                </li>
+            
+        </ul>
+    
+</aside>
+
+                        </div>
+                    
+                    <main class="column is-8" id="main-content">
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+<div class="content">
+    <p><a href="main_page.md">(back to main page)</a></p>
+
+<p><a href="tutorials_main.md">(one page up)</a></p>
+
+<h1 id="inverse-compton-tutorial">Inverse Compton Tutorial</h1>
+
+<p>In this tutorial we will see in some more detail how to set up the radiation fields for the Inverse Compton scattering
+for both isotropic and anisotropic case. In the following we assume that <code class="language-plaintext highlighter-rouge">fr</code> is an instance of the class <code class="language-plaintext highlighter-rouge">Radiation</code>.</p>
+
+<p>GAMERA allows the user to add directly a thermal photon field knowing the temperature and the energy density through the
+function:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fr</span><span class="p">.</span><span class="nc">AddThermalTargetPhotons</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span><span class="n">energy_density</span><span class="p">)</span>
+</code></pre></div></div>
+<p>The units to be used are Kelvin degrees for the temperature and erg/cm<sup>3</sup> for the energy density.</p>
+
+<p>For a more particular usage, it is also possible to add arbitrary photon fields via</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fr</span><span class="p">.</span><span class="nc">AddArbitraryTargetPhotons</span><span class="p">(</span><span class="n">photon_array</span><span class="p">)</span>
+</code></pre></div></div>
+<p>where <code class="language-plaintext highlighter-rouge">photon_array</code> is an array of tuples (E,photon_density) in units of <code class="language-plaintext highlighter-rouge">erg</code> vs <code class="language-plaintext highlighter-rouge">erg^-1 cm^-3</code>.</p>
+
+<p>A further possibility is to import a photon field from a file with:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fr</span><span class="p">.</span><span class="nc">ImportTargetPhotonsFromFile</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</code></pre></div></div>
+<p>where the structure of the file must be <code class="language-plaintext highlighter-rouge">energy [eV]</code> vs <code class="language-plaintext highlighter-rouge">number density [cm^-3]</code>.
+As for the other mechanisms, we have to compute the radiative output before accessing the Inverse Compton components.
+We remind here to call the function</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fr.CalculateDifferentialPhotonSpectrum(e)
+</code></pre></div></div>
+<p>where <code class="language-plaintext highlighter-rouge">e</code> is the energy range of the photon spectrum we want as a result.</p>
+
+<h2 id="case-1-isotropic-photon-fields">Case 1: Isotropic photon fields</h2>
+
+<p>Let’s start with the simple case of a thermal photon field. In principle we can add multiple photon fields. In the default
+case, when asking for the Inverse Compton component of the gamma ray spectrum, it will be computed on the sum of the
+photon fields.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fr</span><span class="p">.</span><span class="nc">GetICSpectrum</span><span class="p">()</span>  <span class="c1"># IC spectrum for the sum of all the target photon fields.
+</span><span class="n">fr</span><span class="p">.</span><span class="nc">GetICSED</span><span class="p">()</span>       <span class="c1"># IC SED for the sum of all the target photon fields.
+</span></code></pre></div></div>
+<p>If instead we want to know what is the contribution of each target field to the total Inverse Compton spectrum, we have to
+esplicitely specify that before filling the differential photon spectrum. This is done by calling the function
+<code class="language-plaintext highlighter-rouge">fr.UnsetICFastMode()</code> that forces GAMERA to compute all the single Inverse Compton components.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fr</span><span class="p">.</span><span class="nc">UnsetICFastMode</span><span class="p">()</span>
+<span class="n">fr</span><span class="p">.</span><span class="nc">CalculateDifferentialPhotonSpectrum</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+<span class="n">fr</span><span class="p">.</span><span class="nc">GetICSpectrum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># IC spectrum for the target photon field 0
+</span><span class="n">fr</span><span class="p">.</span><span class="nc">GetICSED</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>       <span class="c1"># IC SED for the target photon field 0
+</span></code></pre></div></div>
+<p>Case 2: Anisotropic photon fields
+———————————</p>
+
+<p>In this section we will go through the steps to consider anisotropic fields.
+The first step is to give an angular dependency to the target photon field. There are 2 possibilities:</p>
+<ol>
+  <li>anisotropic beam of electrons</li>
+  <li>isotropic distribution of electrons</li>
+</ol>
+
+<p>Before going into the details of the 2 cases, here is the geometry used in GAMERA</p>
+
+<p>In the following figure it is illustrated how the angles are defined together with the direction of the electrons (in case 1.)
+and the direction of the line of sight (always along the x-axis)</p>
+
+<p><img src="anisotropy_geometry_v3.png" alt="geometry" /></p>
+
+<p>so the phi angle goes from 0 to 2*pi and the theta angle from 0 to pi.</p>
+
+<p>If you work in python, the angular dependency can be implemented by filling a <code class="language-plaintext highlighter-rouge">numpy.meshgrid</code>:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">linspace</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span><span class="mf">1.5</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>          <span class="c1"># angles from 1 to 1.5 radiants divided in 20 bins
+</span><span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">linspace</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>        <span class="c1"># angles from 0.5 to 1 radiant divided in 20 bins
+</span><span class="n">ph_m</span><span class="p">,</span> <span class="n">th_m</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">meshgrid</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>  <span class="c1"># defining the meshgrid
+</span><span class="n">distr</span> <span class="o">=</span> <span class="nf">fill_grid</span><span class="p">(</span><span class="n">ph_m</span><span class="p">,</span><span class="n">th_m</span><span class="p">)</span>          <span class="c1"># fill the meshgrid with a user defined function
+</span></code></pre></div></div>
+<p>The filled grid <code class="language-plaintext highlighter-rouge">distr</code> needs to be normalized over solid angle by the user (see the example scripts).
+Once we have the angular distribution of the photon field, we can complete the geometry of the system.</p>
+
+<h3 id="anisotropic-distribution-of-electrons">Anisotropic distribution of electrons</h3>
+
+<p>At the moment, this is the default case implemented in GAMERA. The full geometry of the IC scattering in this case is done
+with the following function:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fr</span><span class="p">.</span><span class="nc">SetTargetPhotonAnisotropy</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">angles_e</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">distr</span><span class="p">)</span>
+</code></pre></div></div>
+<p>where <code class="language-plaintext highlighter-rouge">target</code> is the index of the target field we want to make anisotropic, <code class="language-plaintext highlighter-rouge">angles_e</code> is an array <code class="language-plaintext highlighter-rouge">[phi,theta]</code> for
+the direction of the electron beam and the other variables are the same as above.</p>
+
+<p>At this point GAMERA will use the angular dependent cross section to compute the IC scattering and the results can
+be explored with the previous methods (including the unsetting of the fast mode option to retrieve single components).</p>
+
+<p>An example script that produces the plot below can be found <a href="anisotropic_IC_scattering.py">here</a></p>
+
+<p>&lt;img src=anisotropy_distribution.png height=”400”&gt; &lt;img src=SED_iso_aniso.png height=”400”&gt;</p>
+
+<h3 id="isotropic-distribution-of-electrons">Isotropic distribution of electrons</h3>
+
+<p>This is a rather recent addition to the code. In case we have an isotropic distribution of electrons, we can follow the same
+steps as before additionally stating that our electrons are isotropically distributed:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fr</span><span class="p">.</span><span class="nc">SetElectronsIsotropic</span><span class="p">()</span>
+<span class="n">fr</span><span class="p">.</span><span class="nc">SetTargetPhotonAnisotropy</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">angles_e</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">distr</span><span class="p">)</span>
+</code></pre></div></div>
+<p>the first function will set an inner GAMERA variable so that the code will use an isotropic distribution of electrons.
+The second function is exactly the same as before, but the variable <code class="language-plaintext highlighter-rouge">angles_e</code> will not actually be used in the calculations.
+<strong>WARNING:</strong> currently this implementation is rather slow, so don’t panic if your code takes long time to run. We will try to
+speed up the computations.</p>
+
+<p>At the moment the code does not allow to switch back from an isotropic distribution of electrons to an anisotropic one. We would recommend not to mix the two options and use only one of the possibilities at a time. Also in this case holds the same procedure to access single components of the Inverse Compton spectrum. The script linked above has also the line to set up the isotropic electrons needed for this case.</p>
+
+<h2 id="synchrotron-self-compton-process">Synchrotron Self Compton process</h2>
+
+<p>The Synchrotron Self Compton (abbreviated as <em>SSC</em>) process is that radiation process in which the same particle distribution first produces
+synchrotron photons and then uses this photon field as target for Inverse Compton scattering.</p>
+
+<p>In GAMERA, the SSC component is obtained via an iterative approach in which the equilibrium solution between the losses in the
+Synchrotron and IC channel is found.</p>
+
+<p><a href="tutorials_main.md">(one page up)</a></p>
+
+<p><a href="main_page.md">(back to main page)</a></p>
+
+</div>
+
+                    </main>
+                    
+                </div>
+            </div>
+        </section>
+        
+            <footer class="footer">
+    <div class="container">
+        
+
+        
+
+
+        <div class="content is-small has-text-centered">
+            <p class="">Theme built by <a href="https://www.csrhymes.com">C.S. Rhymes</a></p>
+        </div>
+    </div>
+</footer>
+
+        
+        <script src="/GAMERA/assets/js/app.js" type="text/javascript"></script><!-- footer scripts -->
+</body>
+</html>

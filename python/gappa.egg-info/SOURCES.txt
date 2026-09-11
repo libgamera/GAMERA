@@ -1,0 +1,14 @@
+_gappa_swig.cc
+setup.py
+../src/Astro.C
+../src/Particles.C
+../src/Radiation.C
+../src/Utils.C
+../src/2D_interp/bicubic.C
+../src/2D_interp/bilinear.C
+../src/2D_interp/interp2d.C
+../src/2D_interp/interp2d_spline.C
+gappa.egg-info/PKG-INFO
+gappa.egg-info/SOURCES.txt
+gappa.egg-info/dependency_links.txt
+gappa.egg-info/top_level.txt

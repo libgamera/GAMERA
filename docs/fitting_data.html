@@ -1,0 +1,476 @@
+<!doctype html>
+
+
+
+
+<html
+    dir="ltr"
+    lang="en"
+    class=" has-navbar-fixed-top  "
+>
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="/GAMERA/assets/css/app.css">
+    <link
+        rel="shortcut icon"
+        type="image/png"
+        
+            href="/GAMERA/favicon.png"
+        
+    >
+    <script defer src="https://unpkg.com/alpinejs@3.9.0/dist/cdn.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"
+    ></script>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    >
+    
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-social@1/bin/bulma-social.min.css">
+    
+    <!-- Begin Jekyll SEO tag v2.9.0 -->
+<title>Fitting data</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Fitting data" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://mischabr.github.io/GAMERA/docs/fitting_data" />
+<meta property="og:url" content="https://mischabr.github.io/GAMERA/docs/fitting_data" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Fitting data" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Fitting data","url":"https://mischabr.github.io/GAMERA/docs/fitting_data"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <!-- head scripts -->
+</head>
+
+    <body>
+        <a href="#main-content" class="is-sr-only skip-link"> Skip to main content </a>
+
+        
+        <nav
+    class="navbar is-primary  is-fixed-top "
+    x-data="{ openNav: false }"
+>
+    <div class="container">
+        <div class="navbar-brand">
+            <a href="/GAMERA/" class="navbar-item">
+                
+            </a>
+            <a
+                role="button"
+                class="navbar-burger burger"
+                aria-label="menu"
+                aria-expanded="false"
+                data-target="navMenu"
+                :class="{ 'is-active': openNav }"
+                x-on:click="openNav = !openNav"
+            >
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        <div class="navbar-menu" id="navMenu" :class="{ 'is-active': openNav }">
+            <div class="navbar-start">
+                <a href="/GAMERA/" class="navbar-item ">Home</a>
+                
+                    
+                        
+                            <a
+                                href="/GAMERA/docs/documentation/"
+                                class="navbar-item "
+                            >Overview</a>
+                        
+                    
+                        
+                            <a
+                                href="/GAMERA/docs/tutorials_main"
+                                class="navbar-item "
+                            >Tutorials</a>
+                        
+                    
+                        
+                            <a
+                                href="https://github.com/libgamera/GAMERA"
+                                class="navbar-item "
+                            >Github</a>
+                        
+                    
+                
+            </div>
+
+            <div class="navbar-end">
+                
+            </div>
+        </div>
+    </div>
+</nav>
+
+        
+            <section
+    class="hero  is-medium  is-bold is-primary"
+    
+>
+    <div class="hero-body ">
+        <div class="container">
+            <h1 class="title is-2">Fitting data</h1>
+            <p class="subtitle is-3"></p>
+            
+        </div>
+    </div>
+</section>
+
+        
+        
+
+        <section class="section">
+            <div class="container">
+                <div class="columns is-multiline">
+                    
+                        <div class="column is-4-desktop is-4-tablet">
+                            
+
+<aside class="menu">
+    
+        <p class="menu-label">General Information</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/index" class="">News</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/documentation" class="">Overview</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Installation</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/download_installation" class="">Downlad & Installation</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Tutorials</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/tutorials_main" class="">List of Tutorials</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/radiation_modeling" class="">Radiation</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/time_independent_modeling" class="">Time independent modeling</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/time_dependent_modeling" class="">Time dependent modeling</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/inverse_compton" class="">Inverse Compton Radiation Fields</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/hadronic_models" class="">Hadronic Interaction Models</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/particle_escape" class="">Particle Escape</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/energy_loss" class="">Energy Loss Rates</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/gammagamma_absorption" class="">Absorption</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/hadronic_components" class="">Arbitrary Cosmic Ray Species</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/fitting_data" class="is-active">Fitting Data</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Miscellaneous</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/contact" class="">Contact and support</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/acknowledging" class="">Acknowledging GAMERA</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/licence" class="">Licence</a>
+                    
+                </li>
+            
+        </ul>
+    
+</aside>
+
+                        </div>
+                    
+                    <main class="column is-8" id="main-content">
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+<div class="content">
+    <p><a href="/docs/tutorials_main">(one page up)</a></p>
+
+<h1 id="fitting-data-with-gamera-models">Fitting data with GAMERA models</h1>
+
+<p>Here we document a quick example that shows how the pytohn framework can be used to fit data.</p>
+
+<p>The example script is <a href="gappa_fitter_example.py">here</a> and can be used as guide for further user’s applications.</p>
+
+<p>In the script we have provided 2 possibilities to obtain the final results:</p>
+<ul>
+  <li>fitting with scipy.optimize.curve_fit (see doc <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html">here</a>)</li>
+  <li>fitting with the MCMC implementation given by the package <a href="https://emcee.readthedocs.io/en/stable/">emcee</a></li>
+</ul>
+
+<p>In order to fully run the script, you need the following additional packages:</p>
+<ul>
+  <li>scipy (scripts works for version 1.6.0)</li>
+  <li>emcee (script works for version 3.0.2)</li>
+  <li>corner</li>
+  <li>multiprocessing</li>
+</ul>
+
+<h2 id="description-of-the-script">Description of the script</h2>
+
+<p>If you open the script, you can see that everything boils down to writing a nice model function that will accept
+external parameters and will return as a result an array of spectral values:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">model_for_fitting</span><span class="p">(</span><span class="n">ene</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">
+    Build model for data fitting.
+    The parameters need to be separated
+
+    The function is based on the previous one and can be modified by the user depending on the parameters that are
+    needed to be fitted. The first argument is the photon energy of the points to be fitted (given in TeV)
+    
+    Arguments:
+        - ene : array of energies of photons (in TeV)
+        - a, b, c, d, e : parameters to be fitted
+    </span><span class="sh">"""</span>
+
+    <span class="c1"># print("Function call")  # DEBUG only
+</span>    <span class="n">fu</span> <span class="o">=</span> <span class="n">gp</span><span class="p">.</span><span class="nc">Utils</span><span class="p">()</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="n">gp</span><span class="p">.</span><span class="nc">Particles</span><span class="p">()</span>
+    <span class="n">fr</span> <span class="o">=</span> <span class="n">gp</span><span class="p">.</span><span class="nc">Radiation</span><span class="p">()</span>
+    <span class="n">fp</span><span class="p">.</span><span class="nc">ToggleQuietMode</span><span class="p">()</span>
+    <span class="n">fr</span><span class="p">.</span><span class="nc">ToggleQuietMode</span><span class="p">()</span>
+    <span class="n">fp</span><span class="p">.</span><span class="nc">SetSolverMethod</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Use the semi-analytical model (which is faster) given that we don't have time evolution
+</span>                           <span class="c1"># in the environment
+</span>
+    <span class="n">e_total_pl</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="n">a</span>  <span class="c1"># total energy of the particles (logspace) in erg
+</span>    <span class="n">alpha_pl</span> <span class="o">=</span> <span class="n">b</span>  <span class="c1"># index of the particle PL
+</span>    <span class="n">bfield</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="n">c</span>  <span class="c1"># B field of the environment (logspace) in Gauss
+</span>    <span class="n">temp</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="n">d</span>  <span class="c1"># temperature of the photon field in K (linspace)
+</span>    <span class="n">edens</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="n">e</span>  <span class="c1"># energy density of the photon field in erg/cm3 (linspace)
+</span>    <span class="n">age</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># age of the system in years (logspace) - FIXED
+</span>    <span class="n">distance</span> <span class="o">=</span> <span class="mf">1e3</span>  <span class="c1"># in pc - FIXED
+</span>
+    <span class="n">energy_in_erg_pl</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">75</span><span class="p">)</span> <span class="o">*</span> <span class="n">gp</span><span class="p">.</span><span class="n">TeV_to_erg</span>  <span class="c1"># emin and emax of the PL are fixed
+</span>    <span class="n">power_law</span> <span class="o">=</span> <span class="n">energy_in_erg_pl</span> <span class="o">**</span> <span class="o">-</span><span class="n">alpha_pl</span>
+    <span class="n">power_law</span> <span class="o">*=</span> <span class="n">e_total_pl</span> <span class="o">/</span> <span class="n">fu</span><span class="p">.</span><span class="nc">Integrate</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="nf">zip</span><span class="p">(</span><span class="n">energy_in_erg_pl</span><span class="p">,</span> <span class="n">power_law</span> <span class="o">*</span> <span class="n">energy_in_erg_pl</span><span class="p">)))</span>
+    <span class="n">power_law_spectrum</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="nf">zip</span><span class="p">(</span><span class="n">energy_in_erg_pl</span><span class="p">,</span> <span class="n">power_law</span><span class="p">)))</span>
+
+    <span class="n">fp</span><span class="p">.</span><span class="nc">SetBField</span><span class="p">(</span><span class="n">bfield</span><span class="p">)</span>
+    <span class="n">fp</span><span class="p">.</span><span class="nc">AddThermalTargetPhotons</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span> <span class="n">edens</span><span class="p">,</span> <span class="mi">150</span><span class="p">)</span>
+    <span class="n">fp</span><span class="p">.</span><span class="nc">SetCustomInjectionSpectrum</span><span class="p">(</span>
+        <span class="n">power_law_spectrum</span><span class="p">)</span>  <span class="c1"># the injection rate is constant and given by the normalization of injected PL
+</span>    <span class="n">fr</span><span class="p">.</span><span class="nc">AddArbitraryTargetPhotons</span><span class="p">(</span><span class="n">fp</span><span class="p">.</span><span class="nc">GetTargetPhotons</span><span class="p">())</span>
+    <span class="n">fr</span><span class="p">.</span><span class="nc">SetBField</span><span class="p">(</span><span class="n">bfield</span><span class="p">)</span>
+    <span class="n">fr</span><span class="p">.</span><span class="nc">SetDistance</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span>
+
+    <span class="n">time_steps</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">logspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">age</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># Need to have at least a timestep otherwise the evolution
+</span>    <span class="c1"># is not computed
+</span>    <span class="k">for</span> <span class="n">time</span> <span class="ow">in</span> <span class="n">time_steps</span><span class="p">:</span>
+        <span class="n">fp</span><span class="p">.</span><span class="nc">SetAge</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+        <span class="n">fp</span><span class="p">.</span><span class="nc">CalculateElectronSpectrum</span><span class="p">()</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">fp</span><span class="p">.</span><span class="nc">GetParticleSpectrum</span><span class="p">())</span>
+        <span class="n">fr</span><span class="p">.</span><span class="nc">SetElectrons</span><span class="p">(</span><span class="n">sp</span><span class="p">)</span>
+        <span class="c1"># compute the spectrum on the points given by the data
+</span>        <span class="n">fr</span><span class="p">.</span><span class="nc">CalculateDifferentialPhotonSpectrum</span><span class="p">(</span><span class="n">ene</span> <span class="o">*</span> <span class="n">gp</span><span class="p">.</span><span class="n">TeV_to_erg</span><span class="p">)</span>
+        <span class="n">rad</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">fr</span><span class="p">.</span><span class="nc">GetTotalSED</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">rad</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># returns the y value of the function
+</span></code></pre></div></div>
+
+<p>Once this function is defined, the fits can be performed with the external packages:</p>
+
+<p><strong>Using curve_fit</strong></p>
+
+<p>This fit is a simple least square fit using a well tested routine available in scipy</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Start the curve_fit part</span><span class="sh">"</span><span class="p">)</span>
+ <span class="c1"># For testing, start from a point a bit further from true position
+</span> <span class="n">p1</span> <span class="o">=</span> <span class="p">[</span><span class="mf">35.1</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="nf">log10</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="n">gp</span><span class="p">.</span><span class="n">eV_to_erg</span><span class="p">)]</span>
+ <span class="n">res</span> <span class="o">=</span> <span class="n">opt</span><span class="p">.</span><span class="nf">curve_fit</span><span class="p">(</span><span class="n">model_for_fitting</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="n">p1</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">yerr</span><span class="p">,</span> <span class="n">absolute_sigma</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+ <span class="nf">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>  <span class="c1"># print the results
+</span></code></pre></div></div>
+
+<p><strong>Using emcee</strong></p>
+
+<p>This method is more involved and will run a markov-chain Montecarlo (MCMC) on the dataset
+in order not only to fit the data, but also to derive the posterior probability distribution of the
+fitted paramerers in a Bayesian approach (see the package documentation for additional details).</p>
+
+<p>Without going into many details, we can just say that in this approach we need some probability 
+priors on the parameters (a good way to do it is to have uninformative flat priors in the interval
+we think the parameter lives) and a likelihood function to be maximised by the fit.</p>
+
+<p>To notice that this method can be quite slow, depending on how complex is your model, because it requires running
+the model multiples times in order to get a good estimate of the final probability distribution.</p>
+
+<p>Depending on the model, the prior and the likelihood can be written like:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">## Auxiliary functions for the MCMC
+</span><span class="k">def</span> <span class="nf">log_prior</span><span class="p">(</span><span class="n">theta</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">
+    Uninformative flat prior.
+    Needs to be adjusted depending on the chosen parameters
+    
+    Arguments:
+        - theta : list of parameters
+    </span><span class="sh">"""</span>
+
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">theta</span>  <span class="c1"># extract the parameters
+</span>    <span class="k">if</span> <span class="mi">30</span> <span class="o">&lt;</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="mi">40</span> <span class="ow">and</span> <span class="mf">1.5</span> <span class="o">&lt;</span> <span class="n">b</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="ow">and</span> <span class="o">-</span><span class="mi">8</span> <span class="o">&lt;</span> <span class="n">c</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">3</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">d</span> <span class="o">&lt;</span> <span class="mf">1.5</span> <span class="ow">and</span> <span class="o">-</span><span class="mi">14</span> <span class="o">&lt;</span> <span class="n">e</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">10</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="p">.</span><span class="n">inf</span>
+
+
+<span class="k">def</span> <span class="nf">log_likelihood</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">
+    Compute the chi2.
+    Needs to be adjusted depending on the chosen parameters
+    
+    Arguments:
+        - theta : list of parameters
+        - x, y, yerr : data points with errorbar
+    </span><span class="sh">"""</span>
+
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">theta</span>  <span class="c1"># adjust here in case you have different parameters
+</span>    <span class="n">model</span> <span class="o">=</span> <span class="nf">model_for_fitting</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+    <span class="n">sigma2</span> <span class="o">=</span> <span class="n">yerr</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">model</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="nf">sum</span><span class="p">((</span><span class="n">y</span> <span class="o">-</span> <span class="n">model</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">sigma2</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">log_prob</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="p">):</span>
+    <span class="sh">"""</span><span class="s">
+    Compute the total log probability.
+    
+    Arguments:
+        - theta : list of parameters
+        - x, y, yerr : data points with errorbar
+    </span><span class="sh">"""</span>
+
+    <span class="n">lp</span> <span class="o">=</span> <span class="nf">log_prior</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="p">.</span><span class="nf">isfinite</span><span class="p">(</span><span class="n">lp</span><span class="p">):</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="p">.</span><span class="n">inf</span>
+    <span class="k">return</span> <span class="n">lp</span> <span class="o">+</span> <span class="nf">log_likelihood</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>at this point we can run the MCMC chain:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Start the MCMC part</span><span class="sh">"</span><span class="p">)</span>
+<span class="kn">import</span> <span class="n">os</span>
+<span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="sh">"</span><span class="s">OMP_NUM_THREADS</span><span class="sh">"</span><span class="p">]</span> <span class="o">=</span> <span class="sh">"</span><span class="s">1</span><span class="sh">"</span>  <span class="c1"># to avoid problems with numpy and Pool. Follows emcee guidelines.
+</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="mf">1e-3</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="nf">randn</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># initial position of the walkers
+</span><span class="n">nwalkers</span><span class="p">,</span> <span class="n">ndim</span> <span class="o">=</span> <span class="n">pos</span><span class="p">.</span><span class="n">shape</span>
+
+<span class="c1">####
+## Note:
+## In this example, due to the long time to run the model, the burn-in phase is quite short and
+## would be better to run everything for a larger number of steps
+## (like 100 burn-in and 1000 of the chain could be a good option)
+</span><span class="n">burn_in_steps</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">chain_steps</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="k">with</span> <span class="nc">Pool</span><span class="p">()</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+    <span class="n">sampler</span> <span class="o">=</span> <span class="n">emcee</span><span class="p">.</span><span class="nc">EnsembleSampler</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">,</span> <span class="n">ndim</span><span class="p">,</span> <span class="n">log_prob</span><span class="p">,</span> <span class="n">pool</span><span class="o">=</span><span class="n">pool</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">yerr</span><span class="p">))</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">sampler</span><span class="p">.</span><span class="nf">run_mcmc</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">burn_in_steps</span><span class="p">,</span>
+                             <span class="n">progress</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  <span class="c1"># saves the position of the walkers in the state variable
+</span>    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">End burn-in phase</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">sampler</span><span class="p">.</span><span class="nf">reset</span><span class="p">()</span>  <span class="c1"># resets the chain
+</span>    <span class="n">sampler</span><span class="p">.</span><span class="nf">run_mcmc</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">chain_steps</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>  <span class="c1"># start again the chain form after the burn-in
+</span>    <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">End MCMC</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
+<p>because this MCMC implementation uses multiple <em>walkers</em> to test the method and compute likelihoods,
+it can be parallelised. Hence the call to the Pool() method.</p>
+
+<p>If you want to run on a single CPU, remove the with statement and the <code class="language-plaintext highlighter-rouge">os.environ</code> line.</p>
+
+</div>
+
+                    </main>
+                    
+                </div>
+            </div>
+        </section>
+        
+            <footer class="footer">
+    <div class="container">
+        
+
+        
+
+
+        <div class="content is-small has-text-centered">
+            <p class="">Theme built by <a href="https://www.csrhymes.com">C.S. Rhymes</a></p>
+        </div>
+    </div>
+</footer>
+
+        
+        <script src="/GAMERA/assets/js/app.js" type="text/javascript"></script><!-- footer scripts -->
+</body>
+</html>

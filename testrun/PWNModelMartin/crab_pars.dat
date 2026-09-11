@@ -1,0 +1,24 @@
+[Parameters]
+InitialLuminosity = 3.1e39
+Age = 950
+TauZero = 730
+Distance = 2000
+AmbientDensity = 1
+tNIR = 5000
+edensNIR = 1
+tFIR = 70
+edensFIR = 0.5
+gammabreak = 7e5
+SpectralIndexHigh = 2.5
+SpectralIndexLow = 1.5
+Mej = 9.5
+E0 = 1e51
+etaB = 3e-2
+epsilon = 0.2
+BrakingIndex = 2.509
+
+
+[Files]
+mwl = CrabMWLData.txt
+
+

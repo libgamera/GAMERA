@@ -1,0 +1,349 @@
+<!doctype html>
+
+
+
+
+<html
+    dir="ltr"
+    lang="en"
+    class=" has-navbar-fixed-top  "
+>
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="/GAMERA/assets/css/app.css">
+    <link
+        rel="shortcut icon"
+        type="image/png"
+        
+            href="/GAMERA/favicon.png"
+        
+    >
+    <script defer src="https://unpkg.com/alpinejs@3.9.0/dist/cdn.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"
+    ></script>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    >
+    
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-social@1/bin/bulma-social.min.css">
+    
+    <!-- Begin Jekyll SEO tag v2.9.0 -->
+<title>Time-dependent Modeling</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Time-dependent Modeling" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://mischabr.github.io/GAMERA/docs/time_dependent_modeling" />
+<meta property="og:url" content="https://mischabr.github.io/GAMERA/docs/time_dependent_modeling" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Time-dependent Modeling" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Time-dependent Modeling","url":"https://mischabr.github.io/GAMERA/docs/time_dependent_modeling"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <!-- head scripts -->
+</head>
+
+    <body>
+        <a href="#main-content" class="is-sr-only skip-link"> Skip to main content </a>
+
+        
+        <nav
+    class="navbar is-primary  is-fixed-top "
+    x-data="{ openNav: false }"
+>
+    <div class="container">
+        <div class="navbar-brand">
+            <a href="/GAMERA/" class="navbar-item">
+                
+            </a>
+            <a
+                role="button"
+                class="navbar-burger burger"
+                aria-label="menu"
+                aria-expanded="false"
+                data-target="navMenu"
+                :class="{ 'is-active': openNav }"
+                x-on:click="openNav = !openNav"
+            >
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        <div class="navbar-menu" id="navMenu" :class="{ 'is-active': openNav }">
+            <div class="navbar-start">
+                <a href="/GAMERA/" class="navbar-item ">Home</a>
+                
+                    
+                        
+                            <a
+                                href="/GAMERA/docs/documentation/"
+                                class="navbar-item "
+                            >Overview</a>
+                        
+                    
+                        
+                            <a
+                                href="/GAMERA/docs/tutorials_main"
+                                class="navbar-item "
+                            >Tutorials</a>
+                        
+                    
+                        
+                            <a
+                                href="https://github.com/libgamera/GAMERA"
+                                class="navbar-item "
+                            >Github</a>
+                        
+                    
+                
+            </div>
+
+            <div class="navbar-end">
+                
+            </div>
+        </div>
+    </div>
+</nav>
+
+        
+            <section
+    class="hero  is-medium  is-bold is-primary"
+    
+>
+    <div class="hero-body ">
+        <div class="container">
+            <h1 class="title is-2">Time-dependent Modeling</h1>
+            <p class="subtitle is-3"></p>
+            
+        </div>
+    </div>
+</section>
+
+        
+        
+
+        <section class="section">
+            <div class="container">
+                <div class="columns is-multiline">
+                    
+                        <div class="column is-4-desktop is-4-tablet">
+                            
+
+<aside class="menu">
+    
+        <p class="menu-label">General Information</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/index" class="">News</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/documentation" class="">Overview</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Installation</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/download_installation" class="">Downlad & Installation</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Tutorials</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/tutorials_main" class="">List of Tutorials</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/radiation_modeling" class="">Radiation</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/time_independent_modeling" class="">Time independent modeling</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/time_dependent_modeling" class="is-active">Time dependent modeling</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/inverse_compton" class="">Inverse Compton Radiation Fields</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/hadronic_models" class="">Hadronic Interaction Models</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/particle_escape" class="">Particle Escape</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/energy_loss" class="">Energy Loss Rates</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/gammagamma_absorption" class="">Absorption</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/hadronic_components" class="">Arbitrary Cosmic Ray Species</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/fitting_data" class="">Fitting Data</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Miscellaneous</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/contact" class="">Contact and support</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/acknowledging" class="">Acknowledging GAMERA</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/licence" class="">Licence</a>
+                    
+                </li>
+            
+        </ul>
+    
+</aside>
+
+                        </div>
+                    
+                    <main class="column is-8" id="main-content">
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+<div class="content">
+    <p><a href="/docs/tutorials_main">(one page up)</a></p>
+
+<h1 id="time-dependent-modeling">Time-Dependent Modeling</h1>
+
+<p>Time-dependent modeling, i.e. modeling the spectral evolution of sources while 
+physical parameters like magnetic fields are changing over time, can be performed with <code class="language-plaintext highlighter-rouge">GAMERA</code> in much the same way as time-independent modeling, described <a href="/docs/time_independent_modeling">in this tutorial</a>. If you havent done so already, please go through that one first before proceeding!</p>
+
+<h2 id="energy-independent-parameters">Energy-independent parameters</h2>
+<p>If you want to model the time-dependency of energy-independent parameters such as the ambient magnetic field or gas density the only difference to the time-independent procedure is to provide 2D-vectors instead of doubles to the corresponding <code class="language-plaintext highlighter-rouge">Setter</code>-functions you have.</p>
+
+<p>These vectors need to constist of two columns, with the first column holding the 
+time steps and the second the value of the environmental parameter at that time. 
+For instance, if you wanted to define a magnetic field declining with time as</p>
+
+<p><img src="bfield_tdep.png" alt="bfield_tdep" /></p>
+
+<p>you would have to implement this like that:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fp = Particles()
+t_ref = 100
+time_steps = np.logspace(1,4,100) #in years
+b = 1e-4 * (time_steps / t_ref) ** -0.5 #in Gauss
+b_lookup = list(zip(time_steps,b))
+fp.SetBField(b_lookup)
+</code></pre></div></div>
+
+<p>This simple implementation works with</p>
+<ul>
+  <li>ambient density (<code class="language-plaintext highlighter-rouge">fp.SetAmbientDensity(dens)</code>)</li>
+  <li>the injection luminosity, i.e. the normalisation of the injection spectrum  (<code class="language-plaintext highlighter-rouge">fp.SetLuminosity(dens)</code>)</li>
+  <li>expansion velocity and radius (<code class="language-plaintext highlighter-rouge">fp.SetExpansionVelocity(vel)</code>, <code class="language-plaintext highlighter-rouge">fp.SetRadius(radius)</code>)</li>
+  <li>a slightly different nomenclature in case of time-dependent but energy-independent particle escape times, here an example:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>t_esc_0 = 1000 * gp.yr_to_sec # in seconds
+t_esc = t_esc_0 * (time_steps / t_ref) ** 0.5
+t_esc_lookup = list(zip(time_steps, t_esc))
+fp.SetTimeDependentEscapeTime(t_esc_lookup)
+</code></pre></div>    </div>
+    <h2 id="energy-dependent-parameters">Energy-dependent parameters</h2>
+    <p>For energy-dependent parameters, the method of applying time-dependency
+is different:</p>
+  </li>
+  <li>
+    <p>If the particle escape time scale depends both on energy and time, also the spectral shape can be made to change with time, see <a href="/docs/particle_escape">here</a>.</p>
+  </li>
+  <li>
+    <p>If not only the injection spectrum normalisation (luminosity) but also its spectral shape, this can be modeled <a href="/docs/tt">following these steps</a>. (Under Construction)</p>
+  </li>
+  <li>Currently time-dependent radiation fields are only possible via an iterative
+approach. There is an <a href="/docs/iteration">extra tutorial on iterating</a>. (Under Construction)</li>
+</ul>
+
+<p>A working script can be found <a href="particles_time_dep.py">here</a>, which will output the following plots:</p>
+
+<p>Temporal evolution of the particle spectrum assuming the following time dependences 
+(escape time not set in this example):</p>
+
+<p><img src="time_evolution_basic.png" alt="time_evolution_basic" /></p>
+
+<p><img src="particle_time_evolution_basic.png" alt="particle_time_evolution_basic" /></p>
+
+<p><a href="/docs/tutorials_main">(one page up)</a></p>
+
+</div>
+
+                    </main>
+                    
+                </div>
+            </div>
+        </section>
+        
+            <footer class="footer">
+    <div class="container">
+        
+
+        
+
+
+        <div class="content is-small has-text-centered">
+            <p class="">Theme built by <a href="https://www.csrhymes.com">C.S. Rhymes</a></p>
+        </div>
+    </div>
+</footer>
+
+        
+        <script src="/GAMERA/assets/js/app.js" type="text/javascript"></script><!-- footer scripts -->
+</body>
+</html>
