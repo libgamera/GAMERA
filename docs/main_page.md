@@ -1,6 +1,6 @@
 ---
 layout: page
-title: News
+title: Start
 show_sidebar: false
 menubar: menu
 permalink: /docs/main_page
