@@ -100,6 +100,31 @@ Particles::Particles() {
 Particles::~Particles() {
   for (unsigned int i = 0; i < grid.size(); i++) grid[i].clear();
   grid.clear();
+    // Free accelerators
+  gsl_interp_accel_free(accIC);   gsl_interp_accel_free(accLum);
+  gsl_interp_accel_free(accN);    gsl_interp_accel_free(accBField);
+  gsl_interp_accel_free(acceMax); gsl_interp_accel_free(accescapeTimeEdep);
+  gsl_interp_accel_free(accescapeTimeTdep); gsl_interp_accel_free(accR);
+  gsl_interp_accel_free(accV);    gsl_interp_accel_free(accTr);
+  gsl_interp_accel_free(accTrInv);gsl_interp_accel_free(accCustInj);
+  gsl_interp_accel_free(taccsp);  gsl_interp_accel_free(eaccsp);
+  gsl_interp_accel_free(taccesc); gsl_interp_accel_free(eaccesc);
+
+  // Free splines (guard with NULL check since they're init'd to NULL)
+  if (ICLossLookup)          gsl_spline_free(ICLossLookup);
+  if (LumLookup)             gsl_spline_free(LumLookup);
+  if (NLookup)               gsl_spline_free(NLookup);
+  if (BFieldLookup)          gsl_spline_free(BFieldLookup);
+  if (eMaxLookup)            gsl_spline_free(eMaxLookup);
+  if (RLookup)               gsl_spline_free(RLookup);
+  if (VLookup)               gsl_spline_free(VLookup);
+  if (escapeTimeLookupTdep)  gsl_spline_free(escapeTimeLookupTdep);
+  if (escapeTimeLookupEdep)  gsl_spline_free(escapeTimeLookupEdep);
+  if (energyTrajectory)      gsl_spline_free(energyTrajectory);
+  if (energyTrajectoryInverse) gsl_spline_free(energyTrajectoryInverse);
+
+  delete fUtils;
+  delete fRadiation;
 }
 
 
