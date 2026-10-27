@@ -1,8 +1,5 @@
 #/usr/local/bin/python
-import sys
-import os
 import numpy as np
-sys.path.append(os.path.abspath('../lib'))
 import gappa as gp
 import unittest
 
