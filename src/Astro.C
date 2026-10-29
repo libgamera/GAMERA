@@ -129,11 +129,57 @@ Astro::Astro() {
   xyzref.push_back(0.);
   xyzref.push_back(0.);
 
+  thinshellradiuslookup = thinshellvelocitylookup = NULL;
+  r_edforwardlookup = v_edforwardlookup = NULL;
+  r_edreverselookup = v_edreverselookup = NULL;
+  r_stforwardlookup = v_stforwardlookup = NULL;
+  r_streverselookup = v_streverselookup = NULL;
 
 }
 
 Astro::~Astro() {
     delete fUtils;
+
+    // --- Always-allocated accelerators ---
+    gsl_interp_accel_free(accArm1);
+    gsl_interp_accel_free(accArm2);
+    gsl_interp_accel_free(accArm3);
+    gsl_interp_accel_free(accArm4);
+    gsl_interp_accel_free(atsrad);
+    gsl_interp_accel_free(atsvel);
+    gsl_interp_accel_free(aredr);
+    gsl_interp_accel_free(avedr);
+    gsl_interp_accel_free(aredf);
+    gsl_interp_accel_free(avedf);
+    gsl_interp_accel_free(arstr);
+    gsl_interp_accel_free(avstr);
+    gsl_interp_accel_free(arstf);
+    gsl_interp_accel_free(avstf);
+
+    // --- Always-allocated splines ---
+    gsl_spline_free(TaylorCordesArm1);
+    gsl_spline_free(TaylorCordesArm2);
+    gsl_spline_free(TaylorCordesArm3);
+    gsl_spline_free(TaylorCordesArm4);
+    gsl_spline_free(TaylorCordesArm1Inv);
+    gsl_spline_free(TaylorCordesArm2Inv);
+    gsl_spline_free(TaylorCordesArm3Inv);
+    gsl_spline_free(TaylorCordesArm4Inv);
+
+    // --- Conditionally allocated (thin shell) ---
+    if (thinshellradiuslookup)  gsl_spline_free(thinshellradiuslookup);
+    if (thinshellvelocitylookup) gsl_spline_free(thinshellvelocitylookup);
+
+    // --- Conditionally allocated (Truelove-McKee) ---
+    if (r_edforwardlookup)  gsl_spline_free(r_edforwardlookup);
+    if (v_edforwardlookup)  gsl_spline_free(v_edforwardlookup);
+    if (r_edreverselookup)  gsl_spline_free(r_edreverselookup);
+    if (v_edreverselookup)  gsl_spline_free(v_edreverselookup);
+    if (r_stforwardlookup)  gsl_spline_free(r_stforwardlookup);
+    if (v_stforwardlookup)  gsl_spline_free(v_stforwardlookup);
+    if (r_streverselookup)  gsl_spline_free(r_streverselookup);
+    if (v_streverselookup)  gsl_spline_free(v_streverselookup);
+
 }
 
 
@@ -2590,6 +2636,10 @@ void Astro::CalculateThinShellApproximation(vector< vector<double> > dProfile,
       cout << "Astro::CalculateThinShellApproximation: Can't create profiles"
               "because tmin >= tmax (" << tmin <<" >= "<< tmax <<
               ") Exiting!" << endl;
+      gsl_spline_free(masslookup);
+      gsl_interp_accel_free(amass);
+      gsl_spline_free(timelookup);
+      gsl_interp_accel_free(atime);
       return;
     }
     double logtmin = log10(tmin);
@@ -2607,6 +2657,12 @@ void Astro::CalculateThinShellApproximation(vector< vector<double> > dProfile,
       fUtils->TwoDVectorPushBack(t,x[1],forwardshockvelocityprofile);
     }
   }
+
+  gsl_spline_free(masslookup);
+  gsl_interp_accel_free(amass);
+  gsl_spline_free(timelookup);
+  gsl_interp_accel_free(atime);
+
   return;
 }
 
@@ -3136,6 +3192,8 @@ void Astro::CalculateForwardShockInRGWind(vector<double> pars, double tmin,
       fUtils->TwoDVectorPushBack(t,x[1],forwardshockvelocityprofile);
     }
   }
+  gsl_spline_free(m);
+  gsl_interp_accel_free(a);
   return;
 }
 

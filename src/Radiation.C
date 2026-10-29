@@ -130,51 +130,39 @@ Radiation::~Radiation() {
     gsl_interp_accel_free(ICLossLookupAccAll);
     gsl_interp_accel_free(loraccesc);
     gsl_interp_accel_free(edaccesc);
-    
-    //gsl_spline_free(ICLossLookupSumAll);
-    //gsl_spline_free(ICLossLookupSumIso);
-    //gsl_spline_free(ElectronLookup);
-    //gsl_spline_free(ProtonLookup);
-    
-    //gsl_spline_free(TargetPhotonLookupSumAll);
-    //gsl_spline_free(TargetPhotonLookupSumIso);
-    
-    for (int i = 0; i < (int)TargetPhotonLookups.size(); i++){
-        gsl_spline_free(TargetPhotonLookups[i]);
-    }
-    for (int i = 0; i < (int)TargetPhotonAccs.size(); i++){
-        gsl_interp_accel_free(TargetPhotonAccs[i]);
-    }
-    
-    for (int i = 0; i < (int)ICLossLookups.size(); i++){
-        gsl_spline_free(ICLossLookups[i]);
-    }
-    for (int i = 0; i < (int)ICLossLookupAccs.size(); i++){
-        gsl_interp_accel_free(ICLossLookupAccs[i]);
-    }
-    
-    for (int i = 0; i < (int)phiaccescs.size();i++){
-        gsl_interp_accel_free(phiaccescs[i]);
-    }
-    for (int i = 0; i < (int)thetaaccescs.size();i++){
-        gsl_interp_accel_free(thetaaccescs[i]);
-    }
-    for (int i = 0; i < (int)phiaccesc_zetas.size();i++){
-        gsl_interp_accel_free(phiaccesc_zetas[i]);
-    }
-    for (int i = 0; i < (int)thetaaccesc_zetas.size();i++){
-        gsl_interp_accel_free(thetaaccesc_zetas[i]);
-    }
-    for (int i=0; i< (int)CosZetaLookups.size(); i++){
-        interp2d_spline_free(CosZetaLookups[i]);
+
+
+    // --- Particle lookups (conditionally allocated) ---
+    if (ElectronLookup)          { gsl_spline_free(ElectronLookup);          ElectronLookup = NULL; }
+    if (ProtonLookup)            { gsl_spline_free(ProtonLookup);             ProtonLookup = NULL; }
+
+    // --- Sum-field lookups (conditionally allocated) ---
+    if (TargetPhotonLookupSumIso) { gsl_spline_free(TargetPhotonLookupSumIso); TargetPhotonLookupSumIso = NULL; }
+    if (TargetPhotonLookupSumAll) { gsl_spline_free(TargetPhotonLookupSumAll); TargetPhotonLookupSumAll = NULL; }
+    if (ICLossLookupSumIso)       { gsl_spline_free(ICLossLookupSumIso);       ICLossLookupSumIso = NULL; }
+    if (ICLossLookupSumAll)       { gsl_spline_free(ICLossLookupSumAll);       ICLossLookupSumAll = NULL; }
+    // accall is allocated inside SetTargetPhotonVectorLookup (i==-2 path), not the constructor
+    if (accall)                   { gsl_interp_accel_free(accall);             accall = NULL; }
+
+
+    // --- Per-field arrays (allocated up to RADFIELD_COUNTER, rest are NULL) ---
+    for (int i = 0; i < (int)RADFIELDS_MAX; i++) {
+        if (TargetPhotonLookups[i])  { gsl_spline_free(TargetPhotonLookups[i]);          TargetPhotonLookups[i] = NULL; }
+        if (TargetPhotonAccs[i])     { gsl_interp_accel_free(TargetPhotonAccs[i]);        TargetPhotonAccs[i] = NULL; }
+        if (ICLossLookups[i])        { gsl_spline_free(ICLossLookups[i]);                 ICLossLookups[i] = NULL; }
+        if (ICLossLookupAccs[i])     { gsl_interp_accel_free(ICLossLookupAccs[i]);        ICLossLookupAccs[i] = NULL; }
+        if (phiaccescs[i])           { gsl_interp_accel_free(phiaccescs[i]);              phiaccescs[i] = NULL; }
+        if (thetaaccescs[i])         { gsl_interp_accel_free(thetaaccescs[i]);            thetaaccescs[i] = NULL; }
+        if (phiaccesc_zetas[i])      { gsl_interp_accel_free(phiaccesc_zetas[i]);         phiaccesc_zetas[i] = NULL; }
+        if (thetaaccesc_zetas[i])    { gsl_interp_accel_free(thetaaccesc_zetas[i]);       thetaaccesc_zetas[i] = NULL; }
+        if (CosZetaLookups[i])       { interp2d_spline_free(CosZetaLookups[i]);           CosZetaLookups[i] = NULL; }
+        if (TargetPhotonAngularDistrs[i]) { interp2d_spline_free(TargetPhotonAngularDistrs[i]); TargetPhotonAngularDistrs[i] = NULL; }
     }
     
-    for (int i = 0; i< (int)TargetPhotonAngularDistrs.size(); i++){
-        interp2d_spline_free(TargetPhotonAngularDistrs[i]);
-    }
-    
+
     for (int i = 0; i< (int)HadronSpectraLookups.size(); i++){
-        gsl_spline_free(HadronSpectraLookups[i]);
+        if (HadronSpectraLookups[i]) { gsl_spline_free(HadronSpectraLookups[i]);
+          HadronSpectraLookups[i] = NULL; }
     }
     
 }
@@ -184,9 +172,12 @@ void Radiation::Reset() {
   ParticleVector.clear();
   ElectronVector.clear();
   ProtonVector.clear();
-  gsl_spline_free(ElectronLookup);
-  gsl_spline_free(ProtonLookup);
-  gsl_spline_free(TargetPhotonLookupSumIso);
+  if (ElectronLookup)          { gsl_spline_free(ElectronLookup);          ElectronLookup = NULL; }
+  if (ProtonLookup)            { gsl_spline_free(ProtonLookup);             ProtonLookup = NULL; }
+  if (TargetPhotonLookupSumIso){ gsl_spline_free(TargetPhotonLookupSumIso); TargetPhotonLookupSumIso = NULL; }
+  //gsl_spline_free(ElectronLookup);
+  //gsl_spline_free(ProtonLookup);
+  //gsl_spline_free(TargetPhotonLookupSumIso);
   BField = 0.;
   n = 0.;
   return;

@@ -21,6 +21,8 @@ Utils::~Utils() {
     gsl_interp_accel_free(acc);
     gsl_interp_accel_free(xacc);
     gsl_interp_accel_free(yacc);
+    if (INTERNAL1DSPLINE) gsl_spline_free(INTERNAL1DSPLINE);
+    if (INTERNAL2DSPLINE) interp2d_spline_free(INTERNAL2DSPLINE);
 }
 
 /**
@@ -494,6 +496,7 @@ vector< vector<double> > Utils::CustomFunctionRandom2D(vector< vector<double> > 
     }
     TwoDVectorPushBack(x,y,v);
   }
+  interp2d_spline_free(spline2d);
   gsl_interp_accel_free(xaccsp);
   gsl_interp_accel_free(yaccsp);
   
