@@ -219,17 +219,6 @@ void Radiation::ClearHadrons() {
 
 
 
-/**
- * Remove all previously defined hadrons via clearing the mass
- * vector, the spectral vector and the associated lookup.
- *
- */
-void Radiation::ClearHadrons() {
-    HadronMasses.clear();
-    HadronSpectra.clear();
-    HadronSpectraLookups.clear();
-    return;
-}
 
 /**
  * Calculates the differential photon emission at energy 'e' [erg]. This results
@@ -3677,40 +3666,6 @@ vector<vector<double> > Radiation::GetICSED(unsigned int i, double emin, double 
     return ReturnSED(i+1, emin, emax, diffSpecICComponents);
   }
 
-  
-  
-  
-vector<vector<double> > Radiation::GetHadronSpectrum(unsigned int i, double emin, double emax) {
-    /*
-    if(IC_CALCULATED && FASTMODE_IC==true && epoints_temp.size()) {
-        FASTMODE_IC=false;
-        CalculateDifferentialPhotonSpectrum(epoints_temp);
-        FASTMODE_IC=true;
-    }*/
-    return ReturnDifferentialPhotonSpectrum(i+1, emin, emax, diffSpecHadronComponents);
-}  ///< return pi0 decay spectrum from Hadron component i
-
-
-vector<vector<double> > Radiation::GetHadronSED(unsigned int i, double emin, double emax) {
-    /*
-    if(IC_CALCULATED && FASTMODE_IC==true && epoints_temp.size()) {
-        FASTMODE_IC=false;
-        CalculateDifferentialPhotonSpectrum(epoints_temp);
-        FASTMODE_IC=true;
-    }*/
-    return ReturnSED(i+1, emin, emax, diffSpecHadronComponents);
-  }  ///< return pi0 decay spectrum from Hadron component i
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   
   
   

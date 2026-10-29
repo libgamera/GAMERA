@@ -210,9 +210,5 @@ class Utils {
   double LogisticsFunction(double z, double h, double w);
   double Norm(vector<double> v);
 
-  //addition for the gamma-gamma absorption
-  // !!!UNDER CONSTRUCTION!!!
-  double AverageSigmaGammaGamma(double Eph1, double Eph2);
-  double SigmaGammaGamma(double Eph1, double Eph2, double theta);
 };
 #endif

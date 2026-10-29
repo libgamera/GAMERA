@@ -761,18 +761,6 @@ class Radiation {
   double GetIntegralTotalAbsFlux(double emin, double emax, vector <int> fields) {
     return ReturnAbsorbedIntergratedFlux(emin,emax,false,fields,sizephfield); }
 
-  /*
-   * Functions for the calculation of the optical depth
-   * Fill use in the definition the functions GetTotalSpectrum() and GetTargetPhotons()
-   * Need to define a method to speed up the calculation and compute the contribution
-   * only for the relevant part of the cross section
-   * !!! CAREFUL UNDER CONSTRUCTION !!!
-   */
-  double AverageSigmaGammaGamma(double Eph1, double Eph2);
-  double SigmaGammaGamma(double Eph1, double Eph2, double theta);
-  
-  //vector<double> ComputeOptDepth(double Egammamin,double Egammamax, double emin,double emax, double distance);
-  double ComputeOptDepth(double Egamma, int target, double distance);
 
 /* //to be fixed
   vector <vector <double> > RetAbsDiffSpectrum(double emin, double emax);
@@ -786,15 +774,6 @@ class Radiation {
 */
 
 
-  double GetIntegralTotalAbsEnergyFlux(double emin, double emax, vector <int> fields) { ///< get integrated 
-    return ReturnAbsorbedIntergratedFlux(emin,emax,true,fields,sizephfield); }                      /// absorbed energy flux between
-                                                                                          /// emin and emax (erg) 
-                                                                                          /// summed over all 
-                                                                                          /// radiation processes
-  double GetIntegralTotalAbsFlux(double emin, double emax, vector <int> fields) { ///< get integrated 
-    return ReturnAbsorbedIntergratedFlux(emin,emax,false,fields,sizephfield); }                      /// absorbed energy flux between
-                                                                                          /// emin and emax (erg) 
-  
   void SetLocalAmbientMediumComposition(double density, string norm="hydrogen");
   void AddLocalCosmicRayModel(bool extragalactic=true, double slope=2.65);
   void AddCRModel(bool extragalactic = true, bool CREAM = false);
