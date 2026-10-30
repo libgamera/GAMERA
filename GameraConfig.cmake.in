@@ -1,0 +1,19 @@
+# Include version information
+include("${CMAKE_CURRENT_LIST_DIR}/GameraConfigVersion.cmake")
+
+# Find dependencies
+find_package(GSL REQUIRED)
+
+# Include the targets file
+include("${CMAKE_CURRENT_LIST_DIR}/GameraTargets.cmake")
+
+# Set usage requirements
+set(GAMERA_FOUND TRUE)
+set(GAMERA_INCLUDE_DIRS "${CMAKE_CURRENT_LIST_DIR}/../../include")
+set(GAMERA_LIBRARIES gamera)
+
+# Print found message
+if(NOT GAMERA_FIND_QUIETLY)
+    message(STATUS "Found GAMERA: ${GAMERA_LIBRARIES}")
+    message(STATUS "  Include dirs: ${GAMERA_INCLUDE_DIRS}")
+endif()
