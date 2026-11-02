@@ -1564,11 +1564,17 @@ void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
   vCustom = fUtils->VectorAxisLogarithm(vCustom,0);
   vCustom = fUtils->VectorAxisLogarithm(vCustom,1);
   if(!mode) {  
-    if(CustomInjectionSpectrum) gsl_spline_free(CustomInjectionSpectrum);
+    if(CustomInjectionSpectrum) {
+      gsl_spline_free(CustomInjectionSpectrum);
+      CustomInjectionSpectrum = NULL;
+    }
     CustomInjectionSpectrum = fUtils->GSLsplineFromTwoDVector(vCustom);
   }
   else if(mode == 1) {
-    if(escapeTimeLookupEdep) gsl_spline_free(escapeTimeLookupEdep);
+    if(escapeTimeLookupEdep) {
+      gsl_spline_free(escapeTimeLookupEdep);
+      escapeTimeLookupEdep = NULL;
+    }
     escapeTimeLookupEdep = fUtils->GSLsplineFromTwoDVector(vCustom);
   }
   else {
@@ -1611,7 +1617,10 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
   vCustom = fUtils->VectorAxisLogarithm(vCustom,1);
   vCustom = fUtils->VectorAxisLogarithm(vCustom,2);
   if(!mode) {
-    if(CustomInjectionSpectrumTimeEvolution) interp2d_spline_free(CustomInjectionSpectrumTimeEvolution);
+    if(CustomInjectionSpectrumTimeEvolution) {
+      interp2d_spline_free(CustomInjectionSpectrumTimeEvolution);
+      CustomInjectionSpectrumTimeEvolution = NULL;
+    }
     CustomInjectionSpectrumTimeEvolution = 
                       fUtils->TwoDsplineFromTwoDVector(vCustom,
                                                        TminLookup,TmaxLookup,
@@ -1619,7 +1628,10 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
     CustomInjectionSpectrumTimeEvolutionVector = vCustom;
   }
   else if(mode == 1) {
-    if(EscapeTimeEnergyTimeEvolution) interp2d_spline_free(EscapeTimeEnergyTimeEvolution);
+    if(EscapeTimeEnergyTimeEvolution) {
+      interp2d_spline_free(EscapeTimeEnergyTimeEvolution);
+      EscapeTimeEnergyTimeEvolution = NULL;
+    }
     EscapeTimeEnergyTimeEvolution = 
                       fUtils->TwoDsplineFromTwoDVector(vCustom,
                                                        TminLookup,TmaxLookup,

@@ -922,7 +922,6 @@ class Radiation(object):
 
     def GetElectronSED(self):
         return _gappa.Radiation_GetElectronSED(self)
-    fUtils = property(_gappa.Radiation_fUtils_get, _gappa.Radiation_fUtils_set)
 
     def SetTargetPhotonAnisotropy(self, *args):
         return _gappa.Radiation_SetTargetPhotonAnisotropy(self, *args)

@@ -25,6 +25,7 @@ class Radiation {
   static Radiation *_radPtr;
 
  private:
+  Utils *fUtils;
   // this function does not exist
   void CalculateLuminosityAndFlux(string mechanism, double e, double &l,
                                   double &f);
@@ -633,7 +634,6 @@ class Radiation {
   vector< vector<double> > GetProtonSED() {return GetParticleSED("protons");}
   /// Return electron SED See: Radiation::GetPaticleSED
   vector< vector<double> > GetElectronSED() {return GetParticleSED("electrons");}
-  Utils *fUtils;
   /// Set up anisotropy for target photon \a i accounting for observation angle
   void SetTargetPhotonAnisotropy(int i, vector<double> obs_angle, 
                                  vector<double> phi, vector<double> theta, 

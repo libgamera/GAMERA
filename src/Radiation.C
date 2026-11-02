@@ -31,6 +31,8 @@ Radiation::Radiation() {
   TargetPhotonLookupSumIso = NULL;
   TargetPhotonLookupSumAll = NULL;
   ICLossLookupSumIso = NULL;
+  ICLossLookupSumAll = NULL;
+  accall = NULL;
   RADFIELD_COUNTER = 0;
   RADFIELDS_MAX = 1000;
   RADFIELD_CURRENT = -1;
@@ -114,22 +116,18 @@ Radiation::Radiation() {
   ICLossLookupAccAll = gsl_interp_accel_alloc();
   loraccesc = gsl_interp_accel_alloc();
   edaccesc = gsl_interp_accel_alloc();
-  /// for spatial dependency of the gamma-gamma absorption target field
-  // accsp = gsl_interp_accel_alloc();
 }
 
 /**
  * Destructor. All allocated space has to be freed.
  */
 Radiation::~Radiation() {
-    delete fUtils;
-    gsl_interp_accel_free(acc);
-    gsl_interp_accel_free(acciso);
-    //if (accall != NULL){ gsl_interp_accel_free(accall);}
-    gsl_interp_accel_free(ICLossLookupAccIso);
-    gsl_interp_accel_free(ICLossLookupAccAll);
-    gsl_interp_accel_free(loraccesc);
-    gsl_interp_accel_free(edaccesc);
+    if (acc) gsl_interp_accel_free(acc);
+    if (acciso) gsl_interp_accel_free(acciso);
+    if (ICLossLookupAccIso) gsl_interp_accel_free(ICLossLookupAccIso);
+    if (ICLossLookupAccAll) gsl_interp_accel_free(ICLossLookupAccAll);
+    if (loraccesc) gsl_interp_accel_free(loraccesc);
+    if (edaccesc) gsl_interp_accel_free(edaccesc);
 
 
     // --- Particle lookups (conditionally allocated) ---
@@ -164,7 +162,7 @@ Radiation::~Radiation() {
         if (HadronSpectraLookups[i]) { gsl_spline_free(HadronSpectraLookups[i]);
           HadronSpectraLookups[i] = NULL; }
     }
-    
+    delete fUtils;
 }
 
 //FIXME make me a nice function!
@@ -2606,10 +2604,13 @@ void Radiation::ClearTargetPhotonField(int i) {
         fUtils->Clear2DVector(TargetPhotonVectorSumAll);
         TargetPhotonLookupSumAll = NULL;
         TargetPhotonEdensSumAll = 0.;
-        accall = NULL;
+        //accall = NULL;
         fUtils->Clear2DVector(ICLossVectorSumAll);
-        ICLossLookupSumAll = NULL;
-        ICLossLookupAccAll = NULL;
+        //ICLossLookupSumAll = NULL;
+        //ICLossLookupAccAll = NULL;
+        if (accall)            { gsl_interp_accel_free(accall);            accall = NULL; }
+        if (ICLossLookupSumAll){ gsl_spline_free(ICLossLookupSumAll);      ICLossLookupSumAll = NULL; }
+        if (ICLossLookupAccAll){ gsl_interp_accel_free(ICLossLookupAccAll); ICLossLookupAccAll = NULL; }
     }
     else if(i==-1) {
         if (VERBOSEMODE == true) {
@@ -2617,13 +2618,17 @@ void Radiation::ClearTargetPhotonField(int i) {
                  << endl;
         }
         fUtils->Clear2DVector(TargetPhotonVectorSumIso);
-        TargetPhotonLookupSumIso = NULL;
+        //TargetPhotonLookupSumIso = NULL;
         TargetPhotonEdensSumIso = 0.;
-        acciso = NULL;
+        //acciso = NULL;
 
         fUtils->Clear2DVector(ICLossVectorSumIso);
-        ICLossLookupSumIso = NULL;
-        ICLossLookupAccIso = NULL;
+        //ICLossLookupSumIso = NULL;
+        //ICLossLookupAccIso = NULL;
+        if (TargetPhotonLookupSumIso){ gsl_spline_free(TargetPhotonLookupSumIso);      TargetPhotonLookupSumIso = NULL; }
+        if (acciso)                  { gsl_interp_accel_free(acciso);                  acciso = NULL; }
+        if (ICLossLookupSumIso)      { gsl_spline_free(ICLossLookupSumIso);            ICLossLookupSumIso = NULL; }
+        if (ICLossLookupAccIso)      { gsl_interp_accel_free(ICLossLookupAccIso);      ICLossLookupAccIso = NULL; }
     }
     else {
             
@@ -3050,12 +3055,10 @@ void Radiation::SetTargetPhotonVectorLookup(vector< vector<double> > v, int i) {
             "via the Radiation::SetRadfieldMaxNumber() function. Exiting." <<endl;
              exit(1);
   }
-
   ClearTargetPhotonField(-2);
   int size = (int)v.size();
   gsl_spline **spl;
   gsl_interp_accel **accspl;
-  
   if(i>=0 && i<(int)RADFIELDS_MAX) {
     spl = &TargetPhotonLookups[i];
     accspl = &TargetPhotonAccs[i];
@@ -3079,7 +3082,6 @@ void Radiation::SetTargetPhotonVectorLookup(vector< vector<double> > v, int i) {
               " not valid. Exiting!" << endl;
       return;
   }
-
   double e[size];
   double n[size];
   double elin[size];
