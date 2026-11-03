@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>https://mischabr.github.io/GAMERA/gh-pages/jekyll/update/2025/03/11/welcome-to-jekyll.html</loc>
-<lastmod>2025-03-11T19:48:03+01:00</lastmod>
-</url>
-<url>
-<loc>https://mischabr.github.io/GAMERA/about/</loc>
-</url>
-<url>
 <loc>https://mischabr.github.io/GAMERA/docs/acknowledging</loc>
 </url>
 <url>
@@ -35,9 +28,6 @@
 <loc>https://mischabr.github.io/GAMERA/docs/hadronic_models</loc>
 </url>
 <url>
-<loc>https://mischabr.github.io/GAMERA/gh-pages/</loc>
-</url>
-<url>
 <loc>https://mischabr.github.io/GAMERA/index</loc>
 </url>
 <url>
@@ -51,6 +41,12 @@
 </url>
 <url>
 <loc>https://mischabr.github.io/GAMERA/docs/main_page</loc>
+</url>
+<url>
+<loc>https://mischabr.github.io/GAMERA/docs/neutrino_emission</loc>
+</url>
+<url>
+<loc>https://mischabr.github.io/GAMERA/docs/numerical_pitfalls</loc>
 </url>
 <url>
 <loc>https://mischabr.github.io/GAMERA/docs/particle_escape</loc>

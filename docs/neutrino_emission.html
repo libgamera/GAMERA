@@ -1,0 +1,373 @@
+<!doctype html>
+
+
+
+
+<html
+    dir="ltr"
+    lang="en"
+    class=" has-navbar-fixed-top  "
+>
+    <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="/GAMERA/assets/css/app.css">
+    <link
+        rel="shortcut icon"
+        type="image/png"
+        
+            href="/GAMERA/favicon.png"
+        
+    >
+    <script defer src="https://unpkg.com/alpinejs@3.9.0/dist/cdn.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"
+    ></script>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    >
+    
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-social@1/bin/bulma-social.min.css">
+    
+    <!-- Begin Jekyll SEO tag v2.9.0 -->
+<title>Neutrino Emission</title>
+<meta name="generator" content="Jekyll v4.4.1" />
+<meta property="og:title" content="Neutrino Emission" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://mischabr.github.io/GAMERA/docs/neutrino_emission" />
+<meta property="og:url" content="https://mischabr.github.io/GAMERA/docs/neutrino_emission" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Neutrino Emission" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","headline":"Neutrino Emission","url":"https://mischabr.github.io/GAMERA/docs/neutrino_emission"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <!-- head scripts -->
+</head>
+
+    <body>
+        <a href="#main-content" class="is-sr-only skip-link"> Skip to main content </a>
+
+        
+        <nav
+    class="navbar is-primary  is-fixed-top "
+    x-data="{ openNav: false }"
+>
+    <div class="container">
+        <div class="navbar-brand">
+            <a href="/GAMERA/" class="navbar-item">
+                
+            </a>
+            <a
+                role="button"
+                class="navbar-burger burger"
+                aria-label="menu"
+                aria-expanded="false"
+                data-target="navMenu"
+                :class="{ 'is-active': openNav }"
+                x-on:click="openNav = !openNav"
+            >
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        <div class="navbar-menu" id="navMenu" :class="{ 'is-active': openNav }">
+            <div class="navbar-start">
+                <a href="/GAMERA/" class="navbar-item ">Home</a>
+                
+                    
+                        
+                            <a
+                                href="/GAMERA/docs/documentation"
+                                class="navbar-item "
+                            >Overview</a>
+                        
+                    
+                        
+                            <a
+                                href="/GAMERA/docs/tutorials_main"
+                                class="navbar-item "
+                            >Tutorials</a>
+                        
+                    
+                        
+                            <a
+                                href="https://github.com/libgamera/GAMERA"
+                                class="navbar-item "
+                            >Github</a>
+                        
+                    
+                
+            </div>
+
+            <div class="navbar-end">
+                
+            </div>
+        </div>
+    </div>
+</nav>
+
+        
+            <section
+    class="hero  is-medium  is-bold is-primary"
+    
+>
+    <div class="hero-body ">
+        <div class="container">
+            <h1 class="title is-2">Neutrino Emission</h1>
+            <p class="subtitle is-3"></p>
+            
+        </div>
+    </div>
+</section>
+
+        
+        
+
+        <section class="section">
+            <div class="container">
+                <div class="columns is-multiline">
+                    
+                        <div class="column is-4-desktop is-4-tablet">
+                            
+
+<aside class="menu">
+    
+        <p class="menu-label">General Information</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/index" class="">Start</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/documentation" class="">Overview</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/numerical_pitfalls" class="">Numerical pitfalls</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Installation</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/download_installation" class="">Download & Installation</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Tutorials</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/tutorials_main" class="">List of Tutorials</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/radiation_modeling" class="">Radiation</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/time_independent_modeling" class="">Time independent modeling</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/time_dependent_modeling" class="">Time dependent modeling</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/inverse_compton" class="">Inverse Compton Radiation Fields</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/hadronic_models" class="">Hadronic Interaction Models</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/particle_escape" class="">Particle Escape</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/energy_loss" class="">Energy Loss Rates</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/gammagamma_absorption" class="">Absorption</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/hadronic_components" class="">Arbitrary Cosmic Ray Species</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/fitting_data" class="">Fitting Data</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/neutrino_emission" class="is-active">Neutrino emission</a>
+                    
+                </li>
+            
+        </ul>
+    
+        <p class="menu-label">Miscellaneous</p>
+        <ul class="menu-list">
+            
+                <li>
+                    <a href="/GAMERA/docs/contact" class="">Contact and support</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/acknowledging" class="">Acknowledging GAMERA</a>
+                    
+                </li>
+            
+                <li>
+                    <a href="/GAMERA/docs/licence" class="">Licence</a>
+                    
+                </li>
+            
+        </ul>
+    
+</aside>
+
+                        </div>
+                    
+                    <main class="column is-8" id="main-content">
+                        
+
+                        
+
+                        
+
+                        
+
+                        
+<div class="content">
+    <h1 id="neutrino-emission">Neutrino Emission</h1>
+
+<p>In this tutorial we describe how to compute the neutrino emission from hadronic interactions in <code class="language-plaintext highlighter-rouge">GAMERA</code> with the <code class="language-plaintext highlighter-rouge">Radiation</code> class. If you are not yet familiar with the basics of the Radiation class, please have a look at the dedicated <a href="/GAMERA/docs/radiation_modeling">tutorial</a>.
+In the following we assume that <code class="language-plaintext highlighter-rouge">fr</code> is an instance of the class <code class="language-plaintext highlighter-rouge">Radiation</code>.</p>
+
+<p>The neutrino emission is calculated from inelastic proton-proton (and nucleus-nucleus) collisions, following the same
+approach as for the pi0 decay gamma-ray emission. It makes use of the parametrisations in
+<a href="https://ui.adsabs.harvard.edu/abs/2006PhRvD..74c4018K/abstract">Kelner et al. 2006</a>.
+A full working script calculating neutrinos can be found <a href="neutrinos.py">here</a>.</p>
+
+<h1 id="defining-the-cosmic-ray-spectra-and-the-ambient-medium">Defining the cosmic ray spectra and the ambient medium</h1>
+
+<p>As a first step, the parent particle spectra and the ambient medium
+need to be defined. Protons can be set via <code class="language-plaintext highlighter-rouge">SetProtons()</code>, while heavier hadronic species can be added with
+<code class="language-plaintext highlighter-rouge">AddHadrons()</code>. The calculation of neutrinos works for arbitrary hadronic cosmic ray species and ambient medium compositions.
+For a detailed description of how to set up arbitrary hadronic species and arbitrary medium compositions,
+please have a look at the tutorial about <a href="/GAMERA/docs/hadronic_components">arbitrary cosmic ray species</a>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fr</span> <span class="o">=</span> <span class="n">gp</span><span class="p">.</span><span class="nc">Radiation</span><span class="p">()</span>
+
+<span class="n">evalues</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span><span class="o">*</span><span class="n">gp</span><span class="p">.</span><span class="n">TeV_to_erg</span>
+<span class="n">e_cut</span> <span class="o">=</span> <span class="mf">60.</span><span class="o">*</span><span class="n">gp</span><span class="p">.</span><span class="n">TeV_to_erg</span>
+<span class="n">dn_dE_proton</span> <span class="o">=</span> <span class="n">evalues</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="p">.</span><span class="nf">exp</span><span class="p">(</span><span class="o">-</span><span class="n">evalues</span><span class="o">/</span><span class="n">e_cut</span><span class="p">)</span>
+
+<span class="n">fr</span><span class="p">.</span><span class="nc">SetProtons</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="nf">zip</span><span class="p">(</span><span class="n">evalues</span><span class="p">,</span> <span class="n">dn_dE_proton</span><span class="p">)))</span>
+
+<span class="n">e_cut_HE</span> <span class="o">=</span> <span class="n">e_cut</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="n">dn_dE_HE</span> <span class="o">=</span> <span class="n">evalues</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="p">.</span><span class="nf">exp</span><span class="p">(</span><span class="o">-</span><span class="n">evalues</span><span class="o">/</span><span class="n">e_cut_HE</span><span class="p">)</span>
+<span class="n">fr</span><span class="p">.</span><span class="nc">AddHadrons</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="nf">zip</span><span class="p">(</span><span class="n">evalues</span><span class="p">,</span> <span class="n">dn_dE_proton</span><span class="p">)),</span>  <span class="mf">1.0</span><span class="p">)</span>   <span class="c1"># A = 1 (protons)
+</span><span class="n">fr</span><span class="p">.</span><span class="nc">AddHadrons</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="nf">zip</span><span class="p">(</span><span class="n">evalues</span><span class="p">,</span> <span class="n">dn_dE_HE</span><span class="p">)),</span> <span class="mf">4.0</span><span class="p">)</span>   <span class="c1"># A = 4 (helium)
+</span>
+<span class="n">fr</span><span class="p">.</span><span class="nc">SetAmbientDensity</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="calculating-the-neutrino-spectrum">Calculating the neutrino spectrum</h2>
+
+<p>Once the particle spectra and the ambient medium are defined, the neutrino emission is computed by calling:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">E</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="n">gp</span><span class="p">.</span><span class="n">TeV_to_erg</span>  <span class="c1"># energy points in erg
+</span><span class="n">fr</span><span class="p">.</span><span class="nc">CalculateNeutrinoSpectrum</span><span class="p">(</span><span class="n">E</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>where <code class="language-plaintext highlighter-rouge">E</code> is a list or numpy array of energy points in erg at which the neutrino spectrum will be evaluated.</p>
+
+<h2 id="retrieving-the-neutrino-emission">Retrieving the neutrino emission</h2>
+
+<p>After the calculation, the total neutrino emission can be retrieved as an SED (E² dN/dE vs E):</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">total_neutrino_SED</span> <span class="o">=</span> <span class="n">fr</span><span class="p">.</span><span class="nc">GetNeutrinoSED</span><span class="p">()</span>  <span class="c1"># total neutrino SED (all species combined)
+</span></code></pre></div></div>
+
+<p>This corresponds to the total amount of neutrinos, irrespective of their flavour. Therefore, if one is only interested in, for example, the muon-neutrino SED, the total SED needs to be divided by a factor of 3, assuming full neutrino mixing.
+It is also possible to retrieve the contributions from protons set via <code class="language-plaintext highlighter-rouge">SetProtons()</code> and from each hadronic species
+added via <code class="language-plaintext highlighter-rouge">AddHadrons()</code> individually:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">proton_neutrino_SED</span>  <span class="o">=</span> <span class="n">fr</span><span class="p">.</span><span class="nc">GetProtonNeutrinoSED</span><span class="p">()</span>   <span class="c1"># contribution from SetProtons()
+</span>
+<span class="n">hadron_neutrino_SED_0</span> <span class="o">=</span> <span class="n">fr</span><span class="p">.</span><span class="nc">GetHadronNeutrinoSED</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># contribution from the 1st AddHadrons() species
+</span><span class="n">hadron_neutrino_SED_1</span> <span class="o">=</span> <span class="n">fr</span><span class="p">.</span><span class="nc">GetHadronNeutrinoSED</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># contribution from the 2nd AddHadrons() species
+</span></code></pre></div></div>
+
+<p>where the index passed to <code class="language-plaintext highlighter-rouge">GetHadronNeutrinoSED(i)</code> corresponds to the order in which the species were added with
+<code class="language-plaintext highlighter-rouge">AddHadrons()</code>.</p>
+
+<p>The differential neutrino spectrum (dN/dE vs E, in units of <code class="language-plaintext highlighter-rouge">1 / erg / cm² / s</code> vs <code class="language-plaintext highlighter-rouge">erg</code>) can be retrieved in the
+same way using the corresponding spectrum functions:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">total_neutrino_spectrum</span>  <span class="o">=</span> <span class="n">fr</span><span class="p">.</span><span class="nc">GetNeutrinoSpectrum</span><span class="p">()</span>      <span class="c1"># total neutrino spectrum
+</span><span class="n">proton_neutrino_spectrum</span> <span class="o">=</span> <span class="n">fr</span><span class="p">.</span><span class="nc">GetProtonNeutrinoSpectrum</span><span class="p">()</span> <span class="c1"># from SetProtons()
+</span><span class="n">hadron_neutrino_spectrum</span> <span class="o">=</span> <span class="n">fr</span><span class="p">.</span><span class="nc">GetHadronNeutrinoSpectrum</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># from the 1st AddHadrons() species
+</span></code></pre></div></div>
+
+<p>A documented, working example script can be found <a href="neutrinos.py">here</a>, which will produce the following plot:</p>
+
+<p><img src="neutrino_sed_total.png" alt="neutrino_sed_total" /></p>
+
+</div>
+
+                    </main>
+                    
+                </div>
+            </div>
+        </section>
+        
+            <footer class="footer">
+    <div class="container">
+        
+
+        
+
+
+        <div class="content is-small has-text-centered">
+            <p class="">Theme built by <a href="https://www.csrhymes.com">C.S. Rhymes</a></p>
+        </div>
+    </div>
+</footer>
+
+        
+        <script src="/GAMERA/assets/js/app.js" type="text/javascript"></script><!-- footer scripts -->
+</body>
+</html>
