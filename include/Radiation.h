@@ -25,6 +25,7 @@ class Radiation {
   static Radiation *_radPtr;
 
  private:
+  Utils *fUtils;
   // this function does not exist
   void CalculateLuminosityAndFlux(string mechanism, double e, double &l,
                                   double &f);
@@ -37,18 +38,20 @@ class Radiation {
   bool FASTMODE_IC; ///< speed up IC calculation by not calculating emission on
                    ///< isotropic target fields individually but only sum
   bool IC_CALCULATED;
-  bool ISOTROPIC_ELECTRONS; ///< Set to true for isotropic electrons in IC scattering
+  bool ISOTROPIC_ELECTRONS; /// < Set to true for isotropic electrons in IC scattering
 
   bool FASTMODE_IC_LOSSLOOK; ///< speed up IC calculation by not calculating emission on
                              ///< isotropic target fields individually but only sum
   bool IC_LOSSLOOK_CALCULATED;  ///< Store if the Inverse Compton Lookup has been computed
+  bool USE_KELNER; ///< Use the parametrization of Kelner et al. 2006 for PP interactions
+  bool USE_KAMAE; ///< Use the parametrization of Kamae et al. 2006 for PP interactions
   double DifferentialEmissionComponent(double e, void *par); ///< Calculates the differential photon rate
   double GreyBody(double ephoton, double temp, double edens); ///< Thermal grey body
   double ICEmissivityRadFieldIntegrated(double x, void *par); ///< IC emission from electrons integrated over the target photon population.
   double ICEmissivity(double x, void *par);           ///< Emissivity from IC scattering
   double ICEmissivityAnisotropic(double x, void *par);  ///< Anisitropic IC emissivity
   double ICAnisotropicAuxFunc(double phi_p, double theta_p, double ephoton,
-                              double egamma, double lorentz, double beta, 
+                              double egamma, double lorentz, double beta,
                               double cos_zeta); ///< Auxiliary function for IC scattering 
   double ICEmissivityAnisotropicIsotropicElectrons(double x, void *par);  ///< Anisotropic IC emissivity with isotropic electrons
   double ICEmissivityAnisotropicIsotropicElectronsSecondIntegral(double x, void *par);
@@ -58,6 +61,12 @@ class Radiation {
   double ICEmissivityAnisotropicIsotropicElectronsAharonian(double x, void *par);
   double ICEmissivityAnisotropicIsotropicElectronsAharonianSecondIntegral(double x, void *par);
   double ICEmissivityAnisotropicIsotropicElectronsAharonianFirstIntegral(double x, void *par);
+  double NeutrinoFlux2(double energy_proton, void *par);
+  double NeutrinoFlux1(double energy_proton, void *par);
+  
+  
+  double CalculateNeutrinoFlux(double energy, int leptontype);
+  
   double K(double nu, double x);             ///< modified Bessel function
   double K_53(double x, void *par);          ///< modified Bessel function of order 5/3
   double SynchEmissivity(double x, void *par);  ///< Synchrotron Emissivity
@@ -97,7 +106,7 @@ class Radiation {
   vector<vector<double> > ElectronVector;  ///< format of Radiation::ParticleVector, holding the electron spectrum
   vector<vector<double> > ProtonVector;    ///< format of Radiation::ParticleVector, holding the proton spectrum
   /**\brief 2D Vector holding the total target field for IC scattering*/
-  
+
 
   vector<double> HadronMasses;
   vector<vector< vector <double> > > HadronSpectra;
@@ -106,6 +115,11 @@ class Radiation {
   
   
   bool DEFAULT_HADRON_COMPOSITION;
+  
+  gsl_spline *EpsilonLookup;
+  gsl_spline * ProtonEpsilonLookup;
+  
+  
   
   vector<vector<double> > TargetPhotonVectorSumAll;  ///< Format: 
                                                ///< E(erg)-dN/dE(differential
@@ -119,9 +133,35 @@ class Radiation {
   vector<vector<double> > *TargetPhotonVectorCurrent;  ///< Pointer to the current target field in use
   /**\brief Target photon field for Synchrotron Self Compton mechanism */
   vector<vector<double> > SSCTargetPhotons;  ///< 2D-vector object holding the
-                                             ///< SSC target photon spectrum  {
-                                             ///< E(erg) - Edens(erg cm^-3) }
-  double n;  ///< ambient density for Bremsstrahlung and inelastic p-p emission mechanisms (cm^-3)
+                                             ///SSC target photon spectrum  {
+                                             ///E(erg) - Edens(erg cm^-3) }
+                                             
+  vector<vector<double> > MuonNeutrinoVector; /// Vector containing muon neutrinos from
+                                            /// first decay of charged pions
+  vector<vector<double> > ElectronNeutrinoVector; /// Vector containing electron/muon Neutrinos from
+                                            /// decay of muon into an electron after decay of 
+                                            /// charged pions
+  vector<vector<double> > TotalNeutrinoVector; /// Vector containing the total neutrino emission from
+                                            /// pp-collisions.
+                                            
+  vector<vector<double> > ProtonMuonNeutrinoVector; /// Vector containing muon neutrinos from
+                                            /// first decay of charged pions for protons
+  vector<vector<double> > ProtonElectronNeutrinoVector; /// Vector containing electron/muon Neutrinos from
+                                            /// decay of muon into an electron after decay of 
+                                            /// charged pions for protons
+  vector<vector<double> > ProtonTotalNeutrinoVector; /// Vector containing the total neutrino emission from
+                                            /// pp-collisions for protons.    
+                                            
+  vector<vector<vector<double> > > HadronicMuonNeutrinoVectors; /// Vector containing muon neutrinos from
+                                            /// first decay of charged pions
+  vector<vector<vector<double> >  > HadronicElectronNeutrinoVectors; /// Vector containing electron/muon Neutrinos from
+                                            /// decay of muon into an electron after decay of 
+                                            /// charged pions
+  vector<vector<vector<double> > > HadronicTotalNeutrinoVectors; /// Vector containing the total neutrino emission from
+                                            /// pp-collisions.                                            
+                                            
+  double n;  ///< ambient density for Bremsstrahlung and inelastic p-p emission
+             ///mechanisms (cm^-3)
   double fdiffbrems;  ///< differential flux at specified energy E (in
                       ///< Radiation::CalculateDifferentialGammaEmission) due to
                       ///< Bremsstrahlung
@@ -209,6 +249,23 @@ class Radiation {
    */
   int SynchModel;  
   double PPEmissivity(double x, void *par);  ///< Compute pi0 emissivity
+  double PPEmissivityKelner(double x, void *par); ///< pi0 emissivity according to Kelner et al. 2006
+  double Fgamma(double Tp, double EP);  /// Function for the Kelner 2006 calculations
+  double Fnumu(double Enu_erg, double Ep_erg);
+  double Felectron(double Ee_erg, double Ep_erg);  
+  
+  double PPEmissivityKamae(double x, void *par);
+  double FndKamae(double x, double a0, double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8);
+  double FndklKamae(double x, double Wndl, double Wndh, double Lmax);
+  double FdiffKamae(double x, double b0, double b1, double b2, double b3, double b4, double b5, double b6, double b7);
+  double FklKamae(double x, double Tp);
+  double FresKamae(double x, double c0, double c1, double c2, double c3, double c4);
+  double SigmaNdKamae(double Tp);
+  double SigmaDiffKamae(double Tp);
+  double SigmaDeltaKamae(double Tp);
+  double SigmaResKamae(double Tp);
+  
+  
   void GetABGParams(double Tp, double &alpha, double &beta, double &gamma,
                     double &lambda); ///< auxiliary function for Radiation::PPEmissivity
   void GetAParams(double Tp, double &a1, double &a2, double &a3, double &a4,
@@ -294,9 +351,9 @@ class Radiation {
   Radiation();
   /// standard destructor
   ~Radiation();
-  /// Set Protons
+  /// Set the proton spectrum (e.g. calculated in the "Particles" class, but also arbitrary spectra. Input format: 2D vector, E(erg)-N(number))
   void SetProtons(vector<vector<double> > PROTONS);
-  /// Set Electrons
+  /// Set the electron spectrum (e.g. calculated in the "Particles" class, but also arbitrary spectra). Input format: 2D vector, E(erg)-N(number))
   void SetElectrons(vector<vector<double> > ELECTRONS);
   /// Setting isotropic electrons variable to true for anisotropic IC scattering
   void SetElectronsIsotropic(void);
@@ -315,6 +372,12 @@ class Radiation {
   void ClearHadrons(void);
   /// Test the hadron lookup
   double TestHadronLookup(int i, double e);
+  
+  
+   void UseKelner(bool kelner);  // Use parametrization of Kelner et al. 2006 for pp emission
+   double InelasticPPXSectionKelner(double EP); // Inelastic PP cross section from Kelner
+   
+   void UseKamae(bool kamae); // Use parametrization of Kamae et al. 2006 for pp emission
 
   /// Calculate epsilon factor for hadronic interactions
   double CalculateEpsilon(double Tp, double Mass);
@@ -341,10 +404,12 @@ class Radiation {
                                            double emax = 0.);
   /// Calculate differential photon spectrum at given \a points
   void CalculateDifferentialPhotonSpectrum(vector<double> points);
-  /**
-   * Return the differential photon spectra
-   * dN/dE [number of photons/(erg*s*cm^2)] vs E [erg] in a 2D-Vector
-   * */
+
+  void CalculateNeutrinoSpectrum(vector<double> points);
+/**
+ * Return the differential photon spectra
+ * dN/dE [number of photons/(erg*s*cm^2)] vs E [erg] in a 2D-Vector
+ * */
   vector<vector<double> > ReturnDifferentialPhotonSpectrum(int i,
                                                            double emin,
                                                            double emax,
@@ -352,6 +417,7 @@ class Radiation {
   /// returns SED for emission component \a i as 2D vector
   vector<vector<double> > ReturnSED(int i, double emin,double emax, 
                                       vector< vector<double> > vec);
+
   /// set the source B-Field (G)
   void SetBField(double BFIELD) {
     BField = BFIELD;
@@ -512,10 +578,42 @@ class Radiation {
   /// Returns IC SED for target field \a i
   vector<vector<double> > GetICSED(unsigned int i, double emin = 0., double emax = 0.);
 
-  /// Return pi0 decay spectrum from hadronic component i
-  vector<vector<double> > GetHadronSpectrum(unsigned int i, double emin = 0., double emax = 0.);
-  /// Return pi0 decay SED from hadronic component i
-  vector<vector<double> > GetHadronSED(unsigned int i, double emin = 0., double emax = 0.);
+
+  vector<vector<double> > GetHadronSpectrum(unsigned int i, double emin = 0., double emax = 0.); ///< return Hadron spectrum from component i
+  vector<vector<double> > GetHadronSED(unsigned int i, double emin = 0., double emax = 0.); ///< return Hadron SED from component i 
+  
+  
+  vector<vector<double> > ReturnNeutrinoSpectrum(vector<vector<double> > vec);
+  vector<vector<double> > ReturnNeutrinoSED(vector<vector<double> > vec);
+  vector<vector<double> > ReturnHadronNeutrinoSpectrum(int i, vector<vector<vector<double> > > vec);
+  vector<vector<double> > ReturnHadronNeutrinoSED(int i, vector<vector<vector<double> > > vec);
+  
+  
+  vector<vector<double> > GetNeutrinoSpectrum(void) { return ReturnNeutrinoSpectrum(TotalNeutrinoVector);}; /// Return the neutrino spectrum
+  vector<vector<double> > GetNeutrinoSED(void) {return ReturnNeutrinoSED(TotalNeutrinoVector);}; /// Return the neutrino SED
+  vector<vector<double> > GetNeutrinoSpectrumMuon(void) { return ReturnNeutrinoSpectrum(MuonNeutrinoVector);};
+  vector<vector<double> > GetNeutrinoSpectrumElectron(void) { return ReturnNeutrinoSpectrum(ElectronNeutrinoVector);};
+  vector<vector<double> > GetNeutrinoSEDMuon(void) {return ReturnNeutrinoSED(MuonNeutrinoVector);};
+  vector<vector<double> > GetNeutrinoSEDElectron(void) {return ReturnNeutrinoSED(ElectronNeutrinoVector);};
+  
+
+  vector<vector<double> > GetProtonNeutrinoSpectrum(void) { return ReturnNeutrinoSpectrum(ProtonTotalNeutrinoVector);}; /// Return the neutrino spectrum
+  vector<vector<double> > GetProtonNeutrinoSED(void) {return ReturnNeutrinoSED(ProtonTotalNeutrinoVector);}; /// Return the neutrino SED
+  vector<vector<double> > GetProtonNeutrinoSpectrumMuon(void) { return ReturnNeutrinoSpectrum(ProtonMuonNeutrinoVector);};
+  vector<vector<double> > GetProtonNeutrinoSpectrumElectron(void) { return ReturnNeutrinoSpectrum(ProtonElectronNeutrinoVector);};
+  vector<vector<double> > GetProtonNeutrinoSEDMuon(void) {return ReturnNeutrinoSED(ProtonMuonNeutrinoVector);};
+  vector<vector<double> > GetProtonNeutrinoSEDElectron(void) {return ReturnNeutrinoSED(ProtonElectronNeutrinoVector);};
+
+
+  
+  vector<vector<double> > GetHadronNeutrinoSpectrum(int i) { return ReturnHadronNeutrinoSpectrum(i, HadronicTotalNeutrinoVectors);}; /// Return the neutrino spectrum
+  vector<vector<double> > GetHadronNeutrinoSED(int i) {return ReturnHadronNeutrinoSED(i, HadronicTotalNeutrinoVectors);}; /// Return the neutrino SED
+  vector<vector<double> > GetHadronNeutrinoSpectrumMuon(int i) { return ReturnHadronNeutrinoSpectrum(i, HadronicMuonNeutrinoVectors);};
+  vector<vector<double> > GetHadronNeutrinoSpectrumElectron(int i) { return ReturnHadronNeutrinoSpectrum(i, HadronicElectronNeutrinoVectors);};
+  vector<vector<double> > GetHadronNeutrinoSEDMuon(int i) {return ReturnHadronNeutrinoSED(i, HadronicMuonNeutrinoVectors);};
+  vector<vector<double> > GetHadronNeutrinoSEDElectron(int i) {return ReturnHadronNeutrinoSED(i, HadronicElectronNeutrinoVectors);};  
+  
+  
   
   
   Radiation *Clone() { return this; }
@@ -536,7 +634,6 @@ class Radiation {
   vector< vector<double> > GetProtonSED() {return GetParticleSED("protons");}
   /// Return electron SED See: Radiation::GetPaticleSED
   vector< vector<double> > GetElectronSED() {return GetParticleSED("electrons");}
-  Utils *fUtils;
   /// Set up anisotropy for target photon \a i accounting for observation angle
   void SetTargetPhotonAnisotropy(int i, vector<double> obs_angle, 
                                  vector<double> phi, vector<double> theta, 
@@ -663,5 +760,22 @@ class Radiation {
   /// Get integrated absorbed energy flux between emin and emax (erg) summed over all radiation processes
   double GetIntegralTotalAbsFlux(double emin, double emax, vector <int> fields) {
     return ReturnAbsorbedIntergratedFlux(emin,emax,false,fields,sizephfield); }
+
+
+/* //to be fixed
+  vector <vector <double> > RetAbsDiffSpectrum(double emin, double emax);
+  vector <vector <double> > RetAbsSED(double emin, double emax);
+  vector<vector<double> > GetAbsSED(double emin = 0., double emax = 0.) {
+      return RetAbsSED(emin, emax);
+    }  ///< return total SED
+  vector<vector<double> > GetAbsSpectrum(double emin = 0., double emax = 0.) {
+        return RetAbsDiffSpectrum(emin, emax);
+      }  ///< return total Diff Spectrum
+*/
+
+
+  void SetLocalAmbientMediumComposition(double density, string norm="hydrogen");
+  void AddLocalCosmicRayModel(bool extragalactic=true, double slope=2.65);
+  void AddCRModel(bool extragalactic = true, bool CREAM = false);
 };
 #endif

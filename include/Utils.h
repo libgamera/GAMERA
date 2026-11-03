@@ -22,6 +22,8 @@
 #define GeV_to_erg 1.602e-3
 /* eV->erg */
 #define eV_to_erg 1.602e-12
+/*erg->TeV*/
+#define erg_to_TeV 0.624151
 /* Thomson cross section */
 #define sigma_T 6.6524e-25
 /* classical electron radius (cm) */
@@ -155,6 +157,7 @@ class Utils {
                     const char* t, int l);
   void SetInterpolationMethod(string intermeth);
   void Clear2DVector(vector< vector<double> > &v);
+  void Clear3DVector(vector< vector< vector<double> > > &v);
   vector< vector<double> > VectorAxisLogarithm(vector< vector<double> > v,
                                                unsigned int column); ///< Make log10 of column
 
@@ -200,9 +203,12 @@ class Utils {
   bool GetQuietMode() {return QUIETMODE;}
   vector< vector<double> > RemoveZeroEntries(vector< vector<double> > v);
   vector< vector<double> > TwoDVectorFabs(vector< vector<double> > v);
+
+
   vector<double> RotateVector(vector<double> v, vector<double> p1, vector<double> p2);
   double Gaussian1D(double x, double sigma, double mu=0., double norm=0.);
   double LogisticsFunction(double z, double h, double w);
   double Norm(vector<double> v);
+
 };
 #endif
