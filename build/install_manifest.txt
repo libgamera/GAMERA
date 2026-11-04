@@ -1,0 +1,11 @@
+/home/mbreuhaus/.local/gamera/lib/libgamera.so
+/home/mbreuhaus/.local/gamera/include/2D_interp/interp2d_spline.h
+/home/mbreuhaus/.local/gamera/include/2D_interp/interp2d.h
+/home/mbreuhaus/.local/gamera/include/Particles.h
+/home/mbreuhaus/.local/gamera/include/Radiation.h
+/home/mbreuhaus/.local/gamera/include/Utils.h
+/home/mbreuhaus/.local/gamera/include/Astro.h
+/home/mbreuhaus/.local/gamera/share/cmake/GAMERA/GAMERATargets.cmake
+/home/mbreuhaus/.local/gamera/share/cmake/GAMERA/GAMERATargets-release.cmake
+/home/mbreuhaus/.local/gamera/share/cmake/GAMERA/GAMERAConfig.cmake
+/home/mbreuhaus/.local/gamera/share/cmake/GAMERA/GAMERAConfigVersion.cmake

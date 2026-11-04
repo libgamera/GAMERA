@@ -1,0 +1,2356 @@
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineSystem.cmake:12 (find_program)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_UNAME"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "uname"
+    candidate_directories:
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/home/mbreuhaus/micromamba/bin/uname"
+      - "/home/mbreuhaus/gems/bin/uname"
+      - "/home/mbreuhaus/micromamba/condabin/uname"
+      - "/home/mbreuhaus/.local/bin/uname"
+      - "/usr/local/sbin/uname"
+      - "/usr/local/bin/uname"
+      - "/usr/sbin/uname"
+    found: "/usr/bin/uname"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineSystem.cmake:212 (message)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      The system is: Linux - 7.0.0-30-generic - x86_64
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeUnixFindMake.cmake:5 (find_program)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_MAKE_PROGRAM"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gmake"
+      - "make"
+      - "smake"
+    candidate_directories:
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/home/mbreuhaus/micromamba/bin/gmake"
+      - "/home/mbreuhaus/gems/bin/gmake"
+      - "/home/mbreuhaus/micromamba/condabin/gmake"
+      - "/home/mbreuhaus/.local/bin/gmake"
+      - "/usr/local/sbin/gmake"
+      - "/usr/local/bin/gmake"
+      - "/usr/sbin/gmake"
+    found: "/usr/bin/gmake"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCompiler.cmake:73 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:69 (_cmake_find_compiler)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_CXX_COMPILER"
+    description: "CXX compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "c++"
+      - "CC"
+      - "g++"
+      - "aCC"
+      - "cl"
+      - "bcc"
+      - "xlC"
+      - "icpx"
+      - "icx"
+      - "clang++"
+    candidate_directories:
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/home/mbreuhaus/micromamba/bin/c++"
+      - "/home/mbreuhaus/gems/bin/c++"
+      - "/home/mbreuhaus/micromamba/condabin/c++"
+      - "/home/mbreuhaus/.local/bin/c++"
+      - "/usr/local/sbin/c++"
+      - "/usr/local/bin/c++"
+      - "/usr/sbin/c++"
+    found: "/usr/bin/c++"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCXXCompilerId.cpp.in"
+    candidate_directories:
+      - "/usr/share/cmake-4.2/Modules/"
+    found: "/usr/share/cmake-4.2/Modules/CMakeCXXCompilerId.cpp.in"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:125 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler: /usr/bin/c++ 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+      
+      The CXX compiler identification is GNU, found in:
+        /home/mbreuhaus/Nextcloud/Documents/Gamera/GAMERA/build/CMakeFiles/4.2.3/CompilerIdCXX/a.out
+      
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_AR"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ar"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/usr/bin/ar"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_RANLIB"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ranlib"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/usr/bin/ranlib"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_STRIP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "strip"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/usr/bin/strip"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_LINKER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ld"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/usr/bin/ld"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_NM"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "nm"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/usr/bin/nm"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_OBJDUMP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "objdump"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/usr/bin/objdump"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_OBJCOPY"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "objcopy"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/usr/bin/objcopy"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_READELF"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "readelf"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/usr/bin/readelf"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_DLLTOOL"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "dlltool"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/usr/bin/dlltool"
+      - "/home/mbreuhaus/micromamba/bin/dlltool"
+      - "/home/mbreuhaus/gems/bin/dlltool"
+      - "/home/mbreuhaus/micromamba/condabin/dlltool"
+      - "/home/mbreuhaus/.local/bin/dlltool"
+      - "/usr/local/sbin/dlltool"
+      - "/usr/local/bin/dlltool"
+      - "/usr/sbin/dlltool"
+      - "/sbin/dlltool"
+      - "/bin/dlltool"
+      - "/usr/games/dlltool"
+      - "/usr/local/games/dlltool"
+      - "/snap/bin/dlltool"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_ADDR2LINE"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "addr2line"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    found: "/usr/bin/addr2line"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:206 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_TAPI"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "tapi"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/usr/bin/tapi"
+      - "/home/mbreuhaus/micromamba/bin/tapi"
+      - "/home/mbreuhaus/gems/bin/tapi"
+      - "/home/mbreuhaus/micromamba/condabin/tapi"
+      - "/home/mbreuhaus/.local/bin/tapi"
+      - "/usr/local/sbin/tapi"
+      - "/usr/local/bin/tapi"
+      - "/usr/sbin/tapi"
+      - "/sbin/tapi"
+      - "/bin/tapi"
+      - "/usr/games/tapi"
+      - "/usr/local/games/tapi"
+      - "/snap/bin/tapi"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/Compiler/GNU-FindBinUtils.cmake:18 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:207 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_CXX_COMPILER_AR"
+    description: "A wrapper around 'ar' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gcc-ar-15.2"
+      - "gcc-ar-15"
+      - "gcc-ar15"
+      - "gcc-ar"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/usr/bin/gcc-ar-15.2"
+      - "/home/mbreuhaus/micromamba/bin/gcc-ar-15.2"
+      - "/home/mbreuhaus/gems/bin/gcc-ar-15.2"
+      - "/home/mbreuhaus/micromamba/condabin/gcc-ar-15.2"
+      - "/home/mbreuhaus/.local/bin/gcc-ar-15.2"
+      - "/usr/local/sbin/gcc-ar-15.2"
+      - "/usr/local/bin/gcc-ar-15.2"
+      - "/usr/sbin/gcc-ar-15.2"
+      - "/sbin/gcc-ar-15.2"
+      - "/bin/gcc-ar-15.2"
+      - "/usr/games/gcc-ar-15.2"
+      - "/usr/local/games/gcc-ar-15.2"
+      - "/snap/bin/gcc-ar-15.2"
+    found: "/usr/bin/gcc-ar-15"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/Compiler/GNU-FindBinUtils.cmake:30 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCXXCompiler.cmake:207 (include)"
+      - "CMakeLists.txt:3 (project)"
+    mode: "program"
+    variable: "CMAKE_CXX_COMPILER_RANLIB"
+    description: "A wrapper around 'ranlib' adding the appropriate '--plugin' option for the GCC compiler"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gcc-ranlib-15.2"
+      - "gcc-ranlib-15"
+      - "gcc-ranlib15"
+      - "gcc-ranlib"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/usr/bin/gcc-ranlib-15.2"
+      - "/home/mbreuhaus/micromamba/bin/gcc-ranlib-15.2"
+      - "/home/mbreuhaus/gems/bin/gcc-ranlib-15.2"
+      - "/home/mbreuhaus/micromamba/condabin/gcc-ranlib-15.2"
+      - "/home/mbreuhaus/.local/bin/gcc-ranlib-15.2"
+      - "/usr/local/sbin/gcc-ranlib-15.2"
+      - "/usr/local/bin/gcc-ranlib-15.2"
+      - "/usr/sbin/gcc-ranlib-15.2"
+      - "/sbin/gcc-ranlib-15.2"
+      - "/bin/gcc-ranlib-15.2"
+      - "/usr/games/gcc-ranlib-15.2"
+      - "/usr/local/games/gcc-ranlib-15.2"
+      - "/snap/bin/gcc-ranlib-15.2"
+    found: "/usr/bin/gcc-ranlib-15"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "~/.local/gamera"
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "/usr/share/cmake-4.2/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:3 (project)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "/home/mbreuhaus/Nextcloud/Documents/Gamera/GAMERA/build/CMakeFiles/CMakeScratch/TryCompile-3lrtf4"
+      binary: "/home/mbreuhaus/Nextcloud/Documents/Gamera/GAMERA/build/CMakeFiles/CMakeScratch/TryCompile-3lrtf4"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: '/home/mbreuhaus/Nextcloud/Documents/Gamera/GAMERA/build/CMakeFiles/CMakeScratch/TryCompile-3lrtf4'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_f60c2/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_f60c2.dir/build.make CMakeFiles/cmTC_f60c2.dir/build
+        gmake[1]: Entering directory '/home/mbreuhaus/Nextcloud/Documents/Gamera/GAMERA/build/CMakeFiles/CMakeScratch/TryCompile-3lrtf4'
+        Building CXX object CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o
+        /usr/bin/c++   -v -o CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-4.2/Modules/CMakeCXXCompilerABI.cpp
+        Using built-in specs.
+        COLLECT_GCC=/usr/bin/c++
+        OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa
+        OFFLOAD_TARGET_DEFAULT=1
+        Target: x86_64-linux-gnu
+        Configured with: ../src/configure -v --with-pkgversion='Ubuntu 15.2.0-16ubuntu1' --with-bugurl=file:///usr/share/doc/gcc-15/README.Bugs --enable-languages=c,ada,c++,go,d,fortran,objc,obj-c++,m2,rust,cobol,algol68 --prefix=/usr --with-gcc-major-version-only --program-suffix=-15 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/libexec --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-libstdcxx-backtrace --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-15-j35TAX/gcc-15-15.2.0/debian/tmp-nvptx/usr,amdgcn-amdhsa=/build/gcc-15-j35TAX/gcc-15-15.2.0/debian/tmp-gcn/usr --enable-offload-defaulted --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=2
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 15.2.0 (Ubuntu 15.2.0-16ubuntu1) 
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_f60c2.dir/'
+         /usr/libexec/gcc/x86_64-linux-gnu/15/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/share/cmake-4.2/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_f60c2.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -fasynchronous-unwind-tables -fstack-protector-strong -Wformat -Wformat-security -fstack-clash-protection -fcf-protection -fzero-init-padding-bits=all -Wbidi-chars=any -o /tmp/ccCsa9ik.s
+        GNU C++17 (Ubuntu 15.2.0-16ubuntu1) version 15.2.0 (x86_64-linux-gnu)
+        	compiled by GNU C version 15.2.0, GMP version 6.3.0, MPFR version 4.2.2, MPC version 1.3.1, isl version isl-0.27-GMP
+        
+        GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+        ignoring duplicate directory "/usr/include/x86_64-linux-gnu/c++/15"
+        ignoring nonexistent directory "/usr/local/include/x86_64-linux-gnu"
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/15/include-fixed/x86_64-linux-gnu"
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/15/include-fixed"
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/15/../../../../x86_64-linux-gnu/include"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /usr/include/c++/15
+         /usr/include/x86_64-linux-gnu/c++/15
+         /usr/include/c++/15/backward
+         /usr/lib/gcc/x86_64-linux-gnu/15/include
+         /usr/local/include
+         /usr/include/x86_64-linux-gnu
+         /usr/include
+        End of search list.
+        Compiler executable checksum: b661a74662ad7cf413c4193391ab5290
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_f60c2.dir/'
+         /usr/bin/x86_64-linux-gnu-as -v --64 -o CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccCsa9ik.s
+        GNU assembler version 2.46 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.46
+        COMPILER_PATH=/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/
+        LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../:/lib/:/usr/lib/
+        COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.'
+        Linking CXX executable cmTC_f60c2
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f60c2.dir/link.txt --verbose=1
+        Using built-in specs.
+        COLLECT_GCC=/usr/bin/c++
+        COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper
+        OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa
+        OFFLOAD_TARGET_DEFAULT=1
+        Target: x86_64-linux-gnu
+        Configured with: ../src/configure -v --with-pkgversion='Ubuntu 15.2.0-16ubuntu1' --with-bugurl=file:///usr/share/doc/gcc-15/README.Bugs --enable-languages=c,ada,c++,go,d,fortran,objc,obj-c++,m2,rust,cobol,algol68 --prefix=/usr --with-gcc-major-version-only --program-suffix=-15 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/libexec --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-libstdcxx-backtrace --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-15-j35TAX/gcc-15-15.2.0/debian/tmp-nvptx/usr,amdgcn-amdhsa=/build/gcc-15-j35TAX/gcc-15-15.2.0/debian/tmp-gcn/usr --enable-offload-defaulted --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=2
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 15.2.0 (Ubuntu 15.2.0-16ubuntu1) 
+        COMPILER_PATH=/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/
+        LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../:/lib/:/usr/lib/
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_f60c2' '-foffload-options=-l_GCC_stdc++' '-foffload-options=-l_GCC_m' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_f60c2.'
+         /usr/libexec/gcc/x86_64-linux-gnu/15/collect2 -plugin /usr/libexec/gcc/x86_64-linux-gnu/15/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper -plugin-opt=-fresolution=/tmp/ccmlHapb.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o cmTC_f60c2 /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/15 -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/15/../../.. -L/lib -L/usr/lib -v CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o
+        collect2 version 15.2.0
+        /usr/bin/ld -plugin /usr/libexec/gcc/x86_64-linux-gnu/15/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper -plugin-opt=-fresolution=/tmp/ccmlHapb.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o cmTC_f60c2 /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/15 -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/15/../../.. -L/lib -L/usr/lib -v CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o
+        GNU ld (GNU Binutils for Ubuntu) 2.46
+        COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_f60c2' '-foffload-options=-l_GCC_stdc++' '-foffload-options=-l_GCC_m' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_f60c2.'
+        /usr/bin/c++  -v -Wl,-v CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_f60c2
+        gmake[1]: Leaving directory '/home/mbreuhaus/Nextcloud/Documents/Gamera/GAMERA/build/CMakeFiles/CMakeScratch/TryCompile-3lrtf4'
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:217 (message)"
+      - "/usr/share/cmake-4.2/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Parsed CXX implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/usr/include/c++/15]
+          add: [/usr/include/x86_64-linux-gnu/c++/15]
+          add: [/usr/include/c++/15/backward]
+          add: [/usr/lib/gcc/x86_64-linux-gnu/15/include]
+          add: [/usr/local/include]
+          add: [/usr/include/x86_64-linux-gnu]
+          add: [/usr/include]
+        end of search list found
+        collapse include dir [/usr/include/c++/15] ==> [/usr/include/c++/15]
+        collapse include dir [/usr/include/x86_64-linux-gnu/c++/15] ==> [/usr/include/x86_64-linux-gnu/c++/15]
+        collapse include dir [/usr/include/c++/15/backward] ==> [/usr/include/c++/15/backward]
+        collapse include dir [/usr/lib/gcc/x86_64-linux-gnu/15/include] ==> [/usr/lib/gcc/x86_64-linux-gnu/15/include]
+        collapse include dir [/usr/local/include] ==> [/usr/local/include]
+        collapse include dir [/usr/include/x86_64-linux-gnu] ==> [/usr/include/x86_64-linux-gnu]
+        collapse include dir [/usr/include] ==> [/usr/include]
+        implicit include dirs: [/usr/include/c++/15;/usr/include/x86_64-linux-gnu/c++/15;/usr/include/c++/15/backward;/usr/lib/gcc/x86_64-linux-gnu/15/include;/usr/local/include;/usr/include/x86_64-linux-gnu;/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:253 (message)"
+      - "/usr/share/cmake-4.2/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)))("|,| |$)]
+        ignore line: [Change Dir: '/home/mbreuhaus/Nextcloud/Documents/Gamera/GAMERA/build/CMakeFiles/CMakeScratch/TryCompile-3lrtf4']
+        ignore line: []
+        ignore line: [Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_f60c2/fast]
+        ignore line: [/usr/bin/gmake  -f CMakeFiles/cmTC_f60c2.dir/build.make CMakeFiles/cmTC_f60c2.dir/build]
+        ignore line: [gmake[1]: Entering directory '/home/mbreuhaus/Nextcloud/Documents/Gamera/GAMERA/build/CMakeFiles/CMakeScratch/TryCompile-3lrtf4']
+        ignore line: [Building CXX object CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o]
+        ignore line: [/usr/bin/c++   -v -o CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-4.2/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/usr/bin/c++]
+        ignore line: [OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa]
+        ignore line: [OFFLOAD_TARGET_DEFAULT=1]
+        ignore line: [Target: x86_64-linux-gnu]
+        ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 15.2.0-16ubuntu1' --with-bugurl=file:///usr/share/doc/gcc-15/README.Bugs --enable-languages=c ada c++ go d fortran objc obj-c++ m2 rust cobol algol68 --prefix=/usr --with-gcc-major-version-only --program-suffix=-15 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/libexec --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-libstdcxx-backtrace --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32 m64 mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-15-j35TAX/gcc-15-15.2.0/debian/tmp-nvptx/usr amdgcn-amdhsa=/build/gcc-15-j35TAX/gcc-15-15.2.0/debian/tmp-gcn/usr --enable-offload-defaulted --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=2]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 15.2.0 (Ubuntu 15.2.0-16ubuntu1) ]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_f60c2.dir/']
+        ignore line: [ /usr/libexec/gcc/x86_64-linux-gnu/15/cc1plus -quiet -v -imultiarch x86_64-linux-gnu -D_GNU_SOURCE /usr/share/cmake-4.2/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_f60c2.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mtune=generic -march=x86-64 -version -fasynchronous-unwind-tables -fstack-protector-strong -Wformat -Wformat-security -fstack-clash-protection -fcf-protection -fzero-init-padding-bits=all -Wbidi-chars=any -o /tmp/ccCsa9ik.s]
+        ignore line: [GNU C++17 (Ubuntu 15.2.0-16ubuntu1) version 15.2.0 (x86_64-linux-gnu)]
+        ignore line: [	compiled by GNU C version 15.2.0  GMP version 6.3.0  MPFR version 4.2.2  MPC version 1.3.1  isl version isl-0.27-GMP]
+        ignore line: []
+        ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+        ignore line: [ignoring duplicate directory "/usr/include/x86_64-linux-gnu/c++/15"]
+        ignore line: [ignoring nonexistent directory "/usr/local/include/x86_64-linux-gnu"]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/15/include-fixed/x86_64-linux-gnu"]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/15/include-fixed"]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/15/../../../../x86_64-linux-gnu/include"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /usr/include/c++/15]
+        ignore line: [ /usr/include/x86_64-linux-gnu/c++/15]
+        ignore line: [ /usr/include/c++/15/backward]
+        ignore line: [ /usr/lib/gcc/x86_64-linux-gnu/15/include]
+        ignore line: [ /usr/local/include]
+        ignore line: [ /usr/include/x86_64-linux-gnu]
+        ignore line: [ /usr/include]
+        ignore line: [End of search list.]
+        ignore line: [Compiler executable checksum: b661a74662ad7cf413c4193391ab5290]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_f60c2.dir/']
+        ignore line: [ /usr/bin/x86_64-linux-gnu-as -v --64 -o CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccCsa9ik.s]
+        ignore line: [GNU assembler version 2.46 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.46]
+        ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/]
+        ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../:/lib/:/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.']
+        ignore line: [Linking CXX executable cmTC_f60c2]
+        ignore line: [/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f60c2.dir/link.txt --verbose=1]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/usr/bin/c++]
+        ignore line: [COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper]
+        ignore line: [OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa]
+        ignore line: [OFFLOAD_TARGET_DEFAULT=1]
+        ignore line: [Target: x86_64-linux-gnu]
+        ignore line: [Configured with: ../src/configure -v --with-pkgversion='Ubuntu 15.2.0-16ubuntu1' --with-bugurl=file:///usr/share/doc/gcc-15/README.Bugs --enable-languages=c ada c++ go d fortran objc obj-c++ m2 rust cobol algol68 --prefix=/usr --with-gcc-major-version-only --program-suffix=-15 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/libexec --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-libstdcxx-backtrace --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32 m64 mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-15-j35TAX/gcc-15-15.2.0/debian/tmp-nvptx/usr amdgcn-amdhsa=/build/gcc-15-j35TAX/gcc-15-15.2.0/debian/tmp-gcn/usr --enable-offload-defaulted --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=2]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 15.2.0 (Ubuntu 15.2.0-16ubuntu1) ]
+        ignore line: [COMPILER_PATH=/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/15/:/usr/libexec/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/]
+        ignore line: [LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/15/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/15/../../../:/lib/:/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_f60c2' '-foffload-options=-l_GCC_stdc++' '-foffload-options=-l_GCC_m' '-shared-libgcc' '-mtune=generic' '-march=x86-64' '-dumpdir' 'cmTC_f60c2.']
+        link line: [ /usr/libexec/gcc/x86_64-linux-gnu/15/collect2 -plugin /usr/libexec/gcc/x86_64-linux-gnu/15/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper -plugin-opt=-fresolution=/tmp/ccmlHapb.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o cmTC_f60c2 /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/15 -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/15/../../.. -L/lib -L/usr/lib -v CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o]
+          arg [/usr/libexec/gcc/x86_64-linux-gnu/15/collect2] ==> ignore
+          arg [-plugin] ==> ignore
+          arg [/usr/libexec/gcc/x86_64-linux-gnu/15/liblto_plugin.so] ==> ignore
+          arg [-plugin-opt=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper] ==> ignore
+          arg [-plugin-opt=-fresolution=/tmp/ccmlHapb.res] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [--build-id] ==> ignore
+          arg [--eh-frame-hdr] ==> ignore
+          arg [-m] ==> ignore
+          arg [elf_x86_64] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [--as-needed] ==> ignore
+          arg [-dynamic-linker] ==> ignore
+          arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+          arg [-pie] ==> ignore
+          arg [-znow] ==> ignore
+          arg [-zrelro] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_f60c2] ==> ignore
+          arg [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o] ==> obj [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o]
+          arg [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o] ==> obj [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o]
+          arg [/usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o] ==> obj [/usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o]
+          arg [-L/usr/lib/gcc/x86_64-linux-gnu/15] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/15]
+          arg [-L/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu]
+          arg [-L/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib]
+          arg [-L/lib/x86_64-linux-gnu] ==> dir [/lib/x86_64-linux-gnu]
+          arg [-L/lib/../lib] ==> dir [/lib/../lib]
+          arg [-L/usr/lib/x86_64-linux-gnu] ==> dir [/usr/lib/x86_64-linux-gnu]
+          arg [-L/usr/lib/../lib] ==> dir [/usr/lib/../lib]
+          arg [-L/usr/lib/gcc/x86_64-linux-gnu/15/../../..] ==> dir [/usr/lib/gcc/x86_64-linux-gnu/15/../../..]
+          arg [-L/lib] ==> dir [/lib]
+          arg [-L/usr/lib] ==> dir [/usr/lib]
+          arg [-v] ==> ignore
+          arg [CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [-lstdc++] ==> lib [stdc++]
+          arg [-lm] ==> lib [m]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [-lc] ==> lib [c]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [/usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o] ==> obj [/usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o]
+          arg [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o] ==> obj [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o]
+        ignore line: [collect2 version 15.2.0]
+        ignore line: [/usr/bin/ld -plugin /usr/libexec/gcc/x86_64-linux-gnu/15/liblto_plugin.so -plugin-opt=/usr/libexec/gcc/x86_64-linux-gnu/15/lto-wrapper -plugin-opt=-fresolution=/tmp/ccmlHapb.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -pie -z now -z relro -o cmTC_f60c2 /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/15 -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/15/../../.. -L/lib -L/usr/lib -v CMakeFiles/cmTC_f60c2.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o]
+        linker tool for 'CXX': /usr/bin/ld
+        collapse obj [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/Scrt1.o] ==> [/usr/lib/x86_64-linux-gnu/Scrt1.o]
+        collapse obj [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crti.o] ==> [/usr/lib/x86_64-linux-gnu/crti.o]
+        collapse obj [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/crtn.o] ==> [/usr/lib/x86_64-linux-gnu/crtn.o]
+        collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/15] ==> [/usr/lib/gcc/x86_64-linux-gnu/15]
+        collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+        collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/15/../../../../lib] ==> [/usr/lib]
+        collapse library dir [/lib/x86_64-linux-gnu] ==> [/lib/x86_64-linux-gnu]
+        collapse library dir [/lib/../lib] ==> [/lib]
+        collapse library dir [/usr/lib/x86_64-linux-gnu] ==> [/usr/lib/x86_64-linux-gnu]
+        collapse library dir [/usr/lib/../lib] ==> [/usr/lib]
+        collapse library dir [/usr/lib/gcc/x86_64-linux-gnu/15/../../..] ==> [/usr/lib]
+        collapse library dir [/lib] ==> [/lib]
+        collapse library dir [/usr/lib] ==> [/usr/lib]
+        implicit libs: [stdc++;m;gcc_s;gcc;c;gcc_s;gcc]
+        implicit objs: [/usr/lib/x86_64-linux-gnu/Scrt1.o;/usr/lib/x86_64-linux-gnu/crti.o;/usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o;/usr/lib/gcc/x86_64-linux-gnu/15/crtendS.o;/usr/lib/x86_64-linux-gnu/crtn.o]
+        implicit dirs: [/usr/lib/gcc/x86_64-linux-gnu/15;/usr/lib/x86_64-linux-gnu;/usr/lib;/lib/x86_64-linux-gnu;/lib]
+        implicit fwks: []
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/Internal/CMakeDetermineLinkerId.cmake:38 (message)"
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineCompilerABI.cmake:299 (cmake_determine_linker_id)"
+      - "/usr/share/cmake-4.2/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:3 (project)"
+    message: |
+      Running the CXX compiler's linker: "/usr/bin/ld" "-v"
+      GNU ld (GNU Binutils for Ubuntu) 2.46
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/FindPkgConfig.cmake:517 (find_program)"
+      - "/usr/share/cmake-4.2/Modules/FindGSL.cmake:117 (find_package)"
+      - "CMakeLists.txt:10 (find_package)"
+    mode: "program"
+    variable: "PKG_CONFIG_EXECUTABLE"
+    description: "pkg-config executable"
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "pkg-config"
+      - "pkgconf"
+    candidate_directories:
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+      - "/usr/local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/"
+      - "/usr/bin/"
+      - "/usr/sbin/"
+      - "/usr/"
+      - "/bin/"
+      - "/sbin/"
+      - "/home/mbreuhaus/.local/gamera/bin/"
+      - "/home/mbreuhaus/.local/gamera/sbin/"
+      - "/home/mbreuhaus/.local/gamera/"
+      - "/usr/X11R6/bin/"
+      - "/usr/X11R6/sbin/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/bin/"
+      - "/usr/pkg/sbin/"
+      - "/usr/pkg/"
+      - "/opt/bin/"
+      - "/opt/sbin/"
+      - "/opt/"
+    searched_directories:
+      - "/home/mbreuhaus/micromamba/bin/pkg-config"
+      - "/home/mbreuhaus/micromamba/bin/pkgconf"
+      - "/home/mbreuhaus/gems/bin/pkg-config"
+      - "/home/mbreuhaus/gems/bin/pkgconf"
+      - "/home/mbreuhaus/micromamba/condabin/pkg-config"
+      - "/home/mbreuhaus/micromamba/condabin/pkgconf"
+      - "/home/mbreuhaus/.local/bin/pkg-config"
+      - "/home/mbreuhaus/.local/bin/pkgconf"
+      - "/usr/local/sbin/pkg-config"
+      - "/usr/local/sbin/pkgconf"
+      - "/usr/local/bin/pkg-config"
+      - "/usr/local/bin/pkgconf"
+      - "/usr/sbin/pkg-config"
+      - "/usr/sbin/pkgconf"
+    found: "/usr/bin/pkg-config"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "/home/mbreuhaus/.local/gamera"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/home/mbreuhaus/.local/gamera"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/FindPkgConfig.cmake:761 (find_library)"
+      - "/usr/share/cmake-4.2/Modules/FindPkgConfig.cmake:811 (_pkg_find_libs)"
+      - "/usr/share/cmake-4.2/Modules/FindPkgConfig.cmake:1149 (_pkg_recalculate)"
+      - "/usr/share/cmake-4.2/Modules/FindPkgConfig.cmake:1166 (_pkg_check_modules_internal)"
+      - "/usr/share/cmake-4.2/Modules/FindGSL.cmake:119 (pkg_check_modules)"
+      - "CMakeLists.txt:10 (find_package)"
+    mode: "library"
+    variable: "pkgcfg_lib_GSL_gsl"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gsl"
+    candidate_directories:
+      - "/usr/lib/x86_64-linux-gnu/"
+    found: "/usr/lib/x86_64-linux-gnu/libgsl.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "/home/mbreuhaus/.local/gamera"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/home/mbreuhaus/.local/gamera"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/FindPkgConfig.cmake:761 (find_library)"
+      - "/usr/share/cmake-4.2/Modules/FindPkgConfig.cmake:811 (_pkg_find_libs)"
+      - "/usr/share/cmake-4.2/Modules/FindPkgConfig.cmake:1149 (_pkg_recalculate)"
+      - "/usr/share/cmake-4.2/Modules/FindPkgConfig.cmake:1166 (_pkg_check_modules_internal)"
+      - "/usr/share/cmake-4.2/Modules/FindGSL.cmake:119 (pkg_check_modules)"
+      - "CMakeLists.txt:10 (find_package)"
+    mode: "library"
+    variable: "pkgcfg_lib_GSL_gslcblas"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gslcblas"
+    candidate_directories:
+      - "/usr/lib/x86_64-linux-gnu/"
+    found: "/usr/lib/x86_64-linux-gnu/libgslcblas.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "/home/mbreuhaus/.local/gamera"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/home/mbreuhaus/.local/gamera"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/FindPkgConfig.cmake:761 (find_library)"
+      - "/usr/share/cmake-4.2/Modules/FindPkgConfig.cmake:811 (_pkg_find_libs)"
+      - "/usr/share/cmake-4.2/Modules/FindPkgConfig.cmake:1149 (_pkg_recalculate)"
+      - "/usr/share/cmake-4.2/Modules/FindPkgConfig.cmake:1166 (_pkg_check_modules_internal)"
+      - "/usr/share/cmake-4.2/Modules/FindGSL.cmake:119 (pkg_check_modules)"
+      - "CMakeLists.txt:10 (find_package)"
+    mode: "library"
+    variable: "pkgcfg_lib_GSL_m"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "m"
+    candidate_directories:
+      - "/usr/lib/x86_64-linux-gnu/"
+    found: "/usr/lib/x86_64-linux-gnu/libm.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "/home/mbreuhaus/.local/gamera"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/home/mbreuhaus/.local/gamera"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/FindGSL.cmake:134 (find_path)"
+      - "CMakeLists.txt:10 (find_package)"
+    mode: "path"
+    variable: "GSL_INCLUDE_DIR"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gsl/gsl_sf.h"
+    candidate_directories:
+      - "/usr/include/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/snap/bin/"
+      - "/usr/local/include/x86_64-linux-gnu/"
+      - "/usr/local/include/"
+      - "/usr/local/"
+      - "/usr/include/x86_64-linux-gnu/"
+      - "/usr/include/"
+      - "/usr/"
+      - "/include/x86_64-linux-gnu/"
+      - "/include/"
+      - "/home/mbreuhaus/.local/gamera/include/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/.local/gamera/include/"
+      - "/home/mbreuhaus/.local/gamera/"
+      - "/usr/X11R6/include/x86_64-linux-gnu/"
+      - "/usr/X11R6/include/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/include/x86_64-linux-gnu/"
+      - "/usr/pkg/include/"
+      - "/usr/pkg/"
+      - "/opt/include/x86_64-linux-gnu/"
+      - "/opt/include/"
+      - "/opt/"
+      - "/usr/include/X11/"
+    found: "/usr/include/"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "/home/mbreuhaus/.local/gamera"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/home/mbreuhaus/.local/gamera"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_INCLUDE_PATH:
+        - "/usr/include/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/FindGSL.cmake:138 (find_library)"
+      - "CMakeLists.txt:10 (find_package)"
+    mode: "library"
+    variable: "GSL_LIBRARY"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gsl"
+    candidate_directories:
+      - "/usr/lib/Release/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/lib/x86_64-linux-gnu/Release/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/micromamba/bin/Release/"
+      - "/home/mbreuhaus/micromamba/bin/Debug/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/Release/"
+      - "/home/mbreuhaus/gems/bin/Debug/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/Release/"
+      - "/home/mbreuhaus/micromamba/condabin/Debug/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/Release/"
+      - "/home/mbreuhaus/.local/bin/Debug/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/Release/"
+      - "/usr/local/sbin/Debug/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/Release/"
+      - "/usr/local/bin/Debug/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/Release/"
+      - "/usr/sbin/Debug/"
+      - "/usr/sbin/"
+      - "/usr/bin/Release/"
+      - "/usr/bin/Debug/"
+      - "/usr/bin/"
+      - "/sbin/Release/"
+      - "/sbin/Debug/"
+      - "/sbin/"
+      - "/bin/Release/"
+      - "/bin/Debug/"
+      - "/bin/"
+      - "/usr/games/Release/"
+      - "/usr/games/Debug/"
+      - "/usr/games/"
+      - "/usr/local/games/Release/"
+      - "/usr/local/games/Debug/"
+      - "/usr/local/games/"
+      - "/snap/bin/Release/"
+      - "/snap/bin/Debug/"
+      - "/snap/bin/"
+      - "/usr/local/lib/x86_64-linux-gnu/Release/"
+      - "/usr/local/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/local/lib/x86_64-linux-gnu/"
+      - "/usr/local/lib/Release/"
+      - "/usr/local/lib/Debug/"
+      - "/usr/local/lib/"
+      - "/usr/local/Release/"
+      - "/usr/local/Debug/"
+      - "/usr/local/"
+      - "/usr/lib/x86_64-linux-gnu/Release/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/usr/lib/Release/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/Release/"
+      - "/usr/Debug/"
+      - "/usr/"
+      - "/lib/x86_64-linux-gnu/Release/"
+      - "/lib/x86_64-linux-gnu/Debug/"
+      - "/lib/x86_64-linux-gnu/"
+      - "/lib/Release/"
+      - "/lib/Debug/"
+      - "/lib/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/Release/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/.local/gamera/lib/Release/"
+      - "/home/mbreuhaus/.local/gamera/lib/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/"
+      - "/home/mbreuhaus/.local/gamera/Release/"
+      - "/home/mbreuhaus/.local/gamera/Debug/"
+      - "/home/mbreuhaus/.local/gamera/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/Release/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/"
+      - "/usr/X11R6/lib/Release/"
+      - "/usr/X11R6/lib/Debug/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/Release/"
+      - "/usr/X11R6/Debug/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/Release/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/"
+      - "/usr/pkg/lib/Release/"
+      - "/usr/pkg/lib/Debug/"
+      - "/usr/pkg/lib/"
+      - "/usr/pkg/Release/"
+      - "/usr/pkg/Debug/"
+      - "/usr/pkg/"
+      - "/opt/lib/x86_64-linux-gnu/Release/"
+      - "/opt/lib/x86_64-linux-gnu/Debug/"
+      - "/opt/lib/x86_64-linux-gnu/"
+      - "/opt/lib/Release/"
+      - "/opt/lib/Debug/"
+      - "/opt/lib/"
+      - "/opt/Release/"
+      - "/opt/Debug/"
+      - "/opt/"
+      - "/usr/lib/X11/Release/"
+      - "/usr/lib/X11/Debug/"
+      - "/usr/lib/X11/"
+    searched_directories:
+      - "/usr/lib/Release/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/lib/x86_64-linux-gnu/Release/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+    found: "/usr/lib/x86_64-linux-gnu/libgsl.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "/home/mbreuhaus/.local/gamera"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/home/mbreuhaus/.local/gamera"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/FindGSL.cmake:143 (find_library)"
+      - "CMakeLists.txt:10 (find_package)"
+    mode: "library"
+    variable: "GSL_CBLAS_LIBRARY"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gslcblas"
+      - "cblas"
+    candidate_directories:
+      - "/usr/lib/Release/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/lib/x86_64-linux-gnu/Release/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/micromamba/bin/Release/"
+      - "/home/mbreuhaus/micromamba/bin/Debug/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/Release/"
+      - "/home/mbreuhaus/gems/bin/Debug/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/Release/"
+      - "/home/mbreuhaus/micromamba/condabin/Debug/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/Release/"
+      - "/home/mbreuhaus/.local/bin/Debug/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/Release/"
+      - "/usr/local/sbin/Debug/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/Release/"
+      - "/usr/local/bin/Debug/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/Release/"
+      - "/usr/sbin/Debug/"
+      - "/usr/sbin/"
+      - "/usr/bin/Release/"
+      - "/usr/bin/Debug/"
+      - "/usr/bin/"
+      - "/sbin/Release/"
+      - "/sbin/Debug/"
+      - "/sbin/"
+      - "/bin/Release/"
+      - "/bin/Debug/"
+      - "/bin/"
+      - "/usr/games/Release/"
+      - "/usr/games/Debug/"
+      - "/usr/games/"
+      - "/usr/local/games/Release/"
+      - "/usr/local/games/Debug/"
+      - "/usr/local/games/"
+      - "/snap/bin/Release/"
+      - "/snap/bin/Debug/"
+      - "/snap/bin/"
+      - "/usr/local/lib/x86_64-linux-gnu/Release/"
+      - "/usr/local/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/local/lib/x86_64-linux-gnu/"
+      - "/usr/local/lib/Release/"
+      - "/usr/local/lib/Debug/"
+      - "/usr/local/lib/"
+      - "/usr/local/Release/"
+      - "/usr/local/Debug/"
+      - "/usr/local/"
+      - "/usr/lib/x86_64-linux-gnu/Release/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/usr/lib/Release/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/Release/"
+      - "/usr/Debug/"
+      - "/usr/"
+      - "/lib/x86_64-linux-gnu/Release/"
+      - "/lib/x86_64-linux-gnu/Debug/"
+      - "/lib/x86_64-linux-gnu/"
+      - "/lib/Release/"
+      - "/lib/Debug/"
+      - "/lib/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/Release/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/.local/gamera/lib/Release/"
+      - "/home/mbreuhaus/.local/gamera/lib/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/"
+      - "/home/mbreuhaus/.local/gamera/Release/"
+      - "/home/mbreuhaus/.local/gamera/Debug/"
+      - "/home/mbreuhaus/.local/gamera/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/Release/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/"
+      - "/usr/X11R6/lib/Release/"
+      - "/usr/X11R6/lib/Debug/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/Release/"
+      - "/usr/X11R6/Debug/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/Release/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/"
+      - "/usr/pkg/lib/Release/"
+      - "/usr/pkg/lib/Debug/"
+      - "/usr/pkg/lib/"
+      - "/usr/pkg/Release/"
+      - "/usr/pkg/Debug/"
+      - "/usr/pkg/"
+      - "/opt/lib/x86_64-linux-gnu/Release/"
+      - "/opt/lib/x86_64-linux-gnu/Debug/"
+      - "/opt/lib/x86_64-linux-gnu/"
+      - "/opt/lib/Release/"
+      - "/opt/lib/Debug/"
+      - "/opt/lib/"
+      - "/opt/Release/"
+      - "/opt/Debug/"
+      - "/opt/"
+      - "/usr/lib/X11/Release/"
+      - "/usr/lib/X11/Debug/"
+      - "/usr/lib/X11/"
+    searched_directories:
+      - "/usr/lib/Release/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/lib/x86_64-linux-gnu/Release/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+    found: "/usr/lib/x86_64-linux-gnu/libgslcblas.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "/home/mbreuhaus/.local/gamera"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/home/mbreuhaus/.local/gamera"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/FindGSL.cmake:149 (find_library)"
+      - "CMakeLists.txt:10 (find_package)"
+    mode: "library"
+    variable: "GSL_LIBRARY_DEBUG"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gsld"
+      - "gsl"
+    candidate_directories:
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/micromamba/bin/Debug/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/Debug/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/Debug/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/Debug/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/Debug/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/Debug/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/Debug/"
+      - "/usr/sbin/"
+      - "/usr/bin/Debug/"
+      - "/usr/bin/"
+      - "/sbin/Debug/"
+      - "/sbin/"
+      - "/bin/Debug/"
+      - "/bin/"
+      - "/usr/games/Debug/"
+      - "/usr/games/"
+      - "/usr/local/games/Debug/"
+      - "/usr/local/games/"
+      - "/snap/bin/Debug/"
+      - "/snap/bin/"
+      - "/usr/local/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/local/lib/x86_64-linux-gnu/"
+      - "/usr/local/lib/Debug/"
+      - "/usr/local/lib/"
+      - "/usr/local/Debug/"
+      - "/usr/local/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/Debug/"
+      - "/usr/"
+      - "/lib/x86_64-linux-gnu/Debug/"
+      - "/lib/x86_64-linux-gnu/"
+      - "/lib/Debug/"
+      - "/lib/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/.local/gamera/lib/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/"
+      - "/home/mbreuhaus/.local/gamera/Debug/"
+      - "/home/mbreuhaus/.local/gamera/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/"
+      - "/usr/X11R6/lib/Debug/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/Debug/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/"
+      - "/usr/pkg/lib/Debug/"
+      - "/usr/pkg/lib/"
+      - "/usr/pkg/Debug/"
+      - "/usr/pkg/"
+      - "/opt/lib/x86_64-linux-gnu/Debug/"
+      - "/opt/lib/x86_64-linux-gnu/"
+      - "/opt/lib/Debug/"
+      - "/opt/lib/"
+      - "/opt/Debug/"
+      - "/opt/"
+      - "/usr/lib/X11/Debug/"
+      - "/usr/lib/X11/"
+    searched_directories:
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/micromamba/bin/Debug/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/Debug/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/Debug/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/Debug/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/Debug/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/Debug/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/Debug/"
+      - "/usr/sbin/"
+      - "/usr/bin/Debug/"
+      - "/usr/bin/"
+      - "/sbin/Debug/"
+      - "/sbin/"
+      - "/bin/Debug/"
+      - "/bin/"
+      - "/usr/games/Debug/"
+      - "/usr/games/"
+      - "/usr/local/games/Debug/"
+      - "/usr/local/games/"
+      - "/snap/bin/Debug/"
+      - "/snap/bin/"
+      - "/usr/local/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/local/lib/x86_64-linux-gnu/"
+      - "/usr/local/lib/Debug/"
+      - "/usr/local/lib/"
+      - "/usr/local/Debug/"
+      - "/usr/local/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/Debug/"
+      - "/usr/"
+      - "/lib/x86_64-linux-gnu/Debug/"
+      - "/lib/x86_64-linux-gnu/"
+      - "/lib/Debug/"
+      - "/lib/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/.local/gamera/lib/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/"
+      - "/home/mbreuhaus/.local/gamera/Debug/"
+      - "/home/mbreuhaus/.local/gamera/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/"
+      - "/usr/X11R6/lib/Debug/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/Debug/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/"
+      - "/usr/pkg/lib/Debug/"
+      - "/usr/pkg/lib/"
+      - "/usr/pkg/Debug/"
+      - "/usr/pkg/"
+      - "/opt/lib/x86_64-linux-gnu/Debug/"
+      - "/opt/lib/x86_64-linux-gnu/"
+      - "/opt/lib/Debug/"
+      - "/opt/lib/"
+      - "/opt/Debug/"
+      - "/opt/"
+      - "/usr/lib/X11/Debug/"
+      - "/usr/lib/X11/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+    found: "/usr/lib/x86_64-linux-gnu/libgsl.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "/home/mbreuhaus/.local/gamera"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/home/mbreuhaus/.local/gamera"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/FindGSL.cmake:154 (find_library)"
+      - "CMakeLists.txt:10 (find_package)"
+    mode: "library"
+    variable: "GSL_CBLAS_LIBRARY_DEBUG"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gslcblasd"
+      - "cblasd"
+      - "gslcblas"
+      - "cblas"
+    candidate_directories:
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/micromamba/bin/Debug/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/Debug/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/Debug/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/Debug/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/Debug/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/Debug/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/Debug/"
+      - "/usr/sbin/"
+      - "/usr/bin/Debug/"
+      - "/usr/bin/"
+      - "/sbin/Debug/"
+      - "/sbin/"
+      - "/bin/Debug/"
+      - "/bin/"
+      - "/usr/games/Debug/"
+      - "/usr/games/"
+      - "/usr/local/games/Debug/"
+      - "/usr/local/games/"
+      - "/snap/bin/Debug/"
+      - "/snap/bin/"
+      - "/usr/local/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/local/lib/x86_64-linux-gnu/"
+      - "/usr/local/lib/Debug/"
+      - "/usr/local/lib/"
+      - "/usr/local/Debug/"
+      - "/usr/local/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/Debug/"
+      - "/usr/"
+      - "/lib/x86_64-linux-gnu/Debug/"
+      - "/lib/x86_64-linux-gnu/"
+      - "/lib/Debug/"
+      - "/lib/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/.local/gamera/lib/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/"
+      - "/home/mbreuhaus/.local/gamera/Debug/"
+      - "/home/mbreuhaus/.local/gamera/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/"
+      - "/usr/X11R6/lib/Debug/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/Debug/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/"
+      - "/usr/pkg/lib/Debug/"
+      - "/usr/pkg/lib/"
+      - "/usr/pkg/Debug/"
+      - "/usr/pkg/"
+      - "/opt/lib/x86_64-linux-gnu/Debug/"
+      - "/opt/lib/x86_64-linux-gnu/"
+      - "/opt/lib/Debug/"
+      - "/opt/lib/"
+      - "/opt/Debug/"
+      - "/opt/"
+      - "/usr/lib/X11/Debug/"
+      - "/usr/lib/X11/"
+    searched_directories:
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/micromamba/bin/Debug/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/Debug/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/Debug/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/Debug/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/Debug/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/Debug/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/Debug/"
+      - "/usr/sbin/"
+      - "/usr/bin/Debug/"
+      - "/usr/bin/"
+      - "/sbin/Debug/"
+      - "/sbin/"
+      - "/bin/Debug/"
+      - "/bin/"
+      - "/usr/games/Debug/"
+      - "/usr/games/"
+      - "/usr/local/games/Debug/"
+      - "/usr/local/games/"
+      - "/snap/bin/Debug/"
+      - "/snap/bin/"
+      - "/usr/local/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/local/lib/x86_64-linux-gnu/"
+      - "/usr/local/lib/Debug/"
+      - "/usr/local/lib/"
+      - "/usr/local/Debug/"
+      - "/usr/local/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/Debug/"
+      - "/usr/"
+      - "/lib/x86_64-linux-gnu/Debug/"
+      - "/lib/x86_64-linux-gnu/"
+      - "/lib/Debug/"
+      - "/lib/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/.local/gamera/lib/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/"
+      - "/home/mbreuhaus/.local/gamera/Debug/"
+      - "/home/mbreuhaus/.local/gamera/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/"
+      - "/usr/X11R6/lib/Debug/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/Debug/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/"
+      - "/usr/pkg/lib/Debug/"
+      - "/usr/pkg/lib/"
+      - "/usr/pkg/Debug/"
+      - "/usr/pkg/"
+      - "/opt/lib/x86_64-linux-gnu/Debug/"
+      - "/opt/lib/x86_64-linux-gnu/"
+      - "/opt/lib/Debug/"
+      - "/opt/lib/"
+      - "/opt/Debug/"
+      - "/opt/"
+      - "/usr/lib/X11/Debug/"
+      - "/usr/lib/X11/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/micromamba/bin/Debug/"
+      - "/home/mbreuhaus/micromamba/bin/"
+      - "/home/mbreuhaus/gems/bin/Debug/"
+      - "/home/mbreuhaus/gems/bin/"
+      - "/home/mbreuhaus/micromamba/condabin/Debug/"
+      - "/home/mbreuhaus/micromamba/condabin/"
+      - "/home/mbreuhaus/.local/bin/Debug/"
+      - "/home/mbreuhaus/.local/bin/"
+      - "/usr/local/sbin/Debug/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/Debug/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/Debug/"
+      - "/usr/sbin/"
+      - "/usr/bin/Debug/"
+      - "/usr/bin/"
+      - "/sbin/Debug/"
+      - "/sbin/"
+      - "/bin/Debug/"
+      - "/bin/"
+      - "/usr/games/Debug/"
+      - "/usr/games/"
+      - "/usr/local/games/Debug/"
+      - "/usr/local/games/"
+      - "/snap/bin/Debug/"
+      - "/snap/bin/"
+      - "/usr/local/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/local/lib/x86_64-linux-gnu/"
+      - "/usr/local/lib/Debug/"
+      - "/usr/local/lib/"
+      - "/usr/local/Debug/"
+      - "/usr/local/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/lib/x86_64-linux-gnu/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/Debug/"
+      - "/usr/"
+      - "/lib/x86_64-linux-gnu/Debug/"
+      - "/lib/x86_64-linux-gnu/"
+      - "/lib/Debug/"
+      - "/lib/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/x86_64-linux-gnu/"
+      - "/home/mbreuhaus/.local/gamera/lib/Debug/"
+      - "/home/mbreuhaus/.local/gamera/lib/"
+      - "/home/mbreuhaus/.local/gamera/Debug/"
+      - "/home/mbreuhaus/.local/gamera/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/X11R6/lib/x86_64-linux-gnu/"
+      - "/usr/X11R6/lib/Debug/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/Debug/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/Debug/"
+      - "/usr/pkg/lib/x86_64-linux-gnu/"
+      - "/usr/pkg/lib/Debug/"
+      - "/usr/pkg/lib/"
+      - "/usr/pkg/Debug/"
+      - "/usr/pkg/"
+      - "/opt/lib/x86_64-linux-gnu/Debug/"
+      - "/opt/lib/x86_64-linux-gnu/"
+      - "/opt/lib/Debug/"
+      - "/opt/lib/"
+      - "/opt/Debug/"
+      - "/opt/"
+      - "/usr/lib/X11/Debug/"
+      - "/usr/lib/X11/"
+      - "/usr/lib/Debug/"
+      - "/usr/lib/"
+      - "/usr/lib/x86_64-linux-gnu/Debug/"
+    found: "/usr/lib/x86_64-linux-gnu/libgslcblas.so"
+    search_context:
+      ENV{PATH}:
+        - "/home/mbreuhaus/micromamba/bin"
+        - "/home/mbreuhaus/gems/bin"
+        - "/home/mbreuhaus/micromamba/condabin"
+        - "/home/mbreuhaus/.local/bin"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/snap/bin"
+      CMAKE_INSTALL_PREFIX: "/home/mbreuhaus/.local/gamera"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr"
+        - "/home/mbreuhaus/.local/gamera"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+...

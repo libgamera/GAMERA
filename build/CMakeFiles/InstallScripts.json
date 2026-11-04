@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/mbreuhaus/Nextcloud/Documents/Gamera/GAMERA/build/cmake_install.cmake",
+		"/home/mbreuhaus/Nextcloud/Documents/Gamera/GAMERA/build/src/cmake_install.cmake",
+		"/home/mbreuhaus/Nextcloud/Documents/Gamera/GAMERA/build/src/2D_interp/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

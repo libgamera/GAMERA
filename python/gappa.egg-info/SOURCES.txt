@@ -1,4 +1,4 @@
-_gappa_swig.cc
+_gappa.cc
 setup.py
 ../src/Astro.C
 ../src/Particles.C

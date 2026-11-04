@@ -1,1 +1,1 @@
-_gappa_swig
+_gappa

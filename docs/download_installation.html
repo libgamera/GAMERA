@@ -153,6 +153,11 @@
                     
                 </li>
             
+                <li>
+                    <a href="/GAMERA/docs/numerical_pitfalls" class="">Numerical pitfalls</a>
+                    
+                </li>
+            
         </ul>
     
         <p class="menu-label">Installation</p>
@@ -223,6 +228,11 @@
                     
                 </li>
             
+                <li>
+                    <a href="/GAMERA/docs/neutrino_emission" class="">Neutrino emission</a>
+                    
+                </li>
+            
         </ul>
     
         <p class="menu-label">Miscellaneous</p>
@@ -264,96 +274,102 @@
 
 <h1 id="download">Download</h1>
 
+<p>Because it is now possible to install the GAMERA python package with pip, a direct download is only required
+if you want to use the C++ library, or to develope the code.</p>
+
 <p>GAMERA is available on <a href="https://github.com/libgamera/GAMERA">github</a>.
-There, you can download a <a href="https://github.com/libgamera/GAMERA/archive/master.zip">zip archive</a> with the source code or clone it with git via</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ git clone https://github.com/libgamera/GAMERA.git
+There, you can download a <a href="https://github.com/libgamera/GAMERA/archive/master.zip">zip archive</a> with
+the source code or clone it with git via</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git clone https://github.com/libgamera/GAMERA.git
 </code></pre></div></div>
 
 <h1 id="installation">Installation</h1>
 
 <h2 id="dependencies">Dependencies</h2>
-<p>You will have to compile <code class="language-plaintext highlighter-rouge">GAMERA</code> from source. Apart from a <code class="language-plaintext highlighter-rouge">C++</code> compiler (e.g. using 
-<code class="language-plaintext highlighter-rouge">gcc</code> on Linux or <code class="language-plaintext highlighter-rouge">clang</code> on Mac), you need to install the following dependencies:</p>
+<p>Apart from a <code class="language-plaintext highlighter-rouge">C++</code> compiler (e.g. using 
+<code class="language-plaintext highlighter-rouge">g++</code> on Linux or <code class="language-plaintext highlighter-rouge">clang</code> on Mac) and cmake, you need to install the following dependencies:</p>
 <ul>
   <li>the GNU scientific library <code class="language-plaintext highlighter-rouge">gsl</code></li>
-  <li>the <code class="language-plaintext highlighter-rouge">C/C++</code> python wrapper <code class="language-plaintext highlighter-rouge">swig</code>, if you want the python-wrapped version (i.e. <code class="language-plaintext highlighter-rouge">GAPPA</code>)</li>
   <li>python (including the headers) for <code class="language-plaintext highlighter-rouge">GAPPA</code></li>
+  <li><code class="language-plaintext highlighter-rouge">pkg-config</code></li>
 </ul>
+
+<p>On many systems these packages are already installed by default, otherwise they can be installed in the following way:</p>
 
 <p>On <code class="language-plaintext highlighter-rouge">Linux</code>:</p>
 
-<ul>
-  <li>
-    <p>On Ubuntu 16.04 LTS</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>apt <span class="nb">install </span>libgsl-dev pkg-config cmake g++
+</code></pre></div></div>
 
-    <p>These packages are readily available on all major Linux platforms. On Ubuntu 16.04 LTS,<br />
-you can install them via</p>
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt install libgsl2 libgsl-dev swig python-dev
-</code></pre></div>    </div>
-  </li>
-  <li>
-    <p>On Ubuntu 18.04 LTS (and 20.04)</p>
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo apt install libgsl23 libgsl-dev swig python-dev pkg-config
-</code></pre></div>    </div>
-  </li>
-</ul>
+<p>On later versions of the operating system, it might be necessary to additionally install, e.g.,
+<code class="language-plaintext highlighter-rouge">libgsl2</code> or <code class="language-plaintext highlighter-rouge">libgsl23</code>.</p>
 
 <p>On <code class="language-plaintext highlighter-rouge">MacOS</code>:</p>
 
-<p>many repositories provide <code class="language-plaintext highlighter-rouge">gsl</code> and <code class="language-plaintext highlighter-rouge">swig</code>, for example <a href="https://brew.sh/">homebrew</a>:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ brew install gsl swig
+<p>many repositories provide <code class="language-plaintext highlighter-rouge">gsl</code>, for example <a href="https://brew.sh/">homebrew</a>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ brew install gsl
 </code></pre></div></div>
 <p>It might also be required to install <a href="https://www.freedesktop.org/wiki/Software/pkg-config/">pkg-config</a>. Installation instructions can be found e.g. <a href="http://macappstore.org/pkg-config/">here</a>.</p>
 
-<p>On some MacOS systems, issues are encountered in the compilation phase. These can be fixed by adding 2 lines to the file &lt;GAMERA-path&gt;/python/setup.py</p>
+<!---
+On some MacOS systems, issues are encountered in the compilation phase. These can be fixed by adding 2 lines to the file \<GAMERA-path\>/python/setup.py
 
-<p>after line 20 add:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>extra_compile_args.append(“-stdlib=libc++”)
+after line 20 add:
+```
+extra_compile_args.append(“-stdlib=libc++”)
 extra_link_args.append(“-stdlib=libc++”)
-</code></pre></div></div>
-<p>on some other MacOS versions (e.g. Mojave 10.14.5) a further issue can stop the compilation of the gappa library: the swig version that can be installed does not support anymore the option <code class="language-plaintext highlighter-rouge">-nosafecstrings</code> option.
-The workaround is to remove it from the Makefile (at line 70).</p>
+```
+on some other MacOS versions (e.g. Mojave 10.14.5) a further issue can stop the compilation of the gappa library: the swig version that can be installed does not support anymore the option `-nosafecstrings` option.
+The workaround is to remove it from the Makefile (at line 70).
 
-<p><strong>The latest version of GAMERA does not need anymore the <code class="language-plaintext highlighter-rouge">-nosafecstrings</code> option.</strong></p>
+__The latest version of GAMERA does not need anymore the `-nosafecstrings` option.__
+--->
 
 <h2 id="building-python">Building: <code class="language-plaintext highlighter-rouge">python</code></h2>
 <p><strong>Compilation</strong></p>
 
-<p>If you are interested in the <code class="language-plaintext highlighter-rouge">python</code> package (<code class="language-plaintext highlighter-rouge">GAPPA</code>), run</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ make gappa
+<p>The <code class="language-plaintext highlighter-rouge">python</code> package (<code class="language-plaintext highlighter-rouge">GAPPA</code>) can now easily be installed via pip, without the need to download anything beforehand:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>pip <span class="nb">install </span>git+https://github.com/libgamera/GAMERA
 </code></pre></div></div>
-<p>and it will generate <code class="language-plaintext highlighter-rouge">lib/_gappa.so</code> and <code class="language-plaintext highlighter-rouge">lib/gappa.py</code>.</p>
 
 <p><strong>Usage</strong></p>
 
-<p>In your python script, You need to add the directory holding the module (default: <code class="language-plaintext highlighter-rouge">lib/</code> in the <code class="language-plaintext highlighter-rouge">GAMERA</code> directory) to the search  path for modules, e.g.:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import sys
-sys.path.append('/home/user/Documents/GAMERA/lib')
+<p>In your python script, just import the <code class="language-plaintext highlighter-rouge">gappa</code> package, for example like this:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">gappa</span> <span class="k">as</span> <span class="n">gp</span>
 </code></pre></div></div>
 
 <h2 id="building-c">Building: <code class="language-plaintext highlighter-rouge">C++</code></h2>
 <p><strong>Compilation</strong></p>
 
-<p>To build the <code class="language-plaintext highlighter-rouge">C++</code> library, go to the base GAMERA directory and run</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ make gamera
+<p>To build the <code class="language-plaintext highlighter-rouge">C++</code> library, you first need to download the source code, as described on the Download-section above.
+Then, go to the base GAMERA directory and run</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>cmake <span class="nt">-S</span> <span class="nb">.</span> <span class="nt">-B</span> build <span class="nt">-DCMAKE_BUILD_TYPE</span><span class="o">=</span>Release <span class="nt">-DCMAKE_INSTALL_PREFIX</span><span class="o">=</span>~/.local/gamera
+<span class="nv">$ </span>cmake <span class="nt">--build</span> build
+<span class="nv">$ </span>cmake <span class="nt">--install</span> build
 </code></pre></div></div>
-<p>This will create the shared object <code class="language-plaintext highlighter-rouge">lib/libgamera.so</code> which can be used in <code class="language-plaintext highlighter-rouge">C++</code> programs.</p>
+<p>This will create the shared object <code class="language-plaintext highlighter-rouge">build/lib/libgamera.so</code> which can be used in <code class="language-plaintext highlighter-rouge">C++</code> programs.</p>
 
 <p><strong>Usage</strong></p>
 
-<p>To use the library in you program, compile like e.g.:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ gcc -o yourProgram yourProgramSource.C -lgamera -L$(LIBDIR)
+<p>If you are using <code class="language-plaintext highlighter-rouge">cmake</code> in your project, you simply can use the command <code class="language-plaintext highlighter-rouge">find_package(GAMERA)</code> in your
+<code class="language-plaintext highlighter-rouge">CMakeList.txt</code> file.</p>
+
+<p>Otherwise, to use the library in you program, compile like e.g.:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ g++ -o yourProgram yourProgramSource.C -lgamera -L~/.local/gamera/lib -I~/.local/gamera/include
 </code></pre></div></div>
-<p>where <code class="language-plaintext highlighter-rouge">LIBDIR</code> is the directory where <code class="language-plaintext highlighter-rouge">libgamera.so</code> is located (default: <code class="language-plaintext highlighter-rouge">lib/</code> in the <code class="language-plaintext highlighter-rouge">GAMERA</code> directory). 
-Also, it might be necessary to export the lib directory to <code class="language-plaintext highlighter-rouge">LD_LIBRARY_PATH</code>, e.g.:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ export LD_LIBRARY_PATH=./lib:$LD_LIBRARY_PATH
+<p>Also, it might be necessary to export the lib directory to <code class="language-plaintext highlighter-rouge">LD_LIBRARY_PATH</code>, e.g.:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">export </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>~/.local/gamera/lib:<span class="nv">$LD_LIBRARY_PATH</span>
 </code></pre></div></div>
 
-<h2 id="updating-gamera">Updating <code class="language-plaintext highlighter-rouge">GAMERA</code></h2>
-<p>After any new <code class="language-plaintext highlighter-rouge">git pull</code>, you should clean up the directory via</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ make clean
-</code></pre></div></div>
-<p>and re-compile with the commands above.</p>
+<!--
+Updating `GAMERA`
+-----------------
+After any new `git pull`, you should clean up the directory via 
+```
+$ make clean
+```
+and re-compile with the commands above.
+-->
 
 <!-- [(back to main page)](/docs/main_page) -->
 
