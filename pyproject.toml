@@ -5,6 +5,28 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "gappa"
 version = "1.0.0"
+description = "Calculation of the evolution of relativistic particles and their non-thermal emission"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Joachim Hahn"},
+    {name = "Carlo Romoli"},
+    {name = "Mischa Breuhaus", email = "mbreuhaus@mpifr-bonn.mpg.de"}
+]
+maintainers = [
+    {name = "Mischa Breuhaus", email = "mbreuhaus@mpifr-bonn.mpg.de"}
+]
+requires-python = ">=3.7"
+keywords = ["astrophysics", "radiation", "particles", "high-energy astrophysics"]
+classifiers = [
+    "License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+
+
 
 [tool.scikit-build]
 cmake.source-dir = "python"
