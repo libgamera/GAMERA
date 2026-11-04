@@ -26,6 +26,10 @@ classifiers = [
 ]
 
 
+[project.urls]
+Homepage = "https://libgamera.github.io/GAMERA/"
+Repository = "https://github.com/libgamera/GAMERA"
+Documentation = "https://libgamera.github.io/GAMERA/"
 
 
 [tool.scikit-build]
