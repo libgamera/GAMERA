@@ -16,7 +16,14 @@ Utils::Utils(bool DRAWLOGO) {
   yacc = gsl_interp_accel_alloc();
 }
 
-Utils::~Utils() {}
+Utils::~Utils() {
+    gsl_rng_free(r);
+    gsl_interp_accel_free(acc);
+    gsl_interp_accel_free(xacc);
+    gsl_interp_accel_free(yacc);
+    if (INTERNAL1DSPLINE) gsl_spline_free(INTERNAL1DSPLINE);
+    if (INTERNAL2DSPLINE) interp2d_spline_free(INTERNAL2DSPLINE);
+}
 
 /**
  * Generic parameter file reading function. Fill a vector with parameter titles
@@ -414,6 +421,8 @@ vector<double> Utils::CustomFunctionRandom(vector< vector<double> > f, int n,
     }
     v.push_back(x);
   }
+  gsl_spline_free(lookup);
+  gsl_interp_accel_free(a);
   return v;
 }
 
@@ -487,6 +496,10 @@ vector< vector<double> > Utils::CustomFunctionRandom2D(vector< vector<double> > 
     }
     TwoDVectorPushBack(x,y,v);
   }
+  interp2d_spline_free(spline2d);
+  gsl_interp_accel_free(xaccsp);
+  gsl_interp_accel_free(yaccsp);
+  
   return v;
 }
 
@@ -575,6 +588,9 @@ double Utils::Integrate(vector< vector<double> > f, double xmin, double xmax) {
             "Errorcode " << errcode << ". Returning 0. value. " << endl;}
     integral = 0.;
   }
+  gsl_spline_free(lookup);
+  gsl_interp_accel_free(a);
+  
   return integral;
 }
 
@@ -874,6 +890,15 @@ bool sortcriterionsecondcolumn (vector<double> i,
  
 void Utils::Clear2DVector(vector< vector<double> > &v) {
   for (unsigned int i = 0; i < v.size(); i++) v[i].clear();
+  v.clear();
+}
+
+
+void Utils::Clear3DVector(vector< vector< vector<double> > > &v) {
+  for (unsigned int i = 0; i < v.size(); i++) {
+      for (unsigned int j = 0; j < v[i].size(); j++) v[i][j].clear();
+      v[i].clear();
+  }
   v.clear();
 }
 

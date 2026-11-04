@@ -100,6 +100,35 @@ Particles::Particles() {
 Particles::~Particles() {
   for (unsigned int i = 0; i < grid.size(); i++) grid[i].clear();
   grid.clear();
+    // Free accelerators
+  gsl_interp_accel_free(accIC);   gsl_interp_accel_free(accLum);
+  gsl_interp_accel_free(accN);    gsl_interp_accel_free(accBField);
+  gsl_interp_accel_free(acceMax); gsl_interp_accel_free(accescapeTimeEdep);
+  gsl_interp_accel_free(accescapeTimeTdep); gsl_interp_accel_free(accR);
+  gsl_interp_accel_free(accV);    gsl_interp_accel_free(accTr);
+  gsl_interp_accel_free(accTrInv);gsl_interp_accel_free(accCustInj);
+  gsl_interp_accel_free(taccsp);  gsl_interp_accel_free(eaccsp);
+  gsl_interp_accel_free(taccesc); gsl_interp_accel_free(eaccesc);
+
+  // Free splines (guard with NULL check since they're init'd to NULL)
+  if (ICLossLookup)          gsl_spline_free(ICLossLookup);
+  if (LumLookup)             gsl_spline_free(LumLookup);
+  if (NLookup)               gsl_spline_free(NLookup);
+  if (BFieldLookup)          gsl_spline_free(BFieldLookup);
+  if (eMaxLookup)            gsl_spline_free(eMaxLookup);
+  if (RLookup)               gsl_spline_free(RLookup);
+  if (VLookup)               gsl_spline_free(VLookup);
+  if (escapeTimeLookupTdep)  gsl_spline_free(escapeTimeLookupTdep);
+  if (escapeTimeLookupEdep)  gsl_spline_free(escapeTimeLookupEdep);
+  if (energyTrajectory)      gsl_spline_free(energyTrajectory);
+  if (energyTrajectoryInverse) gsl_spline_free(energyTrajectoryInverse);
+
+  if (CustomInjectionSpectrum)             gsl_spline_free(CustomInjectionSpectrum);
+  if (EscapeTimeEnergyTimeEvolution)       interp2d_spline_free(EscapeTimeEnergyTimeEvolution);
+  if (CustomInjectionSpectrumTimeEvolution) interp2d_spline_free(CustomInjectionSpectrumTimeEvolution);
+
+  delete fUtils;
+  delete fRadiation;
 }
 
 
@@ -977,28 +1006,29 @@ void Particles::ComputeGrid(vector<double> EnergyAxis, double startTime,
 
       /* slope limiters (per default enabled, toggle on/off with FASTMODE flag) */    
       if(FASTMODE == false) {
-        double mm,sb;
         /* Uncomment the following lines if you want to use the
          * Lax-Wendroff slope limiter. You also have to comment
          * the code after until the curly bracket. Normally you
          * don't want to do this, the MinMod slope limiter is better */
-        /*mm =  quot * (LaxWendroffSlope(i, ebin, i0) * ElossRate_e1 *
-                (ebin - deltaE1) -
-                             LaxWendroffSlope(i + 1, ebin, i0) * ElossRate_e2 *
-                                 (ebin - deltaE2));
-        double lw = 0.5*quot*(LaxWendroffSlope(i,ebin,i0)*ElossRate_e1*(ebin-deltaE1)-LaxWendroffSlope(i+1,ebin,i0)*ElossRate_e2*(ebin-deltaE2));
-        value -= lw;*/
+
+        /*
+         double lw = 0.5*quot*(LaxWendroffSlope(i,ebin,i0)*ElossRate_e1*(ebin-deltaE1)-LaxWendroffSlope(i+1,ebin,i0)*ElossRate_e2*(ebin-deltaE2));
+        value -= lw;
+        */
         
         /*
          * Comment the next lines until the curly bracket if the
          * Lax-Wendroff slope limiter is used.
          */
+        double mm,sb;
         mm =  0.5*quot * (GetMinModSlope(i, ebin, i0) * ElossRate_e1 *
                                  (ebin - deltaE1) -
                              GetMinModSlope(i + 1, ebin, i0) * ElossRate_e2 *
                                  (ebin - deltaE2));
-        sb =
-            0.5*quot*(GetSuperBeeSlope(i,ebin,i0)*ElossRate_e1*(ebin-deltaE1)-GetSuperBeeSlope(i+1,ebin,i0)*ElossRate_e2*(ebin-deltaE2));
+        sb =  0.5*quot * (GetSuperBeeSlope(i, ebin, i0) * ElossRate_e1 *
+                                (ebin-deltaE1) -
+                                GetSuperBeeSlope(i+1, ebin, i0) * ElossRate_e2 *
+                                (ebin-deltaE2));
         value -= 0.5 * sqrt(mm*mm + sb*sb);
       }
 
@@ -1534,9 +1564,17 @@ void Particles::SetCustomEnergylookup(vector< vector<double> > vCustom,
   vCustom = fUtils->VectorAxisLogarithm(vCustom,0);
   vCustom = fUtils->VectorAxisLogarithm(vCustom,1);
   if(!mode) {  
+    if(CustomInjectionSpectrum) {
+      gsl_spline_free(CustomInjectionSpectrum);
+      CustomInjectionSpectrum = NULL;
+    }
     CustomInjectionSpectrum = fUtils->GSLsplineFromTwoDVector(vCustom);
   }
   else if(mode == 1) {
+    if(escapeTimeLookupEdep) {
+      gsl_spline_free(escapeTimeLookupEdep);
+      escapeTimeLookupEdep = NULL;
+    }
     escapeTimeLookupEdep = fUtils->GSLsplineFromTwoDVector(vCustom);
   }
   else {
@@ -1579,6 +1617,10 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
   vCustom = fUtils->VectorAxisLogarithm(vCustom,1);
   vCustom = fUtils->VectorAxisLogarithm(vCustom,2);
   if(!mode) {
+    if(CustomInjectionSpectrumTimeEvolution) {
+      interp2d_spline_free(CustomInjectionSpectrumTimeEvolution);
+      CustomInjectionSpectrumTimeEvolution = NULL;
+    }
     CustomInjectionSpectrumTimeEvolution = 
                       fUtils->TwoDsplineFromTwoDVector(vCustom,
                                                        TminLookup,TmaxLookup,
@@ -1586,6 +1628,10 @@ void Particles::SetCustomTimeEnergyLookup(vector< vector<double> > vCustom, int 
     CustomInjectionSpectrumTimeEvolutionVector = vCustom;
   }
   else if(mode == 1) {
+    if(EscapeTimeEnergyTimeEvolution) {
+      interp2d_spline_free(EscapeTimeEnergyTimeEvolution);
+      EscapeTimeEnergyTimeEvolution = NULL;
+    }
     EscapeTimeEnergyTimeEvolution = 
                       fUtils->TwoDsplineFromTwoDVector(vCustom,
                                                        TminLookup,TmaxLookup,

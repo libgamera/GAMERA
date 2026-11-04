@@ -1,5 +1,5 @@
-from distutils.core import setup, Extension
-import distutils.sysconfig
+from setuptools import setup, Extension
+import sysconfig
 import os
 import sys
 
@@ -9,10 +9,10 @@ here = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, here)
 import pkgconfig
 
-cfg_vars = distutils.sysconfig.get_config_vars()
+cfg_vars = sysconfig.get_config_vars()
 
 for key,value in cfg_vars.items():
-    if type(value) == str:
+    if isinstance(value, str):
         cfg_vars[key] = value.replace("-Wstrict-prototypes","")
 
 extra_link_args = pkgconfig.libs('gsl').split()

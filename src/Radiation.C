@@ -15,7 +15,9 @@ Radiation::Radiation() {
   ANISOTROPY_CURRENT = false;
   ISOTROPIC_ELECTRONS = false;  //If true, calculate anisotropic IC scattering with isotropic electrons
   SPATIALDEP_CURRENT = false;
-  DEFAULT_HADRON_COMPOSITION = false;
+  DEFAULT_HADRON_COMPOSITION = false; //TODO: Check if it is still needed, otherwise delete it
+  USE_KELNER = false;
+  USE_KAMAE = false;
   lumtoflux = 0.;
   ldiffbrems = fdiffbrems = ldiffsynch = fdiffsynch = 0.;
   ldiffic = fdiffic = ldiffpp = fdiffpp = 0.;
@@ -29,6 +31,8 @@ Radiation::Radiation() {
   TargetPhotonLookupSumIso = NULL;
   TargetPhotonLookupSumAll = NULL;
   ICLossLookupSumIso = NULL;
+  ICLossLookupSumAll = NULL;
+  accall = NULL;
   RADFIELD_COUNTER = 0;
   RADFIELDS_MAX = 1000;
   RADFIELD_CURRENT = -1;
@@ -61,6 +65,20 @@ Radiation::Radiation() {
   HadronSpectraLookups.clear();
   AmbientMediumComposition.clear();
   diffSpecHadronComponents.clear();
+  
+  // This are the vectors used for the neutrino calculations
+  HadronicMuonNeutrinoVectors.clear();
+  HadronicElectronNeutrinoVectors.clear();
+  HadronicTotalNeutrinoVectors.clear();
+  
+  ProtonMuonNeutrinoVector.clear();
+  ProtonElectronNeutrinoVector.clear();
+  ProtonTotalNeutrinoVector.clear();
+  
+  MuonNeutrinoVector.clear();
+  ElectronNeutrinoVector.clear();
+  TotalNeutrinoVector.clear();
+  
   
   for(unsigned int i=0;i<RADFIELDS_MAX;i++) {
     fdiffics[i] = NAN;
@@ -98,23 +116,66 @@ Radiation::Radiation() {
   ICLossLookupAccAll = gsl_interp_accel_alloc();
   loraccesc = gsl_interp_accel_alloc();
   edaccesc = gsl_interp_accel_alloc();
-  /// for spatial dependency of the gamma-gamma absorption target field
-  // accsp = gsl_interp_accel_alloc();
 }
 
 /**
- * Standard destructor.
+ * Destructor. All allocated space has to be freed.
  */
-Radiation::~Radiation() {}
+Radiation::~Radiation() {
+    if (acc) gsl_interp_accel_free(acc);
+    if (acciso) gsl_interp_accel_free(acciso);
+    if (ICLossLookupAccIso) gsl_interp_accel_free(ICLossLookupAccIso);
+    if (ICLossLookupAccAll) gsl_interp_accel_free(ICLossLookupAccAll);
+    if (loraccesc) gsl_interp_accel_free(loraccesc);
+    if (edaccesc) gsl_interp_accel_free(edaccesc);
+
+
+    // --- Particle lookups (conditionally allocated) ---
+    if (ElectronLookup)          { gsl_spline_free(ElectronLookup);          ElectronLookup = NULL; }
+    if (ProtonLookup)            { gsl_spline_free(ProtonLookup);             ProtonLookup = NULL; }
+
+    // --- Sum-field lookups (conditionally allocated) ---
+    if (TargetPhotonLookupSumIso) { gsl_spline_free(TargetPhotonLookupSumIso); TargetPhotonLookupSumIso = NULL; }
+    if (TargetPhotonLookupSumAll) { gsl_spline_free(TargetPhotonLookupSumAll); TargetPhotonLookupSumAll = NULL; }
+    if (ICLossLookupSumIso)       { gsl_spline_free(ICLossLookupSumIso);       ICLossLookupSumIso = NULL; }
+    if (ICLossLookupSumAll)       { gsl_spline_free(ICLossLookupSumAll);       ICLossLookupSumAll = NULL; }
+    // accall is allocated inside SetTargetPhotonVectorLookup (i==-2 path), not the constructor
+    if (accall)                   { gsl_interp_accel_free(accall);             accall = NULL; }
+
+
+    // --- Per-field arrays (allocated up to RADFIELD_COUNTER, rest are NULL) ---
+    for (int i = 0; i < (int)RADFIELDS_MAX; i++) {
+        if (TargetPhotonLookups[i])  { gsl_spline_free(TargetPhotonLookups[i]);          TargetPhotonLookups[i] = NULL; }
+        if (TargetPhotonAccs[i])     { gsl_interp_accel_free(TargetPhotonAccs[i]);        TargetPhotonAccs[i] = NULL; }
+        if (ICLossLookups[i])        { gsl_spline_free(ICLossLookups[i]);                 ICLossLookups[i] = NULL; }
+        if (ICLossLookupAccs[i])     { gsl_interp_accel_free(ICLossLookupAccs[i]);        ICLossLookupAccs[i] = NULL; }
+        if (phiaccescs[i])           { gsl_interp_accel_free(phiaccescs[i]);              phiaccescs[i] = NULL; }
+        if (thetaaccescs[i])         { gsl_interp_accel_free(thetaaccescs[i]);            thetaaccescs[i] = NULL; }
+        if (phiaccesc_zetas[i])      { gsl_interp_accel_free(phiaccesc_zetas[i]);         phiaccesc_zetas[i] = NULL; }
+        if (thetaaccesc_zetas[i])    { gsl_interp_accel_free(thetaaccesc_zetas[i]);       thetaaccesc_zetas[i] = NULL; }
+        if (CosZetaLookups[i])       { interp2d_spline_free(CosZetaLookups[i]);           CosZetaLookups[i] = NULL; }
+        if (TargetPhotonAngularDistrs[i]) { interp2d_spline_free(TargetPhotonAngularDistrs[i]); TargetPhotonAngularDistrs[i] = NULL; }
+    }
+    
+
+    for (int i = 0; i< (int)HadronSpectraLookups.size(); i++){
+        if (HadronSpectraLookups[i]) { gsl_spline_free(HadronSpectraLookups[i]);
+          HadronSpectraLookups[i] = NULL; }
+    }
+    delete fUtils;
+}
 
 //FIXME make me a nice function!
 void Radiation::Reset() {
   ParticleVector.clear();
   ElectronVector.clear();
   ProtonVector.clear();
-  gsl_spline_free(ElectronLookup);
-  gsl_spline_free(ProtonLookup);
-  gsl_spline_free(TargetPhotonLookupSumIso);
+  if (ElectronLookup)          { gsl_spline_free(ElectronLookup);          ElectronLookup = NULL; }
+  if (ProtonLookup)            { gsl_spline_free(ProtonLookup);             ProtonLookup = NULL; }
+  if (TargetPhotonLookupSumIso){ gsl_spline_free(TargetPhotonLookupSumIso); TargetPhotonLookupSumIso = NULL; }
+  //gsl_spline_free(ElectronLookup);
+  //gsl_spline_free(ProtonLookup);
+  //gsl_spline_free(TargetPhotonLookupSumIso);
   BField = 0.;
   n = 0.;
   return;
@@ -131,17 +192,22 @@ void Radiation::ClearTargetPhotons() {
     return;
 }
 
-/**
- * Remove all previously defined hadrons via clearing the mass
- * vector, the spectral vector and the associated lookup.
- *
- */
+/************************************************
+ * Remove all previously defined hadrons
+************************************************/
 void Radiation::ClearHadrons() {
     HadronMasses.clear();
     HadronSpectra.clear();
+    for (int i = 0; i< (int)HadronSpectraLookups.size(); i++){
+        gsl_spline_free(HadronSpectraLookups[i]);
+    }
     HadronSpectraLookups.clear();
     return;
 }
+
+
+
+
 
 /**
  * Calculates the differential photon emission at energy 'e' [erg]. This results
@@ -311,7 +377,7 @@ void Radiation::SetICLookups(int i) {
  * at energy 'e' [erg] resulting from radiation mechanism
  * 'radiationMechanism' that has been specified before in
  * 'CalculateDifferentialGammaEmission' or 'CalculateIntegralGammaEmission'.
- */  // TODO: the input parameter void *par became useless, it is not used -> delete it to avoid confusion!!
+ */  // TODO: the input parameter void *par became useless? if it is not used -> delete it to avoid confusion!!
 double Radiation::DifferentialEmissionComponent(double e, void *par) {
   if (radiationMechanism.compare("Synchrotron") &&
       radiationMechanism.compare("Bremsstrahlung") &&
@@ -380,17 +446,19 @@ double Radiation::DifferentialEmissionComponent(double e, void *par) {
       cout << "Set it via the SetPPEmissionModel(<OPTION>) method. " << endl;
       return 0.;
     }
-    IntFunc = &Radiation::PPEmissivity;
+    if(USE_KELNER) {IntFunc = &Radiation::PPEmissivityKelner;}
+    else if (USE_KAMAE) {IntFunc = &Radiation::PPEmissivityKamae;}
+    else {IntFunc = &Radiation::PPEmissivity;}
   } else if (!radiationMechanism.compare("hadronicEmission")) {
+    if(USE_KELNER) { IntFunc = &Radiation::PPEmissivityKelner;}
+    else if (USE_KAMAE) {IntFunc = &Radiation::PPEmissivityKamae;}
+    else {IntFunc = &Radiation::PPEmissivity;}
 	  if (!n && !AmbientMediumComposition.size()) {
 	    if(!QUIETMODE) cout << "Radiation::DifferentialEmissionComponent:"
 	                           "No ambient density value set for "
 	                           "p-p scattering. Returning zero value." << endl;
 	    return 0.;
 	  }
-    IntFunc = &Radiation::PPEmissivity;
-      
-      
       
   } else
     return 0.;
@@ -464,7 +532,7 @@ double Radiation::ICEmissivityRadFieldIntegrated(double x, void *par) {
   int kronrod = 6; 
   if(ANISOTROPY_CURRENT == true)  {
     if(ISOTROPIC_ELECTRONS){
-        IntFunc = &Radiation::ICEmissivityAnisotropicIsotropicElectrons;
+      IntFunc = &Radiation::ICEmissivityAnisotropicIsotropicElectrons;
     }
     else {
         IntFunc = &Radiation::ICEmissivityAnisotropic;
@@ -629,7 +697,8 @@ double Radiation::ICEmissivityAnisotropic(double x, void *par) {
             Q = interp2d_spline_eval(*TargetPhotonAngularDistrCurrent, 
                                      phi, theta, *phiaccescCurrent,*thetaaccescCurrent);
             double eph_d = ephoton/m_e * lorentz * (1. + beta*cos_zeta);    // M&S equ. 9
-            if (egamma/m_e > 2. * lorentz * eph_d / (1. + 2.*eph_d)) continue;  // see M&S equ.9
+
+            if (egamma/m_e > 2. * lorentz * eph_d / (1. + 2.*eph_d)) continue; // see M&S equ.9
 
             F = ICAnisotropicAuxFunc(phi,theta,ephoton,egamma,lorentz,beta,cos_zeta);
             integral += sin(theta) * d_phi * d_theta * F * Q;
@@ -647,6 +716,7 @@ double Radiation::ICEmissivityAnisotropic(double x, void *par) {
     // std::cout<<"-------------------------------------"<<std::endl;
     return integrand;
 }
+
 
 
 
@@ -745,8 +815,8 @@ double Radiation::ICEmissivityAnisotropicIsotropicElectronsFirstIntegral(double 
     return (result*Q);
 }
 
-//--------------------------------------------------------------------------------------------------------
-//--------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------
 
 
 /**
@@ -1262,7 +1332,6 @@ double Radiation::Fbr(double x, double g) {
 
 
 /* ---      pi0 decay     --- */
-
 double Radiation::PPEmissivity(double x, void *par) {
   /* proton energy */
   double EP = pow(10.,x);
@@ -1281,6 +1350,8 @@ double Radiation::PPEmissivity(double x, void *par) {
                                       acc,__func__,__LINE__);
   return c_speed * N * pow(10., logprotons) * ln10 * EP;
 }
+
+
 
 /**
  * differential cross section following Kafexhiu 2014
@@ -1312,6 +1383,7 @@ double Radiation::InclusivePPXSection(double Tp) {
 double Radiation::InelasticPPXSectionKaf(double Tp) {
   double Tpth = 0.2797 * GeV_to_erg;
   double L = Tp / Tpth;
+  if (L < 1.0) return 0.0;   // Return 0 if we are below the threshold
   double logL = log(L);
   double sigma =
       (30.7 - 0.96 * logL + 0.18 * logL * logL) * pow(1. - pow(L, -1.9), 3.);
@@ -1356,6 +1428,8 @@ double Radiation::MeanMultiplicity(double Tp) {
 /** Eq. 2 Kafexhiu 2014, needed for lowest energies
  */
 double Radiation::SigmaOnePi(double Tp) {
+  if ( Tp/GeV_to_erg < 0.2797) return 0.0;
+  if (Tp/GeV_to_erg > 2.0) return 0.0;
   double sigma0 = 7.66e-3;
   double s = 2. * m_p * (Tp + 2. * m_p);
   double Mres = 1.1883 * GeV_to_erg;
@@ -1374,11 +1448,14 @@ double Radiation::SigmaOnePi(double Tp) {
   return SigmaOnePi * 1.e-27;
 }
 
-/** Eq. 2 Kafexhiu 2014, needed for lowest energies
+/** Eq. 5 Kafexhiu 2014, needed for lowest energies
  */
 double Radiation::SigmaTwoPi(double Tp) {
+  if ((Tp / GeV_to_erg) < 0.56) { return 0.0;}
+  else {
   double SigmaTwoPi = 5.7 / (1. + exp(-9.3 * (Tp / GeV_to_erg - 1.4)));
   return SigmaTwoPi * 1.e-27;
+  }
 }
 
 /** X-section normalisation following Eq. 12 in Kafexhiu 2014
@@ -1410,6 +1487,7 @@ double Radiation::F(double Tp, double Eg) {
   double Xg = (Yg - m_pi) / (Ygmax - m_pi);
   double C = lambda * m_pi / Ygmax;
   double f = pow(1. - pow(Xg, alpha), beta) / pow(1. + Xg / C, gamma);
+  if (Xg > 1.0) return 0.0;
   return f;
 }
 
@@ -1441,7 +1519,6 @@ double Radiation::Epilabmax(double Tp) {
   double Epilabmax = gammaCM * (EpiCM + PpiCM * betaCM);
   return Epilabmax;
 }
-
 
 
 /** get the alpha beta and gamma parameters used in Eq. 11, Kafexhiu 2014
@@ -1510,6 +1587,671 @@ void Radiation::GetBParams(double Tp, double &b1, double &b2, double &b3) {
   if (Tp > 50. && PiModel == 1) b1 = 9.06, b2 = 0.3795, b3 = 1.105e-2;
   return;
 }
+
+
+
+
+
+/******************************************************************
+ * With this function one can set the parametrization of
+ * pp and hadronic collisions to the one by Kamae et al. 2006
+ * \param kamae = Boolean, if true Kamae 2006 par. will be used
+ ******************************************************************/
+void Radiation::UseKamae(bool kamae){
+    if (kamae) {
+     USE_KELNER = false;
+     USE_KAMAE = kamae;
+    }
+    else {
+     USE_KAMAE = kamae;   
+    }
+    return;
+}
+
+
+
+
+double Radiation::PPEmissivityKamae(double x, void *par){
+  /* proton energy */
+  double EP = pow(10.,x);
+  /* pi0 decay photon energy */
+  double Eg = pow(10.,*(double *)par);
+  if (EP <= m_p) return 0.;
+  double Tp = sqrt(EP * EP - m_p * m_p); 
+  double Tpth = 0.2797 * GeV_to_erg; 
+  if (Tp <= Tpth) return 0.;
+  
+  
+  // Calculation of the parameters in table 3 in Kamae et al. 2006
+  double y = log(Tp * erg_to_TeV);
+  
+  double a0 = -0.51187*(y + 3.3) + 7.6179*(y + 3.3)*(y + 3.3) - 2.1332*pow(y + 3.3, 3) + 0.22184*pow(y + 3.3, 4);
+  double a1 = -1.2592e-5 + 1.4439e-5 * exp(-0.29360 * ( y + 3.4)) + 5.9363e-5/( y + 4.1485) + 2.2640e-6 * y - 3.3723e-7 * y*y;
+  double a2 = -1.0*(174.83 + 152.78) * log(1.5682 * ( y + 3.4)) -  808.74/(y + 4.6157);
+  double a3 = 0.81177 + 0.56385*y + 0.0040031*y*y - 0.0057658*y*y*y + 0.00012057*pow(y,4);
+  double a4 = 0.68631*( y + 3.32) + 10.145* pow( y + 3.32 , 2) - 4.6176*pow( y + 3.32 , 3) + 0.86824*pow( y + 3.32 , 4) - 0.053741*pow( y + 3.32 , 5);
+  double a5 = 9.0466e-7 + 1.4539e-6 * log(0.015204*( y + 3.4)) + 1.3253e-4/((y + 4.7171)*(y + 4.7171)) - 4.1228e-7 * y + 2.2036e-7 *y*y;
+  double a6 = -1.0*(339.45 + 618.73) *  log(0.31595*( y + 3.9)) + 250.20/(( y + 4.4395)*( y + 4.4395));
+  double a7 = -35.105 + 36.167*y - 9.3575*y*y + 0.33717*y*y*y;
+  double a8 = 0.17554 + 0.37300*y - 0.014938*y*y + 0.0032314*y*y*y + 0.0025579*pow(y, 4);
+  double r = 1.01;
+  if (Tp/GeV_to_erg <= 1.95){
+   r = 3.05*exp( -107.0*pow((y + 3.25)/(1.0 + 8.08*(y + 3.25)), 2));   
+  }
+    
+  double b0 = 60.142 * tanh(-0.37555*( y + 2.2)) - 5.9564*(y + 0.59913)*(y + 0.59913) + 6.0162e-3 *pow(y + 9.4773,4);
+  double b1 = 35.322 + 3.8026 * tanh(-2.5979*(y + 1.9)) - 2.1870e-4 * (y + 369.13)*(y + 369.13);
+  double b2 = -15.732 - 0.082064 * tanh(-1.9621*(y + 2.1)) + 2.3355e-4 * (y + 252.43) *(y + 252.43);
+  double b3 = -0.086827 + 0.37646 * exp(-0.53053*pow(((y + 1.0444)/(1.0 + 0.27437*(y + 1.0444))),2));
+  double b4 = 2.5982 + 0.39131*(y + 2.95)*(y + 2.95) - 0.0049693*pow( y + 2.95, 4) + 0.94131 * exp(-24.347*pow(y + 2.45 - 0.19717*(y + 2.45)*(y + 2.45),2));
+  double b5 = 0.11198 - 0.64582*y + 0.16114*y*y + 2.2853 * exp(-0.0032432*pow(( y - 0.83562)/(1.0 + 0.33933*( y - 0.83562)),2) );
+  double b6 = 1.7843 + 0.91914*y + 0.050118*y*y + 0.038096*y*y*y - 0.027334*pow(y, 4) - 0.0035556*pow(y, 5) + 0.0025742*pow(y, 6);
+  double b7 = -0.19870 - 0.071003*y + 0.019328*y*y - 0.28321 * exp(-6.0516*(y + 1.8441)*(y + 1.8441));
+  
+  double c0 = 2.4316 * exp(-69.484*pow((y + 3.1301)/(1.0 + 1.24921*(y + 3.1301)),2)) - 6.3003 - 9.5349/y + 0.38121*y*y;
+  double c1 = 56.872 + 40.627*y + 7.7528*y*y;
+  double c2 = -5.4918 - 6.7872 * tanh(4.7128*(y + 2.1)) + 0.68048*y;
+  double c3 = -0.36414 + 0.039777*y;
+  double c4 = -0.72807 - 0.48828*y - 0.092876*y*y;
+  
+  double d0 = 3.2433 * exp(-57.133*pow((y + 2.9507)/(1.0 + 1.2912*(y + 2.9507)),2)) - 1.0640 - 0.43925*y;
+  double d1 = 16.901 + 5.9539*y - 2.1257*y*y - 0.92057*y*y*y;
+  double d2 = -6.6638 - 7.5010 * tanh(30.322*(y + 2.1)) + 0.54662*y;
+  double d3 = -1.50648 - 0.87211*y - 0.17097*y*y;
+  double d4 = 0.42795 + 0.55136*y + 0.20707*y*y + 0.027552*y*y*y;
+
+
+  double Wndl = 15.0;
+  double Wndh = 44.0;
+  double Lmax = 0.96*log(Tp/GeV_to_erg);
+  
+  double X = log(Eg/GeV_to_erg);
+  
+  
+  double Fnd = FndKamae(X, a0, a1, a2, a3, a4, a5, a6, a7, a8) * FndklKamae(X,Wndl, Wndh, Lmax)*r;
+  
+  double Fdiff = FdiffKamae(X, b0,b1,b2,b3,b4,b5,b6,b7) * FklKamae(X, Tp/GeV_to_erg);
+  
+  double FresDelta = FresKamae(X,c0,c1,c2,c3,c4) * FklKamae(X, Tp/GeV_to_erg);
+  double Fres1600 = FresKamae(X,d0,d1,d2,d3,d4) * FklKamae(X, Tp/GeV_to_erg);
+  
+  double N = Fnd * SigmaNdKamae(Tp) + Fdiff * SigmaDiffKamae(Tp) + FresDelta * SigmaDeltaKamae(Tp) + Fres1600 * SigmaResKamae(Tp);
+  
+  double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
+  
+  double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
+                                      acc,__func__,__LINE__);
+  return c_speed * NuclearEnhancement * N * pow(10., logprotons) * ln10 * EP * Eg;
+
+    
+}
+
+
+
+
+/**************************************************************
+ * Equation 6 from Kamae et al. 2006 for the non-diffractive
+ * channel
+ * ***********************************************************/
+double Radiation::FndKamae(double x, double a0, double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8){
+    //return 0.0;
+    //cout << " a0: " << a0 << " a1: " << a1 << " a5: " << a5 << " arg_exp1: " << -a1* pow((x-a3 + a2*(x-a3)*(x-a3)),2.0) << " arg_exp2: " << -a5* pow((x-a8 + a6*(x-a8)*(x-a8)+ a7*pow((x-a8),3.0)) , 2.0);
+    double result = a0 * exp(-a1* pow((x-a3 + a2*(x-a3)*(x-a3)),2.0))
+                    + a4 * exp(-a5* pow((x-a8 + a6*(x-a8)*(x-a8)+ a7*pow((x-a8),3.0)) , 2.0));
+    //cout << result << "\n";
+    if (not isinf(result)) return result;
+    else return 0.0;
+}
+
+/**************************************************************
+ * Equation 7 from Kamae et al. 2006 for the non-diffractive
+ * channel
+ * ***********************************************************/
+double Radiation::FndklKamae(double x, double Wndl, double Wndh, double Lmax){
+    //cout << "In FndklKamae\n";
+    //return 0.0;
+    double Lmin = -2.6;
+    double result = 1.0/(exp(Wndl*(Lmin - x)) + 1.0) * 1.0/(exp(Wndh*(x - Lmax)) + 1.0);
+    
+    return result;
+}
+
+
+/**************************************************************
+ * Equation 9 from Kamae et al. 2006 for the non-diffractive
+ * channel
+ * ***********************************************************/
+double Radiation::FdiffKamae(double x, double b0, double b1, double b2, double b3, double b4, double b5, double b6, double b7){
+    double result = b0 * exp(-1.0*b1 * pow((x-b2)/(1.0 + b3*(x-b2)),2))
+                    + b4*exp(-1.0*b5*pow((x-b6)/(1.0+b7*(x-b6)),2)); //DANGER: There is a typo in Kamae in equ. 9
+    if (not isinf(result)) return result;
+    else return 0.0;
+}
+// Equation 10 in Kamae
+double Radiation::FklKamae(double x, double Tp){
+    //cout << "In FklKamae\n";
+    //return 0.0;
+    double Lmax = log(Tp);
+    double Wdiff = 75.0;
+    double result = 1.0/(exp(Wdiff*(x-Lmax)) + 1.0);
+    //if (not isinf(result)) return result;
+    return result;
+}
+
+// Equation 12 in Kamae
+double Radiation::FresKamae(double x, double c0, double c1, double c2, double c3, double c4){
+    //cout << "In FresKamae\n";
+    //return 0.0;
+    double result = c0*exp(-1.0*c1* pow(((x-c2)/(1.0 + c3*(x-c2) + c4*(x-c2)*(x-c2))),2));
+    return result;
+}
+
+
+/*Cross sections for Kamae. NOTE: There is an erratum to the original paper, the equations
+ were taken from the erratum. */
+// Equation 1
+double Radiation::SigmaNdKamae(double Tp){
+    //cout << "In SigmaNdKamae\n";
+    //return 0.0;
+    double x = log( Tp/GeV_to_erg/c_speed );
+    double a0 = 0.1176, a1 = 0.3829, a2 = 23.10, a3 = 6.454, a4 = -5.764, a5 = -23.63, a6 = 94.75, a7 = 0.02667;
+    double b0 = 11.34, b1 = 23.72;
+    double c0 = 28.5, c1 = -6.133, c2 = 1.464;
+    
+    double sigma;
+    if (x < 1.0) sigma = 0.0;
+    else if (x < 1.3) sigma = 0.57*pow(x/a0,1.2)*(a2 + a3*x*x + a4*x*x*x + a5*exp(-a6*(x+a7)*(x+a7)));
+    else if (x < 2.4) sigma = (b0*abs(a1-x) + b1*abs(a0-x) - x)/(a1-a0);
+    else if (x < 10.0) sigma = a2 + a3*x*x + a4*x*x*x + a5*exp(-a6*(x+a7)*(x+a7));
+    else sigma = c0 + c1*x + c2*x*x;
+        
+    return sigma*1.0e-27;
+}
+
+//Equation 2
+double Radiation::SigmaDiffKamae(double Tp){
+    //cout << "In SigmaDiffKamae\n";
+    //return 0.0;
+    double x = log( Tp/GeV_to_erg/c_speed );
+    double d0 = 0.3522, d1 = 0.1530, d2 = 1.498, d3 = 2.0, d4 = 30.0, d5 = 3.155, d6 = 1.042;
+    double e0 = 5.922, e1 = 1.632;
+    
+    double sigma;
+    if (x<2.25) sigma = 0.0;
+    else if (x< 3.2) sigma = sqrt((x-d0)/d1) * (d2 + d3*log(d4*(x-0.25)) + d5*x*x - d6*x*x*x);
+    else if(x < 100.0) sigma = d2 + d3 * log(d4*(x-0.25)) + d5*x*x - d6*x*x*x;
+    else sigma = e0 + e1*x;
+    
+    
+    return sigma*1.0e-27;
+}
+
+// Equation 3
+double Radiation::SigmaDeltaKamae(double Tp){
+    //cout << "In SigmaDeltaKamae\n";
+    //return 0.0;
+    double Ep = sqrt(Tp*Tp + m_p*m_p)/GeV_to_erg;
+    double f0 = 0.0834, f1 = 9.5, f2 = -5.5, f3 = 1.68, f4 = 3134.0;
+    
+    double sigma;
+    if (Ep < 1.4) sigma = 0.0;
+    else if (Ep < 1.6) sigma = f0 * pow(Ep,10);
+    else if (Ep < 1.8) sigma = f1*exp(-f2*(Ep - f3)*(Ep - f3));
+    else if (Ep < 10.0) sigma = f4* pow(Ep, -10);
+    else sigma = 0.0;
+    
+    return sigma*1.0e-27;
+}
+
+// Equation 4
+double Radiation::SigmaResKamae(double Tp){
+    //cout << "In SigmaResKamae\n";
+    //return 0.0;
+    double Ep = sqrt(Tp*Tp + m_p*m_p)/GeV_to_erg;
+    double g0 = 0.0004257, g1 = 4.5, g2 = -7.0, g3 = 2.1, g4 = 503.5;
+    
+    double sigma;
+    if (Ep < 1.6) sigma = 0.0;
+    else if (Ep < 1.9) sigma = g0* pow(Ep,14);
+    else if (Ep < 2.3) sigma = g1 * exp(-g2*(Ep - g3)*(Ep - g3));
+    else if (Ep < 20.0) sigma = g4 * pow(Ep, -6);
+    else sigma = 0.0;
+    
+    return sigma*1.0e-27;
+}
+
+
+
+
+
+
+
+
+
+
+/******************************************************************
+ * With this function one can set the parametrization of
+ * pp and hadronic collisions to the one by Kelner et al. 2006
+ * \par  - Boolean, if true Kelner 2006 par. will be used
+ ******************************************************************/
+void Radiation::UseKelner(bool kelner){
+    if (kelner) {
+     USE_KAMAE = false;
+     USE_KELNER = kelner;
+    }
+    else {
+     USE_KELNER = kelner;   
+    }
+    return;
+}
+
+
+/**************************************************************
+ * PP emissivity according to Kelner et al. 2006
+ * ***********************************************************/
+double Radiation::PPEmissivityKelner(double x, void *par) {
+  /* proton energy */
+  double EP = pow(10.,x);
+  /* pi0 decay photon energy */
+  double Eg = pow(10.,*(double *)par);
+  if (EP <= m_p) return 0.;
+  double Tp = sqrt(EP * EP - m_p * m_p); 
+  double Tpth = 0.2797 * GeV_to_erg; 
+  if (Tp <= Tpth) return 0.;
+  if (Eg <= GetMinimumGammaEnergy(Tp)) return 0.;
+  if (Eg >= GetMaximumGammaEnergy(Tp)) return 0.;
+
+  double N = Fgamma(Eg, EP); 
+
+  double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
+  
+  double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
+  //double sigma = InelasticPPXSectionKelner(EP);  // Here, the cross section from Kelner is used
+
+  
+  double logprotons = fUtils->EvalSpline(log10(EP),current_Hadron_lookup,
+                                      acc,__func__,__LINE__);
+  
+  return (c_speed * NuclearEnhancement * sigma * pow(10., logprotons) * N * ln10);
+}
+
+
+
+/**
+ * Inelastic PP interaction corss section according to Kelner et al. 2006.
+ * \param EP = Total proton energy in [erg]
+ * \return Cross section in [barn]
+ * */
+double Radiation::InelasticPPXSectionKelner(double EP){
+  double L = log(EP*erg_to_TeV);
+  double Eth = 1.22*GeV_to_erg;
+  double sigma = (34.3 + 1.88*L + 0.25*L*L) * (1.0 - Eth*Eth*Eth*Eth/(EP*EP*EP*EP))*(1.0 - Eth*Eth*Eth*Eth/(EP*EP*EP*EP)) * 1.0e-27;
+  
+  return sigma;
+}
+
+
+
+/*******************************************************
+ * Equations 58 to 61 in Kelner et al. 2006
+ * Input:   - Energy of the gamma ray in [erg]
+ *          - Energy of the proton in [erg]
+ ******************************************************/
+double Radiation::Fgamma(double Egamma, double Eproton){
+    double x = Egamma/Eproton;
+    double L = log(Eproton*erg_to_TeV);
+    
+    double Bgamma = 1.30 + 0.14*L + 0.011*L*L;
+    double betagamma = 1.0/(1.79 + 0.11*L + 0.008*L*L);
+    double kgamma = 1.0/(0.801 + 0.049*L + 0.014*L*L);
+    
+    double xbeta = pow(x, betagamma);
+    double Fg = Bgamma * log(x)/x * pow(((1.0-xbeta)/(1.0 + kgamma*xbeta*(1.0-xbeta))),4.0)
+                *( 1.0/log(x) - 4.0*betagamma*xbeta/(1.0-xbeta) - 
+                4.0*kgamma*betagamma*xbeta*(1.0-2.0*xbeta) / (1.0 + kgamma*xbeta*(1.0-xbeta)));
+    
+    
+    
+    return Fg;
+}
+
+
+
+/*---- Calculation of neutrinos following Kelner et al 2006 --- */
+
+/*************************************************************************
+ * Calculation of the Neutrino spectrum. It fills the vectors
+ * MuonNeutrinoVector, ElectronNeutrinoVector and TotalNeutrinoVector.
+ * Input:   - Energy points where to calculate the spectrum in [erg]
+ * **********************************************************************/
+void Radiation::CalculateNeutrinoSpectrum(vector<double> points){
+  if (MuonNeutrinoVector.size()) fUtils->Clear2DVector(MuonNeutrinoVector);
+  if (ElectronNeutrinoVector.size()) fUtils->Clear2DVector(ElectronNeutrinoVector);
+  if (TotalNeutrinoVector.size()) fUtils->Clear2DVector(TotalNeutrinoVector);
+  
+  if (ProtonMuonNeutrinoVector.size()) fUtils->Clear2DVector(ProtonMuonNeutrinoVector);
+  if (ProtonElectronNeutrinoVector.size()) fUtils->Clear2DVector(ProtonElectronNeutrinoVector);
+  if (ProtonTotalNeutrinoVector.size()) fUtils->Clear2DVector(ProtonTotalNeutrinoVector);
+  
+  if (HadronicMuonNeutrinoVectors.size()) fUtils->Clear3DVector(HadronicMuonNeutrinoVectors);
+  if (HadronicElectronNeutrinoVectors.size()) fUtils->Clear3DVector(HadronicElectronNeutrinoVectors);
+  if (HadronicTotalNeutrinoVectors.size()) fUtils->Clear3DVector(HadronicTotalNeutrinoVectors);
+  
+  if (!ProtonVector.size() && !HadronSpectra.size()) {
+    cout << "Radiation::CalculateNeutrinoSpectrum: No proton or hadron spectra filled "
+            "-> No neutrino spectra to calculate. Exiting..." << endl;
+    return;
+  }
+  
+  
+  if( !AmbientMediumComposition.size()){
+      vector<double> temp0; temp0.resize(2);
+      vector<vector<double> > temp;
+      if (!n) { temp0[0] = 1.0; temp0[1] = 0.0;
+          temp.push_back(temp0);
+          if(!QUIETMODE) cout << "Warning in Radiation::CalculateNeutrinoSpectrum: "
+                             "No ambient medium defined "
+                             "for p-p scattering. Values will be zero." << endl;
+          
+      }
+      else { temp0[0] = 1.0; temp0[1] = n;
+          temp.push_back(temp0);
+      }
+      SetAmbientMediumComposition(temp);
+  }
+  
+  if (HadronSpectra.size()){
+    HadronicMuonNeutrinoVectors.resize(HadronSpectra.size());
+    HadronicElectronNeutrinoVectors.resize(HadronSpectra.size());
+    HadronicTotalNeutrinoVectors.resize(HadronSpectra.size());
+  }
+
+  double distance_normalisation;
+  if (!distance) {
+        cout << "### Radiation::CalculateNeutrinoSpectrum: Distance to "
+                "particles not specified -> Flux equals now the luminosity! ###"
+             << endl;
+      distance_normalisation = 1.;
+    } else
+      distance_normalisation = 1. / (4. * pi * distance * distance);
+  
+  
+  
+  if (!QUIETMODE) {
+    cout << "___________________________________________________________" << endl;
+    cout << ">> CALCULATING NEUTRINO SED FROM PARENT PROTONS AND HADRONS " << endl;
+  }
+  
+
+  
+  double E, nu1, nu2, total_flux;   // will contain the summed contribution from protons and all hadrons
+  double nu1_protons = 0.0, nu2_protons = 0.0, total_flux_protons = 0.0;
+  double nu1_hadrons = 0.0, nu2_hadrons = 0.0, total_flux_hadrons = 0.0;
+  
+  int size = (int)points.size();
+ for(int i = 0; i < size; i++ ){
+     if (QUIETMODE == false) {
+      cout << "\r";
+      cout << "    "
+           << i+1 << " / " << size
+           << " points calculated" << std::flush;
+     }
+     E = points[i];
+
+     // If there are protons defined, calculate the neutrinos from protons
+     if (ProtonVector.size()){
+         ParticleVector = ProtonVector;
+        current_Hadron_lookup = ProtonLookup;
+        current_mass_number = 1.0;
+        nu1_protons = CalculateNeutrinoFlux(E, 1)*distance_normalisation;
+        nu2_protons = CalculateNeutrinoFlux(E, 0)*distance_normalisation;
+        total_flux_protons = nu1_protons + 2.*nu2_protons;
+        fUtils->TwoDVectorPushBack(E, nu1_protons, ProtonMuonNeutrinoVector);
+        fUtils->TwoDVectorPushBack(E, nu2_protons, ProtonElectronNeutrinoVector);
+        fUtils->TwoDVectorPushBack(E, total_flux_protons, ProtonTotalNeutrinoVector);
+     }
+
+     // If there are hadrons defined, calculate the neutrinos from all hadron species
+     if (HadronSpectra.size()){
+         nu1_hadrons = 0.0; nu2_hadrons = 0.0, total_flux_hadrons = 0.0;
+         for(int j = 0; j < (int)HadronSpectra.size(); j++){
+             ParticleVector = HadronSpectra[j];
+             current_Hadron_lookup = HadronSpectraLookups[j];
+             current_mass_number = HadronMasses[j];
+             nu1 = CalculateNeutrinoFlux(E, 1)*distance_normalisation;
+             nu2 = CalculateNeutrinoFlux(E, 0)*distance_normalisation;
+             total_flux = nu1 + 2.*nu2;
+             fUtils->TwoDVectorPushBack(E, nu1, HadronicMuonNeutrinoVectors[j]);
+             fUtils->TwoDVectorPushBack(E, nu2, HadronicElectronNeutrinoVectors[j]);
+             fUtils->TwoDVectorPushBack(E, total_flux, HadronicTotalNeutrinoVectors[j]);    
+             
+             nu1_hadrons += nu1;
+             nu2_hadrons += nu2;
+             total_flux_hadrons += total_flux;
+         }
+         
+     }
+     
+     // Save the total flux from protons and all hadron species
+     nu1 = nu1_protons + nu1_hadrons;
+     nu2 = nu2_protons + nu2_hadrons;
+     total_flux = total_flux_protons + total_flux_hadrons;
+     fUtils->TwoDVectorPushBack(E, nu1, MuonNeutrinoVector);
+     fUtils->TwoDVectorPushBack(E, nu2, ElectronNeutrinoVector);
+     fUtils->TwoDVectorPushBack(E, total_flux, TotalNeutrinoVector);
+ }
+ if (QUIETMODE == false) {
+    cout << endl;
+    cout << "    -> DONE!   " << endl;
+    cout << endl;
+    cout << ">> NEUTRINO CALCULATION DONE. EXITING." << endl;
+    cout << endl;
+ }
+ return;
+}
+
+
+
+/*****************************************************************************************
+ *  Integrates and returns the result, used by the function CalculateNeutrinoSpectrum
+ *   Input:  - Energy of the neutrinos (or electrons) in [erg]
+ *           - leptontype: '0' for electron/muon neutrinos from decay of muons and '1' 
+ *              for muons from direct charged pion decay
+ *  Output: - Flux
+ ****************************************************************************************/
+double Radiation::CalculateNeutrinoFlux(double energy, int leptontype) {
+    if (!n) {
+        if ((AmbientMediumComposition.size() == 1) && (AmbientMediumComposition[0][1] == 0.0)) {
+        return 0.;
+        }
+    }
+    double integral = 0;
+    const double ethresh = 1.22e-3 * TeV_to_erg;  // Threshold for pion production
+    double emax = ParticleVector[ParticleVector.size() - 1][0];
+    double emin = energy;
+    if (emin < ParticleVector[0][0]) emin = ParticleVector[0][0];
+    if (emin < ethresh) emin = ethresh; // Don't start integration below the threshold
+    if (emin >= emax) return 0.; // We can not produce neutrinos more energetic than the protons
+    
+
+    // Contains the energy of the muon
+    double integralinput[1];
+    integralinput[0] = energy;    
+    
+    // Convert everything to logarithmic values
+    double emin_log = log10(emin);
+    double emax_log = log10(emax);
+    
+    // Set the function for the spectrum to electron neutrinos (or electrons) or muon neutrinos
+    if (leptontype == 0) {
+        fPointer Fnu = &Radiation::NeutrinoFlux1;
+        integral = Integrate(Fnu, integralinput, emin_log, emax_log,integratorTolerance*5., integratorKronrodRule);
+    }
+    
+    else if (leptontype == 1) {
+        double emin_new = energy/0.427;
+        if(emin_new > emin) emin_log = log10(emin_new);
+        if(emax_log < emin_log) return 0.0;
+        fPointer Fnu = &Radiation::NeutrinoFlux2;
+        // integrate the function
+        integral = Integrate(Fnu, integralinput, emin_log, emax_log,integratorTolerance*5., integratorKronrodRule);
+    }
+    else {
+        cout << "Radiation::CalculateNeutrinoFlux: No valid lepton type specified.";
+        return 0.;
+    }
+
+    double result = c_speed * integral * ln10;
+    return result;
+}
+
+
+
+/**********************************************************************
+ * Function to be integrated to get the neutrino emission for
+ * electron- and muon-Neutrino produced in the muon decay,
+ * as well as the electron spectrum.
+ * Input:   - Energy of the proton (or hadron) in [erg]
+ *          - energy of the muon/electron as a parameter in [erg]
+ * Output:  - The integrand (see e.g. equ. 71 or 72 in Kelner et al.
+ *              2006
+ *********************************************************************/
+double Radiation::NeutrinoFlux1(double energy_proton, void *par) {
+    double *p = (double *)par;
+    double energy_nu = p[0];
+    
+    double logprotons = fUtils->EvalSpline(energy_proton,current_Hadron_lookup,
+                                      acc,__func__,__LINE__);
+    double Jp = pow(10, logprotons);   // Proton flux, Jp in Kelner 2006
+    
+    // Convert the energy to the real value again
+    energy_proton = pow(10, energy_proton);        
+    double Tp = sqrt(energy_proton * energy_proton - m_p * m_p);
+    double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
+    
+    double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
+    //double sigma = InelasticPPXSectionKelner(energy_proton); // Cross section from Kelner
+    double Fnu = Felectron(energy_nu, energy_proton);
+    
+    double result = sigma*Jp*Fnu*NuclearEnhancement;
+    return result;
+}
+
+
+
+/**********************************************************************
+ * Function to be integrated to get the muon-neutrino emission produced
+ * in the pion decay.
+ * Input:   - Energy of the proton in [erg]
+ *          - energy of the muon as a parameter in [erg]
+ * Output:  - The integrand (see e.g. equ. 71 or 72 in Kelner et al.
+ *              2006
+ *********************************************************************/
+double Radiation::NeutrinoFlux2(double energy_proton, void *par) {
+    double *p = (double *)par;
+    double energy_nu = p[0];
+    
+    
+    double logprotons = fUtils->EvalSpline(energy_proton,current_Hadron_lookup,
+                                      acc,__func__,__LINE__);
+    double Jp = pow(10, logprotons);   // Proton flux, Jp in Kelner 2006
+    
+    // Convert the energy to the real value again
+    energy_proton = pow(10, energy_proton);        
+    double Tp = sqrt(energy_proton * energy_proton - m_p * m_p);
+    
+    double sigma = InelasticPPXSectionKaf(Tp);   // calculate the cross section
+    //double sigma = InelasticPPXSectionKelner(energy_proton);  // Cross section from Kelner
+    double Fnu = Fnumu(energy_nu, energy_proton);
+    
+    double NuclearEnhancement = CalculateEpsilon(Tp, current_mass_number);
+    
+    double result = sigma*Jp*Fnu*NuclearEnhancement;
+    return result;
+}
+
+
+
+/********************************************************************************* 
+ * Function for electrons and muon neutrinos from pion and muon decay
+ * Equations 62 to 65 from Kelner et al 2006
+ * Input:
+ *       - Energy of electrons or neutrinos, where the flux should
+ *           be calculated in [erg]
+ *       - Energy of protons in [erg]
+ *   Output:
+ *       - Flux
+ ********************************************************************************/
+double Radiation::Felectron(double Ee_erg, double Ep_erg) 
+{
+
+  double Ee = Ee_erg*erg_to_TeV;    // Electron/neutrino energy in TeV
+  double Ep = Ep_erg*erg_to_TeV;
+
+
+  double x = Ee/Ep; 
+  //if (x<1.e-4) return 0.0; /// hack
+
+  if (Ep < 0.04) Ep = 0.04; // HACK!!!!!!!!
+
+  double L = log(Ep);
+  double L2 = L*L; 
+  double B = 1.0/(69.5 + 2.65*L + 0.3*L2);
+  double beta = 1.0/pow(0.201 + 0.062*L+0.00042*L2,0.25); 
+  double kappa = (0.279 + 0.141*L + 0.0172*L2)/(0.3 + pow(2.3 + L,2.0));
+  
+  double xb = pow(x,beta);
+
+  double p1 = B;
+  double p2 = pow(1+kappa*log(x)*log(x),3)/(x*(1 + 0.3/xb));
+  double p3 = pow(-log(x),5);
+  
+  return p1*p2*p3;
+}
+
+/********************************************************************************* 
+ * Function for muon neutrinos from pion decay
+ * Equations 66 to 69 from Kelner et al 2006
+ * Input:
+ *       - Energy of neutrinos, where the flux should
+ *           be calculated in [erg]
+ *       - Energy of protons in [erg]
+ *   Output:
+ *       - Flux
+ ********************************************************************************/
+double Radiation::Fnumu(double Enu_erg, double Ep_erg)
+{
+
+  double Ep = Ep_erg*erg_to_TeV;
+  double Enu = Enu_erg*erg_to_TeV;
+
+  double x = Enu/Ep;
+  double y = x/0.427;
+  if (x > 0.427) return 0.0;
+
+  double L = log(Ep);
+  double L2 = L * L; 
+  double B = 1.75 + 0.204 * L + 0.010 * L2;
+  double beta = 1.0/(1.67 + 0.111 * L + 0.0038*L2); 
+  double kappa = 1.07 - 0.086*L + 0.002*L2;
+
+  double yb = pow(y,beta);
+
+  double p1 = B*log(y)/y;
+  double p2 = pow((1-yb)/(1+kappa*yb*(1-yb)),4);
+  double p3 = (1/log(y)) 
+    - (4*beta*yb/(1-yb)) 
+    - 4*kappa*beta*yb*(1-2*yb)/(1+kappa*yb*(1-yb));
+  
+  return p1*p2*p3;
+} 
+
+/******** END of Neutrino calculations *******************************/
+
+
+
+
+
 
 /* ----         END OF RADIATION MODELS        ----  */
 
@@ -1662,6 +2404,7 @@ void Radiation::AddHadrons(vector<vector<double> > Spectrum, double Mass_number)
     
     HadronSpectra.push_back(tempVec);        // Save the spectrum
     HadronSpectraLookups.push_back(HadronLookup2);
+    gsl_spline_free(HadronLookup);  // free the not needed allocated space of HadronLookup
   }
   else {
   HadronSpectra.push_back(Spectrum);        // Save the spectrum
@@ -1670,7 +2413,6 @@ void Radiation::AddHadrons(vector<vector<double> > Spectrum, double Mass_number)
   
   return;
 }
-
 
 
 /**
@@ -1862,10 +2604,13 @@ void Radiation::ClearTargetPhotonField(int i) {
         fUtils->Clear2DVector(TargetPhotonVectorSumAll);
         TargetPhotonLookupSumAll = NULL;
         TargetPhotonEdensSumAll = 0.;
-        accall = NULL;
+        //accall = NULL;
         fUtils->Clear2DVector(ICLossVectorSumAll);
-        ICLossLookupSumAll = NULL;
-        ICLossLookupAccAll = NULL;
+        //ICLossLookupSumAll = NULL;
+        //ICLossLookupAccAll = NULL;
+        if (accall)            { gsl_interp_accel_free(accall);            accall = NULL; }
+        if (ICLossLookupSumAll){ gsl_spline_free(ICLossLookupSumAll);      ICLossLookupSumAll = NULL; }
+        if (ICLossLookupAccAll){ gsl_interp_accel_free(ICLossLookupAccAll); ICLossLookupAccAll = NULL; }
     }
     else if(i==-1) {
         if (VERBOSEMODE == true) {
@@ -1873,13 +2618,17 @@ void Radiation::ClearTargetPhotonField(int i) {
                  << endl;
         }
         fUtils->Clear2DVector(TargetPhotonVectorSumIso);
-        TargetPhotonLookupSumIso = NULL;
+        //TargetPhotonLookupSumIso = NULL;
         TargetPhotonEdensSumIso = 0.;
-        acciso = NULL;
+        //acciso = NULL;
 
         fUtils->Clear2DVector(ICLossVectorSumIso);
-        ICLossLookupSumIso = NULL;
-        ICLossLookupAccIso = NULL;
+        //ICLossLookupSumIso = NULL;
+        //ICLossLookupAccIso = NULL;
+        if (TargetPhotonLookupSumIso){ gsl_spline_free(TargetPhotonLookupSumIso);      TargetPhotonLookupSumIso = NULL; }
+        if (acciso)                  { gsl_interp_accel_free(acciso);                  acciso = NULL; }
+        if (ICLossLookupSumIso)      { gsl_spline_free(ICLossLookupSumIso);            ICLossLookupSumIso = NULL; }
+        if (ICLossLookupAccIso)      { gsl_interp_accel_free(ICLossLookupAccIso);      ICLossLookupAccIso = NULL; }
     }
     else {
             
@@ -2306,12 +3055,10 @@ void Radiation::SetTargetPhotonVectorLookup(vector< vector<double> > v, int i) {
             "via the Radiation::SetRadfieldMaxNumber() function. Exiting." <<endl;
              exit(1);
   }
-
   ClearTargetPhotonField(-2);
   int size = (int)v.size();
   gsl_spline **spl;
   gsl_interp_accel **accspl;
-  
   if(i>=0 && i<(int)RADFIELDS_MAX) {
     spl = &TargetPhotonLookups[i];
     accspl = &TargetPhotonAccs[i];
@@ -2335,7 +3082,6 @@ void Radiation::SetTargetPhotonVectorLookup(vector< vector<double> > v, int i) {
               " not valid. Exiting!" << endl;
       return;
   }
-
   double e[size];
   double n[size];
   double elin[size];
@@ -2441,6 +3187,7 @@ void Radiation::SetTargetPhotonAnisotropy(int i, vector<double> obs_angle,
     d_phi = phi[1]-phi[0];
     d_theta = theta[1]-theta[0];
 
+    
     // now set the target field anisotropy map
     vector< vector<double> > ani = fUtils->MeshgridToTwoDVector(phi,theta,mesh);
 
@@ -2556,6 +3303,7 @@ void Radiation::SetTargetPhotonAnisotropy(int i,
 
     return;
 }
+
 
 
 /**
@@ -2765,6 +3513,7 @@ void Radiation::CalculateDifferentialPhotonSpectrum(vector<double> points) {
         total_hadron_emission += hadronVal[j];
     }
 
+    
     diffSpec.push_back(vector<double>());
     diffSpec[diffSpec.size() - 1].push_back(E);
     diffSpec[diffSpec.size() - 1]
@@ -2781,6 +3530,8 @@ void Radiation::CalculateDifferentialPhotonSpectrum(vector<double> points) {
     for(int j=0; j < (int)hadronVal.size(); j++) {
         diffSpecHadronComponents[diffSpecHadronComponents.size() - 1].push_back(hadronVal[j]);
     }    
+
+    
     
     diffSpecICComponents.push_back(vector<double>());
     diffSpecICComponents[diffSpecICComponents.size() - 1].push_back(E);
@@ -2908,6 +3659,9 @@ vector<vector<double> > Radiation::GetICSED(unsigned int i, double emin, double 
     return ReturnSED(i+1, emin, emax, diffSpecICComponents);
   }
 
+  
+  
+  
 /**
  * Return pi0 decay spectrum from Hadron component \a i
  *
@@ -3025,6 +3779,62 @@ double Radiation::GetIntegratedFlux(int i, double emin, double emax, bool ENERGY
   fUtils->ToggleQuietMode();
   return val;
 }
+
+
+
+vector<vector<double> > Radiation::ReturnNeutrinoSpectrum(vector< vector<double> > vec){
+ int size = (int)vec.size();
+ if (size == 0){
+     cout << "Warning in Radiation::ReturnNeutrinoSpectrum: No neutrinos calculated. "
+            "Returning empty vector. Add missing protons or hadrons and/or fill it via "
+            "Radiation::CalculateNeutrinoSpectrum() first!" << endl;
+ }
+ return vec;    
+}
+
+vector<vector<double> > Radiation::ReturnNeutrinoSED(vector< vector<double> > vec){
+ int size = (int)vec.size();
+ vector<vector<double> > tempVec;
+ if (size == 0){
+     cout << "Warning in Radiation::ReturnNeutrinoSED: No neutrinos calculated. "
+            "Returning empty vector. Add missing protons or hadrons and/or fill it via "
+            "Radiation::CalculateNeutrinoSpectrum() first!" << endl;
+    return tempVec;
+ }
+ double E, E_TeV, flux, sed_value;
+ for ( int i = 0; i < size; i++ ){
+     E = vec[i][0];
+     flux = vec[i][1];
+     E_TeV = E*erg_to_TeV;
+     sed_value = flux*E*E;
+     fUtils->TwoDVectorPushBack(E_TeV, sed_value, tempVec);
+ }
+ return tempVec;
+}
+
+
+vector<vector<double> > Radiation::ReturnHadronNeutrinoSpectrum(int i, vector< vector< vector<double> > > vec){
+    vector<vector<double> > tempvec;
+ if (i >= (int)vec.size()){
+     cout << "In Radiation::ReturnHadronNeutrinoSpectrum: Index value is to high, returning empty vector. Please define more hadron species with the function Radiation::AddHadrons and/or fill it via Radiation::CalculateNeutrinoSpectrum() first!" << endl;
+     return tempvec;
+ }
+ tempvec = ReturnNeutrinoSpectrum(vec[i]);
+ return tempvec;
+}
+
+vector<vector<double> > Radiation::ReturnHadronNeutrinoSED(int i, vector< vector< vector<double> > > vec){
+    vector<vector<double> > tempvec;
+ if (i >= (int)vec.size()){
+     cout << "In Radiation::ReturnHadronNeutrinoSED: Index value is to high, returning empty vector. please define more hadron species with the function Radiation::AddHadrons." << endl;
+     return tempvec;
+ }
+ tempvec = ReturnNeutrinoSED(vec[i]);
+ return tempvec;
+}
+
+
+
 
 
 /**
@@ -3210,6 +4020,9 @@ vector< vector<double> > Radiation::GetTargetFieldSPatialDep(int i){
  * @param Eph2 = energy of the second photon (in ergs)
  *
  * @return the averaged gamma-gamma cross section [cm^2]
+ * !!!UNDER CONSTRUCTION!!!
+ * 
+ * To be consistent, the energy of the photons must be given in ergs
  * 
  */
 double Radiation::AverageSigmaGammaGamma(double Eph1, double Eph2) {
@@ -3502,3 +4315,282 @@ double Radiation::ReturnAbsorbedIntergratedFlux(double emin, double emax, bool E
     fUtils->ToggleQuietMode();
     return val;
 }
+
+/*
+ * Functions to directly retrieve the absorbed gamma ray spectrum and
+ * the absorbed gammaray SED
+ * using the above calculated optical depth
+ * It makes things easier when scripting
+ 
+vector <vector <double> > Radiation::RetAbsDiffSpectrum(double emin, double emax){
+	vector <vector<double> > gammaspec = Radiation::ReturnDifferentialPhotonSpectrum(1,emin,emax,diffSpecICComponents);
+    vector <vector<double> > TempVect;
+    for (unsigned int i=0;i<gammaspec.size();i++){
+        double tau = Radiation::ComputeOptDepth(gammaspec[i][0]);
+    	fUtils->TwoDVectorPushBack(gammaspec[i][0],gammaspec[i][1]*exp(-tau),TempVect);
+    }
+    return TempVect;
+}
+
+vector <vector <double> > Radiation::RetAbsSED(double emin, double emax){
+	vector <vector<double> > gammaspec = Radiation::ReturnSED(1,emin,emax,diffSpecICComponents);
+    vector <vector<double> > TempVect;
+    for (unsigned int i=0;i<gammaspec.size();i++){
+        double tau = Radiation::ComputeOptDepth(gammaspec[i][0]);
+    	fUtils->TwoDVectorPushBack(gammaspec[i][0],gammaspec[i][1]*exp(-tau),TempVect);
+    }
+    return TempVect;
+}
+*/
+
+
+
+
+
+/**
+ * Function to set the ambient medium composition to the one in the local galactic ISM
+ * composition. It uses the same relative abundances as in Kafexhiu et al. 2014
+ * 
+ * \param density: Density of hydrogen in 1/cm^3
+ * **/
+void Radiation::SetLocalAmbientMediumComposition(double density, string norm){
+    vector < double > mass_numbers = {1.0,4.0,12.0,14.0,16.0,20.0,24.0,28.0,32.0,56.0};
+    double normalisation;
+    vector < double > abundances = {1.0, 9.59e-2, 4.65e-4,8.3e-5, 8.3e-4,1.2e-4, 3.87e-5, 3.69e-5, 1.59e-5,3.25e-5};
+    if (norm == "Hydrogen" || norm == "hydrogen"){
+        //vector < double > abundances = {1.0*density, 9.59e-2*density, 4.65e-4*density,8.3e-5*density, 8.3e-4*density,1.2e-4*density, 3.87e-5*density, 3.69e-5*density, 1.59e-5*density,3.25e-5*density};
+        normalisation = 1.0;
+        //for(int i=0;i<abundances.size(); i++){
+        //    abundances[i] *= density;
+        //}
+    }
+    
+    else if (norm == "number density"){
+        normalisation = 0.0;
+        for(unsigned int i=0;i<abundances.size(); i++){
+            normalisation += abundances[i];
+        }
+    }
+    
+    else if (norm == "mass density"){
+        normalisation = 0.0;
+        for(unsigned int i=0;i<abundances.size(); i++){
+            normalisation += (abundances[i]*mass_numbers[i]);
+        }        
+    }
+    
+    else{
+     cout << "In function Radiation::SetLocalAmbientMediumComposition: ";
+     cout << "No valid input string for parameter 'norm'.\n";
+     cout << "Options are:  'hydrogen' (default)\n";
+     cout << "              'number density'\n";
+     cout << "              'mass density'\n";
+     cout << "Exiting without setting the ambient medium composition.\n";
+     return;
+    }
+    
+    double density_normed = density/normalisation;
+    for(unsigned int i=0;i<abundances.size(); i++){
+        abundances[i] *= density_normed;
+    }
+    
+    vector< vector <double> > zipped_vector = fUtils->ZipTwoOneDVectors(mass_numbers, abundances);
+    SetAmbientMediumComposition(zipped_vector);
+    
+    return;
+}
+
+
+
+
+
+/**
+ * Function to use the local cosmic ray model above 10 TeV by ... TODO: Add paper reference when it is published
+ * 
+ * \param extragalactic (optional): Boolean, if true use the extragalctic component,
+ *                                  if false not.
+ * **/
+void Radiation::AddLocalCosmicRayModel(bool extragalactic, double slope){
+    double N_H=1.0e-4, N_He=1.22e-4, N_C=2.45e-5, N_O=3.5e-5, N_Mg=0.87e-5, N_Si=1.2e-5, N_Fe=2.17e-5, alpha=2.65, ecut=3.0e6, alpha2=2.4, N_downscale=1.8e-2, ecut2 = 70.0e6, N_extragal = 2.5e-8, ecut_extragal = 0.45e11, alpha_extragal = 2.3;
+    
+    alpha = slope;
+    
+    double Ns[] = {N_H, N_He, N_C, N_O, N_Mg, N_Si, N_Fe};
+    double mass_numbers_CR[] = {1.0,4.0,12.0, 16.0, 24.0, 28.0, 56.0, 1.0};
+    double charges[] = {1.0,2.0,6.0,8.0,12.0,14.0,26.0};
+    double ecuts[] = {1.0*ecut,2.0*ecut,6.0*ecut,8.0*ecut,12.0*ecut,14.0*ecut,26.0*ecut};
+    
+    vector < double > e_values;
+    e_values.push_back(2.0);                    // These values are log10(E/GeV)
+    double difference = (11.5 - 2.0)/300.0;
+    for (int i = 0; i < 300; i++) {
+        e_values.push_back(e_values[i] + difference);
+    }
+    
+    
+    double conversion = 4.0*pi/1.0e4/c_speed;
+    
+    // Here, the Hadron species of the first galactic component are initialized
+    double N, mass, charge, ecut_value, e;
+    vector < vector<double> > tempvec;
+    for (int i = 0; i<7; i++) {
+        tempvec.clear();
+        N = Ns[i]; mass = mass_numbers_CR[i]; charge = charges[i]; ecut_value = ecuts[i];
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N*pow(e/1.0e3, -1.0*alpha) * exp(-e/ecut_value)/GeV_to_erg * conversion, tempvec);
+        }
+        
+        AddHadrons(tempvec, mass);
+    }
+    
+    
+    // Here, the Hadron species of the second galactic component are initialized
+    for (int i = 0; i<7; i++) {
+        tempvec.clear();
+        N = Ns[i]; mass = mass_numbers_CR[i]; charge = charges[i]; ecut_value = charge*ecut2;
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N*N_downscale*pow(e/1.0e3, -1.0*alpha2) * exp(-e/ecut_value)/GeV_to_erg*conversion, tempvec);
+        }
+        AddHadrons(tempvec, mass);
+    }
+    
+    
+    // If needed, add the extragalactic component. It is assumed, they are solely protons
+    if(extragalactic) {
+        tempvec.clear();
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N_extragal*pow(e/1.0e3, -1.0*alpha_extragal) * exp(-e/ecut_extragal)/GeV_to_erg * conversion, tempvec);
+        }
+        AddHadrons(tempvec, 1.0);
+    }
+    
+    return;
+}
+
+
+void Radiation::AddCRModel(bool extragalactic, bool CREAM){
+    
+    
+    double mass_numbers_CR[] = {1.0,4.0,12.0, 16.0, 24.0, 28.0, 56.0, 1.0};
+    double charges[] = {1.0,2.0,6.0,8.0,12.0,14.0,26.0};
+    
+    vector < double > e_values;
+    e_values.push_back(2.0);                    // These values are log10(E/GeV)
+    double difference = (11.5 - 2.0)/300.0;
+    for (int i = 0; i < 300; i++) {
+        e_values.push_back(e_values[i] + difference);
+    }
+    
+    double conversion = 4.0*pi/1.0e4/c_speed;
+    
+    double N, mass, charge, ecut_value, e;
+    vector < vector<double> > tempvec;
+    
+    double N0_H = 28.2, E1_H = 2.0e3, alpha1_H = 2.815, alpha2_H = 2.45, alpha3_H = 2.72, E2_H = 2.5e4, ecut_H = 9.0e6;
+    if( CREAM) { N0_H = 28.2; E1_H = 2.0e3; alpha1_H = 2.815; alpha2_H = 2.4; alpha3_H = 3.0; E2_H = 1.5e4; ecut_H = 9.0e6;}
+    
+    double N0_He = 16.0, E1_He = 4.0e3, alpha1_He = 2.71, alpha2_He = 2.32, alpha3_He = 2.66, E2_He = 4.0e4, ecut_He = 5.0e6;
+    if( CREAM ){ N0_He = 16.0; E1_He = 3.0e3; alpha1_He = 2.71; alpha2_He = 2.2; alpha3_He = 2.87; E2_He = 9.0e3; ecut_He = 5.0e6;}
+    
+    // Parameters only needed for H and He because of the double break spectrum:
+    double alpha3s[] = {alpha3_H, alpha3_He};
+    double E2s[] = {E2_H, E2_He};
+    
+    // Parameters used for all species:
+    double N0_C = 3.5, E1_C = 7.0e3, alpha1_C = 2.7, alpha2_C = 2.45, ecut_C = 3.0e6*3.0;
+    double N0_O = 6.0, E1_O = 7.0e3, alpha1_O = 2.7, alpha2_O = 2.5, ecut_O = 3.0e6*2.0;
+    double N0_Mg = 3.0, E1_Mg = 1.0e4, alpha1_Mg = 2.75, alpha2_Mg = 2.55, ecut_Mg = 3.0e6*14.0;
+    double N0_Si = 2.5, E1_Si = 1.0e4, alpha1_Si = 2.7, alpha2_Si = 2.5, ecut_Si = 3.0e6*13.0;
+    double N0_Fe = 10.0, E1_Fe = 1.0e4, alpha1_Fe = 2.8, alpha2_Fe = 2.55, ecut_Fe = 3.0e6*12.0;
+    
+    double N0s[] = {N0_H, N0_He, N0_C, N0_O, N0_Mg, N0_Si, N0_Fe};
+    double E1s[] = {E1_H, E1_He, E1_C, E1_O, E1_Mg, E1_Si, E1_Fe};
+    double alpha1s[] = {alpha1_H, alpha1_He, alpha1_C, alpha1_O, alpha1_Mg, alpha1_Si, alpha1_Fe};
+    double alpha2s[] = {alpha2_H, alpha2_He, alpha2_C, alpha2_O, alpha2_Mg, alpha2_Si, alpha2_Fe};
+    double ecuts[] = {ecut_H, ecut_He, ecut_C, ecut_O, ecut_Mg, ecut_Si, ecut_Fe};
+    
+    
+    //******************************************************************
+    // First component for H and He
+    double E0 = 10.0, w = 0.5;
+    double alpha1, alpha2, alpha3, E1, E2;
+    
+    
+        for (int i = 0; i<2; i++) {
+        tempvec.clear();
+        N = N0s[i]; mass = mass_numbers_CR[i]; charge = charges[i]; ecut_value = ecuts[i]; alpha1 = alpha1s[i]; alpha2 = alpha2s[i]; E1 = E1s[i];
+        alpha3 = alpha3s[i]; E2 = E2s[i];
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N * pow((e/E0), -alpha1) * pow((1.0 + (e*e/(E1*E1))), (-(alpha2-alpha1)*w)) * pow((1.0 + (e*e/(E2*E2))),(-(alpha3-alpha2)*w)) * exp(-e/ecut_value)/GeV_to_erg*conversion, tempvec);
+        }
+        AddHadrons(tempvec, mass);
+    }
+    
+    
+    
+    //*********************************************************
+    // First component for Carbon until Iron
+    
+    
+    
+    for (int i = 2; i<7; i++) {
+        tempvec.clear();
+        N = N0s[i]; mass = mass_numbers_CR[i]; charge = charges[i]; ecut_value = ecuts[i]; alpha1 = alpha1s[i]; alpha2 = alpha2s[i]; E1 = E1s[i];
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N*pow(e/E0, -1.0*alpha1) *  pow( 1. + (e*e/(E1*E1)), -1.*(alpha2-alpha1)*w) * exp(-e/ecut_value)/GeV_to_erg*conversion, tempvec);
+        }
+        AddHadrons(tempvec, mass);
+    }
+    
+    
+    
+    
+    //**********************************************************
+    // Adding the second galactic component for each species:
+    
+    double alpha_H2 = 2.5, alpha_He2 = 2.5, alpha_C2 = 2.45, alpha_O2 = 2.45, alpha_Mg2 = 2.45, alpha_Si2 = 2.45, alpha_Fe2 = 2.4;
+    double N_H2 = 6.0e-6, N_He2 = 4.0e-6, N_C2 = 6.0e-7, N_O2 = 6.0e-7, N_Mg2 = 5.0e-7, N_Si2 = 3.0e-7, N_Fe2 = 8.0e-7;
+    double ecut_H2 = 70.0e6, ecut_He2 = 70.0e6*2.0, ecut_C2 = 70.0e6*6.0, ecut_O2 = 70.0e6*8.0, ecut_Mg2 = 70.0e6*12.0, ecut_Si2 = 70.0e6*14.0, ecut_Fe2 = 70.0e6*12.0;
+    
+    double alphas2[] = {alpha_H2, alpha_He2, alpha_C2, alpha_O2, alpha_Mg2, alpha_Si2, alpha_Fe2};
+    double Ns2[] = {N_H2, N_He2, N_C2, N_O2, N_Mg2, N_Si2, N_Fe2};
+    double ecuts2[] = {ecut_H2, ecut_He2, ecut_C2, ecut_O2, ecut_Mg2, ecut_Si2, ecut_Fe2};
+    
+    // Here, the Hadron species of the second galactic component are initialized
+    for (int i = 0; i<7; i++) {
+        tempvec.clear();
+        N = Ns2[i]; mass = mass_numbers_CR[i]; charge = charges[i]; ecut_value = ecuts2[i];
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N*pow(e/1.0e3, -1.0*alphas2[i]) * exp(-e/ecut_value)/GeV_to_erg*conversion, tempvec);
+        }
+        AddHadrons(tempvec, mass);
+    }
+    
+    
+    
+    
+        
+    // If needed, add the extragalactic component. It is assumed, they are solely protons
+    double N_extragal = 1.4e-7, alpha_extragal = 2.4, ecut_extragal = 0.45e11;
+    if(extragalactic) {
+        tempvec.clear();
+        for (int j = 0; j< (int) e_values.size(); j++){
+            e = pow(10.0,e_values[j]);
+            fUtils->TwoDVectorPushBack(e*GeV_to_erg, N_extragal*pow(e/1.0e3, -1.0*alpha_extragal) * exp(-e/ecut_extragal)/GeV_to_erg * conversion, tempvec);
+        }
+        AddHadrons(tempvec, 1.0);
+    }
+    
+    
+    
+    return;
+}
+
+
+
