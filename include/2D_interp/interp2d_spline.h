@@ -42,7 +42,8 @@
 #define __INTERP_2D_SPLINE_H__
 
 #include <gsl/gsl_interp.h>
-#include "interp2d.h"
+#include "2D_interp/interp2d.h"
+//#include "interp2d.h"
 
 #ifdef __cplusplus
 extern "C" {
